@@ -6,6 +6,13 @@ import { headers } from 'next/headers'
 export const maxDuration = 60 // This function can run for a maximum of 60 seconds
 
 export async function POST(): Promise<Response> {
+  const isProd = process.env.NODE_ENV === 'production'
+  const allowSeedInProd = process.env.ALLOW_SEED_IN_PROD === 'true'
+
+  if (isProd && !allowSeedInProd) {
+    return new Response('Not found.', { status: 404 })
+  }
+
   const payload = await getPayload({ config })
   const requestHeaders = await headers()
 

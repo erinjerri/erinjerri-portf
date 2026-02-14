@@ -552,7 +552,17 @@ export interface ContentBlock {
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
-  media: string | Media;
+  /**
+   * Choose which kind of media to insert into this block.
+   */
+  mediaType: 'image' | 'video' | 'audio';
+  image?: (string | null) | Media;
+  video?: (string | null) | Media;
+  audio?: (string | null) | Media;
+  /**
+   * Legacy field for existing content. Use Image/Video/Audio above for new content.
+   */
+  media?: (string | null) | Media;
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
@@ -1170,6 +1180,10 @@ export interface ContentBlockSelect<T extends boolean = true> {
  * via the `definition` "MediaBlock_select".
  */
 export interface MediaBlockSelect<T extends boolean = true> {
+  mediaType?: T;
+  image?: T;
+  video?: T;
+  audio?: T;
   media?: T;
   id?: T;
   blockName?: T;
