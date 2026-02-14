@@ -38,6 +38,20 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
 const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) => ({
   ...defaultConverters,
   ...LinkJSXConverter({ internalDocToHref }),
+  paragraph: ({ node, nodesToJSX }) => {
+    // Use <div> instead of <p> to avoid hydration errors when block elements
+    // (headings, other divs) are nested inside paragraph nodes from Lexical
+    const children = nodesToJSX({ nodes: node.children })
+    const style: React.CSSProperties = {}
+    if (node.format === 'center') style.textAlign = 'center'
+    if (node.format === 'right') style.textAlign = 'right'
+    if (node.format === 'left') style.textAlign = 'left'
+    if (node.indent) style.paddingInlineStart = `${node.indent * 2}rem`
+
+    return (
+      <div style={Object.keys(style).length > 0 ? style : undefined}>{children}</div>
+    )
+  },
   blocks: {
     banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,
     mediaBlock: ({ node }) => (
