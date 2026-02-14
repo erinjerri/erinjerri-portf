@@ -4,6 +4,7 @@ declare global {
       PAYLOAD_SECRET: string
       DATABASE_URL: string
       NEXT_PUBLIC_SERVER_URL: string
+      CF_PAGES_URL?: string
       ALLOW_SEED_IN_PROD?: 'true' | 'false'
       VERCEL_PROJECT_PRODUCTION_URL: string
     }

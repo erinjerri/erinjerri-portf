@@ -6,6 +6,7 @@ const serverURLs = Array.from(
   new Set(
     [
       process.env.NEXT_PUBLIC_SERVER_URL,
+      process.env.CF_PAGES_URL ? `https://${process.env.CF_PAGES_URL}` : undefined,
       process.env.VERCEL_PROJECT_PRODUCTION_URL
         ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
         : undefined,

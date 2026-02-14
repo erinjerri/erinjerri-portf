@@ -557,7 +557,22 @@ export interface MediaBlock {
    */
   mediaType: 'image' | 'video' | 'audio';
   image?: (string | null) | Media;
+  /**
+   * Choose an existing video asset or create a new one once.
+   */
   video?: (string | null) | Media;
+  /**
+   * Pick a local video asset or paste a video URL.
+   */
+  videoSource?: ('upload' | 'url') | null;
+  /**
+   * Supports YouTube links and direct .mp4/.webm URLs.
+   */
+  videoUrl?: string | null;
+  /**
+   * Optional poster image for video.
+   */
+  thumbnail?: (string | null) | Media;
   audio?: (string | null) | Media;
   /**
    * Legacy field for existing content. Use Image/Video/Audio above for new content.
@@ -1183,6 +1198,9 @@ export interface MediaBlockSelect<T extends boolean = true> {
   mediaType?: T;
   image?: T;
   video?: T;
+  videoSource?: T;
+  videoUrl?: T;
+  thumbnail?: T;
   audio?: T;
   media?: T;
   id?: T;
