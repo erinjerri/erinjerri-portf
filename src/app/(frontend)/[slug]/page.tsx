@@ -10,6 +10,7 @@ import { homeStatic } from '@/endpoints/seed/home-static'
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
+import { Media as MediaComponent } from '@/components/Media'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -64,7 +65,10 @@ export default async function Page({ params: paramsPromise }: Args) {
     return <PayloadRedirects url={url} />
   }
 
-  const { hero, layout } = page
+  const { hero, layout, videoAsset } = page
+  const selectedVideo = typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video')
+    ? videoAsset
+    : null
 
   return (
     <article className="pt-16 pb-24">
@@ -75,6 +79,11 @@ export default async function Page({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <RenderHero {...hero} />
+      {selectedVideo && (
+        <div className="container mt-8">
+          <MediaComponent resource={selectedVideo} />
+        </div>
+      )}
       <RenderBlocks blocks={layout} />
     </article>
   )

@@ -117,6 +117,20 @@ export const Pages: CollectionConfig<'pages'> = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'videoAsset',
+      type: 'relationship',
+      relationTo: 'media',
+      filterOptions: {
+        mediaType: {
+          equals: 'video',
+        },
+      },
+      admin: {
+        position: 'sidebar',
+        description: 'Dropdown select for uploaded video assets from Media.',
+      },
+    },
     slugField(),
   ],
   hooks: {

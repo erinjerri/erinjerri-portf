@@ -211,6 +211,10 @@ export interface Page {
   };
   publishedAt?: string | null;
   /**
+   * Dropdown select for uploaded video assets from Media.
+   */
+  videoAsset?: (string | null) | Media;
+  /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
@@ -254,6 +258,10 @@ export interface Post {
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
+  /**
+   * Dropdown select for uploaded video assets from Media.
+   */
+  videoAsset?: (string | null) | Media;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -275,6 +283,10 @@ export interface Post {
  */
 export interface Media {
   id: string;
+  /**
+   * Auto-detected from uploaded file MIME type.
+   */
+  mediaType: 'image' | 'video' | 'audio';
   alt?: string | null;
   caption?: {
     root: {
@@ -1096,6 +1108,7 @@ export interface PagesSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  videoAsset?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -1205,6 +1218,7 @@ export interface PostsSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   authors?: T;
+  videoAsset?: T;
   populatedAuthors?:
     | T
     | {
@@ -1222,6 +1236,7 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  mediaType?: T;
   alt?: T;
   caption?: T;
   folder?: T;

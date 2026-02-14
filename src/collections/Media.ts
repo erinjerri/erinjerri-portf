@@ -14,9 +14,20 @@ import { authenticated } from '../access/authenticated'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const getMediaTypeFromMimeType = (mimeType?: string | null): 'audio' | 'image' | 'video' | null => {
+  if (!mimeType) return null
+  if (mimeType.startsWith('image/')) return 'image'
+  if (mimeType.startsWith('video/')) return 'video'
+  if (mimeType.startsWith('audio/')) return 'audio'
+  return null
+}
+
 export const Media: CollectionConfig = {
   slug: 'media',
   folders: true,
+  admin: {
+    defaultColumns: ['filename', 'mediaType', 'updatedAt'],
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -24,6 +35,22 @@ export const Media: CollectionConfig = {
     update: authenticated,
   },
   fields: [
+    {
+      name: 'mediaType',
+      type: 'select',
+      required: true,
+      index: true,
+      options: [
+        { label: 'Image', value: 'image' },
+        { label: 'Video', value: 'video' },
+        { label: 'Audio', value: 'audio' },
+      ],
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        description: 'Auto-detected from uploaded file MIME type.',
+      },
+    },
     {
       name: 'alt',
       type: 'text',
@@ -39,11 +66,32 @@ export const Media: CollectionConfig = {
       }),
     },
   ],
+  hooks: {
+    beforeValidate: [
+      ({ data, originalDoc }) => {
+        const mimeType =
+          (typeof data?.mimeType === 'string' ? data.mimeType : null) ??
+          (typeof originalDoc?.mimeType === 'string' ? originalDoc.mimeType : null)
+
+        const mediaType = getMediaTypeFromMimeType(mimeType)
+
+        if (mediaType) {
+          return {
+            ...data,
+            mediaType,
+          }
+        }
+
+        return data
+      },
+    ],
+  },
   upload: {
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
     staticDir: path.resolve(dirname, '../../public/media'),
     adminThumbnail: 'thumbnail',
     focalPoint: true,
+    mimeTypes: ['image/*', 'video/*', 'audio/*'],
     imageSizes: [
       {
         name: 'thumbnail',

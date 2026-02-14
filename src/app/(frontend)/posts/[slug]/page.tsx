@@ -10,6 +10,7 @@ import RichText from '@/components/RichText'
 
 import type { Post } from '@/payload-types'
 
+import { Media as MediaComponent } from '@/components/Media'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
@@ -48,6 +49,10 @@ export default async function Post({ params: paramsPromise }: Args) {
   const decodedSlug = decodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
   const post = await queryPostBySlug({ slug: decodedSlug })
+  const selectedVideo =
+    typeof post?.videoAsset === 'object' && post.videoAsset?.mimeType?.includes('video')
+      ? post.videoAsset
+      : null
 
   if (!post) return <PayloadRedirects url={url} />
 
@@ -61,6 +66,11 @@ export default async function Post({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <PostHero post={post} />
+      {selectedVideo && (
+        <div className="container mt-8">
+          <MediaComponent resource={selectedVideo} />
+        </div>
+      )}
 
       <div className="flex flex-col items-center gap-4 pt-8">
         <div className="container">
