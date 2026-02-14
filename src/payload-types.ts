@@ -284,7 +284,7 @@ export interface Post {
 export interface Media {
   id: string;
   /**
-   * Auto-detected from uploaded file MIME type.
+   * Auto-detected from uploaded file MIME type when possible, but you can set it manually.
    */
   mediaType: 'image' | 'video' | 'audio';
   alt?: string | null;

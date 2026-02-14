@@ -46,9 +46,9 @@ export const Media: CollectionConfig = {
         { label: 'Audio', value: 'audio' },
       ],
       admin: {
-        readOnly: true,
         position: 'sidebar',
-        description: 'Auto-detected from uploaded file MIME type.',
+        description:
+          'Auto-detected from uploaded file MIME type when possible, but you can set it manually.',
       },
     },
     {

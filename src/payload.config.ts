@@ -24,9 +24,10 @@ export default buildConfig({
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
       beforeLogin: ['@/components/BeforeLogin'],
-      // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
-      beforeDashboard: ['@/components/BeforeDashboard'],
+      graphics: {
+        Icon: '@/components/AdminGraphics/Icon',
+        Logo: '@/components/AdminGraphics/Logo',
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname),
@@ -86,5 +87,27 @@ export default buildConfig({
       },
     },
     tasks: [],
+  },
+  onInit: async (payload) => {
+    const dbURL = process.env.DATABASE_URL
+
+    if (!dbURL) {
+      payload.logger.warn('Startup DB target: DATABASE_URL is not set.')
+      return
+    }
+
+    try {
+      const parsedURL = new URL(dbURL)
+      const dbName = parsedURL.pathname.replace(/^\/+/, '') || '(default)'
+
+      payload.logger.info({
+        msg: 'Startup DB target',
+        protocol: parsedURL.protocol.replace(':', ''),
+        host: parsedURL.hostname,
+        db: dbName,
+      })
+    } catch {
+      payload.logger.warn('Startup DB target: failed to parse DATABASE_URL.')
+    }
   },
 })
