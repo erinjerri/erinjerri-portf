@@ -15,6 +15,7 @@ import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { ReadingProgress } from '@/components/ReadingProgress'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -58,6 +59,7 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   return (
     <article className="pt-16 pb-16">
+      <ReadingProgress />
       <PageClient />
 
       {/* Allows redirects for valid pages too */}

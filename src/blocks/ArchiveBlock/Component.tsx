@@ -30,6 +30,7 @@ export const ArchiveBlock: React.FC<
       collection: 'posts',
       depth: 1,
       limit,
+      sort: '-publishedAt',
       ...(flattenedCategories && flattenedCategories.length > 0
         ? {
             where: {
@@ -51,6 +52,13 @@ export const ArchiveBlock: React.FC<
       posts = filteredSelectedPosts
     }
   }
+
+  // Always sort posts by publishedAt descending (newest first / far left)
+  posts.sort((a, b) => {
+    const dateA = a?.publishedAt ? new Date(a.publishedAt).getTime() : 0
+    const dateB = b?.publishedAt ? new Date(b.publishedAt).getTime() : 0
+    return dateB - dateA
+  })
 
   return (
     <div className="my-16" id={`block-${id}`}>

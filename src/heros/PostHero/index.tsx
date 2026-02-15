@@ -5,11 +5,13 @@ import type { Post } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { formatAuthors } from '@/utilities/formatAuthors'
+import { getReadingTime } from '@/utilities/readingTime'
 
 export const PostHero: React.FC<{
   post: Post
 }> = ({ post }) => {
-  const { categories, heroImage, populatedAuthors, publishedAt, title } = post
+  const { categories, content, heroImage, populatedAuthors, publishedAt, title } = post
+  const readingTime = getReadingTime(content as Parameters<typeof getReadingTime>[0])
 
   const hasAuthors =
     populatedAuthors && populatedAuthors.length > 0 && formatAuthors(populatedAuthors) !== ''
@@ -57,6 +59,12 @@ export const PostHero: React.FC<{
                 <p className="text-sm">Date Published</p>
 
                 <time dateTime={publishedAt}>{formatDateTime(publishedAt)}</time>
+              </div>
+            )}
+            {readingTime.words > 0 && (
+              <div className="flex flex-col gap-1">
+                <p className="text-sm">Reading Time</p>
+                <p>{readingTime.text}</p>
               </div>
             )}
           </div>

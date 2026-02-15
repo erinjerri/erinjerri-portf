@@ -48,7 +48,7 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'publishedAt', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -172,8 +172,13 @@ export const Posts: CollectionConfig<'posts'> = {
       },
       hooks: {
         beforeChange: [
-          ({ siblingData, value }) => {
-            if (siblingData._status === 'published' && !value) {
+          ({ siblingData, value, originalDoc }) => {
+            // If user explicitly set a date, always preserve it
+            if (value) return value
+            // If there's already a date from a previous save, keep it
+            if (originalDoc?.publishedAt) return originalDoc.publishedAt
+            // Only auto-set when first publishing with no date at all
+            if (siblingData._status === 'published') {
               return new Date()
             }
             return value

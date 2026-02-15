@@ -1,6 +1,6 @@
 import type { Metadata } from 'next/types'
 
-import { CollectionArchive } from '@/components/CollectionArchive'
+import { CategoryFilter } from '@/components/CategoryFilter'
 import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
@@ -8,24 +8,38 @@ import { getPayload } from 'payload'
 import React from 'react'
 import PageClient from './page.client'
 
-export const dynamic = 'force-static'
-export const revalidate = 600
+export const dynamic = 'force-dynamic'
 
 export default async function Page() {
   const payload = await getPayload({ config: configPromise })
 
-  const posts = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit: 12,
-    overrideAccess: false,
-    select: {
-      title: true,
-      slug: true,
-      categories: true,
-      meta: true,
-    },
-  })
+  const [posts, categoriesResult] = await Promise.all([
+    payload.find({
+      collection: 'posts',
+      depth: 1,
+      limit: 12,
+      overrideAccess: false,
+      sort: '-publishedAt',
+      select: {
+        title: true,
+        slug: true,
+        categories: true,
+        meta: true,
+      },
+    }),
+    payload.find({
+      collection: 'categories',
+      limit: 100,
+      overrideAccess: false,
+      sort: 'title',
+    }),
+  ])
+
+  const categories = categoriesResult.docs.map((cat) => ({
+    id: cat.id,
+    title: cat.title,
+    slug: cat.slug ?? null,
+  }))
 
   return (
     <div className="pt-24 pb-24">
@@ -45,7 +59,7 @@ export default async function Page() {
         />
       </div>
 
-      <CollectionArchive posts={posts.docs} />
+      <CategoryFilter categories={categories} posts={posts.docs} />
 
       <div className="container">
         {posts.totalPages > 1 && posts.page && (
