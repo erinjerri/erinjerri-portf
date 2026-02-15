@@ -13,9 +13,9 @@ export const dynamic = 'force-dynamic'
 export default async function Page() {
   const payload = await getPayload({ config: configPromise })
 
-  const [posts, categoriesResult] = await Promise.all([
+  const [projects, categoriesResult] = await Promise.all([
     payload.find({
-      collection: 'posts',
+      collection: 'projects',
       depth: 1,
       limit: 12,
       overrideAccess: false,
@@ -46,24 +46,24 @@ export default async function Page() {
       <PageClient />
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none">
-          <h1>Posts</h1>
+          <h1>Projects</h1>
         </div>
       </div>
 
       <div className="container mb-8">
         <PageRange
-          collection="posts"
-          currentPage={posts.page}
+          collection="projects"
+          currentPage={projects.page}
           limit={12}
-          totalDocs={posts.totalDocs}
+          totalDocs={projects.totalDocs}
         />
       </div>
 
-      <CategoryFilter categories={categories} docs={posts.docs} relationTo="posts" />
+      <CategoryFilter categories={categories} docs={projects.docs} relationTo="projects" />
 
       <div className="container">
-        {posts.totalPages > 1 && posts.page && (
-          <Pagination page={posts.page} totalPages={posts.totalPages} />
+        {projects.totalPages > 1 && projects.page && (
+          <Pagination page={projects.page} routePrefix="/projects/page" totalPages={projects.totalPages} />
         )}
       </div>
     </div>
@@ -72,6 +72,6 @@ export default async function Page() {
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Payload Website Template Posts`,
+    title: `Payload Website Template Projects`,
   }
 }

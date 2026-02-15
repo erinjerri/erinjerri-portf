@@ -1,14 +1,14 @@
 import { formatDateTime } from 'src/utilities/formatDateTime'
 import React from 'react'
 
-import type { Post } from '@/payload-types'
+import type { Post, Project } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { getReadingTime } from '@/utilities/readingTime'
 
 export const PostHero: React.FC<{
-  post: Post
+  post: Post | Project
 }> = ({ post }) => {
   const { categories, content, heroImage, populatedAuthors, publishedAt, title } = post
   const readingTime = getReadingTime(content as Parameters<typeof getReadingTime>[0])

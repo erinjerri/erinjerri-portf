@@ -1,4 +1,4 @@
-import type { Post, ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
+import type { ArchiveBlock as ArchiveBlockProps, Post, Project } from '@/payload-types'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -6,17 +6,20 @@ import React from 'react'
 import RichText from '@/components/RichText'
 
 import { CollectionArchive } from '@/components/CollectionArchive'
+import type { CardRelationTo } from '@/components/Card'
 
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string
   }
 > = async (props) => {
-  const { id, categories, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
+  const { categories, id, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
 
   const limit = limitFromProps || 3
 
-  let posts: Post[] = []
+  const relationTo = (props.relationTo || 'posts') as CardRelationTo
+
+  let docs: (Post | Project)[] = []
 
   if (populateBy === 'collection') {
     const payload = await getPayload({ config: configPromise })
@@ -26,8 +29,8 @@ export const ArchiveBlock: React.FC<
       else return category
     })
 
-    const fetchedPosts = await payload.find({
-      collection: 'posts',
+    const fetchedDocs = await payload.find({
+      collection: relationTo,
       depth: 1,
       limit,
       sort: '-publishedAt',
@@ -42,19 +45,19 @@ export const ArchiveBlock: React.FC<
         : {}),
     })
 
-    posts = fetchedPosts.docs
+    docs = fetchedDocs.docs as (Post | Project)[]
   } else {
     if (selectedDocs?.length) {
-      const filteredSelectedPosts = selectedDocs.map((post) => {
-        if (typeof post.value === 'object') return post.value
-      }) as Post[]
+      const filteredSelectedDocs = selectedDocs.map((doc) => {
+        if (typeof doc.value === 'object') return doc.value
+      }) as (Post | Project)[]
 
-      posts = filteredSelectedPosts
+      docs = filteredSelectedDocs
     }
   }
 
-  // Always sort posts by publishedAt descending (newest first / far left)
-  posts.sort((a, b) => {
+  // Always sort docs by publishedAt descending (newest first / far left)
+  docs.sort((a, b) => {
     const dateA = a?.publishedAt ? new Date(a.publishedAt).getTime() : 0
     const dateB = b?.publishedAt ? new Date(b.publishedAt).getTime() : 0
     return dateB - dateA
@@ -67,7 +70,7 @@ export const ArchiveBlock: React.FC<
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive posts={posts} />
+      <CollectionArchive docs={docs} relationTo={relationTo} />
     </div>
   )
 }

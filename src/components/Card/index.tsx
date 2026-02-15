@@ -4,22 +4,39 @@ import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React, { Fragment } from 'react'
 
-import type { Post } from '@/payload-types'
+import type { Media as MediaType } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 
-export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title'>
+type CardCategory = {
+  id: number | string
+  title?: string | null
+}
+
+type CardMeta = {
+  description?: string | null
+  image?: number | string | MediaType | null
+}
+
+export type CardDocData = {
+  categories?: (number | string | CardCategory | null)[] | null
+  meta?: CardMeta | null
+  slug?: string | null
+  title?: string | null
+}
+
+export type CardRelationTo = 'posts' | 'projects'
 
 export const Card: React.FC<{
   alignItems?: 'center'
   className?: string
-  doc?: CardPostData
-  relationTo?: 'posts'
+  doc?: CardDocData
+  relationTo?: CardRelationTo
   showCategories?: boolean
   title?: string
 }> = (props) => {
   const { card, link } = useClickableCard({})
-  const { className, doc, relationTo, showCategories, title: titleFromProps } = props
+  const { className, doc, relationTo = 'posts', showCategories, title: titleFromProps } = props
 
   const { slug, categories, meta, title } = doc || {}
   const { description, image: metaImage } = meta || {}
@@ -47,7 +64,7 @@ export const Card: React.FC<{
             {showCategories && hasCategories && (
               <div>
                 {categories?.map((category, index) => {
-                  if (typeof category === 'object') {
+                  if (category && typeof category === 'object') {
                     const { title: titleFromCategory } = category
 
                     const categoryTitle = titleFromCategory || 'Untitled category'

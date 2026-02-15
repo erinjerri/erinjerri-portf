@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { cn } from '@/utilities/ui'
-import { Card, CardPostData } from '@/components/Card'
+import { Card, CardDocData, CardRelationTo } from '@/components/Card'
 
 type Category = {
   id: string
@@ -12,16 +12,17 @@ type Category = {
 
 type Props = {
   categories: Category[]
-  posts: CardPostData[]
+  docs: CardDocData[]
+  relationTo?: CardRelationTo
 }
 
-export const CategoryFilter: React.FC<Props> = ({ categories, posts }) => {
+export const CategoryFilter: React.FC<Props> = ({ categories, docs, relationTo = 'posts' }) => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
 
-  const filteredPosts =
+  const filteredDocs =
     activeCategory === null
-      ? posts
-      : posts.filter((post) => {
+      ? docs
+      : docs.filter((post) => {
           if (!post.categories || !Array.isArray(post.categories)) return false
           return post.categories.some((cat) => {
             if (typeof cat === 'object' && cat !== null) {
@@ -67,12 +68,12 @@ export const CategoryFilter: React.FC<Props> = ({ categories, posts }) => {
 
       <div className="container">
         <div className="grid grid-cols-4 sm:grid-cols-8 lg:grid-cols-12 gap-y-4 gap-x-4 lg:gap-y-8 lg:gap-x-8 xl:gap-x-8">
-          {filteredPosts.length > 0 ? (
-            filteredPosts.map((post, index) => {
+          {filteredDocs.length > 0 ? (
+            filteredDocs.map((post, index) => {
               if (typeof post === 'object' && post !== null) {
                 return (
                   <div className="col-span-4" key={index}>
-                    <Card className="h-full" doc={post} relationTo="posts" showCategories />
+                    <Card className="h-full" doc={post} relationTo={relationTo} showCategories />
                   </div>
                 )
               }
@@ -80,7 +81,7 @@ export const CategoryFilter: React.FC<Props> = ({ categories, posts }) => {
             })
           ) : (
             <div className="col-span-full text-center py-12 text-muted-foreground">
-              No posts found for this category.
+              No items found for this category.
             </div>
           )}
         </div>
