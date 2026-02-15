@@ -49,7 +49,7 @@ export const MediaBlock: Block = {
       },
       validate: (value: unknown, { siblingData }: { siblingData?: MediaBlockSiblingData }) => {
         if (siblingData?.mediaType !== 'image') return true
-        return Boolean(value) || 'Please select an image.'
+        return Boolean(value || siblingData?.media) || 'Please select an image.'
       },
     },
     {
@@ -146,7 +146,7 @@ export const MediaBlock: Block = {
       },
       validate: (value: unknown, { siblingData }: { siblingData?: MediaBlockSiblingData }) => {
         if (siblingData?.mediaType !== 'audio') return true
-        return Boolean(value) || 'Please select an audio file.'
+        return Boolean(value || siblingData?.media) || 'Please select an audio file.'
       },
     },
     {
