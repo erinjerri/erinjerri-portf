@@ -70,6 +70,7 @@ export interface Config {
     pages: Page;
     posts: Post;
     projects: Project;
+    watch: Watch;
     media: Media;
     categories: Category;
     users: User;
@@ -93,6 +94,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    watch: WatchSelect<false> | WatchSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -605,7 +607,7 @@ export interface ArchiveBlock {
     [k: string]: unknown;
   } | null;
   populateBy?: ('collection' | 'selection') | null;
-  relationTo?: ('posts' | 'projects') | null;
+  relationTo?: ('posts' | 'projects' | 'watch') | null;
   categories?: (string | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
@@ -617,6 +619,10 @@ export interface ArchiveBlock {
         | {
             relationTo: 'projects';
             value: string | Project;
+          }
+        | {
+            relationTo: 'watch';
+            value: string | Watch;
           }
       )[]
     | null;
@@ -648,6 +654,60 @@ export interface Project {
     [k: string]: unknown;
   };
   relatedProjects?: (string | Project)[] | null;
+  categories?: (string | Category)[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (string | User)[] | null;
+  /**
+   * Dropdown select for uploaded video assets from Media.
+   */
+  videoAsset?: (string | null) | Media;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "watch".
+ */
+export interface Watch {
+  id: string;
+  title: string;
+  heroImage?: (string | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  relatedWatch?: (string | Watch)[] | null;
   categories?: (string | Category)[] | null;
   meta?: {
     title?: string | null;
@@ -902,6 +962,10 @@ export interface Redirect {
       | ({
           relationTo: 'projects';
           value: string | Project;
+        } | null)
+      | ({
+          relationTo: 'watch';
+          value: string | Watch;
         } | null);
     url?: string | null;
   };
@@ -1083,6 +1147,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: string | Project;
+      } | null)
+    | ({
+        relationTo: 'watch';
+        value: string | Watch;
       } | null)
     | ({
         relationTo: 'media';
@@ -1342,6 +1410,38 @@ export interface ProjectsSelect<T extends boolean = true> {
   heroImage?: T;
   content?: T;
   relatedProjects?: T;
+  categories?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  publishedAt?: T;
+  authors?: T;
+  videoAsset?: T;
+  populatedAuthors?:
+    | T
+    | {
+        id?: T;
+        name?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "watch_select".
+ */
+export interface WatchSelect<T extends boolean = true> {
+  title?: T;
+  heroImage?: T;
+  content?: T;
+  relatedWatch?: T;
   categories?: T;
   meta?:
     | T
@@ -1902,6 +2002,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'projects';
           value: string | Project;
+        } | null)
+      | ({
+          relationTo: 'watch';
+          value: string | Watch;
         } | null);
     global?: string | null;
     user?: (string | null) | User;

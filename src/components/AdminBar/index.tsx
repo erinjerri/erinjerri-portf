@@ -27,6 +27,10 @@ const collectionLabels = {
     plural: 'Projects',
     singular: 'Project',
   },
+  watch: {
+    plural: 'Videos',
+    singular: 'Video',
+  },
 }
 
 const Title: React.FC = () => <span>Dashboard</span>

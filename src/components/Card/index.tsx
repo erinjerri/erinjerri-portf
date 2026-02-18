@@ -25,7 +25,7 @@ export type CardDocData = {
   title?: string | null
 }
 
-export type CardRelationTo = 'posts' | 'projects'
+export type CardRelationTo = 'posts' | 'projects' | 'watch'
 
 export const Card: React.FC<{
   alignItems?: 'center'

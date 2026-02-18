@@ -26,6 +26,10 @@ const generateURL: GenerateURL<Post | Page | Project> = ({ doc }) => {
     return `${url}/projects/${doc.slug}`
   }
 
+  if ('relatedWatch' in doc) {
+    return `${url}/watch/${doc.slug}`
+  }
+
   if ('relatedPosts' in doc) {
     return `${url}/posts/${doc.slug}`
   }
@@ -35,7 +39,7 @@ const generateURL: GenerateURL<Post | Page | Project> = ({ doc }) => {
 
 export const plugins: Plugin[] = [
   redirectsPlugin({
-    collections: ['pages', 'posts', 'projects'],
+    collections: ['pages', 'posts', 'projects', 'watch'] as any,
     overrides: {
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {

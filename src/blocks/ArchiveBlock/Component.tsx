@@ -30,7 +30,7 @@ export const ArchiveBlock: React.FC<
       else return category
     })
 
-    const fetchedDocs = await payload.find({
+    const fetchedDocs = await (payload as any).find({
       collection: relationTo,
       depth: 1,
       limit,

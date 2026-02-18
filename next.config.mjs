@@ -1,6 +1,6 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 
-import redirects from './redirects.js'
+import redirects from './redirects.mjs'
 
 const serverURLs = Array.from(
   new Set(
@@ -30,7 +30,11 @@ const nextConfig = {
       }),
     ],
   },
-  webpack: (webpackConfig) => {
+  webpack: (webpackConfig, { dev }) => {
+    if (dev) {
+      webpackConfig.cache = false
+    }
+
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],

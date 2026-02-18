@@ -1,4 +1,5 @@
-import { getClientSideURL } from '@/utilities/getURL'
+import canUseDOM from '@/utilities/canUseDOM'
+import { getClientSideURL, getServerSideURL } from '@/utilities/getURL'
 
 /**
  * Processes media resource URL to ensure proper formatting
@@ -18,7 +19,9 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     return cacheTag ? `${url}?${cacheTag}` : url
   }
 
-  // Otherwise prepend client-side URL
-  const baseUrl = getClientSideURL()
-  return cacheTag ? `${baseUrl}${url}?${cacheTag}` : `${baseUrl}${url}`
+  // Use full base URL when available; otherwise relative (resolves to current origin)
+  // Relative URLs work for same-origin and avoid wrong-port issues when env is unset
+  const baseUrl = canUseDOM ? getClientSideURL() : getServerSideURL()
+  const effectiveBase = baseUrl || ''
+  return cacheTag ? `${effectiveBase}${url}?${cacheTag}` : `${effectiveBase}${url}`
 }

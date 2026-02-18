@@ -14,6 +14,10 @@ const defaultCollectionLabels = {
     plural: 'Projects',
     singular: 'Project',
   },
+  watch: {
+    plural: 'Videos',
+    singular: 'Video',
+  },
 }
 
 export const PageRange: React.FC<{
