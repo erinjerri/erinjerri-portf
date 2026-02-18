@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 import RichText from '@/components/RichText'
 
+import { CategoryFilter } from '@/components/CategoryFilter'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import type { CardRelationTo } from '@/components/Card'
 
@@ -63,6 +64,27 @@ export const ArchiveBlock: React.FC<
     return dateB - dateA
   })
 
+  const categoryMap = new Map<string, { id: string; slug?: string | null; title: string }>()
+
+  for (const doc of docs) {
+    if (!doc?.categories || !Array.isArray(doc.categories)) continue
+
+    for (const category of doc.categories) {
+      if (category && typeof category === 'object') {
+        const id = String(category.id)
+        if (!categoryMap.has(id)) {
+          categoryMap.set(id, {
+            id,
+            slug: category.slug ?? null,
+            title: category.title ?? 'Untitled category',
+          })
+        }
+      }
+    }
+  }
+
+  const filterCategories = Array.from(categoryMap.values())
+
   return (
     <div className="my-16" id={`block-${id}`}>
       {introContent && (
@@ -70,7 +92,11 @@ export const ArchiveBlock: React.FC<
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive docs={docs} relationTo={relationTo} />
+      {filterCategories.length > 0 ? (
+        <CategoryFilter categories={filterCategories} docs={docs} relationTo={relationTo} />
+      ) : (
+        <CollectionArchive docs={docs} relationTo={relationTo} />
+      )}
     </div>
   )
 }

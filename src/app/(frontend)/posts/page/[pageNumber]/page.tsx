@@ -1,6 +1,6 @@
 import type { Metadata } from 'next/types'
 
-import { CollectionArchive } from '@/components/CollectionArchive'
+import { CategoryFilter } from '@/components/CategoryFilter'
 import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
@@ -25,14 +25,34 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   if (!Number.isInteger(sanitizedPageNumber)) notFound()
 
-  const posts = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit: 12,
-    page: sanitizedPageNumber,
-    overrideAccess: false,
-    sort: '-publishedAt',
-  })
+  const [posts, categoriesResult] = await Promise.all([
+    payload.find({
+      collection: 'posts',
+      depth: 1,
+      limit: 12,
+      page: sanitizedPageNumber,
+      overrideAccess: false,
+      sort: '-publishedAt',
+      select: {
+        title: true,
+        slug: true,
+        categories: true,
+        meta: true,
+      },
+    }),
+    payload.find({
+      collection: 'categories',
+      limit: 100,
+      overrideAccess: false,
+      sort: 'title',
+    }),
+  ])
+
+  const categories = categoriesResult.docs.map((cat) => ({
+    id: cat.id,
+    title: cat.title,
+    slug: cat.slug ?? null,
+  }))
 
   return (
     <div className="pt-24 pb-24">
@@ -52,7 +72,7 @@ export default async function Page({ params: paramsPromise }: Args) {
         />
       </div>
 
-      <CollectionArchive docs={posts.docs} relationTo="posts" />
+      <CategoryFilter categories={categories} docs={posts.docs} relationTo="posts" />
 
       <div className="container">
         {posts?.page && posts?.totalPages > 1 && (
