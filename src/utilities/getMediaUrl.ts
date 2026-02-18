@@ -7,6 +7,18 @@ import { getClientSideURL, getServerSideURL } from '@/utilities/getURL'
  * @param cacheTag Optional cache tag to append to the URL
  * @returns Properly formatted URL with cache tag if provided
  */
+/**
+ * Converts Payload API media URLs to static paths to avoid Next.js Image
+ * optimization timeouts from self-requests to /api/media/file/...
+ */
+const toStaticMediaPath = (url: string): string => {
+  const apiMediaMatch = url.match(/^\/api\/media\/file\/(.+)$/)
+  if (apiMediaMatch) {
+    return `/media/${apiMediaMatch[1]}`
+  }
+  return url
+}
+
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
 
@@ -19,9 +31,11 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     return cacheTag ? `${url}?${cacheTag}` : url
   }
 
+  // Use static path for Payload API URLs (avoids Next.js Image self-request timeouts)
+  const staticUrl = toStaticMediaPath(url)
+
   // Use full base URL when available; otherwise relative (resolves to current origin)
-  // Relative URLs work for same-origin and avoid wrong-port issues when env is unset
   const baseUrl = canUseDOM ? getClientSideURL() : getServerSideURL()
   const effectiveBase = baseUrl || ''
-  return cacheTag ? `${effectiveBase}${url}?${cacheTag}` : `${effectiveBase}${url}`
+  return cacheTag ? `${effectiveBase}${staticUrl}?${cacheTag}` : `${effectiveBase}${staticUrl}`
 }
