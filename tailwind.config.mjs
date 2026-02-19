@@ -94,8 +94,9 @@ const config = {
         warning: 'hsl(var(--warning))',
       },
       fontFamily: {
-        mono: ['var(--font-geist-mono)'],
-        sans: ['var(--font-geist-sans)'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['var(--font-copy)'],
+        title: ['var(--font-title)'],
       },
       keyframes: {
         'accordion-down': {
@@ -114,8 +115,21 @@ const config = {
               '--tw-prose-body': 'var(--text)',
               '--tw-prose-headings': 'var(--text)',
               h1: {
-                fontWeight: 'normal',
+                fontFamily: 'var(--font-title)',
+                fontWeight: 800,
                 marginBottom: '0.25em',
+              },
+              h2: {
+                fontFamily: 'var(--font-title)',
+                fontWeight: 700,
+              },
+              h3: {
+                fontFamily: 'var(--font-title)',
+                fontWeight: 700,
+              },
+              p: {
+                fontFamily: 'var(--font-copy)',
+                fontWeight: 400,
               },
             },
           ],

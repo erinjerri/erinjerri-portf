@@ -34,6 +34,24 @@ const columnFields: Field[] = [
     ],
   },
   {
+    name: 'contentType',
+    type: 'select',
+    defaultValue: 'text',
+    options: [
+      {
+        label: 'Text',
+        value: 'text',
+      },
+      {
+        label: 'Media',
+        value: 'media',
+      },
+    ],
+    admin: {
+      description: 'Choose whether this column renders text or media.',
+    },
+  },
+  {
     name: 'richText',
     type: 'richText',
     editor: lexicalEditor({
@@ -46,7 +64,19 @@ const columnFields: Field[] = [
         ]
       },
     }),
+    admin: {
+      condition: (_, siblingData) => !siblingData?.contentType || siblingData?.contentType === 'text',
+    },
     label: false,
+  },
+  {
+    name: 'media',
+    type: 'upload',
+    relationTo: 'media',
+    admin: {
+      condition: (_, siblingData) => siblingData?.contentType === 'media',
+      description: 'Select an existing media asset or upload a new one.',
+    },
   },
   {
     name: 'enableLink',

@@ -35,8 +35,28 @@ export const hero: Field = {
           label: 'Low Impact',
           value: 'lowImpact',
         },
+        {
+          label: 'Topline',
+          value: 'topline',
+        },
       ],
       required: true,
+    },
+    {
+      name: 'overlayTitle',
+      type: 'text',
+      validate: (
+        value: unknown,
+        { siblingData }: { siblingData?: { type?: 'highImpact' | 'lowImpact' | 'mediumImpact' | 'none' | 'topline' } },
+      ) => {
+        if (siblingData?.type !== 'topline') return true
+        if (typeof value === 'string' && value.trim().length > 0) return true
+        return 'Please enter overlay title text.'
+      },
+      admin: {
+        condition: (_, { type } = {}) => type === 'topline',
+        description: 'Large white text over the media (example: Experience).',
+      },
     },
     {
       name: 'richText',
@@ -52,9 +72,15 @@ export const hero: Field = {
         },
       }),
       label: false,
+      admin: {
+        condition: (_, { type } = {}) => type !== 'topline',
+      },
     },
     linkGroup({
       overrides: {
+        admin: {
+          condition: (_, { type } = {}) => type !== 'topline',
+        },
         maxRows: 2,
       },
     }),
@@ -62,7 +88,18 @@ export const hero: Field = {
       name: 'media',
       type: 'upload',
       admin: {
-        condition: (_, { type } = {}) => ['highImpact', 'mediumImpact'].includes(type),
+        condition: (_, { type } = {}) => ['highImpact', 'mediumImpact', 'topline'].includes(type),
+      },
+      filterOptions: ({ data }) => {
+        if (data?.hero?.type === 'topline') {
+          return {
+            mediaType: {
+              in: ['image', 'video'],
+            },
+          }
+        }
+
+        return true
       },
       relationTo: 'media',
       required: true,

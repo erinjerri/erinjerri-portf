@@ -49,6 +49,10 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
                 label: 'Custom URL',
                 value: 'custom',
               },
+              {
+                label: 'Archive',
+                value: 'archive',
+              },
             ],
           },
           {
@@ -76,6 +80,29 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       },
       label: 'Document to link to',
       relationTo: ['pages', 'posts'],
+      required: true,
+    },
+    {
+      name: 'archive',
+      type: 'select',
+      admin: {
+        condition: (_, siblingData) => siblingData?.type === 'archive',
+      },
+      label: 'Archive to link to',
+      options: [
+        {
+          label: 'Posts',
+          value: 'posts',
+        },
+        {
+          label: 'Projects',
+          value: 'projects',
+        },
+        {
+          label: 'Videos',
+          value: 'watch',
+        },
+      ],
       required: true,
     },
     {

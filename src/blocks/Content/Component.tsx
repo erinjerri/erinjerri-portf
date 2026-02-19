@@ -3,11 +3,17 @@ import React from 'react'
 import RichText from '@/components/RichText'
 
 import type { ContentBlock as ContentBlockProps } from '@/payload-types'
+import type { Media } from '@/payload-types'
 
 import { CMSLink } from '../../components/Link'
+import { Media as MediaComponent } from '@/components/Media'
 
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const { columns } = props
+  type ColumnWithFlexibleContent = NonNullable<ContentBlockProps['columns']>[number] & {
+    contentType?: 'media' | 'text' | null
+    media?: Media | number | string | null
+  }
 
   const colsSpanClasses = {
     full: '12',
@@ -22,7 +28,10 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
         {columns &&
           columns.length > 0 &&
           columns.map((col, index) => {
-            const { enableLink, link, richText, size } = col
+            const typedCol = col as ColumnWithFlexibleContent
+            const { contentType, enableLink, link, media, richText, size } = typedCol
+            const shouldRenderText = !contentType || contentType === 'text'
+            const shouldRenderMedia = contentType === 'media' && Boolean(media)
 
             return (
               <div
@@ -31,7 +40,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 })}
                 key={index}
               >
-                {richText && <RichText data={richText} enableGutter={false} />}
+                {shouldRenderText && richText && <RichText data={richText} enableGutter={false} />}
+                {shouldRenderMedia && <MediaComponent resource={media} />}
 
                 {enableLink && <CMSLink {...link} />}
               </div>

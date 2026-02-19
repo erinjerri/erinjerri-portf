@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
-import { GeistMono } from 'geist/font/mono'
-import { GeistSans } from 'geist/font/sans'
 import React from 'react'
+import { Jost, League_Spartan } from 'next/font/google'
 
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/Footer/Component'
@@ -16,11 +15,27 @@ import { draftMode } from 'next/headers'
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
+const jost = Jost({
+  subsets: ['latin'],
+  variable: '--font-jost',
+  weight: ['400', '500', '600', '700', '800'],
+})
+
+const leagueSpartan = League_Spartan({
+  subsets: ['latin'],
+  variable: '--font-league-spartan',
+  weight: ['700', '800', '900'],
+})
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(jost.variable, leagueSpartan.variable)}
+      lang="en"
+      suppressHydrationWarning
+    >
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
