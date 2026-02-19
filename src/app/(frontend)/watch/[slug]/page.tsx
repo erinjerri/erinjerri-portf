@@ -10,8 +10,9 @@ import RichText from '@/components/RichText'
 
 import type { Project } from '@/payload-types'
 
-import { Media as MediaComponent } from '@/components/Media'
-import { PostHero } from '@/heros/PostHero'
+import { WatchVideoHero } from '@/heros/WatchVideoHero'
+import { formatAuthors } from '@/utilities/formatAuthors'
+import { formatDateTime } from '@/utilities/formatDateTime'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
@@ -51,15 +52,24 @@ export default async function WatchPage({ params: paramsPromise }: Args) {
   const decodedSlug = decodeURIComponent(slug)
   const url = '/watch/' + decodedSlug
   const watchDoc = await queryWatchBySlug({ slug: decodedSlug })
-  const selectedVideo =
-    typeof watchDoc?.videoAsset === 'object' && watchDoc.videoAsset?.mimeType?.includes('video')
-      ? watchDoc.videoAsset
-      : null
 
   if (!watchDoc) return <PayloadRedirects url={url} />
 
+  const selectedVideo =
+    typeof watchDoc.videoAsset === 'object' && watchDoc.videoAsset?.mimeType?.includes('video')
+      ? watchDoc.videoAsset
+      : null
+  const heroImage =
+    typeof watchDoc.heroImage === 'object' && watchDoc.heroImage ? watchDoc.heroImage : null
+  const videoSource = watchDoc.videoSource ?? 'upload'
+  const videoUrl = typeof watchDoc.videoUrl === 'string' ? watchDoc.videoUrl : null
+  const hasAuthors =
+    watchDoc.populatedAuthors &&
+    watchDoc.populatedAuthors.length > 0 &&
+    formatAuthors(watchDoc.populatedAuthors) !== ''
+
   return (
-    <article className="pt-16 pb-16">
+    <article className="pt-16 pb-24">
       <ReadingProgress />
       <PageClient />
 
@@ -67,24 +77,62 @@ export default async function WatchPage({ params: paramsPromise }: Args) {
 
       {draft && <LivePreviewListener />}
 
-      <PostHero post={watchDoc as unknown as Project} />
-      {selectedVideo && (
-        <div className="container mt-8">
-          <MediaComponent resource={selectedVideo} />
-        </div>
-      )}
+      {/* Large playable video hero - designcode.io style */}
+      <WatchVideoHero
+        video={selectedVideo}
+        videoUrl={videoUrl}
+        videoSource={videoSource}
+        heroImage={heroImage}
+      />
 
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="max-w-[48rem] mx-auto" data={watchDoc.content} enableGutter={false} />
-          {watchDoc.relatedWatch && watchDoc.relatedWatch.length > 0 && (
+      {/* Blog-style content: title, meta, description */}
+      <div className="container mt-12 max-w-[52rem] mx-auto">
+        <header className="mb-10">
+          {watchDoc.categories && watchDoc.categories.length > 0 && (
+            <div className="uppercase text-sm text-muted-foreground mb-4">
+              {watchDoc.categories
+                .map((cat: { title?: string } | null) =>
+                  typeof cat === 'object' && cat?.title ? cat.title : null,
+                )
+                .filter(Boolean)
+                .join(', ')}
+            </div>
+          )}
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">
+            {watchDoc.title}
+          </h1>
+          <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
+            {watchDoc.publishedAt && (
+              <time dateTime={watchDoc.publishedAt}>
+                {formatDateTime(watchDoc.publishedAt)}
+              </time>
+            )}
+            {hasAuthors && (
+              <span>{formatAuthors(watchDoc.populatedAuthors)}</span>
+            )}
+          </div>
+        </header>
+
+        <div className="prose dark:prose-invert max-w-none">
+          <RichText data={watchDoc.content} enableGutter={false} />
+        </div>
+
+        {/* Placeholder for future: slides, downloads, etc. */}
+        {/* <div className="mt-12 border-t pt-8">
+          <h2 className="text-xl font-semibold mb-4">Resources</h2>
+          ...
+        </div> */}
+
+        {watchDoc.relatedWatch && watchDoc.relatedWatch.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold mb-8">Related Talks</h2>
             <RelatedPosts
-              className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
+              className="max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
               docs={watchDoc.relatedWatch.filter((doc: unknown) => typeof doc === 'object')}
               relationTo="watch"
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </article>
   )
@@ -107,6 +155,7 @@ const queryWatchBySlug = cache(async ({ slug }: { slug: string }) => {
   const result = await payloadAny.find({
     collection: 'watch',
     draft,
+    depth: 2,
     limit: 1,
     overrideAccess: draft,
     pagination: false,

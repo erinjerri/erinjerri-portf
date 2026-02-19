@@ -719,6 +719,8 @@ export interface Watch {
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
+  videoSource?: ('upload' | 'url') | null;
+  videoUrl?: string | null;
   /**
    * Dropdown select for uploaded video assets from Media.
    */

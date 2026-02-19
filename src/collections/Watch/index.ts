@@ -193,6 +193,28 @@ export const Watch: CollectionConfig = {
       relationTo: 'users',
     },
     {
+      name: 'videoSource',
+      type: 'select',
+      options: [
+        { label: 'Upload', value: 'upload' },
+        { label: 'External URL', value: 'url' },
+      ],
+      defaultValue: 'upload',
+      admin: {
+        position: 'sidebar',
+        description: 'Use an uploaded video or link to an external video.',
+      },
+    },
+    {
+      name: 'videoUrl',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        condition: (data) => data?.videoSource === 'url',
+        description: 'Link to YouTube or any page with a video.',
+      },
+    },
+    {
       name: 'videoAsset',
       type: 'relationship',
       relationTo: 'media',
@@ -203,6 +225,7 @@ export const Watch: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        condition: (data) => data?.videoSource !== 'url',
         description: 'Dropdown select for uploaded video assets from Media.',
       },
     },
