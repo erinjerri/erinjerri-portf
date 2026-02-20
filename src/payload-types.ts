@@ -162,7 +162,11 @@ export interface Page {
   id: string;
   title: string;
   hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'topline';
+    /**
+     * Large white text over the media (example: Experience).
+     */
+    overlayTitle?: string | null;
     richText?: {
       root: {
         type: string;
@@ -181,7 +185,7 @@ export interface Page {
     links?:
       | {
           link: {
-            type?: ('reference' | 'custom') | null;
+            type?: ('reference' | 'custom' | 'archive') | null;
             newTab?: boolean | null;
             reference?:
               | ({
@@ -192,6 +196,7 @@ export interface Page {
                   relationTo: 'posts';
                   value: string | Post;
                 } | null);
+            archive?: ('posts' | 'projects' | 'watch') | null;
             url?: string | null;
             label: string;
             /**
@@ -204,7 +209,7 @@ export interface Page {
       | null;
     media?: (string | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock | ToplineHeaderBlock)[];
   meta?: {
     title?: string | null;
     /**
@@ -476,7 +481,7 @@ export interface CallToActionBlock {
   links?:
     | {
         link: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'custom' | 'archive') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -487,6 +492,7 @@ export interface CallToActionBlock {
                 relationTo: 'posts';
                 value: string | Post;
               } | null);
+          archive?: ('posts' | 'projects' | 'watch') | null;
           url?: string | null;
           label: string;
           /**
@@ -509,6 +515,10 @@ export interface ContentBlock {
   columns?:
     | {
         size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        /**
+         * Choose whether this column renders text or media.
+         */
+        contentType?: ('text' | 'media') | null;
         richText?: {
           root: {
             type: string;
@@ -524,9 +534,13 @@ export interface ContentBlock {
           };
           [k: string]: unknown;
         } | null;
+        /**
+         * Select an existing media asset or upload a new one.
+         */
+        media?: (string | null) | Media;
         enableLink?: boolean | null;
         link?: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'custom' | 'archive') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -537,6 +551,7 @@ export interface ContentBlock {
                 relationTo: 'posts';
                 value: string | Post;
               } | null);
+          archive?: ('posts' | 'projects' | 'watch') | null;
           url?: string | null;
           label: string;
           /**
@@ -719,7 +734,13 @@ export interface Watch {
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
+  /**
+   * Use an uploaded video or link to an external video.
+   */
   videoSource?: ('upload' | 'url') | null;
+  /**
+   * Link to YouTube or any page with a video.
+   */
   videoUrl?: string | null;
   /**
    * Dropdown select for uploaded video assets from Media.
@@ -939,6 +960,24 @@ export interface Form {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ToplineHeaderBlock".
+ */
+export interface ToplineHeaderBlock {
+  /**
+   * Large white text over the media banner, e.g. "Experience".
+   */
+  title: string;
+  /**
+   * Select a background image or video asset.
+   */
+  media: string | Media;
+  height?: ('small' | 'medium' | 'large') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'toplineHeader';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1238,6 +1277,7 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         type?: T;
+        overlayTitle?: T;
         richText?: T;
         links?:
           | T
@@ -1248,6 +1288,7 @@ export interface PagesSelect<T extends boolean = true> {
                     type?: T;
                     newTab?: T;
                     reference?: T;
+                    archive?: T;
                     url?: T;
                     label?: T;
                     appearance?: T;
@@ -1264,6 +1305,7 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        toplineHeader?: T | ToplineHeaderBlockSelect<T>;
       };
   meta?:
     | T
@@ -1295,6 +1337,7 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
               type?: T;
               newTab?: T;
               reference?: T;
+              archive?: T;
               url?: T;
               label?: T;
               appearance?: T;
@@ -1313,7 +1356,9 @@ export interface ContentBlockSelect<T extends boolean = true> {
     | T
     | {
         size?: T;
+        contentType?: T;
         richText?: T;
+        media?: T;
         enableLink?: T;
         link?:
           | T
@@ -1321,6 +1366,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
               type?: T;
               newTab?: T;
               reference?: T;
+              archive?: T;
               url?: T;
               label?: T;
               appearance?: T;
@@ -1368,6 +1414,17 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ToplineHeaderBlock_select".
+ */
+export interface ToplineHeaderBlockSelect<T extends boolean = true> {
+  title?: T;
+  media?: T;
+  height?: T;
   id?: T;
   blockName?: T;
 }
@@ -1454,6 +1511,8 @@ export interface WatchSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   authors?: T;
+  videoSource?: T;
+  videoUrl?: T;
   videoAsset?: T;
   populatedAuthors?:
     | T
@@ -1889,7 +1948,7 @@ export interface Header {
   navItems?:
     | {
         link: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'custom' | 'archive') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -1900,6 +1959,7 @@ export interface Header {
                 relationTo: 'posts';
                 value: string | Post;
               } | null);
+          archive?: ('posts' | 'projects' | 'watch') | null;
           url?: string | null;
           label: string;
         };
@@ -1915,26 +1975,47 @@ export interface Header {
  */
 export interface Footer {
   id: string;
-  navItems?:
+  subscribeSection?: {
+    slogan?: string | null;
+    showSubscribe?: boolean | null;
+  };
+  linkGroups?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: string | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: string | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
+        header?: string | null;
+        links: {
+          link: {
+            type?: ('reference' | 'custom' | 'archive') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: string | Post;
+                } | null);
+            archive?: ('posts' | 'projects' | 'watch') | null;
+            url?: string | null;
+            label: string;
+          };
+          id?: string | null;
+        }[];
         id?: string | null;
       }[]
     | null;
+  socialLinks?:
+    | {
+        label: string;
+        url: string;
+        icon?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Copyright text shown at bottom of footer.
+   */
+  copyright?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1952,6 +2033,7 @@ export interface HeaderSelect<T extends boolean = true> {
               type?: T;
               newTab?: T;
               reference?: T;
+              archive?: T;
               url?: T;
               label?: T;
             };
@@ -1966,20 +2048,42 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
-  navItems?:
+  subscribeSection?:
     | T
     | {
-        link?:
+        slogan?: T;
+        showSubscribe?: T;
+      };
+  linkGroups?:
+    | T
+    | {
+        header?: T;
+        links?:
           | T
           | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    archive?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
             };
         id?: T;
       };
+  socialLinks?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        icon?: T;
+        id?: T;
+      };
+  copyright?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

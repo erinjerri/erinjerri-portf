@@ -10,19 +10,70 @@ export const Footer: GlobalConfig = {
   },
   fields: [
     {
-      name: 'navItems',
-      type: 'array',
+      name: 'subscribeSection',
+      type: 'group',
+      label: 'Subscribe Section',
       fields: [
-        link({
-          appearances: false,
-        }),
-      ],
-      maxRows: 6,
-      admin: {
-        initCollapsed: true,
-        components: {
-          RowLabel: '@/Footer/RowLabel#RowLabel',
+        {
+          name: 'slogan',
+          type: 'text',
+          label: 'Slogan',
         },
+        {
+          name: 'showSubscribe',
+          type: 'checkbox',
+          label: 'Show subscribe form',
+          defaultValue: true,
+        },
+      ],
+    },
+    {
+      name: 'linkGroups',
+      type: 'array',
+      label: 'Footer Link Groups',
+      fields: [
+        {
+          name: 'header',
+          type: 'text',
+          label: 'Group Header',
+        },
+        {
+          name: 'links',
+          type: 'array',
+          label: 'Links',
+          required: true,
+          minRows: 1,
+          fields: [link({ appearances: false })],
+        },
+      ],
+    },
+    {
+      name: 'socialLinks',
+      type: 'array',
+      label: 'Social Links',
+      fields: [
+        {
+          name: 'label',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'icon',
+          type: 'upload',
+          relationTo: 'media',
+        },
+      ],
+    },
+    {
+      name: 'copyright',
+      type: 'text',
+      admin: {
+        description: 'Copyright text shown at bottom of footer.',
       },
     },
   ],

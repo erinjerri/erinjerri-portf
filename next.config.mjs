@@ -32,9 +32,9 @@ const nextConfig = {
   },
   webpack: (webpackConfig, { dev }) => {
     if (dev) {
-      webpackConfig.cache = false
+      // Avoid filesystem pack cache races under synced folders (ENOENT on *.pack.gz_)
+      webpackConfig.cache = { type: 'memory' }
     }
-
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],

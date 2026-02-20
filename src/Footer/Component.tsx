@@ -1,6 +1,8 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
+import configPromise from '@payload-config'
 import Link from 'next/link'
+import { getPayload } from 'payload'
 import React from 'react'
 
 import type { Footer, Media as MediaType } from '@/payload-types'
@@ -19,11 +21,12 @@ function SocialIcon({
   label: string
   icon?: MediaType | string | null
 }) {
-  const iconUrl = icon && typeof icon === 'object' && icon.url
-    ? getMediaUrl(icon.url, icon.updatedAt)
-    : icon && typeof icon === 'object' && icon.filename
-      ? getMediaUrl(`/media/${icon.filename}`, icon.updatedAt)
-      : null
+  const iconUrl =
+    icon && typeof icon === 'object' && icon.url
+      ? getMediaUrl(icon.url, icon.updatedAt)
+      : icon && typeof icon === 'object' && icon.filename
+        ? getMediaUrl(`/media/${encodeURIComponent(icon.filename)}`, icon.updatedAt)
+        : null
   const href =
     url.includes('@') && !url.includes('://') && !url.startsWith('mailto:')
       ? `mailto:${url}`
@@ -53,16 +56,10 @@ function SocialIcon({
   )
 }
 
-const FOOTER_FETCH_TIMEOUT_MS = 5000
-
 export async function Footer() {
   let footerData: Footer | null = null
   try {
-    const fetchPromise = getCachedGlobal('footer', 1)()
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Footer fetch timeout')), FOOTER_FETCH_TIMEOUT_MS),
-    )
-    footerData = await Promise.race([fetchPromise, timeoutPromise])
+    footerData = await getCachedGlobal('footer', 2)()
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {
       console.error('[Footer] Failed to fetch footer:', err)
@@ -74,6 +71,38 @@ export async function Footer() {
   const linkGroups = footerData?.linkGroups || []
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
+
+  const unresolvedIconIDs = socialLinks
+    .map((item) => item?.icon)
+    .filter((icon): icon is string => typeof icon === 'string')
+
+  let mediaByID: Record<string, MediaType> = {}
+
+  if (unresolvedIconIDs.length > 0) {
+    try {
+      const payload = await getPayload({ config: configPromise })
+      const mediaResult = await payload.find({
+        collection: 'media',
+        depth: 0,
+        limit: unresolvedIconIDs.length,
+        pagination: false,
+        where: {
+          id: {
+            in: unresolvedIconIDs,
+          },
+        },
+      })
+
+      mediaByID = mediaResult.docs.reduce<Record<string, MediaType>>((acc, mediaDoc) => {
+        acc[mediaDoc.id] = mediaDoc as MediaType
+        return acc
+      }, {})
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Footer] Failed to resolve social icon IDs:', err)
+      }
+    }
+  }
 
   return (
     <footer className="mt-auto border-t border-border bg-transparent text-foreground">
@@ -105,7 +134,9 @@ export async function Footer() {
                       key={item.id || i}
                       url={item.url}
                       label={item.label}
-                      icon={typeof item.icon === 'object' ? item.icon : null}
+                      icon={
+                        typeof item.icon === 'string' ? (mediaByID[item.icon] ?? null) : item.icon
+                      }
                     />
                   ))}
               </div>

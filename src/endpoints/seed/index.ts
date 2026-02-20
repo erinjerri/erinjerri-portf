@@ -20,8 +20,6 @@ const collections: CollectionSlug[] = [
   'search',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
-
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 
 // Next.js revalidation errors are normal when seeding the database without a server running
@@ -44,20 +42,34 @@ export const seed = async ({
   payload.logger.info(`— Clearing collections and globals...`)
 
   // clear the database
-  await Promise.all(
-    globals.map((global) =>
-      payload.updateGlobal({
-        slug: global,
-        data: {
-          navItems: [],
+  await Promise.all([
+    payload.updateGlobal({
+      slug: 'header',
+      data: {
+        navItems: [],
+      },
+      depth: 0,
+      context: {
+        disableRevalidate: true,
+      },
+    }),
+    payload.updateGlobal({
+      slug: 'footer',
+      data: {
+        subscribeSection: {
+          slogan: '',
+          showSubscribe: true,
         },
-        depth: 0,
-        context: {
-          disableRevalidate: true,
-        },
-      }),
-    ),
-  )
+        linkGroups: [],
+        socialLinks: [],
+        copyright: '',
+      },
+      depth: 0,
+      context: {
+        disableRevalidate: true,
+      },
+    }),
+  ])
 
   await Promise.all(
     collections.map((collection) => payload.db.deleteMany({ collection, req, where: {} })),
@@ -245,31 +257,27 @@ export const seed = async ({
     payload.updateGlobal({
       slug: 'footer',
       data: {
-        navItems: [
+        subscribeSection: {
+          slogan: 'Making my cathedral one code block at a time.',
+          showSubscribe: true,
+        },
+        linkGroups: [
           {
-            link: {
-              type: 'custom',
-              label: 'Admin',
-              url: '/admin',
-            },
+            header: 'About',
+            links: [{ link: { type: 'custom', label: 'Home', url: '/' } }],
           },
           {
-            link: {
-              type: 'custom',
-              label: 'Source Code',
-              newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/main/templates/website',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
-            },
+            header: 'Read',
+            links: [{ link: { type: 'archive', label: 'Posts', archive: 'posts' } }],
           },
         ],
+        socialLinks: [
+          {
+            label: 'GitHub',
+            url: 'https://github.com',
+          },
+        ],
+        copyright: '2026 Erin Jerri. All rights reserved.',
       },
     }),
   ])
