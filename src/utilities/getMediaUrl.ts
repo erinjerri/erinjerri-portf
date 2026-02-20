@@ -19,6 +19,23 @@ const toStaticMediaPath = (url: string): string => {
   return url
 }
 
+const encodePathPreserveQuery = (value: string): string => {
+  const [path, query = ''] = value.split('?')
+  const encodedPath = path
+    .split('/')
+    .map((segment) => {
+      if (!segment) return ''
+      try {
+        return encodeURIComponent(decodeURIComponent(segment))
+      } catch {
+        return encodeURIComponent(segment)
+      }
+    })
+    .join('/')
+
+  return query ? `${encodedPath}?${query}` : encodedPath
+}
+
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
 
@@ -28,11 +45,12 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
 
   // Check if URL already has http/https protocol
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    return cacheTag ? `${url}?${cacheTag}` : url
+    const separator = url.includes('?') ? '&' : '?'
+    return cacheTag ? `${url}${separator}${cacheTag}` : url
   }
 
   // Use static path for Payload API URLs (avoids Next.js Image self-request timeouts)
-  const staticUrl = toStaticMediaPath(url)
+  const staticUrl = encodePathPreserveQuery(toStaticMediaPath(url))
 
   // Use full base URL when available; otherwise relative (resolves to current origin)
   const baseUrl = canUseDOM ? getClientSideURL() : getServerSideURL()

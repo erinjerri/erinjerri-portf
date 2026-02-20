@@ -63,6 +63,40 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let alt = altFromProps
   let src: StaticImageData | string = srcFromProps || ''
 
+  const normalizeRelativeMediaPath = (mediaPath: string) => {
+    const apiMediaPrefix = '/api/media/file/'
+    if (mediaPath.startsWith(apiMediaPrefix)) {
+      return `/media/${mediaPath.slice(apiMediaPrefix.length)}`
+    }
+    return mediaPath
+  }
+
+  const encodeRelativePath = (relativePath: string) => {
+    const [path, query = ''] = relativePath.split('?')
+    const encodedPath = path
+      .split('/')
+      .map((segment) => {
+        if (!segment) return ''
+        try {
+          return encodeURIComponent(decodeURIComponent(segment))
+        } catch {
+          return encodeURIComponent(segment)
+        }
+      })
+      .join('/')
+    return query ? `${encodedPath}?${query}` : encodedPath
+  }
+
+  const buildLocalMediaSrc = (mediaPath: string, cacheTag?: string | null) => {
+    if (!mediaPath.startsWith('/')) return mediaPath
+    const normalizedPath = encodeRelativePath(normalizeRelativeMediaPath(mediaPath))
+    if (!cacheTag) return normalizedPath
+    const encodedTag = encodeURIComponent(cacheTag)
+    return normalizedPath.includes('?')
+      ? `${normalizedPath}&v=${encodedTag}`
+      : `${normalizedPath}?v=${encodedTag}`
+  }
+
   if (!src && resource && typeof resource === 'object') {
     const { alt: altFromResource, filename, height: fullHeight, url, width: fullWidth } = resource
 
@@ -72,8 +106,13 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
 
     const cacheTag = resource.updatedAt
     // Use url from Payload, or construct from filename when url is missing
-    const mediaUrl = url ?? (filename ? `/media/${filename}` : null)
-    src = getMediaUrl(mediaUrl, cacheTag)
+    const mediaUrl = url ?? (filename ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}` : null)
+    // Keep local media as relative paths so Next can optimize from disk directly
+    // instead of issuing a remote self-request to localhost via /_next/image.
+    src =
+      mediaUrl && mediaUrl.startsWith('/')
+        ? buildLocalMediaSrc(mediaUrl, cacheTag)
+        : getMediaUrl(mediaUrl, cacheTag)
   }
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)

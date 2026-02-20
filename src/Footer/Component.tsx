@@ -21,11 +21,17 @@ function SocialIcon({
   label: string
   icon?: MediaType | string | null
 }) {
+  const iconDoc = icon && typeof icon === 'object' ? icon : null
+  const fallbackIconPath =
+    iconDoc?.filename
+      ? `/media/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
+      : null
+
   const iconUrl =
-    icon && typeof icon === 'object' && icon.url
-      ? getMediaUrl(icon.url, icon.updatedAt)
-      : icon && typeof icon === 'object' && icon.filename
-        ? getMediaUrl(`/media/${encodeURIComponent(icon.filename)}`, icon.updatedAt)
+    iconDoc?.url
+      ? getMediaUrl(iconDoc.url, iconDoc.updatedAt)
+      : fallbackIconPath
+        ? getMediaUrl(fallbackIconPath, iconDoc?.updatedAt)
         : null
   const href =
     url.includes('@') && !url.includes('://') && !url.startsWith('mailto:')
