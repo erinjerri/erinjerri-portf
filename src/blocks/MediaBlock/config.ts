@@ -36,6 +36,24 @@ export const MediaBlock: Block = {
       },
     },
     {
+      name: 'displayStyle',
+      type: 'select',
+      defaultValue: 'default',
+      options: [
+        {
+          label: 'Default (Contained)',
+          value: 'default',
+        },
+        {
+          label: 'Full Width Transition',
+          value: 'fullWidthTransition',
+        },
+      ],
+      admin: {
+        description: 'Choose how this media block is laid out on the page.',
+      },
+    },
+    {
       name: 'image',
       type: 'upload',
       relationTo: 'media',

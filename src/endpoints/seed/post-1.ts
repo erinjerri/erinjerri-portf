@@ -250,6 +250,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
             fields: {
               blockName: '',
               blockType: 'mediaBlock',
+              displayStyle: 'default',
               mediaType: 'image',
               media: blockImage.id,
             },

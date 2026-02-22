@@ -98,6 +98,24 @@ export const Content: Block = {
   interfaceName: 'ContentBlock',
   fields: [
     {
+      name: 'contrastStyle',
+      type: 'select',
+      defaultValue: 'default',
+      options: [
+        {
+          label: 'Default',
+          value: 'default',
+        },
+        {
+          label: 'White Background / Black Text',
+          value: 'whiteOnBlackText',
+        },
+      ],
+      admin: {
+        description: 'Set visual contrast for this content block independently of theme mode.',
+      },
+    },
+    {
       name: 'columns',
       type: 'array',
       admin: {

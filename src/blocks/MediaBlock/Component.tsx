@@ -25,6 +25,7 @@ type Props = Omit<MediaBlockProps, 'media'> & {
   video?: number | string | MediaDoc | null
   videoSource?: 'upload' | 'url' | null
   videoUrl?: string | null
+  displayStyle?: 'default' | 'fullWidthTransition' | null
   disableInnerContainer?: boolean
 }
 
@@ -75,8 +76,11 @@ export const MediaBlock: React.FC<Props> = (props) => {
     video,
     videoSource,
     videoUrl,
+    displayStyle,
     disableInnerContainer,
   } = props
+
+  const isFullWidthTransition = displayStyle === 'fullWidthTransition'
 
   const selectedMedia = (() => {
     if (mediaType === 'video') return videoSource === 'upload' ? video || media : null
@@ -102,9 +106,12 @@ export const MediaBlock: React.FC<Props> = (props) => {
   return (
     <div
       className={cn(
+        {
+          'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden': isFullWidthTransition,
+        },
         '',
         {
-          container: enableGutter,
+          container: enableGutter && !isFullWidthTransition,
         },
         className,
       )}
@@ -119,7 +126,11 @@ export const MediaBlock: React.FC<Props> = (props) => {
         </audio>
       )}
       {shouldRenderVideoURL && youtubeEmbedURL && (
-        <div className="relative w-full overflow-hidden rounded-[0.8rem] border border-border pt-[56.25%]">
+        <div
+          className={cn('relative w-full overflow-hidden pt-[56.25%]', {
+            'rounded-[0.8rem] border border-border': !isFullWidthTransition,
+          })}
+        >
           <iframe
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
@@ -130,7 +141,13 @@ export const MediaBlock: React.FC<Props> = (props) => {
         </div>
       )}
       {shouldRenderVideoURL && !youtubeEmbedURL && videoUrl && (
-        <video className="h-auto w-full rounded-[0.8rem] border border-border" controls poster={thumbnailURL}>
+        <video
+          className={cn('h-auto w-full', {
+            'rounded-[0.8rem] border border-border': !isFullWidthTransition,
+          })}
+          controls
+          poster={thumbnailURL}
+        >
           <source src={videoUrl} />
           Your browser does not support the video tag.
         </video>
@@ -140,7 +157,13 @@ export const MediaBlock: React.FC<Props> = (props) => {
         typeof selectedMedia === 'object' &&
         selectedMedia?.filename &&
         selectedMedia?.mimeType?.includes('video') && (
-          <video className="h-auto w-full rounded-[0.8rem] border border-border" controls poster={thumbnailURL}>
+          <video
+            className={cn('h-auto w-full', {
+              'rounded-[0.8rem] border border-border': !isFullWidthTransition,
+            })}
+            controls
+            poster={thumbnailURL}
+          >
             <source
               src={getMediaUrl(`/media/${selectedMedia.filename}`)}
               type={selectedMedia.mimeType || undefined}
@@ -153,7 +176,13 @@ export const MediaBlock: React.FC<Props> = (props) => {
         !shouldRenderVideoURL &&
         (selectedMedia || staticImage) && (
         <MediaComponent
-          imgClassName={cn('border border-border rounded-[0.8rem]', imgClassName)}
+          imgClassName={cn(
+            {
+              'border border-border rounded-[0.8rem]': !isFullWidthTransition,
+              'w-full object-cover': isFullWidthTransition,
+            },
+            imgClassName,
+          )}
           resource={selectedMedia}
           src={staticImage}
         />

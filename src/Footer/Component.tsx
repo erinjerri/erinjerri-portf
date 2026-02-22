@@ -24,7 +24,7 @@ function SocialIcon({
   const iconDoc = icon && typeof icon === 'object' ? icon : null
   const fallbackIconPath =
     iconDoc?.filename
-      ? `/media/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
+      ? `/api/media/file/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
       : null
 
   const iconUrl =
@@ -78,9 +78,10 @@ export async function Footer() {
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
 
-  const unresolvedIconIDs = socialLinks
-    .map((item) => item?.icon)
-    .filter((icon): icon is string => typeof icon === 'string')
+  const unresolvedIconIDs = socialLinks.flatMap((item) => {
+    const icon = item?.icon as unknown
+    return typeof icon === 'string' || typeof icon === 'number' ? [icon] : []
+  })
 
   let mediaByID: Record<string, MediaType> = {}
 
@@ -94,13 +95,13 @@ export async function Footer() {
         pagination: false,
         where: {
           id: {
-            in: unresolvedIconIDs,
+            in: unresolvedIconIDs as (string | number)[],
           },
         },
       })
 
       mediaByID = mediaResult.docs.reduce<Record<string, MediaType>>((acc, mediaDoc) => {
-        acc[mediaDoc.id] = mediaDoc as MediaType
+        acc[String(mediaDoc.id)] = mediaDoc as MediaType
         return acc
       }, {})
     } catch (err) {
@@ -140,9 +141,12 @@ export async function Footer() {
                       key={item.id || i}
                       url={item.url}
                       label={item.label}
-                      icon={
-                        typeof item.icon === 'string' ? (mediaByID[item.icon] ?? null) : item.icon
-                      }
+                      icon={(() => {
+                        const icon = item.icon as unknown
+                        return typeof icon === 'string' || typeof icon === 'number'
+                          ? (mediaByID[String(icon)] ?? null)
+                          : item.icon
+                      })()}
                     />
                   ))}
               </div>

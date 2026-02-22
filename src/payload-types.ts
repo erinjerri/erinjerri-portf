@@ -512,6 +512,10 @@ export interface CallToActionBlock {
  * via the `definition` "ContentBlock".
  */
 export interface ContentBlock {
+  /**
+   * Set visual contrast for this content block independently of theme mode.
+   */
+  contrastStyle?: ('default' | 'whiteOnBlackText') | null;
   columns?:
     | {
         size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
@@ -575,6 +579,10 @@ export interface MediaBlock {
    * Choose which kind of media to insert into this block.
    */
   mediaType: 'image' | 'video' | 'audio';
+  /**
+   * Choose how this media block is laid out on the page.
+   */
+  displayStyle?: ('default' | 'fullWidthTransition') | null;
   image?: (string | null) | Media;
   /**
    * Choose an existing video asset or create a new one once.
@@ -1352,6 +1360,7 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
  * via the `definition` "ContentBlock_select".
  */
 export interface ContentBlockSelect<T extends boolean = true> {
+  contrastStyle?: T;
   columns?:
     | T
     | {
@@ -1382,6 +1391,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
  */
 export interface MediaBlockSelect<T extends boolean = true> {
   mediaType?: T;
+  displayStyle?: T;
   image?: T;
   video?: T;
   videoSource?: T;

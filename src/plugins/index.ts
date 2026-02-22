@@ -3,6 +3,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
+import { s3Storage } from '@payloadcms/storage-s3'
 import type { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -37,9 +38,33 @@ const generateURL: GenerateURL<Post | Page | Project> = ({ doc }) => {
   return `${url}/${doc.slug}`
 }
 
+const r2Bucket = process.env.R2_BUCKET
+const r2AccountID = process.env.R2_ACCOUNT_ID
+const r2AccessKeyID = process.env.R2_ACCESS_KEY_ID
+const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY
+const hasR2S3Config = Boolean(r2Bucket && r2AccountID && r2AccessKeyID && r2SecretAccessKey)
+
 export const plugins: Plugin[] = [
+  ...(hasR2S3Config
+    ? [
+        s3Storage({
+          collections: {
+            media: true,
+          },
+          bucket: r2Bucket as string,
+          config: {
+            credentials: {
+              accessKeyId: r2AccessKeyID as string,
+              secretAccessKey: r2SecretAccessKey as string,
+            },
+            endpoint: `https://${r2AccountID}.r2.cloudflarestorage.com`,
+            region: 'auto',
+          },
+        }),
+      ]
+    : []),
   redirectsPlugin({
-    collections: ['pages', 'posts', 'projects', 'watch'] as any,
+    collections: ['pages', 'posts', 'projects', 'watch'],
     overrides: {
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {

@@ -9,7 +9,7 @@ import { CMSLink } from '../../components/Link'
 import { Media as MediaComponent } from '@/components/Media'
 
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
-  const { columns } = props
+  const { columns, contrastStyle } = props
   type ColumnWithFlexibleContent = NonNullable<ContentBlockProps['columns']>[number] & {
     contentType?: 'media' | 'text' | null
     media?: Media | number | string | null
@@ -23,7 +23,11 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   }
 
   return (
-    <div className="container my-16">
+    <div
+      className={cn('container my-16', {
+        'rounded-xl bg-white p-8 text-black [&_a]:text-black': contrastStyle === 'whiteOnBlackText',
+      })}
+    >
       <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-16">
         {columns &&
           columns.length > 0 &&

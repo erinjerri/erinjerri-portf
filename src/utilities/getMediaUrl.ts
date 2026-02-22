@@ -7,18 +7,6 @@ import { getClientSideURL, getServerSideURL } from '@/utilities/getURL'
  * @param cacheTag Optional cache tag to append to the URL
  * @returns Properly formatted URL with cache tag if provided
  */
-/**
- * Converts Payload API media URLs to static paths to avoid Next.js Image
- * optimization timeouts from self-requests to /api/media/file/...
- */
-const toStaticMediaPath = (url: string): string => {
-  const apiMediaMatch = url.match(/^\/api\/media\/file\/(.+)$/)
-  if (apiMediaMatch) {
-    return `/media/${apiMediaMatch[1]}`
-  }
-  return url
-}
-
 const encodePathPreserveQuery = (value: string): string => {
   const [path, query = ''] = value.split('?')
   const encodedPath = path
@@ -36,6 +24,14 @@ const encodePathPreserveQuery = (value: string): string => {
   return query ? `${encodedPath}?${query}` : encodedPath
 }
 
+const toPayloadFileEndpoint = (value: string): string => {
+  if (value.startsWith('/media/')) {
+    return `/api/media/file/${value.slice('/media/'.length)}`
+  }
+
+  return value
+}
+
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
 
@@ -43,17 +39,26 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     cacheTag = encodeURIComponent(cacheTag)
   }
 
-  // Check if URL already has http/https protocol
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    const separator = url.includes('?') ? '&' : '?'
-    return cacheTag ? `${url}${separator}${cacheTag}` : url
+  const appendCacheTag = (value: string): string => {
+    if (!cacheTag) return value
+    const separator = value.includes('?') ? '&' : '?'
+    return `${value}${separator}${cacheTag}`
   }
 
-  // Use static path for Payload API URLs (avoids Next.js Image self-request timeouts)
-  const staticUrl = encodePathPreserveQuery(toStaticMediaPath(url))
+  // Check if URL already has http/https protocol
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return appendCacheTag(url)
+  }
+
+  const normalizedUrl = encodePathPreserveQuery(toPayloadFileEndpoint(url))
+
+  // Keep local URLs relative so they work regardless of host (localhost/LAN/custom domain).
+  if (normalizedUrl.startsWith('/')) {
+    return appendCacheTag(normalizedUrl)
+  }
 
   // Use full base URL when available; otherwise relative (resolves to current origin)
   const baseUrl = canUseDOM ? getClientSideURL() : getServerSideURL()
   const effectiveBase = baseUrl || ''
-  return cacheTag ? `${effectiveBase}${staticUrl}?${cacheTag}` : `${effectiveBase}${staticUrl}`
+  return appendCacheTag(`${effectiveBase}${normalizedUrl}`)
 }
