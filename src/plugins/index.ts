@@ -58,6 +58,7 @@ export const plugins: Plugin[] = [
               secretAccessKey: r2SecretAccessKey as string,
             },
             endpoint: `https://${r2AccountID}.r2.cloudflarestorage.com`,
+            forcePathStyle: true,
             region: 'auto',
           },
         }),
