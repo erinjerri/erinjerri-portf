@@ -24,7 +24,7 @@ const buttonVariants = cva(
         accent:
           'bg-[#37EDFF] text-[#0F172A] hover:bg-[#95D5F6] hover:text-[#0F172A] focus-visible:bg-[#95D5F6] focus-visible:text-[#0F172A] active:bg-[#95D5F6] active:text-[#0F172A]',
         light:
-          'bg-[#BFBFBF] text-[#1C8FDA] hover:bg-[#95D5F6] hover:text-[#1C8FDA] focus-visible:bg-[#95D5F6] focus-visible:text-[#1C8FDA] active:bg-[#95D5F6] active:text-[#1C8FDA]',
+          'bg-white text-[#1C8FDA] hover:bg-[#EAF6FF] hover:text-[#1C8FDA] focus-visible:bg-[#EAF6FF] focus-visible:text-[#1C8FDA] active:bg-[#EAF6FF] active:text-[#1C8FDA]',
         inactive: 'bg-[#C6C6C6] text-primary/60 hover:bg-[#C6C6C6] hover:text-primary/60',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         filter:
