@@ -111,14 +111,15 @@ export default buildConfig({
   onInit: async (payload) => {
     const dbURL = process.env.DATABASE_URL
     const useR2Storage = process.env.USE_R2_STORAGE === 'true'
-    const useR2DirectURLs = process.env.R2_PUBLIC_READS === 'true'
+    const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
+    const useR2DirectURLs =
+      process.env.R2_PUBLIC_READS === 'true' || (useR2Storage && !forcePayloadMediaProxy)
     const r2Endpoint =
       process.env.R2_ENDPOINT ||
       (process.env.R2_ACCOUNT_ID
         ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
         : undefined)
-    const r2ForcePathStyle = process.env.R2_FORCE_PATH_STYLE === 'true'
-    const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
+    const r2ForcePathStyle = process.env.R2_FORCE_PATH_STYLE !== 'false'
     const hasR2Env =
       Boolean(process.env.R2_BUCKET) &&
       Boolean(r2Endpoint) &&

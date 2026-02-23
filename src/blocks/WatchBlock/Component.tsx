@@ -14,6 +14,7 @@ export const WatchBlockComponent: React.FC<Props> = async (props) => {
 
   return (
     <ArchiveBlock
+      blockType="archive"
       categories={categories as any}
       id={id}
       introContent={introContent as any}

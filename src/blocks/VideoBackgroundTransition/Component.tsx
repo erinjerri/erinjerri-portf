@@ -48,7 +48,7 @@ export const VideoBackgroundTransitionBlock: React.FC<Props> = ({
         />
       </div>
       <div className="absolute inset-0 bg-black" style={{ opacity }} />
-      {content && (
+      {Boolean(content) && (
         <div className="relative z-10 h-full flex items-center justify-center text-center px-6">
           <div className="max-w-3xl text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_a]:text-white">
             <RichText data={content as any} enableGutter={false} />

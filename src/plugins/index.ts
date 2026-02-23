@@ -45,9 +45,11 @@ const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY?.trim()
 const r2Endpoint =
   process.env.R2_ENDPOINT?.trim() ||
   (r2AccountID ? `https://${r2AccountID}.r2.cloudflarestorage.com` : undefined)
-const r2ForcePathStyle = process.env.R2_FORCE_PATH_STYLE === 'true'
+const r2ForcePathStyle = process.env.R2_FORCE_PATH_STYLE !== 'false'
 const useR2Storage = process.env.USE_R2_STORAGE === 'true'
-const useR2DirectURLs = process.env.R2_PUBLIC_READS === 'true'
+const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
+const useR2DirectURLs =
+  process.env.R2_PUBLIC_READS === 'true' || (useR2Storage && !forcePayloadProxyReads)
 const hasR2S3Config = Boolean(
   useR2Storage && r2Bucket && r2Endpoint && r2AccessKeyID && r2SecretAccessKey,
 )
