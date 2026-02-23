@@ -19,6 +19,21 @@ import { getServerSideURL } from './utilities/getURL'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.length > 0
+
+const allowedOrigins = Array.from(
+  new Set(
+    [
+      getServerSideURL(),
+      process.env.URL,
+      process.env.DEPLOY_PRIME_URL,
+      ...(process.env.NODE_ENV === 'development'
+        ? ['http://localhost:3000', 'http://127.0.0.1:3000']
+        : []),
+    ].filter(isNonEmptyString),
+  ),
+)
 
 export default buildConfig({
   admin: {
@@ -66,7 +81,8 @@ export default buildConfig({
     url: process.env.DATABASE_URL || '',
   }),
   collections: [Pages, Posts, Projects, Watch, Media, Categories, Users],
-  cors: [getServerSideURL()].filter(Boolean),
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   globals: [Header, Footer],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
@@ -96,10 +112,16 @@ export default buildConfig({
     const dbURL = process.env.DATABASE_URL
     const useR2Storage = process.env.USE_R2_STORAGE === 'true'
     const useR2DirectURLs = process.env.R2_PUBLIC_READS === 'true'
+    const r2Endpoint =
+      process.env.R2_ENDPOINT ||
+      (process.env.R2_ACCOUNT_ID
+        ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+        : undefined)
+    const r2ForcePathStyle = process.env.R2_FORCE_PATH_STYLE === 'true'
     const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
     const hasR2Env =
       Boolean(process.env.R2_BUCKET) &&
-      Boolean(process.env.R2_ACCOUNT_ID) &&
+      Boolean(r2Endpoint) &&
       Boolean(process.env.R2_ACCESS_KEY_ID) &&
       Boolean(process.env.R2_SECRET_ACCESS_KEY)
 
@@ -108,6 +130,8 @@ export default buildConfig({
       r2Enabled: useR2Storage,
       r2EnvConfigured: hasR2Env,
       r2DirectURLs: useR2DirectURLs,
+      r2EndpointConfigured: Boolean(r2Endpoint),
+      r2ForcePathStyle,
       forcePayloadMediaProxy,
     })
 

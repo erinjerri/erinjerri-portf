@@ -22,6 +22,8 @@ const buttonVariants = cva(
         default:
           'bg-primary text-foreground hover:bg-[#95D5F6] hover:text-primary focus-visible:bg-[#BFBFBF] focus-visible:text-primary active:bg-[#BFBFBF] active:text-primary',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        filter:
+          'border border-border bg-transparent text-muted-foreground hover:border-primary hover:text-primary',
         ghost: 'hover:bg-card hover:text-foreground',
         link: 'text-primary items-start justify-start underline-offset-4 hover:underline',
         outline: 'border border-border bg-background hover:bg-card hover:text-foreground',
