@@ -78,7 +78,7 @@ export default buildConfig({
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   db: mongooseAdapter({
-    url: process.env.MONGODB_URI || '',
+    url: process.env.DATABASE_URL || process.env.MONGODB_URI || '',
   }),
   collections: [Pages, Posts, Projects, Watch, Media, Categories, Users],
   cors: allowedOrigins,
@@ -109,7 +109,7 @@ export default buildConfig({
     tasks: [],
   },
   onInit: async (payload) => {
-    const dbURL = process.env.DATABASE_URL
+    const dbURL = process.env.DATABASE_URL || process.env.MONGODB_URI
     const useR2Storage = process.env.USE_R2_STORAGE === 'true'
     const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
     const useR2DirectURLs =
@@ -136,8 +136,15 @@ export default buildConfig({
       forcePayloadMediaProxy,
     })
 
+    payload.logger.info({
+      msg: 'Startup DB env presence',
+      hasDatabaseURL: Boolean(process.env.DATABASE_URL),
+      hasMongoDBURI: Boolean(process.env.MONGODB_URI),
+      selectedEnvVar: process.env.DATABASE_URL ? 'DATABASE_URL' : process.env.MONGODB_URI ? 'MONGODB_URI' : 'none',
+    })
+
     if (!dbURL) {
-      payload.logger.warn('Startup DB target: DATABASE_URL is not set.')
+      payload.logger.warn('Startup DB target: DATABASE_URL/MONGODB_URI is not set.')
       return
     }
 
@@ -152,7 +159,7 @@ export default buildConfig({
         db: dbName,
       })
     } catch {
-      payload.logger.warn('Startup DB target: failed to parse DATABASE_URL.')
+      payload.logger.warn('Startup DB target: failed to parse DATABASE_URL/MONGODB_URI.')
     }
   },
 })
