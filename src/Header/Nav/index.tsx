@@ -56,7 +56,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
 
   return (
     <nav className="relative flex w-full items-center justify-center">
-      <div className="hidden md:flex items-center justify-center gap-8 uppercase tracking-[0.18em] text-[11px] md:text-xs">
+      <div className="hidden md:flex items-center justify-center gap-8 uppercase tracking-[0.18em] text-[11px] md:text-xs font-semibold">
         {navLinks.map(({ id, link, href }) => {
           const isActive = href ? normalizePath(pathname) === normalizePath(href) : false
 
@@ -65,8 +65,8 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
               key={id}
               {...link}
               appearance="inline"
-              className={cn(
-                'rounded px-3 py-2 transition-colors',
+                  className={cn(
+                    'rounded px-3 py-2 transition-colors font-semibold',
                 isActive ? 'text-white bg-white/15' : 'text-white/85 hover:text-white hover:bg-white/10',
               )}
             />
@@ -115,7 +115,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
                   {...link}
                   appearance="inline"
                   className={cn(
-                    'rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] transition-colors',
+                    'rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold transition-colors',
                     isActive
                       ? 'bg-white/15 text-white'
                       : 'text-white/80 hover:bg-white/10 hover:text-white',
@@ -126,7 +126,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
 
             <Link
               href="/search"
-              className="mt-4 rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="mt-4 rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold text-white/80 hover:bg-white/10 hover:text-white transition-colors"
               onClick={() => setMobileOpen(false)}
             >
               Search

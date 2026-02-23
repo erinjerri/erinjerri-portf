@@ -35,15 +35,7 @@ export const CallToActionBlock: React.FC<CTABlockProps> = (props) => {
         </div>
         <div className="flex flex-col gap-8">
           {(links || []).map(({ link }, i) => {
-            const appearance = link?.appearance || 'default'
-            const ctaButtonClass = cn({
-              'border-white/50 text-white hover:bg-white hover:text-black': isDark && appearance === 'outline',
-              'bg-white text-black hover:bg-cyan-100 hover:text-black': isDark && appearance === 'default',
-              'border-black/30 text-black hover:bg-black hover:text-white': isLight && appearance === 'outline',
-              'bg-black text-white hover:bg-cyan-900 hover:text-white': isLight && appearance === 'default',
-            })
-
-            return <CMSLink key={i} size="lg" {...link} className={ctaButtonClass} />
+            return <CMSLink key={i} size="lg" {...link} />
           })}
         </div>
       </div>

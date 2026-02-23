@@ -20,13 +20,19 @@ const buttonVariants = cva(
       },
       variant: {
         default:
-          'bg-primary text-foreground hover:bg-[#95D5F6] hover:text-primary focus-visible:bg-[#BFBFBF] focus-visible:text-primary active:bg-[#BFBFBF] active:text-primary',
+          'bg-[#1C8FDA] text-white hover:bg-[#95D5F6] hover:text-[#1C8FDA] focus-visible:bg-[#95D5F6] focus-visible:text-[#1C8FDA] active:bg-[#95D5F6] active:text-[#1C8FDA]',
+        accent:
+          'bg-[#37EDFF] text-[#0F172A] hover:bg-[#95D5F6] hover:text-[#0F172A] focus-visible:bg-[#95D5F6] focus-visible:text-[#0F172A] active:bg-[#95D5F6] active:text-[#0F172A]',
+        light:
+          'bg-[#BFBFBF] text-[#1C8FDA] hover:bg-[#95D5F6] hover:text-[#1C8FDA] focus-visible:bg-[#95D5F6] focus-visible:text-[#1C8FDA] active:bg-[#95D5F6] active:text-[#1C8FDA]',
+        inactive: 'bg-[#C6C6C6] text-primary/60 hover:bg-[#C6C6C6] hover:text-primary/60',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         filter:
           'border border-border bg-transparent text-muted-foreground hover:border-primary hover:text-primary',
         ghost: 'hover:bg-card hover:text-foreground',
         link: 'text-primary items-start justify-start underline-offset-4 hover:underline',
-        outline: 'border border-border bg-background hover:bg-card hover:text-foreground',
+        outline:
+          'border border-[#1C8FDA] bg-transparent text-[#1C8FDA] hover:bg-[#1C8FDA] hover:text-white',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
       },
     },

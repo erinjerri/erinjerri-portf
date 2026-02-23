@@ -25,7 +25,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   const {
     archive,
     type,
-    appearance = 'inline',
+    appearance = 'default',
     children,
     className,
     label,
