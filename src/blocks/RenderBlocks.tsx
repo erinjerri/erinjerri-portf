@@ -8,6 +8,8 @@ import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { ToplineHeaderBlock } from '@/blocks/ToplineHeader/Component'
+import { VideoBackgroundTransitionBlock } from '@/blocks/VideoBackgroundTransition/Component'
+import { WatchBlockComponent } from '@/blocks/WatchBlock/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -16,6 +18,8 @@ const blockComponents = {
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
   toplineHeader: ToplineHeaderBlock,
+  videoBackgroundTransition: VideoBackgroundTransitionBlock,
+  watchBlock: WatchBlockComponent,
 }
 
 export const RenderBlocks: React.FC<{

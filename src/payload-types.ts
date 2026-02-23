@@ -202,14 +202,23 @@ export interface Page {
             /**
              * Choose how the link should be rendered.
              */
-            appearance?: ('default' | 'outline') | null;
+            appearance?: ('default' | 'accent' | 'light' | 'inactive' | 'filter' | 'outline') | null;
           };
           id?: string | null;
         }[]
       | null;
     media?: (string | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock | ToplineHeaderBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | WatchBlock
+    | VideoBackgroundTransitionBlock
+    | FormBlock
+    | ToplineHeaderBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -463,6 +472,10 @@ export interface User {
  * via the `definition` "CallToActionBlock".
  */
 export interface CallToActionBlock {
+  /**
+   * Set visual contrast for this call-to-action block.
+   */
+  contrastStyle?: ('default' | 'blackBgWhiteText' | 'whiteBgBlackText') | null;
   richText?: {
     root: {
       type: string;
@@ -498,7 +511,7 @@ export interface CallToActionBlock {
           /**
            * Choose how the link should be rendered.
            */
-          appearance?: ('default' | 'outline') | null;
+          appearance?: ('default' | 'accent' | 'light' | 'inactive' | 'outline') | null;
         };
         id?: string | null;
       }[]
@@ -523,6 +536,14 @@ export interface ContentBlock {
          * Choose whether this column renders text or media.
          */
         contentType?: ('text' | 'media') | null;
+        /**
+         * Optional per-column visual override.
+         */
+        columnStyle?: ('default' | 'blackBgWhiteText' | 'whiteBgBlackText') | null;
+        /**
+         * When using White background / Black text, choose whether it is boxed or full bleed.
+         */
+        whiteStyleMode?: ('boxed' | 'fullBleed') | null;
         richText?: {
           root: {
             type: string;
@@ -561,7 +582,7 @@ export interface ContentBlock {
           /**
            * Choose how the link should be rendered.
            */
-          appearance?: ('default' | 'outline') | null;
+          appearance?: ('default' | 'accent' | 'light' | 'inactive' | 'filter' | 'outline') | null;
         };
         id?: string | null;
       }[]
@@ -768,6 +789,65 @@ export interface Watch {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WatchBlock".
+ */
+export interface WatchBlock {
+  introContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  categories?: (string | Category)[] | null;
+  limit?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'watchBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBackgroundTransitionBlock".
+ */
+export interface VideoBackgroundTransitionBlock {
+  /**
+   * Choose a background video (or image fallback).
+   */
+  media: string | Media;
+  /**
+   * Overlay opacity percentage. 80 gives a strong transition effect.
+   */
+  overlayOpacity?: number | null;
+  height?: ('small' | 'medium' | 'large') | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'videoBackgroundTransition';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1312,6 +1392,8 @@ export interface PagesSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
+        watchBlock?: T | WatchBlockSelect<T>;
+        videoBackgroundTransition?: T | VideoBackgroundTransitionBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
         toplineHeader?: T | ToplineHeaderBlockSelect<T>;
       };
@@ -1335,6 +1417,7 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "CallToActionBlock_select".
  */
 export interface CallToActionBlockSelect<T extends boolean = true> {
+  contrastStyle?: T;
   richText?: T;
   links?:
     | T
@@ -1366,6 +1449,8 @@ export interface ContentBlockSelect<T extends boolean = true> {
     | {
         size?: T;
         contentType?: T;
+        columnStyle?: T;
+        whiteStyleMode?: T;
         richText?: T;
         media?: T;
         enableLink?: T;
@@ -1413,6 +1498,29 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   categories?: T;
   limit?: T;
   selectedDocs?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WatchBlock_select".
+ */
+export interface WatchBlockSelect<T extends boolean = true> {
+  introContent?: T;
+  categories?: T;
+  limit?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBackgroundTransitionBlock_select".
+ */
+export interface VideoBackgroundTransitionBlockSelect<T extends boolean = true> {
+  media?: T;
+  overlayOpacity?: T;
+  height?: T;
+  content?: T;
   id?: T;
   blockName?: T;
 }
