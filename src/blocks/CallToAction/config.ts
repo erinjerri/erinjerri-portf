@@ -14,6 +14,28 @@ export const CallToAction: Block = {
   interfaceName: 'CallToActionBlock',
   fields: [
     {
+      name: 'contrastStyle',
+      type: 'select',
+      defaultValue: 'default',
+      options: [
+        {
+          label: 'Default',
+          value: 'default',
+        },
+        {
+          label: 'Black Background / White Text',
+          value: 'blackBgWhiteText',
+        },
+        {
+          label: 'White Background / Black Text',
+          value: 'whiteBgBlackText',
+        },
+      ],
+      admin: {
+        description: 'Set visual contrast for this call-to-action block.',
+      },
+    },
+    {
       name: 'richText',
       type: 'richText',
       editor: lexicalEditor({

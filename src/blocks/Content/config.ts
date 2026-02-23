@@ -52,6 +52,48 @@ const columnFields: Field[] = [
     },
   },
   {
+    name: 'columnStyle',
+    type: 'select',
+    defaultValue: 'default',
+    options: [
+      {
+        label: 'Default (inherit section style)',
+        value: 'default',
+      },
+      {
+        label: 'Black background / White text',
+        value: 'blackBgWhiteText',
+      },
+      {
+        label: 'White background / Black text',
+        value: 'whiteBgBlackText',
+      },
+    ],
+    admin: {
+      description: 'Optional per-column visual override.',
+    },
+  },
+  {
+    name: 'whiteStyleMode',
+    type: 'select',
+    defaultValue: 'boxed',
+    options: [
+      {
+        label: 'Boxed',
+        value: 'boxed',
+      },
+      {
+        label: 'Full bleed (to browser edges)',
+        value: 'fullBleed',
+      },
+    ],
+    admin: {
+      condition: (_, siblingData) => siblingData?.columnStyle === 'whiteBgBlackText',
+      description:
+        'When using White background / Black text, choose whether it is boxed or full bleed.',
+    },
+  },
+  {
     name: 'richText',
     type: 'richText',
     editor: lexicalEditor({
