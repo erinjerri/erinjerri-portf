@@ -64,7 +64,13 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                       <div className="container px-8 text-black [&_.prose]:text-black [&_.prose_*]:text-black [&_a]:text-black">
                         {shouldRenderText && richText && <RichText data={richText} enableGutter={false} />}
                         {shouldRenderMedia && <MediaComponent resource={media} />}
-                        {enableLink && <CMSLink {...link} className="mt-6 inline-flex" />}
+                        {enableLink && (
+                          <CMSLink
+                            {...link}
+                            appearance={link?.appearance || 'default'}
+                            className="mt-6 inline-flex"
+                          />
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -79,7 +85,13 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                       {shouldRenderText && richText && <RichText data={richText} enableGutter={false} />}
                       {shouldRenderMedia && <MediaComponent resource={media} />}
 
-                      {enableLink && <CMSLink {...link} className="mt-6 inline-flex" />}
+                      {enableLink && (
+                        <CMSLink
+                          {...link}
+                          appearance={link?.appearance || 'default'}
+                          className="mt-6 inline-flex"
+                        />
+                      )}
                     </div>
                   )}
                 </div>
