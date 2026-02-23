@@ -40,6 +40,7 @@ const toPayloadFileEndpoint = (value: string): string => {
 
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
+  const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
 
   if (cacheTag && cacheTag !== '') {
     cacheTag = encodeURIComponent(cacheTag)
@@ -53,7 +54,19 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
 
   // Check if URL already has http/https protocol
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    return appendCacheTag(url)
+    try {
+      const parsed = new URL(url)
+
+      if (!forcePayloadProxyReads && parsed.pathname.startsWith('/api/media/file/')) {
+        parsed.pathname = `/media/${parsed.pathname.slice('/api/media/file/'.length)}`
+      } else if (forcePayloadProxyReads && parsed.pathname.startsWith('/media/')) {
+        parsed.pathname = `/api/media/file/${parsed.pathname.slice('/media/'.length)}`
+      }
+
+      return appendCacheTag(parsed.toString())
+    } catch {
+      return appendCacheTag(url)
+    }
   }
 
   const normalizedUrl = encodePathPreserveQuery(toPayloadFileEndpoint(url))

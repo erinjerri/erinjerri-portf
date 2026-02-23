@@ -1,9 +1,12 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import configPromise from '@payload-config'
+import { Facebook, Github, Linkedin, Youtube } from 'lucide-react'
 import Link from 'next/link'
+import path from 'path'
 import { getPayload } from 'payload'
 import React from 'react'
+import { existsSync } from 'fs'
 
 import type { Footer, Media as MediaType } from '@/payload-types'
 
@@ -11,6 +14,38 @@ import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
 import { SubscribeForm } from './SubscribeForm'
+
+const resolveFallbackSocialIcon = (
+  label: string,
+  url: string,
+): React.ComponentType<{ className?: string }> => {
+  const value = `${label} ${url}`.toLowerCase()
+
+  if (value.includes('github')) return Github
+  if (value.includes('linkedin')) return Linkedin
+  if (value.includes('youtube')) return Youtube
+  if (value.includes('facebook')) return Facebook
+
+  return Github
+}
+
+const hasLocalMediaFile = (mediaUrl: string): boolean => {
+  if (!mediaUrl.startsWith('/media/')) return true
+  if (process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true') return true
+
+  const [pathname] = mediaUrl.split('?')
+  const relativePath = pathname.replace(/^\/media\//, '')
+
+  if (!relativePath) return false
+
+  try {
+    const decodedPath = decodeURIComponent(relativePath)
+    const filePath = path.join(process.cwd(), 'public', 'media', decodedPath)
+    return existsSync(filePath)
+  } catch {
+    return false
+  }
+}
 
 function SocialIcon({
   url,
@@ -33,6 +68,8 @@ function SocialIcon({
       : fallbackIconPath
         ? getMediaUrl(fallbackIconPath, iconDoc?.updatedAt)
         : null
+  const fallbackIcon = resolveFallbackSocialIcon(label, url)
+  const resolvedIconUrl = iconUrl && hasLocalMediaFile(iconUrl) ? iconUrl : null
   const href =
     url.includes('@') && !url.includes('://') && !url.startsWith('mailto:')
       ? `mailto:${url}`
@@ -47,16 +84,18 @@ function SocialIcon({
       className="text-foreground hover:text-foreground/80 transition-colors"
       aria-label={label}
     >
-      {iconUrl ? (
+      {resolvedIconUrl ? (
         <img
-          src={iconUrl}
+          src={resolvedIconUrl}
           alt=""
           className="h-5 w-5 object-contain"
           width={20}
           height={20}
         />
       ) : (
-        <span className="text-sm font-medium">{label.charAt(0)}</span>
+        React.createElement(fallbackIcon, {
+          className: 'h-5 w-5',
+        })
       )}
     </Link>
   )
@@ -193,7 +232,7 @@ export async function Footer() {
         {/* Bottom: Copyright */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row sm:justify-between gap-4 text-sm text-muted-foreground">
           {copyright && <span>{copyright}</span>}
-          <span>Made with PayloadCMS</span>
+          <span>Made with ❤️ and PayloadCMS</span>
         </div>
       </div>
     </footer>

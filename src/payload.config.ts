@@ -94,6 +94,22 @@ export default buildConfig({
   },
   onInit: async (payload) => {
     const dbURL = process.env.DATABASE_URL
+    const useR2Storage = process.env.USE_R2_STORAGE === 'true'
+    const useR2DirectURLs = process.env.R2_PUBLIC_READS === 'true'
+    const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
+    const hasR2Env =
+      Boolean(process.env.R2_BUCKET) &&
+      Boolean(process.env.R2_ACCOUNT_ID) &&
+      Boolean(process.env.R2_ACCESS_KEY_ID) &&
+      Boolean(process.env.R2_SECRET_ACCESS_KEY)
+
+    payload.logger.info({
+      msg: 'Startup media storage mode',
+      r2Enabled: useR2Storage,
+      r2EnvConfigured: hasR2Env,
+      r2DirectURLs: useR2DirectURLs,
+      forcePayloadMediaProxy,
+    })
 
     if (!dbURL) {
       payload.logger.warn('Startup DB target: DATABASE_URL is not set.')
