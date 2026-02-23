@@ -16,6 +16,15 @@ const serverURLs = Array.from(
   ),
 )
 
+const r2Hosts = Array.from(
+  new Set(
+    [
+      process.env.R2_ACCOUNT_ID ? `${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : undefined,
+      process.env.R2_PUBLIC_HOSTNAME,
+    ].filter(Boolean),
+  ),
+)
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -28,6 +37,10 @@ const nextConfig = {
           protocol: url.protocol.replace(':', ''),
         }
       }),
+      ...r2Hosts.map((hostname) => ({
+        hostname,
+        protocol: 'https',
+      })),
     ],
   },
   webpack: (webpackConfig, { dev }) => {

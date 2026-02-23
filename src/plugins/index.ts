@@ -42,14 +42,23 @@ const r2Bucket = process.env.R2_BUCKET
 const r2AccountID = process.env.R2_ACCOUNT_ID
 const r2AccessKeyID = process.env.R2_ACCESS_KEY_ID
 const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY
-const hasR2S3Config = Boolean(r2Bucket && r2AccountID && r2AccessKeyID && r2SecretAccessKey)
+const useR2Storage = process.env.USE_R2_STORAGE === 'true'
+const useR2DirectURLs = process.env.R2_PUBLIC_READS === 'true'
+const hasR2S3Config = Boolean(
+  useR2Storage && r2Bucket && r2AccountID && r2AccessKeyID && r2SecretAccessKey,
+)
 
 export const plugins: Plugin[] = [
   ...(hasR2S3Config
     ? [
         s3Storage({
           collections: {
-            media: true,
+            media: useR2DirectURLs
+              ? {
+                  // Direct public object URLs from R2
+                  disablePayloadAccessControl: true,
+                }
+              : true,
           },
           bucket: r2Bucket as string,
           config: {
@@ -58,7 +67,6 @@ export const plugins: Plugin[] = [
               secretAccessKey: r2SecretAccessKey as string,
             },
             endpoint: `https://${r2AccountID}.r2.cloudflarestorage.com`,
-            forcePathStyle: true,
             region: 'auto',
           },
         }),

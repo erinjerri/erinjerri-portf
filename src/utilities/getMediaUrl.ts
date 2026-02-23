@@ -25,7 +25,13 @@ const encodePathPreserveQuery = (value: string): string => {
 }
 
 const toPayloadFileEndpoint = (value: string): string => {
-  if (value.startsWith('/media/')) {
+  const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
+
+  if (!forcePayloadProxyReads && value.startsWith('/api/media/file/')) {
+    return `/media/${value.slice('/api/media/file/'.length)}`
+  }
+
+  if (forcePayloadProxyReads && value.startsWith('/media/')) {
     return `/api/media/file/${value.slice('/media/'.length)}`
   }
 

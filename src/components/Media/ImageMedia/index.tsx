@@ -71,8 +71,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     alt = altFromResource || ''
 
     const cacheTag = resource.updatedAt
-    // Prefer Payload-provided URL; when missing, fall back to Payload file endpoint.
-    const mediaUrl = url ?? (filename ? `/api/media/file/${encodeURI(filename.replace(/^\/+/, ''))}` : null)
+    // Prefer Payload-provided URL; when missing, fall back to static media path.
+    const mediaUrl = url ?? (filename ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}` : null)
     src = getMediaUrl(mediaUrl, cacheTag)
   }
 

@@ -24,7 +24,7 @@ function SocialIcon({
   const iconDoc = icon && typeof icon === 'object' ? icon : null
   const fallbackIconPath =
     iconDoc?.filename
-      ? `/api/media/file/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
+      ? `/media/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
       : null
 
   const iconUrl =
