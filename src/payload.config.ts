@@ -19,6 +19,7 @@ import { getServerSideURL } from './utilities/getURL'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const dbURL = process.env.DATABASE_URL || process.env.MONGODB_URI || ''
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.length > 0
 
@@ -78,7 +79,7 @@ export default buildConfig({
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   db: mongooseAdapter({
-    url: process.env.DATABASE_URL || process.env.MONGODB_URI || '',
+    url: dbURL,
   }),
   collections: [Pages, Posts, Projects, Watch, Media, Categories, Users],
   cors: allowedOrigins,
@@ -109,7 +110,9 @@ export default buildConfig({
     tasks: [],
   },
   onInit: async (payload) => {
-    const dbURL = process.env.DATABASE_URL || process.env.MONGODB_URI
+    const hasDatabaseURL = Boolean(process.env.DATABASE_URL)
+    const hasMongoDBURI = Boolean(process.env.MONGODB_URI)
+    const selectedEnvVar = hasDatabaseURL ? 'DATABASE_URL' : hasMongoDBURI ? 'MONGODB_URI (legacy)' : 'none'
     const useR2Storage = process.env.USE_R2_STORAGE === 'true'
     const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
     const useR2DirectURLs =
@@ -138,10 +141,16 @@ export default buildConfig({
 
     payload.logger.info({
       msg: 'Startup DB env presence',
-      hasDatabaseURL: Boolean(process.env.DATABASE_URL),
-      hasMongoDBURI: Boolean(process.env.MONGODB_URI),
-      selectedEnvVar: process.env.DATABASE_URL ? 'DATABASE_URL' : process.env.MONGODB_URI ? 'MONGODB_URI' : 'none',
+      hasDatabaseURL,
+      hasMongoDBURI,
+      selectedEnvVar,
     })
+
+    if (!hasDatabaseURL && hasMongoDBURI) {
+      payload.logger.warn(
+        'Startup DB config: using legacy MONGODB_URI. Please migrate to DATABASE_URL for consistency.',
+      )
+    }
 
     if (!dbURL) {
       payload.logger.warn('Startup DB target: DATABASE_URL/MONGODB_URI is not set.')
