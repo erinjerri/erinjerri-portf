@@ -5,7 +5,8 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
+import { unstable_cache } from 'next/cache'
+import React from 'react'
 import RichText from '@/components/RichText'
 
 import type { Project } from '@/payload-types'
@@ -48,7 +49,7 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
   const url = '/projects/' + decodedSlug
-  const project = await queryProjectBySlug({ slug: decodedSlug })
+  const project = await getProjectBySlug(decodedSlug, draft)
   const selectedVideo =
     typeof project?.videoAsset === 'object' && project.videoAsset?.mimeType?.includes('video')
       ? project.videoAsset
@@ -89,30 +90,43 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
-  const project = await queryProjectBySlug({ slug: decodedSlug })
+  const project = await getProjectBySlug(decodedSlug, draft)
 
   return generateMeta({ doc: project })
 }
 
-const queryProjectBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
+async function getProjectBySlug(slug: string, draft: boolean) {
+  if (draft) {
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload.find({
+      collection: 'projects',
+      draft: true,
+      limit: 1,
+      pagination: false,
+      overrideAccess: true,
+      where: { slug: { equals: slug } },
+    })
+    return (result.docs?.[0] as Project | null) ?? null
+  }
 
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'projects',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    pagination: false,
-    where: {
-      slug: {
-        equals: slug,
-      },
+  const getCached = unstable_cache(
+    async () => {
+      const payload = await getPayload({ config: configPromise })
+      const result = await payload.find({
+        collection: 'projects',
+        draft: false,
+        limit: 1,
+        pagination: false,
+        overrideAccess: false,
+        where: { slug: { equals: slug } },
+      })
+      return (result.docs?.[0] as Project | null) ?? null
     },
-  })
-
-  return (result.docs?.[0] as Project | null) || null
-})
+    ['project', slug],
+    { revalidate: 60, tags: [`project_${slug}`] },
+  )
+  return getCached()
+}

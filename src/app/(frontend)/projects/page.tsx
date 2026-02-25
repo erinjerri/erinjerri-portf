@@ -5,35 +5,41 @@ import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
 import React from 'react'
 import PageClient from './page.client'
 
-export const dynamic = 'force-dynamic'
+const getCachedProjectsPage = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config: configPromise })
+    return Promise.all([
+      payload.find({
+        collection: 'projects',
+        depth: 1,
+        limit: 12,
+        overrideAccess: false,
+        sort: '-publishedAt',
+        select: {
+          title: true,
+          slug: true,
+          categories: true,
+          meta: true,
+        },
+      }),
+      payload.find({
+        collection: 'categories',
+        limit: 100,
+        overrideAccess: false,
+        sort: 'title',
+      }),
+    ])
+  },
+  ['projects-list'],
+  { revalidate: 60, tags: ['projects'] },
+)
 
 export default async function Page() {
-  const payload = await getPayload({ config: configPromise })
-
-  const [projects, categoriesResult] = await Promise.all([
-    payload.find({
-      collection: 'projects',
-      depth: 1,
-      limit: 12,
-      overrideAccess: false,
-      sort: '-publishedAt',
-      select: {
-        title: true,
-        slug: true,
-        categories: true,
-        meta: true,
-      },
-    }),
-    payload.find({
-      collection: 'categories',
-      limit: 100,
-      overrideAccess: false,
-      sort: 'title',
-    }),
-  ])
+  const [projects, categoriesResult] = await getCachedProjectsPage()
 
   const categories = categoriesResult.docs.map((cat) => ({
     id: cat.id,

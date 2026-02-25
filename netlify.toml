@@ -6,5 +6,15 @@
   # or expected to appear in generated output/runtime bundles.
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SERVER_URL,NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY,R2_ACCOUNT_ID,R2_BUCKET,R2_ENDPOINT,R2_FORCE_PATH_STYLE,R2_PUBLIC_READS,USE_R2_STORAGE,NEXT_SERVER_ACTIONS_ENCRYPTION_KEY"
 
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_next/image/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, s-maxage=86400"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"

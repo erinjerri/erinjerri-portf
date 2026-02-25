@@ -1,6 +1,11 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import bundleAnalyzer from '@next/bundle-analyzer'
 
 import redirects from './redirects.mjs'
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
 
 const serverURLs = Array.from(
   new Set(
@@ -62,4 +67,4 @@ const nextConfig = {
   redirects,
 }
 
-export default withPayload(nextConfig)
+export default withBundleAnalyzer(withPayload(nextConfig))

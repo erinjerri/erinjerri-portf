@@ -4,7 +4,8 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
+import { unstable_cache } from 'next/cache'
+import React from 'react'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
@@ -49,9 +50,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/' + decodedSlug
-  const page = await queryPageBySlug({
-    slug: decodedSlug,
-  })
+  const page = await getPageBySlug(decodedSlug, draft)
 
   if (!page) {
     return <PayloadRedirects url={url} />
@@ -82,33 +81,43 @@ export default async function Page({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
-  // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const page = await queryPageBySlug({
-    slug: decodedSlug,
-  })
+  const page = await getPageBySlug(decodedSlug, draft)
 
   return generateMeta({ doc: page })
 }
 
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
+async function getPageBySlug(slug: string, draft: boolean) {
+  if (draft) {
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload.find({
+      collection: 'pages',
+      draft: true,
+      limit: 1,
+      pagination: false,
+      overrideAccess: true,
+      where: { slug: { equals: slug } },
+    })
+    return result.docs?.[0] ?? null
+  }
 
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'pages',
-    draft,
-    limit: 1,
-    pagination: false,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
-      },
+  const getCached = unstable_cache(
+    async () => {
+      const payload = await getPayload({ config: configPromise })
+      const result = await payload.find({
+        collection: 'pages',
+        draft: false,
+        limit: 1,
+        pagination: false,
+        overrideAccess: false,
+        where: { slug: { equals: slug } },
+      })
+      return result.docs?.[0] ?? null
     },
-  })
-
-  return result.docs?.[0] || null
-})
+    ['page', slug],
+    { revalidate: 60, tags: [`page_${slug}`] },
+  )
+  return getCached()
+}

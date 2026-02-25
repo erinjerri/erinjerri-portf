@@ -81,11 +81,16 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
+  // Reverse breakpoint order so smallest viewport matches first (avoids 4K images on phones)
+  // Cap at 1920px to avoid oversized requests
   const sizes = sizeFromProps
     ? sizeFromProps
-    : Object.entries(breakpoints)
-        .map(([, value]) => `(max-width: ${value}px) ${value * 2}w`)
-        .join(', ')
+    : fill && priority
+      ? '100vw'
+      : Object.entries(breakpoints)
+          .reverse()
+          .map(([, value]) => `(max-width: ${value}px) ${Math.min(value * 2, 1920)}px`)
+          .join(', ')
 
   return (
     <picture className={cn(pictureClassName)}>
@@ -97,7 +102,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         placeholder="blur"
         blurDataURL={placeholderBlur}
         priority={priority}
-        quality={100}
+        quality={priority ? 85 : 80}
         unoptimized={disableOptimization}
         loading={loading}
         sizes={sizes}
