@@ -11,30 +11,26 @@ export async function POST(req: Request): Promise<Response> {
       return NextResponse.json({ ok: false, error: 'Please enter a valid email.' }, { status: 400 })
     }
 
-    const webhookURL = process.env.ZAPIER_SUBSCRIBE_WEBHOOK_URL
-    if (!webhookURL) {
+    const substackUrl = process.env.SUBSTACK_SUBSCRIBE_URL
+    if (!substackUrl) {
       return NextResponse.json(
         { ok: false, error: 'Subscription service is not configured yet.' },
         { status: 503 },
       )
     }
 
-    const webhookRes = await fetch(webhookURL, {
+    const response = await fetch(substackUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email,
-        source: 'footer',
-        subscribedAt: new Date().toISOString(),
-      }),
+      body: JSON.stringify({ email }),
       cache: 'no-store',
     })
 
-    if (!webhookRes.ok) {
+    if (!response.ok) {
       return NextResponse.json(
-        { ok: false, error: 'Subscription provider rejected the request.' },
+        { ok: false, error: 'Subscription failed. Please try again.' },
         { status: 502 },
       )
     }

@@ -35,8 +35,8 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   createdAt: '2023-01-12T21:47:41.374Z',
   emails: [
     {
-      emailFrom: '"Payload" \u003Cdemo@payloadcms.com\u003E',
-      emailTo: '{{email}}',
+      emailFrom: '"Erin" \u003Cyouremail@domain.com\u003E',
+      emailTo: '{{contactme@erinjerri.xyz}}',
       message: {
         root: {
           type: 'root',
