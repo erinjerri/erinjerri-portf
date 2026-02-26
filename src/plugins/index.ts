@@ -45,11 +45,12 @@ const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY?.trim()
 const r2Endpoint =
   process.env.R2_ENDPOINT?.trim() ||
   (r2AccountID ? `https://${r2AccountID}.r2.cloudflarestorage.com` : undefined)
+const r2PublicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
 const r2ForcePathStyle = process.env.R2_FORCE_PATH_STYLE !== 'false'
 const useR2Storage = process.env.USE_R2_STORAGE === 'true'
 const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
 const useR2DirectURLs =
-  process.env.R2_PUBLIC_READS === 'true' || (useR2Storage && !forcePayloadProxyReads)
+  !forcePayloadProxyReads && (process.env.R2_PUBLIC_READS === 'true' || Boolean(r2PublicHostname))
 const hasR2S3Config = Boolean(
   useR2Storage && r2Bucket && r2Endpoint && r2AccessKeyID && r2SecretAccessKey,
 )
@@ -63,6 +64,13 @@ export const plugins: Plugin[] = [
               ? {
                   // Direct public object URLs from R2
                   disablePayloadAccessControl: true,
+                  ...(r2PublicHostname && {
+                    generateFileURL: ({ filename, prefix }) => {
+                      const base = `https://${r2PublicHostname.replace(/^https?:\/\//, '')}`
+                      const path = [prefix, filename].filter(Boolean).join('/')
+                      return `${base}/${path}`
+                    },
+                  }),
                 }
               : true,
           },

@@ -31,6 +31,10 @@ const toPayloadFileEndpoint = (value: string): string => {
     return `/media/${value.slice('/api/media/file/'.length)}`
   }
 
+  if (forcePayloadProxyReads && value.startsWith('/media/')) {
+    return `/api/media/file/${value.slice('/media/'.length)}`
+  }
+
   return value
 }
 
@@ -54,7 +58,7 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
       const parsed = new URL(url)
 
       // R2 S3 API endpoints are not publicly readable in browsers.
-      // In proxy mode, rewrite those URLs to Payload's media route.
+      // In proxy mode, rewrite those URLs to Payload's media file route.
       if (
         forcePayloadProxyReads &&
         parsed.hostname.endsWith('r2.cloudflarestorage.com')
@@ -62,12 +66,14 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
         const pathParts = parsed.pathname.split('/').filter(Boolean)
         const filename = pathParts[pathParts.length - 1]
         if (filename) {
-          return appendCacheTag(`/media/${encodeURIComponent(filename)}`)
+          return appendCacheTag(`/api/media/file/${encodeURIComponent(filename)}`)
         }
       }
 
       if (!forcePayloadProxyReads && parsed.pathname.startsWith('/api/media/file/')) {
         parsed.pathname = `/media/${parsed.pathname.slice('/api/media/file/'.length)}`
+      } else if (forcePayloadProxyReads && parsed.pathname.startsWith('/media/')) {
+        parsed.pathname = `/api/media/file/${parsed.pathname.slice('/media/'.length)}`
       }
 
       return appendCacheTag(parsed.toString())

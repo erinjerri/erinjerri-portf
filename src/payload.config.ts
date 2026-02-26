@@ -136,9 +136,10 @@ export default buildConfig({
     const selectedEnvVar = hasDatabaseURL ? 'DATABASE_URL' : hasMongoDBURI ? 'MONGODB_URI (legacy)' : 'none'
     const useR2Storage = process.env.USE_R2_STORAGE === 'true'
     const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
+    const r2PublicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
     const useR2DirectURLs =
       !forcePayloadMediaProxy &&
-      (process.env.R2_PUBLIC_READS === 'true' || useR2Storage)
+      (process.env.R2_PUBLIC_READS === 'true' || Boolean(r2PublicHostname))
     const r2Endpoint =
       process.env.R2_ENDPOINT ||
       (process.env.R2_ACCOUNT_ID
