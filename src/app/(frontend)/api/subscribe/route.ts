@@ -19,12 +19,16 @@ export async function POST(req: Request): Promise<Response> {
       )
     }
 
-    const response = await fetch(substackUrl, {
+    const baseUrl = substackUrl.trim().replace(/\/$/, '')
+    const subscribeUrl = baseUrl.includes('?') ? baseUrl : `${baseUrl}?nojs=true`
+
+    const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (compatible; NewsletterSubscribe/1.0)',
       },
-      body: JSON.stringify({ email }),
+      body: new URLSearchParams({ email, source: 'subscribe_page' }).toString(),
       cache: 'no-store',
     })
 

@@ -47,6 +47,9 @@ const hasLocalMediaFile = (mediaUrl: string): boolean => {
   }
 }
 
+const isBrokenR2Url = (u: string | null | undefined): boolean =>
+  Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
+
 function SocialIcon({
   url,
   label,
@@ -57,23 +60,22 @@ function SocialIcon({
   icon?: MediaType | string | null
 }) {
   const iconDoc = icon && typeof icon === 'object' ? icon : null
-  const fallbackIconPath =
-    iconDoc?.filename
-      ? `/media/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
-      : null
+  const fallbackIconPath = iconDoc?.filename
+    ? `/media/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
+    : null
 
-  const iconUrl =
-    iconDoc?.url
-      ? getMediaUrl(iconDoc.url, iconDoc.updatedAt)
-      : fallbackIconPath
-        ? getMediaUrl(fallbackIconPath, iconDoc?.updatedAt)
-        : null
+  // Prefer Payload url; if it's a broken R2 S3 API URL (not publicly readable),
+  // use path-based fallback so proxy can serve it.
+  const primaryUrl = iconDoc?.url ?? null
+  const urlToResolve =
+    primaryUrl && !isBrokenR2Url(primaryUrl) ? primaryUrl : (fallbackIconPath ?? primaryUrl)
+
+  // Omit cache tag: R2 rejects URLs with ?timestamp query params; footer icons don't need cache-busting
+  const iconUrl = urlToResolve ? getMediaUrl(urlToResolve, null) : null
   const fallbackIcon = resolveFallbackSocialIcon(label, url)
   const resolvedIconUrl = iconUrl && hasLocalMediaFile(iconUrl) ? iconUrl : null
   const href =
-    url.includes('@') && !url.includes('://') && !url.startsWith('mailto:')
-      ? `mailto:${url}`
-      : url
+    url.includes('@') && !url.includes('://') && !url.startsWith('mailto:') ? `mailto:${url}` : url
   const isExternal = href.startsWith('http://') || href.startsWith('https://')
 
   return (
@@ -117,10 +119,14 @@ export async function Footer() {
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
 
-  const unresolvedIconIDs = socialLinks.flatMap((item) => {
-    const icon = item?.icon as unknown
-    return typeof icon === 'string' || typeof icon === 'number' ? [icon] : []
-  })
+  const unresolvedIconIDs = [
+    ...new Set(
+      socialLinks.flatMap((item) => {
+        const icon = item?.icon as unknown
+        return typeof icon === 'string' || typeof icon === 'number' ? [icon] : []
+      }),
+    ),
+  ]
 
   let mediaByID: Record<string, MediaType> = {}
 
@@ -143,6 +149,13 @@ export async function Footer() {
         acc[String(mediaDoc.id)] = mediaDoc as MediaType
         return acc
       }, {})
+
+      const missingCount = unresolvedIconIDs.length - mediaResult.docs.length
+      if (missingCount > 0 && process.env.NODE_ENV === 'development') {
+        console.warn(
+          `[Footer] ${missingCount} social icon(s) could not be resolved (media may be deleted or IDs stale).`,
+        )
+      }
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[Footer] Failed to resolve social icon IDs:', err)
@@ -161,14 +174,10 @@ export async function Footer() {
               <Logo />
             </Link>
 
-            {subscribeSection?.showSubscribe !== false && (
-              <SubscribeForm />
-            )}
+            {subscribeSection?.showSubscribe !== false && <SubscribeForm />}
 
             {subscribeSection?.slogan && (
-              <p className="text-sm text-muted-foreground">
-                {subscribeSection.slogan}
-              </p>
+              <p className="text-sm text-muted-foreground">{subscribeSection.slogan}</p>
             )}
 
             {socialLinks.length > 0 && (
@@ -200,9 +209,7 @@ export async function Footer() {
               {linkGroups.map((group, groupIndex) => (
                 <div key={group.id || groupIndex} className="flex flex-col gap-3">
                   {group.header && (
-                    <span className="font-semibold text-foreground">
-                      {group.header}
-                    </span>
+                    <span className="font-semibold text-foreground">{group.header}</span>
                   )}
                   <ul className="flex flex-col gap-2">
                     {group.links?.map((item, linkIndex) => {

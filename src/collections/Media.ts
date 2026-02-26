@@ -10,6 +10,11 @@ import { fileURLToPath } from 'url'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import {
+  revalidateFooterOnMediaChange,
+  revalidateFooterOnMediaDelete,
+} from './Media/hooks/revalidateFooterOnMediaChange'
+import { rewriteBrokenR2Urls } from './Media/hooks/rewriteBrokenR2Urls'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -85,6 +90,9 @@ export const Media: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [revalidateFooterOnMediaChange],
+    afterDelete: [revalidateFooterOnMediaDelete],
+    afterRead: [rewriteBrokenR2Urls],
   },
   upload: {
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
