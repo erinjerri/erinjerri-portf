@@ -76,7 +76,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     src = getMediaUrl(mediaUrl, cacheTag)
   }
 
-  const disableOptimization = typeof src === 'string' && src.includes('/api/media/file/')
+  const disableOptimization =
+    typeof src === 'string' && (src.includes('/api/media/file/') || src.includes('/media/'))
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
 
