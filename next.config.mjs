@@ -25,10 +25,13 @@ const serverURLs = Array.from(
 
 const r2Hosts = Array.from(
   new Set(
-    [
-      process.env.R2_ACCOUNT_ID ? `${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : undefined,
-      process.env.R2_PUBLIC_HOSTNAME,
-    ].filter(Boolean),
+    [process.env.R2_ACCOUNT_ID ? `${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : undefined]
+      .concat(
+        process.env.R2_PUBLIC_HOSTNAME
+          ? process.env.R2_PUBLIC_HOSTNAME.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+          : [],
+      )
+      .filter(Boolean),
   ),
 )
 
@@ -48,6 +51,10 @@ const nextConfig = {
         hostname,
         protocol: 'https',
       })),
+      {
+        hostname: '**.r2.dev',
+        protocol: 'https',
+      },
     ],
   },
   webpack: (webpackConfig, { dev }) => {

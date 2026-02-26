@@ -53,11 +53,12 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     try {
       const parsed = new URL(url)
 
-      // R2 S3 API endpoints are not publicly readable in browsers.
-      // In proxy mode, rewrite those URLs to Payload's media file route.
+      // R2 object URLs may not be publicly readable in every environment.
+      // In proxy mode, always route known R2 hostnames through Payload.
       if (
         forcePayloadProxyReads &&
-        parsed.hostname.endsWith('r2.cloudflarestorage.com')
+        (parsed.hostname.endsWith('r2.cloudflarestorage.com') ||
+          parsed.hostname.endsWith('.r2.dev'))
       ) {
         const pathParts = parsed.pathname.split('/').filter(Boolean)
         const filename = pathParts[pathParts.length - 1]
