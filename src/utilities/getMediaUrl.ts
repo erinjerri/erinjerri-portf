@@ -27,10 +27,6 @@ const encodePathPreserveQuery = (value: string): string => {
 const toPayloadFileEndpoint = (value: string): string => {
   const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
 
-  if (!forcePayloadProxyReads && value.startsWith('/api/media/file/')) {
-    return `/media/${value.slice('/api/media/file/'.length)}`
-  }
-
   if (forcePayloadProxyReads && value.startsWith('/media/')) {
     return `/api/media/file/${value.slice('/media/'.length)}`
   }
@@ -70,9 +66,7 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
         }
       }
 
-      if (!forcePayloadProxyReads && parsed.pathname.startsWith('/api/media/file/')) {
-        parsed.pathname = `/media/${parsed.pathname.slice('/api/media/file/'.length)}`
-      } else if (forcePayloadProxyReads && parsed.pathname.startsWith('/media/')) {
+      if (forcePayloadProxyReads && parsed.pathname.startsWith('/media/')) {
         parsed.pathname = `/api/media/file/${parsed.pathname.slice('/media/'.length)}`
       }
 
