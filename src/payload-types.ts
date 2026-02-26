@@ -116,10 +116,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    brand: Brand;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    brand: BrandSelect<false> | BrandSelect<true>;
   };
   locale: null;
   user: User & {
@@ -829,7 +831,7 @@ export interface VideoBackgroundTransitionBlock {
    * Overlay opacity percentage. 80 gives a strong transition effect.
    */
   overlayOpacity?: number | null;
-  height?: ('small' | 'medium' | 'large') | null;
+  height?: ('small' | 'medium' | 'large' | 'hero') | null;
   content?: {
     root: {
       type: string;
@@ -845,6 +847,31 @@ export interface VideoBackgroundTransitionBlock {
     };
     [k: string]: unknown;
   } | null;
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'archive') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          archive?: ('posts' | 'projects' | 'watch') | null;
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'accent' | 'light' | 'inactive' | 'filter' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'videoBackgroundTransition';
@@ -1521,6 +1548,22 @@ export interface VideoBackgroundTransitionBlockSelect<T extends boolean = true> 
   overlayOpacity?: T;
   height?: T;
   content?: T;
+  links?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              archive?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }
@@ -2139,6 +2182,73 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brand".
+ */
+export interface Brand {
+  id: string;
+  fonts: {
+    title: string;
+    copy: string;
+  };
+  colors: {
+    light: {
+      background: string;
+      foreground: string;
+      card: string;
+      cardForeground: string;
+      popover: string;
+      popoverForeground: string;
+      primary: string;
+      primaryForeground: string;
+      secondary: string;
+      secondaryForeground: string;
+      muted: string;
+      mutedForeground: string;
+      accent: string;
+      accentForeground: string;
+      destructive: string;
+      destructiveForeground: string;
+      border: string;
+      input: string;
+      ring: string;
+      success: string;
+      warning: string;
+      error: string;
+    };
+    dark: {
+      background: string;
+      foreground: string;
+      card: string;
+      cardForeground: string;
+      popover: string;
+      popoverForeground: string;
+      primary: string;
+      primaryForeground: string;
+      secondary: string;
+      secondaryForeground: string;
+      muted: string;
+      mutedForeground: string;
+      accent: string;
+      accentForeground: string;
+      destructive: string;
+      destructiveForeground: string;
+      border: string;
+      input: string;
+      ring: string;
+      success: string;
+      warning: string;
+      error: string;
+    };
+  };
+  /**
+   * CSS border radius token. Example: 0.5rem
+   */
+  radius: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -2202,6 +2312,78 @@ export interface FooterSelect<T extends boolean = true> {
         id?: T;
       };
   copyright?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brand_select".
+ */
+export interface BrandSelect<T extends boolean = true> {
+  fonts?:
+    | T
+    | {
+        title?: T;
+        copy?: T;
+      };
+  colors?:
+    | T
+    | {
+        light?:
+          | T
+          | {
+              background?: T;
+              foreground?: T;
+              card?: T;
+              cardForeground?: T;
+              popover?: T;
+              popoverForeground?: T;
+              primary?: T;
+              primaryForeground?: T;
+              secondary?: T;
+              secondaryForeground?: T;
+              muted?: T;
+              mutedForeground?: T;
+              accent?: T;
+              accentForeground?: T;
+              destructive?: T;
+              destructiveForeground?: T;
+              border?: T;
+              input?: T;
+              ring?: T;
+              success?: T;
+              warning?: T;
+              error?: T;
+            };
+        dark?:
+          | T
+          | {
+              background?: T;
+              foreground?: T;
+              card?: T;
+              cardForeground?: T;
+              popover?: T;
+              popoverForeground?: T;
+              primary?: T;
+              primaryForeground?: T;
+              secondary?: T;
+              secondaryForeground?: T;
+              muted?: T;
+              mutedForeground?: T;
+              accent?: T;
+              accentForeground?: T;
+              destructive?: T;
+              destructiveForeground?: T;
+              border?: T;
+              input?: T;
+              ring?: T;
+              success?: T;
+              warning?: T;
+              error?: T;
+            };
+      };
+  radius?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

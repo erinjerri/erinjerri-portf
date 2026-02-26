@@ -7,6 +7,8 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
+import { linkGroup } from '@/fields/linkGroup'
+
 export const VideoBackgroundTransition: Block = {
   slug: 'videoBackgroundTransition',
   interfaceName: 'VideoBackgroundTransitionBlock',
@@ -44,6 +46,7 @@ export const VideoBackgroundTransition: Block = {
         { label: 'Small', value: 'small' },
         { label: 'Medium', value: 'medium' },
         { label: 'Large', value: 'large' },
+        { label: 'Hero (tall, for overlay buttons)', value: 'hero' },
       ],
     },
     {
@@ -61,6 +64,11 @@ export const VideoBackgroundTransition: Block = {
       }),
       label: 'Optional Overlay Content',
     },
+    linkGroup({
+      overrides: {
+        maxRows: 2,
+      },
+    }),
   ],
   labels: {
     singular: 'Video Background Transition',

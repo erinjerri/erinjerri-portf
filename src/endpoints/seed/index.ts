@@ -1,14 +1,21 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import fs from 'fs/promises'
 
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
+import { image3 } from './image-3'
 import { imageHero1 } from './image-hero-1'
 import { post1 } from './post-1'
 import { post2 } from './post-2'
 import { post3 } from './post-3'
+
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
 
 const collections: CollectionSlug[] = [
   'categories',
@@ -49,6 +56,7 @@ export const seed = async ({
         navItems: [],
       },
       depth: 0,
+      req,
       context: {
         disableRevalidate: true,
       },
@@ -65,6 +73,73 @@ export const seed = async ({
         copyright: '',
       },
       depth: 0,
+      req,
+      context: {
+        disableRevalidate: true,
+      },
+    }),
+    payload.updateGlobal({
+      slug: 'brand' as GlobalSlug,
+      data: {
+        fonts: {
+          title:
+            "var(--font-league-spartan), var(--font-jost), 'Satoshi', 'Glacial Indifference', sans-serif",
+          copy: "var(--font-jost), 'Satoshi', 'Glacial Indifference', var(--font-league-spartan), sans-serif",
+        },
+        colors: {
+          light: {
+            background: '222 35% 5%',
+            foreground: '0 0% 74.9%',
+            card: '210 28.8% 28.6%',
+            cardForeground: '0 0% 74.9%',
+            popover: '210 28.8% 28.6%',
+            popoverForeground: '0 0% 74.9%',
+            primary: '203.7 77.2% 48.2%',
+            primaryForeground: '0 0% 96%',
+            secondary: '185.4 100% 60.8%',
+            secondaryForeground: '222 35% 5%',
+            muted: '210 28.8% 28.6%',
+            mutedForeground: '0 0% 62%',
+            accent: '185.4 100% 60.8%',
+            accentForeground: '222 35% 5%',
+            destructive: '354 70% 55%',
+            destructiveForeground: '0 0% 96%',
+            border: '210 28.8% 34%',
+            input: '210 28.8% 28.6%',
+            ring: '203.7 77.2% 48.2%',
+            success: '185.4 100% 60.8%',
+            warning: '44 90% 62%',
+            error: '354 70% 55%',
+          },
+          dark: {
+            background: '222 35% 5%',
+            foreground: '0 0% 74.9%',
+            card: '210 28.8% 28.6%',
+            cardForeground: '0 0% 74.9%',
+            popover: '210 28.8% 28.6%',
+            popoverForeground: '0 0% 74.9%',
+            primary: '203.7 77.2% 48.2%',
+            primaryForeground: '0 0% 96%',
+            secondary: '185.4 100% 60.8%',
+            secondaryForeground: '222 35% 5%',
+            muted: '210 28.8% 28.6%',
+            mutedForeground: '0 0% 62%',
+            accent: '185.4 100% 60.8%',
+            accentForeground: '222 35% 5%',
+            destructive: '354 70% 55%',
+            destructiveForeground: '0 0% 96%',
+            border: '210 28.8% 34%',
+            input: '210 28.8% 28.6%',
+            ring: '203.7 77.2% 48.2%',
+            success: '185.4 100% 60.8%',
+            warning: '44 90% 62%',
+            error: '354 70% 55%',
+          },
+        },
+        radius: '0.5rem',
+      } as any,
+      depth: 0,
+      req,
       context: {
         disableRevalidate: true,
       },
@@ -86,6 +161,7 @@ export const seed = async ({
   await payload.delete({
     collection: 'users',
     depth: 0,
+    req,
     where: {
       email: {
         equals: 'demo-author@example.com',
@@ -96,18 +172,10 @@ export const seed = async ({
   payload.logger.info(`— Seeding media...`)
 
   const [image1Buffer, image2Buffer, image3Buffer, hero1Buffer] = await Promise.all([
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post1.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post2.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post3.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-hero1.webp',
-    ),
+    fetchFileByPath(path.join(dirname, 'image-post1.webp')),
+    fetchFileByPath(path.join(dirname, 'image-post2.webp')),
+    fetchFileByPath(path.join(dirname, 'image-post3.webp')),
+    fetchFileByPath(path.join(dirname, 'image-hero1.webp')),
   ])
 
   const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
@@ -118,34 +186,40 @@ export const seed = async ({
         email: 'demo-author@example.com',
         password: 'password',
       },
+      req,
     }),
     payload.create({
       collection: 'media',
       data: image1,
       file: image1Buffer,
+      req,
     }),
     payload.create({
       collection: 'media',
       data: image2,
       file: image2Buffer,
+      req,
     }),
     payload.create({
       collection: 'media',
-      data: image2,
+      data: image3,
       file: image3Buffer,
+      req,
     }),
     payload.create({
       collection: 'media',
       data: imageHero1,
       file: hero1Buffer,
+      req,
     }),
-    categories.map((category) =>
+    ...categories.map((category) =>
       payload.create({
         collection: 'categories',
         data: {
           title: category,
           slug: category,
         },
+        req,
       }),
     ),
   ])
@@ -157,6 +231,7 @@ export const seed = async ({
   const post1Doc = await payload.create({
     collection: 'posts',
     depth: 0,
+    req,
     context: {
       disableRevalidate: true,
     },
@@ -166,6 +241,7 @@ export const seed = async ({
   const post2Doc = await payload.create({
     collection: 'posts',
     depth: 0,
+    req,
     context: {
       disableRevalidate: true,
     },
@@ -175,6 +251,7 @@ export const seed = async ({
   const post3Doc = await payload.create({
     collection: 'posts',
     depth: 0,
+    req,
     context: {
       disableRevalidate: true,
     },
@@ -188,6 +265,7 @@ export const seed = async ({
     data: {
       relatedPosts: [post2Doc.id, post3Doc.id],
     },
+    req,
   })
   await payload.update({
     id: post2Doc.id,
@@ -195,6 +273,7 @@ export const seed = async ({
     data: {
       relatedPosts: [post1Doc.id, post3Doc.id],
     },
+    req,
   })
   await payload.update({
     id: post3Doc.id,
@@ -202,6 +281,7 @@ export const seed = async ({
     data: {
       relatedPosts: [post1Doc.id, post2Doc.id],
     },
+    req,
   })
 
   payload.logger.info(`— Seeding contact form...`)
@@ -210,6 +290,7 @@ export const seed = async ({
     collection: 'forms',
     depth: 0,
     data: contactFormData,
+    req,
   })
 
   payload.logger.info(`— Seeding pages...`)
@@ -219,11 +300,13 @@ export const seed = async ({
       collection: 'pages',
       depth: 0,
       data: home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+      req,
     }),
     payload.create({
       collection: 'pages',
       depth: 0,
       data: contactPageData({ contactForm: contactForm }),
+      req,
     }),
   ])
 
@@ -253,6 +336,7 @@ export const seed = async ({
           },
         ],
       },
+      req,
     }),
     payload.updateGlobal({
       slug: 'footer',
@@ -279,28 +363,20 @@ export const seed = async ({
         ],
         copyright: '2026 Erin Jerri. All rights reserved.',
       },
+      req,
     }),
   ])
 
   payload.logger.info('Seeded database successfully!')
 }
 
-async function fetchFileByURL(url: string): Promise<File> {
-  const res = await fetch(url, {
-    credentials: 'include',
-    method: 'GET',
-  })
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch file from ${url}, status: ${res.status}`)
-  }
-
-  const data = await res.arrayBuffer()
+async function fetchFileByPath(filePath: string): Promise<File> {
+  const data = await fs.readFile(filePath)
 
   return {
-    name: url.split('/').pop() || `file-${Date.now()}`,
-    data: Buffer.from(data),
-    mimetype: `image/${url.split('.').pop()}`,
+    name: path.basename(filePath),
+    data,
+    mimetype: `image/${path.extname(filePath).replace('.', '') || 'webp'}`,
     size: data.byteLength,
   }
 }

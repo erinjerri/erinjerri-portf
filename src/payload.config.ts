@@ -1,4 +1,5 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -11,6 +12,7 @@ import { Posts } from './collections/Posts'
 import { Projects } from './collections/Projects'
 import { Users } from './collections/Users'
 import { Watch } from './collections/Watch'
+import { Brand } from './Brand/config'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
@@ -81,10 +83,29 @@ export default buildConfig({
   db: mongooseAdapter({
     url: dbURL,
   }),
+  email: nodemailerAdapter({
+    defaultFromAddress: process.env.PROTON_SMTP_USER ?? 'noreply@example.com',
+    defaultFromName: process.env.SITE_NAME ?? 'Portfolio',
+    // In CI / local scripts (e.g. `generate:types`) network access might be unavailable.
+    // Skip transport verification unless explicitly enabled.
+    skipVerify: process.env.EMAIL_VERIFY_TRANSPORT === 'true' ? false : true,
+    transportOptions: {
+      host: 'smtp.protonmail.ch',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.PROTON_SMTP_USER,
+        pass: process.env.PROTON_SMTP_TOKEN,
+      },
+      tls: {
+        rejectUnauthorized: true,
+      },
+    },
+  }),
   collections: [Pages, Posts, Projects, Watch, Media, Categories, Users],
   cors: allowedOrigins,
   csrf: allowedOrigins,
-  globals: [Header, Footer],
+  globals: [Header, Footer, Brand],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

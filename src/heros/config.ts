@@ -81,7 +81,7 @@ export const hero: Field = {
         admin: {
           condition: (_, { type } = {}) => type !== 'topline',
         },
-        maxRows: 2,
+        maxRows: 6,
       },
     }),
     {
