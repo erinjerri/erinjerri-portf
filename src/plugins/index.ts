@@ -42,7 +42,6 @@ const r2Bucket = process.env.R2_BUCKET?.trim()
 const r2AccountID = process.env.R2_ACCOUNT_ID?.trim()
 const r2AccessKeyID = process.env.R2_ACCESS_KEY_ID?.trim()
 const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY?.trim()
-const r2PublicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
 const r2Endpoint =
   process.env.R2_ENDPOINT?.trim() ||
   (r2AccountID ? `https://${r2AccountID}.r2.cloudflarestorage.com` : undefined)
@@ -64,15 +63,6 @@ export const plugins: Plugin[] = [
               ? {
                   // Direct public object URLs from R2
                   disablePayloadAccessControl: true,
-                  // When R2_PUBLIC_HOSTNAME is set, generate correct public URLs
-                  // (R2 S3 API endpoint is not publicly accessible)
-                  ...(r2PublicHostname && {
-                    generateFileURL: ({ filename, prefix }) => {
-                      const base = `https://${r2PublicHostname.replace(/^https?:\/\//, '')}`
-                      const path = [prefix, filename].filter(Boolean).join('/')
-                      return `${base}/${path}`
-                    },
-                  }),
                 }
               : true,
           },

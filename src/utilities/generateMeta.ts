@@ -5,23 +5,21 @@ import type { Media, Page, Post, Config } from '../payload-types'
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
 
-const isBrokenR2Url = (u: string) => u.includes('r2.cloudflarestorage.com')
-
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL()
 
   let url = serverUrl + '/website-template-OG.webp'
 
   if (image && typeof image === 'object' && 'url' in image) {
-    const fallbackPath = image.filename
-      ? `/media/${encodeURI(String(image.filename).replace(/^\/+/, ''))}`
-      : null
-    const pickUrl = (u: string | null | undefined) =>
-      u && !isBrokenR2Url(u) ? u : fallbackPath
-    const ogUrl = pickUrl(image.sizes?.og?.url ?? null)
-    const mainUrl = pickUrl(image.url ?? null)
+    const ogUrl = image.sizes?.og?.url
+    const mainUrl = image.url
 
-    url = (ogUrl || mainUrl) ? serverUrl + (ogUrl || mainUrl!) : url
+    url =
+      ogUrl && typeof ogUrl === 'string'
+        ? serverUrl + ogUrl
+        : mainUrl && typeof mainUrl === 'string'
+          ? serverUrl + mainUrl
+          : url
   }
 
   return url

@@ -62,13 +62,12 @@ function SocialIcon({
       ? `/media/${encodeURI(iconDoc.filename.replace(/^\/+/, ''))}`
       : null
 
-  const iconUrl = iconDoc
-    ? getMediaUrl(
-        iconDoc.url ?? null,
-        iconDoc.updatedAt,
-        fallbackIconPath,
-      )
-    : null
+  const iconUrl =
+    iconDoc?.url
+      ? getMediaUrl(iconDoc.url, iconDoc.updatedAt)
+      : fallbackIconPath
+        ? getMediaUrl(fallbackIconPath, iconDoc?.updatedAt)
+        : null
   const fallbackIcon = resolveFallbackSocialIcon(label, url)
   const resolvedIconUrl = iconUrl && hasLocalMediaFile(iconUrl) ? iconUrl : null
   const href =
