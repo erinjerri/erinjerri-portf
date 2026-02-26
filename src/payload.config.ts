@@ -6,6 +6,7 @@ import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
+import { Documents } from './collections/Documents'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
@@ -102,7 +103,7 @@ export default buildConfig({
       },
     },
   }),
-  collections: [Pages, Posts, Projects, Watch, Media, Categories, Users],
+  collections: [Pages, Posts, Projects, Watch, Media, Documents, Categories, Users],
   cors: allowedOrigins,
   csrf: allowedOrigins,
   globals: [Header, Footer, Brand],

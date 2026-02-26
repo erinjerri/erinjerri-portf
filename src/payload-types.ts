@@ -72,6 +72,7 @@ export interface Config {
     projects: Project;
     watch: Watch;
     media: Media;
+    documents: Document;
     categories: Category;
     users: User;
     redirects: Redirect;
@@ -96,6 +97,7 @@ export interface Config {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     watch: WatchSelect<false> | WatchSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -214,6 +216,7 @@ export interface Page {
   layout: (
     | CallToActionBlock
     | ContentBlock
+    | DocumentBlock
     | MediaBlock
     | ArchiveBlock
     | WatchBlock
@@ -592,6 +595,59 @@ export interface ContentBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'content';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DocumentBlock".
+ */
+export interface DocumentBlock {
+  /**
+   * Select or upload a PDF to embed on the page.
+   */
+  document: string | Document;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'documentBlock';
+}
+/**
+ * PDF files stored in Cloudflare R2 (or local when R2 is disabled)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: string;
+  /**
+   * Display name (e.g. "Creating AR/VR — Chapter 1")
+   */
+  title: string;
+  /**
+   * Optional short description shown beneath the viewer
+   */
+  description?: string | null;
+  /**
+   * Used to filter documents on the front end
+   */
+  category?: ('book' | 'article' | 'press-kit' | 'slides' | 'resume' | 'other') | null;
+  /**
+   * Show a Download button alongside the viewer
+   */
+  allowDownload?: boolean | null;
+  /**
+   * Paste an Issuu, Google Drive, or Scribd embed URL to use that viewer instead.
+   */
+  externalEmbedUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1313,6 +1369,10 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
+        relationTo: 'documents';
+        value: string | Document;
+      } | null)
+    | ({
         relationTo: 'categories';
         value: string | Category;
       } | null)
@@ -1417,6 +1477,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         cta?: T | CallToActionBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
+        documentBlock?: T | DocumentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         watchBlock?: T | WatchBlockSelect<T>;
@@ -1494,6 +1555,15 @@ export interface ContentBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DocumentBlock_select".
+ */
+export interface DocumentBlockSelect<T extends boolean = true> {
+  document?: T;
   id?: T;
   blockName?: T;
 }
@@ -1781,6 +1851,28 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  category?: T;
+  allowDownload?: T;
+  externalEmbedUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
