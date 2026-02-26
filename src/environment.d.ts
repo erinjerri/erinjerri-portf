@@ -7,6 +7,7 @@ declare global {
       CF_PAGES_URL?: string
       USE_R2_STORAGE?: 'true' | 'false'
       R2_PUBLIC_READS?: 'true' | 'false'
+      R2_PUBLIC_HOSTNAME?: string
       R2_ACCOUNT_ID?: string
       R2_BUCKET?: string
       R2_ACCESS_KEY_ID?: string
