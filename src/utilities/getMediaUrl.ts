@@ -57,6 +57,19 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     try {
       const parsed = new URL(url)
 
+      // R2 S3 API endpoints are not publicly readable in browsers.
+      // In proxy mode, rewrite those URLs to Payload's media file route.
+      if (
+        forcePayloadProxyReads &&
+        parsed.hostname.endsWith('r2.cloudflarestorage.com')
+      ) {
+        const pathParts = parsed.pathname.split('/').filter(Boolean)
+        const filename = pathParts[pathParts.length - 1]
+        if (filename) {
+          return appendCacheTag(`/api/media/file/${encodeURIComponent(filename)}`)
+        }
+      }
+
       if (!forcePayloadProxyReads && parsed.pathname.startsWith('/api/media/file/')) {
         parsed.pathname = `/media/${parsed.pathname.slice('/api/media/file/'.length)}`
       } else if (forcePayloadProxyReads && parsed.pathname.startsWith('/media/')) {

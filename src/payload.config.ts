@@ -137,7 +137,8 @@ export default buildConfig({
     const useR2Storage = process.env.USE_R2_STORAGE === 'true'
     const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
     const useR2DirectURLs =
-      process.env.R2_PUBLIC_READS === 'true' || (useR2Storage && !forcePayloadMediaProxy)
+      !forcePayloadMediaProxy &&
+      (process.env.R2_PUBLIC_READS === 'true' || useR2Storage)
     const r2Endpoint =
       process.env.R2_ENDPOINT ||
       (process.env.R2_ACCOUNT_ID
