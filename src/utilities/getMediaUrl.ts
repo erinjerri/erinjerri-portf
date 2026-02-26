@@ -38,8 +38,17 @@ const toPayloadFileEndpoint = (value: string): string => {
   return value
 }
 
-export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
-  if (!url) return ''
+/** R2 S3 API endpoint is not publicly accessible; use proxy path instead */
+const isBrokenR2Url = (url: string): boolean => url.includes('r2.cloudflarestorage.com')
+
+export const getMediaUrl = (
+  url: string | null | undefined,
+  cacheTag?: string | null,
+  fallbackPath?: string | null,
+): string => {
+  const resolved =
+    url && isBrokenR2Url(url) && fallbackPath ? fallbackPath : url ?? fallbackPath ?? ''
+  if (!resolved) return ''
   const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
 
   if (cacheTag && cacheTag !== '') {
@@ -53,9 +62,9 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
   }
 
   // Check if URL already has http/https protocol
-  if (url.startsWith('http://') || url.startsWith('https://')) {
+  if (resolved.startsWith('http://') || resolved.startsWith('https://')) {
     try {
-      const parsed = new URL(url)
+      const parsed = new URL(resolved)
 
       if (!forcePayloadProxyReads && parsed.pathname.startsWith('/api/media/file/')) {
         parsed.pathname = `/media/${parsed.pathname.slice('/api/media/file/'.length)}`
@@ -65,11 +74,11 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
 
       return appendCacheTag(parsed.toString())
     } catch {
-      return appendCacheTag(url)
+      return appendCacheTag(resolved)
     }
   }
 
-  const normalizedUrl = encodePathPreserveQuery(toPayloadFileEndpoint(url))
+  const normalizedUrl = encodePathPreserveQuery(toPayloadFileEndpoint(resolved))
 
   // Keep local URLs relative so they work regardless of host (localhost/LAN/custom domain).
   if (normalizedUrl.startsWith('/')) {

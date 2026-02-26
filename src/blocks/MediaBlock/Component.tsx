@@ -95,9 +95,13 @@ export const MediaBlock: React.FC<Props> = (props) => {
   let caption
   if (selectedMedia && typeof selectedMedia === 'object') caption = selectedMedia.caption
 
+  const thumbnailFallback =
+    thumbnail && typeof thumbnail === 'object' && selectedMedia && typeof selectedMedia === 'object' && selectedMedia.filename
+      ? `/media/${encodeURI(selectedMedia.filename.replace(/^\/+/, ''))}`
+      : null
   const thumbnailURL =
-    thumbnail && typeof thumbnail === 'object' && thumbnail.url
-      ? getMediaUrl(thumbnail.url, thumbnail.updatedAt)
+    thumbnail && typeof thumbnail === 'object'
+      ? getMediaUrl(thumbnail.url ?? null, thumbnail.updatedAt, thumbnailFallback)
       : undefined
 
   const youtubeEmbedURL = videoUrl ? getYouTubeEmbedUrl(videoUrl) : null

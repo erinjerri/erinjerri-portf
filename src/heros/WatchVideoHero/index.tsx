@@ -143,7 +143,11 @@ export const WatchVideoHero: React.FC<Props> = ({
             playsInline
             preload="metadata"
             poster={
-              video?.sizes?.thumbnail?.url ? getMediaUrl(video.sizes.thumbnail.url) : undefined
+              getMediaUrl(
+                video?.sizes?.thumbnail?.url ?? null,
+                video?.sizes?.thumbnail?.updatedAt,
+                filename ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}` : null,
+              ) || undefined
             }
           >
             <source src={src} type={video!.mimeType || 'video/mp4'} />

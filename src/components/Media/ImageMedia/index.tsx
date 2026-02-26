@@ -71,9 +71,12 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     alt = altFromResource || ''
 
     const cacheTag = resource.updatedAt
-    // Prefer Payload-provided URL; when missing, fall back to static media path.
-    const mediaUrl = url ?? (filename ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}` : null)
-    src = getMediaUrl(mediaUrl, cacheTag)
+    const fallbackPath = filename
+      ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}`
+      : null
+    // Prefer Payload-provided URL. If url points to R2 S3 API (r2.cloudflarestorage.com),
+    // it won't work for public access—use fallback so proxy can serve (NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=true).
+    src = getMediaUrl(url ?? null, cacheTag, fallbackPath)
   }
 
   const disableOptimization = typeof src === 'string' && src.includes('/api/media/file/')
