@@ -62,7 +62,18 @@ export const plugins: Plugin[] = [
           collections: {
             media: useR2DirectURLs
               ? {
-                  // Direct public object URLs from R2
+                  disablePayloadAccessControl: true,
+                  ...(r2PublicHostname && {
+                    generateFileURL: ({ filename, prefix }) => {
+                      const base = `https://${r2PublicHostname.replace(/^https?:\/\//, '')}`
+                      const path = [prefix, filename].filter(Boolean).join('/')
+                      return `${base}/${path}`
+                    },
+                  }),
+                }
+              : true,
+            documents: useR2DirectURLs
+              ? {
                   disablePayloadAccessControl: true,
                   ...(r2PublicHostname && {
                     generateFileURL: ({ filename, prefix }) => {
