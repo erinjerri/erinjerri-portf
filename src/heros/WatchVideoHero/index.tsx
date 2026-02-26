@@ -145,7 +145,7 @@ export const WatchVideoHero: React.FC<Props> = ({
             poster={
               getMediaUrl(
                 video?.sizes?.thumbnail?.url ?? null,
-                video?.sizes?.thumbnail?.updatedAt,
+                video?.updatedAt ?? undefined,
                 filename ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}` : null,
               ) || undefined
             }
