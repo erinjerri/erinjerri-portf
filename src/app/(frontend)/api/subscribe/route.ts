@@ -39,25 +39,43 @@ export async function POST(req: Request): Promise<Response> {
       )
     }
 
-    const subscribeUrl = normalizeSubstackSubscribeURL(substackUrl)
-    if (!subscribeUrl) {
+    const baseUrl = normalizeSubstackSubscribeURL(substackUrl)
+    if (!baseUrl) {
       return NextResponse.json(
         { ok: false, error: 'Subscription service is not configured yet.' },
         { status: 503 },
       )
     }
 
+    const subscribeUrl = baseUrl.includes('?') ? baseUrl : `${baseUrl}?nojs=true`
+
+    let origin: string
+    try {
+      origin = new URL(baseUrl).origin
+    } catch {
+      origin = 'https://erinjerri.substack.com'
+    }
+
     const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (compatible; NewsletterSubscribe/1.0)',
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Referer: `${origin}/`,
+        Origin: origin,
       },
-      body: new URLSearchParams({ email }).toString(),
+      body: new URLSearchParams({ email, source: 'subscribe_page' }).toString(),
       cache: 'no-store',
     })
 
-    if (!response.ok) {
+    const responseText = await response.text()
+
+    if (
+      !response.ok ||
+      responseText.toLowerCase().includes('invalid') ||
+      responseText.toLowerCase().includes('error')
+    ) {
       return NextResponse.json(
         { ok: false, error: 'Subscription failed. Please try again.' },
         { status: 502 },
