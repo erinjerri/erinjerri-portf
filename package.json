@@ -22,7 +22,10 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "sync:substack": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/sync-substack.ts",
+    "compress:media": "tsx src/scripts/compress-media.ts",
+    "upload:media": "tsx src/scripts/upload-media-to-r2.ts"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.72.0",
@@ -59,6 +62,7 @@
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-hook-form": "7.45.4",
+    "rss-parser": "^3.13.0",
     "sharp": "0.34.5",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
@@ -81,6 +85,7 @@
     "eslint": "^9.16.0",
     "eslint-config-next": "15.4.7",
     "jsdom": "26.1.0",
+    "lighthouse": "^13.0.3",
     "playwright": "1.56.1",
     "playwright-core": "1.56.1",
     "postcss": "^8.4.38",
