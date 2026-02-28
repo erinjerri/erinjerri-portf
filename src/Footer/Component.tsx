@@ -2,6 +2,7 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import configPromise from '@payload-config'
 import { Facebook, Github, Linkedin, Youtube } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import path from 'path'
 import { getPayload } from 'payload'
@@ -87,7 +88,7 @@ function SocialIcon({
       aria-label={label}
     >
       {resolvedIconUrl ? (
-        <img
+        <Image
           src={resolvedIconUrl}
           alt=""
           className="h-5 w-5 object-contain"

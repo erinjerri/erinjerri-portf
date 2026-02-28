@@ -20,25 +20,26 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const payloadAny = payload as any
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const payloadAny = payload as any
 
-  const watchDocs = await payloadAny.find({
-    collection: 'watch',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
+    const watchDocs = await payloadAny.find({
+      collection: 'watch',
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      select: {
+        slug: true,
+      },
+    })
 
-  const params = watchDocs.docs.map(({ slug }: { slug: string }) => {
-    return { slug }
-  })
-
-  return params
+    return watchDocs.docs.map(({ slug }: { slug: string }) => ({ slug }))
+  } catch (err) {
+    console.warn('[generateStaticParams] Skipping watch prebuild:', err)
+    return []
+  }
 }
 
 type Args = {

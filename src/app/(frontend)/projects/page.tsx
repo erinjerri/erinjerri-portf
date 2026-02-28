@@ -39,9 +39,21 @@ const getCachedProjectsPage = unstable_cache(
 )
 
 export default async function Page() {
-  const [projects, categoriesResult] = await getCachedProjectsPage()
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
-  const categories = categoriesResult.docs.map((cat) => ({
+  let projects: any
+  let categoriesResult: any
+
+  try {
+    ;[projects, categoriesResult] = await getCachedProjectsPage()
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[projects/page] Skipping prerender because DB is unavailable:', err)
+    projects = { docs: [], page: 1, totalPages: 1, totalDocs: 0 }
+    categoriesResult = { docs: [] }
+  }
+
+  const categories = categoriesResult.docs.map((cat: { id: string; title: string; slug?: string | null }) => ({
     id: cat.id,
     title: cat.title,
     slug: cat.slug ?? null,
@@ -69,7 +81,11 @@ export default async function Page() {
 
       <div className="container">
         {projects.totalPages > 1 && projects.page && (
-          <Pagination page={projects.page} routePrefix="/projects/page" totalPages={projects.totalPages} />
+          <Pagination
+            page={projects.page}
+            routePrefix="/projects/page"
+            totalPages={projects.totalPages}
+          />
         )}
       </div>
     </div>

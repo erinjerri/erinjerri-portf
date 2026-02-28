@@ -11,7 +11,7 @@ import { Logo } from '@/components/Logo/Logo'
 import { HeaderNav } from './Nav'
 
 interface HeaderClientProps {
-  data: Header
+  data: Header | null
 }
 
 export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {

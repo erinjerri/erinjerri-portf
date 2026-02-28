@@ -39,9 +39,21 @@ const getCachedPostsPage = unstable_cache(
 )
 
 export default async function Page() {
-  const [posts, categoriesResult] = await getCachedPostsPage()
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
-  const categories = categoriesResult.docs.map((cat) => ({
+  let posts: any
+  let categoriesResult: any
+
+  try {
+    ;[posts, categoriesResult] = await getCachedPostsPage()
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[posts/page] Skipping prerender because DB is unavailable:', err)
+    posts = { docs: [], page: 1, totalPages: 1, totalDocs: 0 }
+    categoriesResult = { docs: [] }
+  }
+
+  const categories = categoriesResult.docs.map((cat: { id: string; title: string; slug?: string | null }) => ({
     id: cat.id,
     title: cat.title,
     slug: cat.slug ?? null,

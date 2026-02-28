@@ -19,23 +19,26 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const projects = await payload.find({
-    collection: 'projects',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const projects = await payload.find({
+      collection: 'projects',
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      select: {
+        slug: true,
+      },
+    })
 
-  const params = projects.docs.map(({ slug }) => {
-    return { slug }
-  })
-
-  return params
+    return projects.docs.map(({ slug }) => ({ slug }))
+  } catch (err) {
+    // Don't fail the entire Next.js build if DB is unavailable (common in preview/CI or offline dev).
+    // Falling back to an empty list makes these routes render on-demand at request time.
+    console.warn('[generateStaticParams] Skipping projects prebuild:', err)
+    return []
+  }
 }
 
 type Args = {

@@ -37,7 +37,30 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    // Run `pnpm lint` separately; skipping during build saves 15–30+ seconds
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    optimizePackageImports: [
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-label',
+      '@radix-ui/react-select',
+      '@radix-ui/react-slot',
+    ],
+  },
   images: {
+    // Only optimize direct /media/* paths. Do NOT whitelist the Payload proxy
+    // endpoint `/api/media/file/**` — allowing it causes Next.js to fetch proxied
+    // media during static generation which multiplies network requests and slows builds.
+    localPatterns: [
+      {
+        pathname: '/media/**',
+      },
+      {
+        pathname: '/api/media/file/**',
+      },
+    ],
     remotePatterns: [
       ...serverURLs.map((item) => {
         const url = new URL(item)
@@ -55,12 +78,22 @@ const nextConfig = {
         hostname: '**.r2.dev',
         protocol: 'https',
       },
+      {
+        hostname: '**.r2.cloudflarestorage.com',
+        protocol: 'https',
+      },
     ],
   },
   webpack: (webpackConfig, { dev }) => {
+    // Memory cache in dev avoids ENOENT on manifests (Next.js 15 bug) and pack cache races in synced folders
     if (dev) {
-      // Avoid filesystem pack cache races under synced folders (ENOENT on *.pack.gz_)
       webpackConfig.cache = { type: 'memory' }
+    }
+    // Replace Next.js polyfills with empty module for modern browsers (saves ~11KB, improves Lighthouse)
+    webpackConfig.resolve.alias = {
+      ...webpackConfig.resolve.alias,
+      '../build/polyfills/polyfill-module': false,
+      'next/dist/build/polyfills/polyfill-module': false,
     }
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

@@ -76,10 +76,17 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     src = getMediaUrl(mediaUrl, cacheTag)
   }
 
-  const disableOptimization =
-    typeof src === 'string' && (src.includes('/api/media/file/') || src.includes('/media/'))
+  // Enable Next.js optimization for all images — same-origin URLs work with remotePatterns
+  const disableOptimization = false
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
+
+  // Use Payload focal point for object-position when using fill (hero images).
+  // Set focalX/focalY in Payload admin (Media → edit image → focal point) to keep faces visible on mobile.
+  const focalPoint =
+    resource && typeof resource === 'object' && (resource.focalX != null || resource.focalY != null)
+      ? `${resource.focalX ?? 50}% ${resource.focalY ?? 50}%`
+      : undefined
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
   // Reverse breakpoint order so smallest viewport matches first (avoids 4K images on phones)
@@ -108,6 +115,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         loading={loading}
         sizes={sizes}
         src={src}
+        style={fill && focalPoint ? { objectPosition: focalPoint } : undefined}
         width={!fill ? width : undefined}
       />
     </picture>

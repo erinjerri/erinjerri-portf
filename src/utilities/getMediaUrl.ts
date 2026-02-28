@@ -25,12 +25,10 @@ const encodePathPreserveQuery = (value: string): string => {
 }
 
 const toPayloadFileEndpoint = (value: string): string => {
-  const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
-
-  if (forcePayloadProxyReads && value.startsWith('/media/')) {
-    return `/api/media/file/${value.slice('/media/'.length)}`
-  }
-
+  // Do not rewrite local /media/ paths to the Payload proxy endpoint here.
+  // Returning `/api/media/file/...` causes next/image to treat images as local proxy
+  // assets and can trigger heavy proxy fetches during SSG. Keep the original value
+  // so callers can decide whether to use a proxy or direct URL.
   return value
 }
 
@@ -53,25 +51,46 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     try {
       const parsed = new URL(url)
 
-      // R2 object URLs may not be publicly readable in every environment.
-      // In proxy mode, always route known R2 hostnames through Payload.
-      if (
-        forcePayloadProxyReads &&
-        (parsed.hostname.endsWith('r2.cloudflarestorage.com') ||
-          parsed.hostname.endsWith('.r2.dev'))
-      ) {
-        const pathParts = parsed.pathname.split('/').filter(Boolean)
-        const filename = pathParts[pathParts.length - 1]
-        if (filename) {
-          return appendCacheTag(`/api/media/file/${encodeURIComponent(filename)}`)
+      // If the source is an R2 URL, prefer serving the image from the site's
+      // public `/media/<filename>` path (served by the app) so Next.js can treat it
+      // as a remote asset matching remotePatterns or a direct /media path.
+      // This avoids returning proxy endpoints like `/api/media/file/...` which
+      // can cause next/image to validate against localPatterns and trigger proxy fetches.
+      try {
+        const isR2 =
+          parsed.hostname.endsWith('r2.cloudflarestorage.com') ||
+          parsed.hostname.endsWith('.r2.dev') ||
+          parsed.hostname.endsWith('.r2.cloudflarestorage.com')
+
+        if (isR2) {
+          const pathParts = parsed.pathname.split('/').filter(Boolean)
+          const filename = pathParts[pathParts.length - 1]
+          if (filename) {
+            // If the R2 bucket is configured for public reads or a public hostname is provided,
+            // prefer returning the public R2 URL so Next.js can treat it as a remote image.
+            const publicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
+            const publicReads = process.env.R2_PUBLIC_READS === 'true'
+            if (publicHostname) {
+              const base = publicHostname.replace(/^https?:\/\//, '')
+              return appendCacheTag(`https://${base}/${encodeURIComponent(filename)}`)
+            }
+
+            if (publicReads && process.env.R2_ACCOUNT_ID) {
+              const acct = process.env.R2_ACCOUNT_ID.trim()
+              return appendCacheTag(`https://${acct}.r2.cloudflarestorage.com/${encodeURIComponent(filename)}`)
+            }
+
+            // Fallback: serve via the app's /media/<filename> path (absolute)
+            const serverBase = getServerSideURL() || ''
+            return appendCacheTag(`${serverBase}/media/${encodeURIComponent(filename)}`)
+          }
         }
-      }
 
-      if (forcePayloadProxyReads && parsed.pathname.startsWith('/media/')) {
-        parsed.pathname = `/api/media/file/${parsed.pathname.slice('/media/'.length)}`
+        // Do not rewrite other /media/ absolute paths to proxy endpoints.
+        return appendCacheTag(parsed.toString())
+      } catch {
+        return appendCacheTag(url)
       }
-
-      return appendCacheTag(parsed.toString())
     } catch {
       return appendCacheTag(url)
     }

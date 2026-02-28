@@ -15,27 +15,28 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const pages = await payload.find({
-    collection: 'pages',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
-
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const pages = await payload.find({
+      collection: 'pages',
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      select: {
+        slug: true,
+      },
     })
 
-  return params
+    return (
+      pages.docs
+        ?.filter((doc) => doc.slug !== 'home')
+        .map(({ slug }) => ({ slug })) ?? []
+    )
+  } catch (err) {
+    console.warn('[generateStaticParams] Skipping pages prebuild:', err)
+    return []
+  }
 }
 
 type Args = {
@@ -50,9 +51,29 @@ export default async function Page({ params: paramsPromise }: Args) {
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/' + decodedSlug
-  const page = await getPageBySlug(decodedSlug, draft)
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+
+  let page: Awaited<ReturnType<typeof getPageBySlug>> | null = null
+
+  try {
+    page = await getPageBySlug(decodedSlug, draft)
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[slug/page] Skipping prerender because DB is unavailable:', err)
+    page = null
+  }
 
   if (!page) {
+    if (isBuild) {
+      // Avoid DB-backed redirects lookup during build when the DB is unavailable.
+      return (
+        <article className="pt-16 pb-24">
+          <div className="container">
+            <h1 className="text-2xl font-bold">Loading…</h1>
+          </div>
+        </article>
+      )
+    }
     return <PayloadRedirects url={url} />
   }
 
@@ -84,9 +105,18 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
-  const page = await getPageBySlug(decodedSlug, draft)
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
-  return generateMeta({ doc: page })
+  try {
+    const page = await getPageBySlug(decodedSlug, draft)
+    return generateMeta({ doc: page })
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[slug/page] Skipping metadata because DB is unavailable:', err)
+    return generateMeta({ doc: null })
+  }
+
+  // Unreachable
 }
 
 async function getPageBySlug(slug: string, draft: boolean) {

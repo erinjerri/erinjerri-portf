@@ -19,36 +19,48 @@ type Args = {
 
 export default async function Page({ params: paramsPromise }: Args) {
   const { pageNumber } = await paramsPromise
-  const payload = await getPayload({ config: configPromise })
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
   const sanitizedPageNumber = Number(pageNumber)
 
   if (!Number.isInteger(sanitizedPageNumber)) notFound()
 
-  const [posts, categoriesResult] = await Promise.all([
-    payload.find({
-      collection: 'posts',
-      depth: 1,
-      limit: 12,
-      page: sanitizedPageNumber,
-      overrideAccess: false,
-      sort: '-publishedAt',
-      select: {
-        title: true,
-        slug: true,
-        categories: true,
-        meta: true,
-      },
-    }),
-    payload.find({
-      collection: 'categories',
-      limit: 100,
-      overrideAccess: false,
-      sort: 'title',
-    }),
-  ])
+  let posts: any
+  let categoriesResult: any
 
-  const categories = categoriesResult.docs.map((cat) => ({
+  try {
+    const payload = await getPayload({ config: configPromise })
+
+    ;[posts, categoriesResult] = await Promise.all([
+      payload.find({
+        collection: 'posts',
+        depth: 1,
+        limit: 12,
+        page: sanitizedPageNumber,
+        overrideAccess: false,
+        sort: '-publishedAt',
+        select: {
+          title: true,
+          slug: true,
+          categories: true,
+          meta: true,
+        },
+      }),
+      payload.find({
+        collection: 'categories',
+        limit: 100,
+        overrideAccess: false,
+        sort: 'title',
+      }),
+    ])
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[posts/page/[pageNumber]] Skipping prerender because DB is unavailable:', err)
+    posts = { docs: [], page: sanitizedPageNumber, totalPages: 1, totalDocs: 0 }
+    categoriesResult = { docs: [] }
+  }
+
+  const categories = categoriesResult.docs.map((cat: { id: string; title: string; slug?: string | null }) => ({
     id: cat.id,
     title: cat.title,
     slug: cat.slug ?? null,
@@ -91,19 +103,23 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 }
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const { totalDocs } = await payload.count({
-    collection: 'posts',
-    overrideAccess: false,
-  })
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const { totalDocs } = await payload.count({
+      collection: 'posts',
+      overrideAccess: false,
+    })
 
-  const totalPages = Math.ceil(totalDocs / 10)
+    const totalPages = Math.ceil(totalDocs / 10)
+    const pages: { pageNumber: string }[] = []
 
-  const pages: { pageNumber: string }[] = []
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push({ pageNumber: String(i) })
+    }
 
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push({ pageNumber: String(i) })
+    return pages
+  } catch (err) {
+    console.warn('[generateStaticParams] Skipping posts pagination prebuild:', err)
+    return []
   }
-
-  return pages
 }

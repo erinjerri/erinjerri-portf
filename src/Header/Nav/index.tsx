@@ -35,7 +35,7 @@ const resolveHref = (link: HeaderLink): string | null => {
   return link.url || null
 }
 
-export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
+export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
   const navItems = data?.navItems || []
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
