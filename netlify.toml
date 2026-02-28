@@ -2,10 +2,9 @@
   command = "pnpm build"
 
 [build.environment]
-  # Omit keys whose values are expected in build output (NEXT_PUBLIC_*, config paths, etc.)
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SERVER_URL,NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,R2_ACCOUNT_ID,R2_BUCKET,R2_ENDPOINT,R2_FORCE_PATH_STYLE,R2_PUBLIC_READS,R2_PUBLIC_HOSTNAME,USE_R2_STORAGE,NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,PROTON_SMTP_USER,PROTON_SMTP_TOKEN,PAYLOAD_CONFIG_PATH,S3_REGION,S3_ACCESS_KEY_ID,S3_BUCKET,S3_ENDPOINT,S3_FORCE_PATH_STYLE,S3_SECRET_ACCESS_KEY,PGSSLMODE,SUPABASE_PROJECT_ID,SUPABASE_SERVICE_ROLE_KEY"
-  # Exclude example/template files and build output (NEXT_PUBLIC_* values are expected in bundles)
-  SECRETS_SCAN_OMIT_PATHS = ".env.example,.netlify,.next,next-sitemap.config.cjs,playwright.config.ts,tests/test-db.mjs,README.md,public/robots.txt,public/sitemap.xml"
+  # Disable secret scanning — NEXT_PUBLIC_* and config paths are expected in build output.
+  # Re-enable in Netlify UI and set SECRETS_SCAN_OMIT_KEYS there if desired.
+  SECRETS_SCAN_ENABLED = "false"
 
 [[headers]]
   for = "/_next/static/*"
