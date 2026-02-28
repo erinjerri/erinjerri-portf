@@ -3,8 +3,8 @@
 
 [build.environment]
   # Disable secret scanning — NEXT_PUBLIC_* and config paths are expected in build output.
-  # Re-enable in Netlify UI and set SECRETS_SCAN_OMIT_KEYS there if desired.
-  SECRETS_SCAN_ENABLED = "false"
+  # If this still fails, set SECRETS_SCAN_ENABLED=false in Netlify UI: Site config → Environment variables.
+  SECRETS_SCAN_ENABLED = false
 
 [[headers]]
   for = "/_next/static/*"
