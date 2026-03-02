@@ -100,7 +100,9 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
 
   // Keep local URLs relative so they work regardless of host (localhost/LAN/custom domain).
   if (normalizedUrl.startsWith('/')) {
-    return appendCacheTag(normalizedUrl)
+    // Strip any cache-busting query params on media endpoints so public URLs are clean.
+    const noQuery = normalizedUrl.split('?')[0]
+    return appendCacheTag(noQuery)
   }
 
   // Use full base URL when available; otherwise relative (resolves to current origin)

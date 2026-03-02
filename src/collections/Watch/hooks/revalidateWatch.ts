@@ -14,7 +14,7 @@ export const revalidateWatch: CollectionAfterChangeHook = ({
       payload.logger.info(`Revalidating watch doc at path: ${path}`)
 
       revalidatePath(path)
-      revalidateTag('watch-sitemap')
+      revalidateTag('watch-sitemap', 'max')
     }
 
     if (previousDoc._status === 'published' && doc._status !== 'published') {
@@ -23,7 +23,7 @@ export const revalidateWatch: CollectionAfterChangeHook = ({
       payload.logger.info(`Revalidating old watch doc at path: ${oldPath}`)
 
       revalidatePath(oldPath)
-      revalidateTag('watch-sitemap')
+      revalidateTag('watch-sitemap', 'max')
     }
   }
   return doc
@@ -34,7 +34,7 @@ export const revalidateDelete: CollectionAfterDeleteHook = ({ doc, req: { contex
     const path = `/watch/${doc?.slug}`
 
     revalidatePath(path)
-    revalidateTag('watch-sitemap')
+    revalidateTag('watch-sitemap', 'max')
   }
 
   return doc

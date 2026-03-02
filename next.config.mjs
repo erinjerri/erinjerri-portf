@@ -41,10 +41,6 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    // Run `pnpm lint` separately; skipping during build saves 15–30+ seconds
-    ignoreDuringBuilds: true,
-  },
   experimental: {
     optimizePackageImports: [
       '@radix-ui/react-checkbox',

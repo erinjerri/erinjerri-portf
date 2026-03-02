@@ -58,7 +58,7 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
     <nav className="relative flex w-full items-center justify-center">
       <div className="hidden md:flex items-center justify-center gap-8 uppercase tracking-[0.18em] text-[11px] md:text-xs font-semibold">
         {navLinks.map(({ id, link, href }) => {
-          const isActive = href ? normalizePath(pathname) === normalizePath(href) : false
+          const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
 
           return (
             <CMSLink
@@ -107,7 +107,7 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
 
           <div className="flex flex-col gap-3">
             {navLinks.map(({ id, link, href }) => {
-              const isActive = href ? normalizePath(pathname) === normalizePath(href) : false
+              const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
 
               return (
                 <CMSLink

@@ -35,7 +35,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     url,
   } = props
 
-  const href =
+  let href =
     type === 'archive' && archive
       ? `/${archive}`
       : type === 'reference' && typeof reference?.value === 'object' && reference.value.slug
@@ -43,6 +43,17 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
           reference.value.slug
         }`
       : url
+
+  // Normalize plain email addresses to mailto: links
+  if (
+    href &&
+    typeof href === 'string' &&
+    href.includes('@') &&
+    !href.includes('://') &&
+    !href.startsWith('mailto:')
+  ) {
+    href = `mailto:${href}`
+  }
 
   if (!href) return null
 

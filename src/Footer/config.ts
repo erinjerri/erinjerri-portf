@@ -61,6 +61,9 @@ export const Footer: GlobalConfig = {
           name: 'url',
           type: 'text',
           required: true,
+          admin: {
+            description: 'URL (e.g. https://github.com/you) or email (e.g. you@domain.com — mailto: is added automatically)',
+          },
         },
         {
           name: 'icon',

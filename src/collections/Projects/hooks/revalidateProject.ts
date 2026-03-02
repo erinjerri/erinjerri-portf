@@ -16,7 +16,7 @@ export const revalidateProject: CollectionAfterChangeHook<Project> = ({
       payload.logger.info(`Revalidating project at path: ${path}`)
 
       revalidatePath(path)
-      revalidateTag('projects-sitemap')
+      revalidateTag('projects-sitemap', 'max')
     }
 
     if (previousDoc._status === 'published' && doc._status !== 'published') {
@@ -25,7 +25,7 @@ export const revalidateProject: CollectionAfterChangeHook<Project> = ({
       payload.logger.info(`Revalidating old project at path: ${oldPath}`)
 
       revalidatePath(oldPath)
-      revalidateTag('projects-sitemap')
+      revalidateTag('projects-sitemap', 'max')
     }
   }
   return doc
@@ -36,7 +36,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Project> = ({ doc, req:
     const path = `/projects/${doc?.slug}`
 
     revalidatePath(path)
-    revalidateTag('projects-sitemap')
+    revalidateTag('projects-sitemap', 'max')
   }
 
   return doc

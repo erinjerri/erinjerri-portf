@@ -11,7 +11,7 @@ export const revalidateFooterOnMediaChange: CollectionAfterChangeHook = ({
 }) => {
   if (!context?.disableRevalidate) {
     payload.logger.info('[Media] Revalidating footer (media changed)')
-    revalidateTag('global_footer')
+    revalidateTag('global_footer', 'max')
   }
 }
 
@@ -20,6 +20,6 @@ export const revalidateFooterOnMediaDelete: CollectionAfterDeleteHook = ({
 }) => {
   if (!context?.disableRevalidate) {
     payload.logger.info('[Media] Revalidating footer (media deleted)')
-    revalidateTag('global_footer')
+    revalidateTag('global_footer', 'max')
   }
 }

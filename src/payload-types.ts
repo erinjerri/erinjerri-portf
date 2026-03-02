@@ -126,9 +126,10 @@ export interface Config {
     brand: BrandSelect<false> | BrandSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'users';
+  widgets: {
+    collections: CollectionsWidget;
   };
+  user: User;
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -217,7 +218,41 @@ export interface Page {
     | CallToActionBlock
     | ContentBlock
     | DocumentBlock
-    | MediaBlock
+    | {
+        /**
+         * Choose which kind of media to insert into this block.
+         */
+        mediaType: 'image' | 'video' | 'audio';
+        /**
+         * Choose how this media block is laid out on the page.
+         */
+        displayStyle?: ('default' | 'fullWidthTransition') | null;
+        image?: (string | null) | Media;
+        /**
+         * Choose an existing video asset or create a new one once.
+         */
+        video?: (string | null) | Media;
+        /**
+         * Pick a local video asset or paste a video URL.
+         */
+        videoSource?: ('upload' | 'url') | null;
+        /**
+         * Supports YouTube links and direct .mp4/.webm URLs.
+         */
+        videoUrl?: string | null;
+        /**
+         * Optional poster image for video.
+         */
+        thumbnail?: (string | null) | Media;
+        audio?: (string | null) | Media;
+        /**
+         * Legacy field for existing content. Use Image/Video/Audio above for new content.
+         */
+        media?: (string | null) | Media;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'mediaBlock';
+      }
     | ArchiveBlock
     | WatchBlock
     | VideoBackgroundTransitionBlock
@@ -475,6 +510,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -652,45 +688,6 @@ export interface Document {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock".
- */
-export interface MediaBlock {
-  /**
-   * Choose which kind of media to insert into this block.
-   */
-  mediaType: 'image' | 'video' | 'audio';
-  /**
-   * Choose how this media block is laid out on the page.
-   */
-  displayStyle?: ('default' | 'fullWidthTransition') | null;
-  image?: (string | null) | Media;
-  /**
-   * Choose an existing video asset or create a new one once.
-   */
-  video?: (string | null) | Media;
-  /**
-   * Pick a local video asset or paste a video URL.
-   */
-  videoSource?: ('upload' | 'url') | null;
-  /**
-   * Supports YouTube links and direct .mp4/.webm URLs.
-   */
-  videoUrl?: string | null;
-  /**
-   * Optional poster image for video.
-   */
-  thumbnail?: (string | null) | Media;
-  audio?: (string | null) | Media;
-  /**
-   * Legacy field for existing content. Use Image/Video/Audio above for new content.
-   */
-  media?: (string | null) | Media;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mediaBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2487,6 +2484,16 @@ export interface BrandSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TaskSchedulePublish".
  */
 export interface TaskSchedulePublish {
@@ -2514,6 +2521,45 @@ export interface TaskSchedulePublish {
     user?: (string | null) | User;
   };
   output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock".
+ */
+export interface MediaBlock {
+  /**
+   * Choose which kind of media to insert into this block.
+   */
+  mediaType: 'image' | 'video' | 'audio';
+  /**
+   * Choose how this media block is laid out on the page.
+   */
+  displayStyle?: ('default' | 'fullWidthTransition') | null;
+  image?: (string | null) | Media;
+  /**
+   * Choose an existing video asset or create a new one once.
+   */
+  video?: (string | null) | Media;
+  /**
+   * Pick a local video asset or paste a video URL.
+   */
+  videoSource?: ('upload' | 'url') | null;
+  /**
+   * Supports YouTube links and direct .mp4/.webm URLs.
+   */
+  videoUrl?: string | null;
+  /**
+   * Optional poster image for video.
+   */
+  thumbnail?: (string | null) | Media;
+  audio?: (string | null) | Media;
+  /**
+   * Legacy field for existing content. Use Image/Video/Audio above for new content.
+   */
+  media?: (string | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

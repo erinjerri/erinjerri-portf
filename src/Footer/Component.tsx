@@ -1,11 +1,9 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-import configPromise from '@payload-config'
 import { Facebook, Github, Linkedin, Youtube } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import path from 'path'
-import { getPayload } from 'payload'
 import React from 'react'
 import { existsSync } from 'fs'
 
@@ -50,6 +48,27 @@ const hasLocalMediaFile = (mediaUrl: string): boolean => {
 
 const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
+
+const getSubstackFormAction = (): string | null => {
+  const raw = process.env.SUBSTACK_SUBSCRIBE_URL?.trim()
+  if (!raw) return null
+
+  const trimmed = raw.replace(/\/$/, '')
+  const lower = trimmed.toLowerCase()
+
+  if (lower.includes('/api/v1/free')) {
+    return trimmed.includes('?') ? trimmed : `${trimmed}?nojs=true`
+  }
+
+  if (lower.endsWith('.substack.com') || lower.includes('.substack.com/')) {
+    const publicationURL = lower.endsWith('/subscribe')
+      ? trimmed.replace(/\/subscribe$/i, '')
+      : trimmed
+    return `${publicationURL}/api/v1/free?nojs=true`
+  }
+
+  return null
+}
 
 function SocialIcon({
   url,
@@ -105,6 +124,7 @@ function SocialIcon({
 }
 
 export async function Footer() {
+  const substackFormAction = getSubstackFormAction()
   let footerData: Footer | null = null
   try {
     footerData = await getCachedGlobal('footer', 2)()
@@ -120,50 +140,6 @@ export async function Footer() {
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
 
-  const unresolvedIconIDs = [
-    ...new Set(
-      socialLinks.flatMap((item) => {
-        const icon = item?.icon as unknown
-        return typeof icon === 'string' || typeof icon === 'number' ? [icon] : []
-      }),
-    ),
-  ]
-
-  let mediaByID: Record<string, MediaType> = {}
-
-  if (unresolvedIconIDs.length > 0) {
-    try {
-      const payload = await getPayload({ config: configPromise })
-      const mediaResult = await payload.find({
-        collection: 'media',
-        depth: 0,
-        limit: unresolvedIconIDs.length,
-        pagination: false,
-        where: {
-          id: {
-            in: unresolvedIconIDs as (string | number)[],
-          },
-        },
-      })
-
-      mediaByID = mediaResult.docs.reduce<Record<string, MediaType>>((acc, mediaDoc) => {
-        acc[String(mediaDoc.id)] = mediaDoc as MediaType
-        return acc
-      }, {})
-
-      const missingCount = unresolvedIconIDs.length - mediaResult.docs.length
-      if (missingCount > 0 && process.env.NODE_ENV === 'development') {
-        console.warn(
-          `[Footer] ${missingCount} social icon(s) could not be resolved (media may be deleted or IDs stale).`,
-        )
-      }
-    } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[Footer] Failed to resolve social icon IDs:', err)
-      }
-    }
-  }
-
   return (
     <footer className="mt-auto border-t border-border bg-transparent text-foreground">
       <div className="container py-10">
@@ -175,7 +151,9 @@ export async function Footer() {
               <Logo />
             </Link>
 
-            {subscribeSection?.showSubscribe !== false && <SubscribeForm />}
+            {subscribeSection?.showSubscribe !== false && (
+              <SubscribeForm substackFormAction={substackFormAction} />
+            )}
 
             {subscribeSection?.slogan && (
               <p className="text-sm text-muted-foreground">{subscribeSection.slogan}</p>
@@ -190,12 +168,7 @@ export async function Footer() {
                       key={item.id || i}
                       url={item.url}
                       label={item.label}
-                      icon={(() => {
-                        const icon = item.icon as unknown
-                        return typeof icon === 'string' || typeof icon === 'number'
-                          ? (mediaByID[String(icon)] ?? null)
-                          : item.icon
-                      })()}
+                      icon={typeof item.icon === 'object' && item.icon ? item.icon : null}
                     />
                   ))}
               </div>

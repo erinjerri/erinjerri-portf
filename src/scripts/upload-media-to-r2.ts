@@ -58,9 +58,15 @@ async function main() {
   const files = await collectFiles(MEDIA_DIR)
   console.log(`Uploading ${files.length} files to r2:${bucket}/media/`)
 
+  const cacheControl = process.env.R2_CACHE_CONTROL?.trim() || 'public, max-age=31536000, immutable'
+
   for (const rel of files) {
     const fullPath = path.join(MEDIA_DIR, rel)
-    const key = `media/${rel}`
+    // Ensure S3 key is safe (encode URI components for segments)
+    const key = `media/${rel
+      .split('/')
+      .map((s) => encodeURIComponent(s))
+      .join('/')}`
 
     try {
       const body = await readFile(fullPath)
@@ -78,6 +84,7 @@ async function main() {
                 : rel.endsWith('.svg')
                   ? 'image/svg+xml'
                   : 'image/jpeg',
+          CacheControl: cacheControl,
         }),
       )
       console.log(`✓ ${rel}`)

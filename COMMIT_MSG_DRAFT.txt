@@ -1,0 +1,9 @@
+fix: Payload 3.78, media proxy buffering, Substack footer, fonts, revalidateTag
+
+- Upgrade all Payload packages to 3.78.0 (resolve version mismatch)
+- Media proxy: buffer S3/R2 Body instead of streaming to fix
+  "transformAlgorithm is not a function" Node.js Web Streams error
+- Substack footer: direct POST form to erinjerri.substack.com (no server proxy)
+- Fonts: League Spartan, Jost, Satoshi (replace GeistSans)
+- revalidateTag: add 'max' second arg for Next.js 16
+- Media proxy: add media/ prefix, decode filenames, R2_MEDIA_PREFIX env

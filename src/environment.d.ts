@@ -14,6 +14,8 @@ declare global {
       R2_SECRET_ACCESS_KEY?: string
       R2_ENDPOINT?: string
       R2_FORCE_PATH_STYLE?: 'true' | 'false'
+      /** S3/R2 key prefix for media (default: media). Set if Payload uses a different prefix. */
+      R2_MEDIA_PREFIX?: string
       ALLOW_SEED_IN_PROD?: 'true' | 'false'
       VERCEL_PROJECT_PRODUCTION_URL: string
     }

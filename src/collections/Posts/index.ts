@@ -209,6 +209,17 @@ export const Posts: CollectionConfig<'posts'> = {
         description: 'Dropdown select for uploaded video assets from Media.',
       },
     },
+    {
+      name: 'substackId',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Substack post GUID for sync deduplication. Set by sync-substack script.',
+        readOnly: true,
+      },
+    },
     // This field is only used to populate the user data via the `populateAuthors` hook
     // This is because the `user` collection has access control locked to protect user privacy
     // GraphQL will also not return mutated user data that differs from the underlying schema
