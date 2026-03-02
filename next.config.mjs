@@ -25,7 +25,11 @@ const serverURLs = Array.from(
 
 const r2Hosts = Array.from(
   new Set(
-    [process.env.R2_ACCOUNT_ID ? `${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : undefined]
+    [
+      process.env.R2_ACCOUNT_ID
+        ? `${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+        : undefined,
+    ]
       .concat(
         process.env.R2_PUBLIC_HOSTNAME
           ? process.env.R2_PUBLIC_HOSTNAME.replace(/^https?:\/\//, '').replace(/\/+$/, '')
@@ -50,6 +54,8 @@ const nextConfig = {
     ],
   },
   images: {
+    // Configure image qualities used by next/image. Next.js 16 will require explicit config.
+    qualities: [80, 85],
     // Only optimize direct /media/* paths. Do NOT whitelist the Payload proxy
     // endpoint `/api/media/file/**` — allowing it causes Next.js to fetch proxied
     // media during static generation which multiplies network requests and slows builds.

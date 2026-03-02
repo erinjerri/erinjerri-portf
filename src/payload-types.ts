@@ -285,6 +285,10 @@ export interface Post {
    * Dropdown select for uploaded video assets from Media.
    */
   videoAsset?: (string | null) | Media;
+  /**
+   * Substack post GUID for sync deduplication. Set by sync-substack script.
+   */
+  substackId?: string | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -1679,6 +1683,7 @@ export interface PostsSelect<T extends boolean = true> {
   publishedAt?: T;
   authors?: T;
   videoAsset?: T;
+  substackId?: T;
   populatedAuthors?:
     | T
     | {

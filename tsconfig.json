@@ -33,20 +33,20 @@
       ],
       "@/*": [
         "./src/*"
-      ],
+      ]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "redirects.mjs",
     "next-env.d.ts",
+    "next-sitemap.config.cjs",
     "next.config.mjs",
-    "next-sitemap.config.cjs"
+    "redirects.mjs",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "src/scripts/**"
-  ],
+  ]
 }
