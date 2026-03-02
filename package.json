@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS=--no-deprecation next build",
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
-    "build:fast": "cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next build",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --webpack",
+    "build:fast": "cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next build --webpack",
     "build:turbo": "cross-env NODE_OPTIONS=--no-deprecation next build --turbo",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
@@ -32,6 +32,7 @@
     "upload:media": "tsx src/scripts/upload-media-to-r2.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.717.0",
     "@payloadcms/admin-bar": "3.72.0",
     "@payloadcms/db-mongodb": "3.72.0",
     "@payloadcms/email-nodemailer": "^3.72.0",
@@ -58,7 +59,7 @@
     "dotenv": "16.4.7",
     "graphql": "^16.8.2",
     "lucide-react": "^0.378.0",
-    "next": "15.5.9",
+    "next": "16.1.6",
     "next-sitemap": "^4.2.3",
     "payload": "3.72.0",
     "prism-react-renderer": "^2.3.1",
