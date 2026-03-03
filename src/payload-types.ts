@@ -202,6 +202,9 @@ export interface Page {
                   value: string | Post;
                 } | null);
             archive?: ('posts' | 'projects' | 'watch') | null;
+            /**
+             * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+             */
             url?: string | null;
             label: string;
             /**
@@ -226,7 +229,60 @@ export interface Page {
         /**
          * Choose how this media block is laid out on the page.
          */
-        displayStyle?: ('default' | 'fullWidthTransition') | null;
+        displayStyle?: ('default' | 'fullWidthTransition' | 'heroOverlay') | null;
+        /**
+         * Overlay opacity (0–100). Darkens the image so overlay links are readable.
+         */
+        overlayOpacity?: number | null;
+        /**
+         * Links overlay the center of the image (e.g. O'Reilly, Amazon).
+         */
+        links?:
+          | {
+              link: {
+                type?: ('reference' | 'custom' | 'archive') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: string | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: string | Post;
+                    } | null);
+                archive?: ('posts' | 'projects' | 'watch') | null;
+                /**
+                 * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+                 */
+                url?: string | null;
+                label: string;
+                /**
+                 * Choose how the link should be rendered.
+                 */
+                appearance?: ('default' | 'accent' | 'light' | 'inactive' | 'filter' | 'outline') | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Optional rich text above overlay links when this image is followed by a block with links (e.g. 'Buy').
+         */
+        overlayRichText?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         image?: (string | null) | Media;
         /**
          * Choose an existing video asset or create a new one once.
@@ -551,6 +607,9 @@ export interface CallToActionBlock {
                 value: string | Post;
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
+          /**
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+           */
           url?: string | null;
           label: string;
           /**
@@ -622,6 +681,9 @@ export interface ContentBlock {
                 value: string | Post;
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
+          /**
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+           */
           url?: string | null;
           label: string;
           /**
@@ -919,6 +981,9 @@ export interface VideoBackgroundTransitionBlock {
                 value: string | Post;
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
+          /**
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+           */
           url?: string | null;
           label: string;
           /**
@@ -1575,6 +1640,24 @@ export interface DocumentBlockSelect<T extends boolean = true> {
 export interface MediaBlockSelect<T extends boolean = true> {
   mediaType?: T;
   displayStyle?: T;
+  overlayOpacity?: T;
+  links?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              archive?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
+  overlayRichText?: T;
   image?: T;
   video?: T;
   videoSource?: T;
@@ -2215,6 +2298,9 @@ export interface Header {
                 value: string | Post;
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
+          /**
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+           */
           url?: string | null;
           label: string;
         };
@@ -2251,6 +2337,9 @@ export interface Footer {
                   value: string | Post;
                 } | null);
             archive?: ('posts' | 'projects' | 'watch') | null;
+            /**
+             * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+             */
             url?: string | null;
             label: string;
           };
@@ -2262,6 +2351,9 @@ export interface Footer {
   socialLinks?:
     | {
         label: string;
+        /**
+         * URL (e.g. https://github.com/you) or email (e.g. you@domain.com — mailto: is added automatically)
+         */
         url: string;
         icon?: (string | null) | Media;
         id?: string | null;
@@ -2534,7 +2626,60 @@ export interface MediaBlock {
   /**
    * Choose how this media block is laid out on the page.
    */
-  displayStyle?: ('default' | 'fullWidthTransition') | null;
+  displayStyle?: ('default' | 'fullWidthTransition' | 'heroOverlay') | null;
+  /**
+   * Overlay opacity (0–100). Darkens the image so overlay links are readable.
+   */
+  overlayOpacity?: number | null;
+  /**
+   * Links overlay the center of the image (e.g. O'Reilly, Amazon).
+   */
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'archive') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          archive?: ('posts' | 'projects' | 'watch') | null;
+          /**
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
+           */
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'accent' | 'light' | 'inactive' | 'filter' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional rich text above overlay links when this image is followed by a block with links (e.g. 'Buy').
+   */
+  overlayRichText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   image?: (string | null) | Media;
   /**
    * Choose an existing video asset or create a new one once.

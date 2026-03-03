@@ -1,5 +1,14 @@
 import type { Block } from 'payload'
 
+import {
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
+
+import { linkGroup } from '@/fields/linkGroup'
+
 type MediaBlockSiblingData = {
   media?: unknown
   mediaType?: 'audio' | 'image' | 'video'
@@ -48,9 +57,55 @@ export const MediaBlock: Block = {
           label: 'Full Width Transition',
           value: 'fullWidthTransition',
         },
+        {
+          label: 'Hero Overlay (image with centered links)',
+          value: 'heroOverlay',
+        },
       ],
       admin: {
         description: 'Choose how this media block is laid out on the page.',
+      },
+    },
+    {
+      name: 'overlayOpacity',
+      type: 'number',
+      defaultValue: 60,
+      min: 0,
+      max: 100,
+      admin: {
+        condition: (_, siblingData) =>
+          siblingData?.displayStyle === 'heroOverlay' && siblingData?.mediaType === 'image',
+        step: 5,
+        description: 'Overlay opacity (0–100). Darkens the image so overlay links are readable.',
+      },
+    },
+    linkGroup({
+      overrides: {
+        admin: {
+          condition: (_, siblingData) =>
+            siblingData?.displayStyle === 'heroOverlay' && siblingData?.mediaType === 'image',
+          description: "Links overlay the center of the image (e.g. O'Reilly, Amazon).",
+        },
+        maxRows: 4,
+      },
+    }),
+    {
+      name: 'overlayRichText',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+          ]
+        },
+      }),
+      admin: {
+        condition: (_, siblingData) => siblingData?.mediaType === 'image',
+        description:
+          "Optional rich text above overlay links when this image is followed by a block with links (e.g. 'Buy').",
       },
     },
     {
@@ -173,7 +228,8 @@ export const MediaBlock: Block = {
       relationTo: 'media',
       admin: {
         condition: (_, siblingData) => !siblingData?.mediaType,
-        description: 'Legacy field for existing content. Use Image/Video/Audio above for new content.',
+        description:
+          'Legacy field for existing content. Use Image/Video/Audio above for new content.',
       },
     },
   ],

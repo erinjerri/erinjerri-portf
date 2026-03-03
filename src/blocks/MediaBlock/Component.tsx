@@ -9,6 +9,7 @@ import type { MediaBlock as MediaBlockProps } from '@/payload-types'
 import type { Media as MediaDoc } from '@/payload-types'
 
 import { Media as MediaComponent } from '../../components/Media'
+import { CMSLink } from '@/components/Link'
 
 type Props = Omit<MediaBlockProps, 'media'> & {
   audio?: number | string | MediaDoc | null
@@ -25,8 +26,12 @@ type Props = Omit<MediaBlockProps, 'media'> & {
   video?: number | string | MediaDoc | null
   videoSource?: 'upload' | 'url' | null
   videoUrl?: string | null
-  displayStyle?: 'default' | 'fullWidthTransition' | null
+  displayStyle?: 'default' | 'fullWidthTransition' | 'heroOverlay' | null
   disableInnerContainer?: boolean
+  links?: Array<{
+    link?: { label?: string | null; url?: string | null; appearance?: string | null }
+  }> | null
+  overlayOpacity?: number | null
 }
 
 const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -78,9 +83,12 @@ export const MediaBlock: React.FC<Props> = (props) => {
     videoUrl,
     displayStyle,
     disableInnerContainer,
+    links,
+    overlayOpacity = 60,
   } = props
 
   const isFullWidthTransition = displayStyle === 'fullWidthTransition'
+  const isHeroOverlay = displayStyle === 'heroOverlay' && mediaType === 'image'
 
   const selectedMedia = (() => {
     if (mediaType === 'video') return videoSource === 'upload' ? video || media : null
@@ -103,11 +111,60 @@ export const MediaBlock: React.FC<Props> = (props) => {
   const youtubeEmbedURL = videoUrl ? getYouTubeEmbedUrl(videoUrl) : null
   const shouldRenderVideoURL = isVideo && videoSource === 'url' && Boolean(videoUrl)
 
+  if (isHeroOverlay && (selectedMedia || staticImage) && !isAudio && !isVideo) {
+    const opacity = Math.max(0, Math.min(100, overlayOpacity ?? 60)) / 100
+    const hasLinks = Array.isArray(links) && links.length > 0
+
+    return (
+      <div
+        className={cn(
+          'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden min-h-[40vh] md:min-h-[50vh]',
+          className,
+        )}
+      >
+        <div className="absolute inset-0">
+          <MediaComponent
+            fill
+            imgClassName="h-full w-full object-cover"
+            pictureClassName="absolute inset-0"
+            priority
+            resource={selectedMedia}
+            src={staticImage}
+          />
+        </div>
+        <div className="absolute inset-0 bg-black" style={{ opacity }} />
+        {hasLinks && (
+          <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-center px-6 py-8 text-center">
+            <ul className="flex flex-wrap justify-center gap-4 text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_a]:text-white">
+              {links.map(({ link }, i) => (
+                <li key={i}>
+                  <CMSLink {...(link as any)} appearance={link?.appearance || 'light'} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {caption && (
+          <div
+            className={cn(
+              'absolute bottom-0 left-0 right-0 z-10 p-4 text-center text-white/90',
+              { container: !disableInnerContainer },
+              captionClassName,
+            )}
+          >
+            <RichText data={caption} enableGutter={false} />
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div
       className={cn(
         {
-          'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden': isFullWidthTransition,
+          'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden':
+            isFullWidthTransition,
         },
         '',
         {
@@ -171,10 +228,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
             Your browser does not support the video tag.
           </video>
         )}
-      {!isAudio &&
-        !isVideo &&
-        !shouldRenderVideoURL &&
-        (selectedMedia || staticImage) && (
+      {!isAudio && !isVideo && !shouldRenderVideoURL && (selectedMedia || staticImage) && (
         <MediaComponent
           imgClassName={cn(
             {
@@ -186,7 +240,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
           resource={selectedMedia}
           src={staticImage}
         />
-        )}
+      )}
       {caption && (
         <div
           className={cn(

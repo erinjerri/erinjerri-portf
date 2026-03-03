@@ -64,7 +64,21 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
 
         if (isR2) {
           const pathParts = parsed.pathname.split('/').filter(Boolean)
-          const filename = pathParts[pathParts.length - 1]
+          let filename = pathParts[pathParts.length - 1]
+          // Decode double-encoded filenames (e.g. %2520 -> space) so we produce a correct URL
+          if (filename) {
+            try {
+              let prev = filename
+              for (let i = 0; i < 5; i++) {
+                const decoded = decodeURIComponent(prev)
+                if (decoded === prev) break
+                prev = decoded
+              }
+              filename = prev
+            } catch {
+              /* keep original */
+            }
+          }
           if (filename) {
             // If the R2 bucket is configured for public reads or a public hostname is provided,
             // prefer returning the public R2 URL so Next.js can treat it as a remote image.
@@ -77,7 +91,9 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
 
             if (publicReads && process.env.R2_ACCOUNT_ID) {
               const acct = process.env.R2_ACCOUNT_ID.trim()
-              return appendCacheTag(`https://${acct}.r2.cloudflarestorage.com/${encodeURIComponent(filename)}`)
+              return appendCacheTag(
+                `https://${acct}.r2.cloudflarestorage.com/${encodeURIComponent(filename)}`,
+              )
             }
 
             // Fallback: serve via the app's /media/<filename> path (absolute)

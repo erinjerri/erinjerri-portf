@@ -1,6 +1,6 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { Facebook, Github, Linkedin, Youtube } from 'lucide-react'
+import { Facebook, Github, Linkedin, Mail, Youtube } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import path from 'path'
@@ -20,6 +20,7 @@ const resolveFallbackSocialIcon = (
 ): React.ComponentType<{ className?: string }> => {
   const value = `${label} ${url}`.toLowerCase()
 
+  if (value.includes('mail') || value.includes('email') || url.includes('@')) return Mail
   if (value.includes('github')) return Github
   if (value.includes('linkedin')) return Linkedin
   if (value.includes('youtube')) return Youtube
