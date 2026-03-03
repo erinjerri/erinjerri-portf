@@ -6,6 +6,7 @@
   "scripts": {
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS=--no-deprecation next build",
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build --webpack",
+    "build:netlify": "node -e \"console.log('node', process.version)\" && node -e \"console.log('next', require('next/package.json').version)\" && node -e \"console.log('react', require('react/package.json').version)\" && cross-env NODE_OPTIONS=--no-deprecation next build --webpack",
     "build:fast": "cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next build --webpack",
     "build:turbo": "cross-env NODE_OPTIONS=--no-deprecation next build --turbo",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",

@@ -1,5 +1,5 @@
 [build]
-  command = "pnpm build"
+  command = "pnpm run build:netlify"
 
 [build.environment]
   # Node 20.x — Payload 3.7x+ and Next.js 16 prefer modern Node
