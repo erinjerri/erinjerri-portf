@@ -63,6 +63,46 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let alt = altFromProps
   let src: StaticImageData | string = srcFromProps || ''
 
+  const toPublicMediaPath = (filename: string): string =>
+    `/media/${encodeURI(filename.replace(/^\/+/, ''))}`
+
+  const apiFileToPublicMediaPath = (value: string): string => {
+    // Payload's default upload URL is `/api/media/file/<filename>`.
+    // We prefer `/media/<filename>` (static) for better caching and to make Next/Image optimization reliable.
+    // Preserve query params by letting `getMediaUrl` append the cache tag after normalization.
+    const [path] = value.split('?')
+    const prefix = '/api/media/file/'
+    if (!path.startsWith(prefix)) return value
+    const filename = path.slice(prefix.length)
+    return filename ? toPublicMediaPath(filename) : value
+  }
+
+  const pickResponsiveSize = (
+    sizes: Record<string, unknown> | undefined,
+    opts: { preferLargest?: boolean; preferWidth?: number },
+  ): { url?: string; filename?: string; width?: number; height?: number } | null => {
+    if (!sizes || typeof sizes !== 'object') return null
+
+    const candidates = ['xlarge', 'large', 'medium', 'small', 'thumbnail']
+    const ordered = opts.preferLargest
+      ? candidates
+      : opts.preferWidth && opts.preferWidth <= 700
+        ? ['small', 'medium', 'large', 'xlarge', 'thumbnail']
+        : ['medium', 'large', 'xlarge', 'small', 'thumbnail']
+
+    for (const key of ordered) {
+      const entry = (sizes as Record<string, any>)[key]
+      if (!entry || typeof entry !== 'object') continue
+      const url = typeof entry.url === 'string' ? entry.url : undefined
+      const filename = typeof entry.filename === 'string' ? entry.filename : undefined
+      const width = typeof entry.width === 'number' ? entry.width : undefined
+      const height = typeof entry.height === 'number' ? entry.height : undefined
+      if (url || filename) return { url, filename, width, height }
+    }
+
+    return null
+  }
+
   if (!src && resource && typeof resource === 'object') {
     const { alt: altFromResource, filename, height: fullHeight, url, width: fullWidth } = resource
 
@@ -71,8 +111,25 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     alt = altFromResource || ''
 
     const cacheTag = resource.updatedAt
-    // Prefer Payload-provided URL; when missing, fall back to static media path.
-    const mediaUrl = url ?? (filename ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}` : null)
+    const preferLargest = Boolean(fill && priority)
+    const preferred = pickResponsiveSize(
+      (resource as any).sizes as Record<string, unknown> | undefined,
+      { preferLargest, preferWidth: width },
+    )
+
+    // Prefer generated responsive size URLs/filenames when present.
+    // This reduces bytes *even if* the original upload is a huge PNG.
+    const preferredUrl =
+      preferred?.filename ? toPublicMediaPath(preferred.filename) : preferred?.url || null
+
+    if (preferred?.width) width = preferred.width
+    if (preferred?.height) height = preferred.height
+
+    // Prefer public /media paths when we can determine a filename.
+    const mediaUrl =
+      preferredUrl ??
+      (filename ? toPublicMediaPath(filename) : url ? apiFileToPublicMediaPath(url) : null)
+
     src = getMediaUrl(mediaUrl, cacheTag)
   }
 

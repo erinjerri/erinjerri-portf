@@ -50,8 +50,15 @@ const nextConfig = {
     ],
   },
   images: {
+    // Make sure image optimization stays enabled (some wrappers/platform presets toggle this).
+    unoptimized: false,
+    // Prefer modern formats when the client supports them.
+    formats: ['image/avif', 'image/webp'],
     // Configure image qualities used by next/image. Next.js 16 will require explicit config.
     qualities: [80, 85],
+    // Responsive breakpoints (helps Next generate right srcset candidates).
+    deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1440, 1920, 2048],
+    imageSizes: [16, 24, 32, 48, 64, 96, 128, 256, 384],
     // Only optimize direct /media/* paths. Do NOT whitelist the Payload proxy
     // endpoint `/api/media/file/**` — allowing it causes Next.js to fetch proxied
     // media during static generation which multiplies network requests and slows builds.
