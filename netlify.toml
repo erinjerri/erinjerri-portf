@@ -2,9 +2,13 @@
   command = "pnpm build"
 
 [build.environment]
+  # Node 20.x — Payload 3.7x+ and Next.js 16 prefer modern Node
+  NODE_VERSION = "20"
   # Disable secret scanning — NEXT_PUBLIC_* and config paths are expected in build output.
   # If this still fails, set SECRETS_SCAN_ENABLED=false in Netlify UI: Site config → Environment variables.
   SECRETS_SCAN_ENABLED = false
+  # Force webpack (avoids Turbopack ENOENT/FS issues on Netlify's ephemeral build containers)
+  NEXT_PRIVATE_TURBOPACK = "0"
 
 [[headers]]
   for = "/_next/static/*"
