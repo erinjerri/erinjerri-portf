@@ -20,6 +20,7 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { substackSyncTask } from './jobs/substackSync'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -42,15 +43,28 @@ const allowedOrigins = Array.from(
 
 export default buildConfig({
   admin: {
+    dashboard: {
+      widgets: [],
+      // Default dashboard shows only collection cards. Analytics has its own view at /admin/analytics-dashboard.
+      defaultLayout: () => [{ widgetSlug: 'collections', width: 'full' }],
+    },
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
       beforeLogin: ['@/components/BeforeLogin'],
       // The `BeforeDashboard` component renders the 'welcome' block and seed action.
       beforeDashboard: ['@/components/BeforeDashboard'],
+      afterNavLinks: ['@/components/dashboard/AnalyticsNavLink#default'],
       graphics: {
         Icon: '@/components/AdminGraphics/Icon',
         Logo: '@/components/AdminGraphics/Logo',
+      },
+      views: {
+        analyticsDashboard: {
+          Component: '@/components/dashboard/AnalyticsView#default',
+          path: '/analytics-dashboard',
+          meta: { title: 'Analytics Dashboard' },
+        },
       },
     },
     importMap: {
@@ -130,7 +144,7 @@ export default buildConfig({
         return authHeader === `Bearer ${secret}`
       },
     },
-    tasks: [],
+    tasks: [substackSyncTask],
   },
   onInit: async (payload) => {
     const hasDatabaseURL = Boolean(process.env.DATABASE_URL)

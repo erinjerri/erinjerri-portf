@@ -4,6 +4,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
+import { AffiliateLink } from '@/components/analytics/AffiliateLink'
 import { Media } from '@/components/Media'
 import { buildAmazonAffiliateURL } from '@/utilities/amazon/buildAmazonAffiliateURL'
 import { cn } from '@/utilities/ui'
@@ -140,14 +141,15 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
 
                 {href ? (
                   <div className="mt-4">
-                    <a
-                      className="inline-flex items-center justify-center rounded-md bg-cyan-300/90 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-200"
-                      href={href}
+                    <AffiliateLink
+                      url={href}
+                      product={product.title ?? product.brand ?? 'Unknown'}
+                      target={openInNewTab ? '_blank' : '_self'}
                       rel={openInNewTab ? 'sponsored noopener noreferrer' : 'sponsored'}
-                      target={openInNewTab ? '_blank' : undefined}
+                      className="inline-flex items-center justify-center rounded-md bg-cyan-300/90 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-200"
                     >
                       {product.ctaLabel || 'View on Amazon'}
-                    </a>
+                    </AffiliateLink>
                   </div>
                 ) : null}
               </div>

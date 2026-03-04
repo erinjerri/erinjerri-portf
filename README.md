@@ -31,6 +31,42 @@ Suggested workflow:
 - `pnpm dev`
 - `pnpm seed` (runs `src/scripts/restore.ts` to seed locally; uses `DATABASE_URL`)
 
+## Substack cross-post sync (auto-import)
+
+This repo can import your Substack posts (via RSS) into the `posts` collection as either:
+- **Drafts for review** (default): `_status=draft`, `crosspostReviewStatus=in_review`, and an optional email notification
+- **Auto-published**: `_status=published`, `crosspostReviewStatus=auto_published`
+
+### One-time import (past posts)
+
+- `pnpm sync:substack`
+
+Optional env vars:
+- `SUBSTACK_RSS_URL` (default: `https://erinjerri.substack.com/feed`)
+- `SUBSTACK_SYNC_MODE` (`review` or `auto_publish`)
+- `SUBSTACK_SYNC_NOTIFY_EMAIL` (send a summary email when new posts are imported)
+- `SUBSTACK_DEFAULT_AUTHOR_ID` or `SUBSTACK_DEFAULT_AUTHOR_EMAIL` (set `posts.authors`)
+- `SUBSTACK_SYNC_MAX_ITEMS` (cap items processed per run)
+- `SUBSTACK_SYNC_FORCE_UPDATE=true` (re-fetch full article and update existing synced posts)
+- `SUBSTACK_SYNC_DOWNLOAD_IMAGES=true` (download Substack images into `media` and embed them)
+- `SUBSTACK_SYNC_MAX_IMAGES_PER_POST` (cap images imported per post; default 25)
+
+### Automated (scheduled) sync
+
+1. Set environment variables:
+   - `SUBSTACK_SYNC_ENABLED=true`
+   - `SUBSTACK_RSS_URL` (optional)
+   - `SUBSTACK_SYNC_MODE` (optional)
+   - `SUBSTACK_SYNC_NOTIFY_EMAIL` (optional)
+   - `SUBSTACK_SYNC_DOWNLOAD_IMAGES` (optional)
+   - `SUBSTACK_SYNC_FORCE_UPDATE` (optional)
+   - `SUBSTACK_SYNC_CRON` (optional; default `0 0 * * * *`)
+   - `SUBSTACK_SYNC_QUEUE` (optional; default `substack`)
+   - `CRON_SECRET` (required if running jobs unauthenticated)
+2. Trigger the job runner on a schedule (Vercel Cron / external cron) by calling:
+   - `GET /api/payload-jobs/run?queue=substack`
+   - with header: `Authorization: Bearer $CRON_SECRET`
+
 ## Branding / theme tokens
 
 This repo stores runtime theme tokens in the `brand` global (fonts/colors/radius). This is meant to be populated from your design system / Figma token export so new sites share the same features/components but can swap brand styling without rewriting UI.

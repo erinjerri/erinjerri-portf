@@ -121,11 +121,13 @@ export interface Config {
     header: Header;
     footer: Footer;
     brand: Brand;
+    'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     brand: BrandSelect<false> | BrandSelect<true>;
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -134,6 +136,7 @@ export interface Config {
   user: User;
   jobs: {
     tasks: {
+      substackSync: TaskSubstackSync;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -387,6 +390,14 @@ export interface Post {
    * Substack post GUID for sync deduplication. Set by sync-substack script.
    */
   substackId?: string | null;
+  /**
+   * Original Substack post URL. Set by Substack sync.
+   */
+  substackURL?: string | null;
+  /**
+   * Cross-post workflow status for imported Substack posts.
+   */
+  crosspostReviewStatus?: ('in_review' | 'approved' | 'rejected' | 'auto_published') | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -1421,7 +1432,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'schedulePublish';
+        taskSlug: 'inline' | 'substackSync' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1454,10 +1465,19 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'substackSync' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1837,6 +1857,8 @@ export interface PostsSelect<T extends boolean = true> {
   authors?: T;
   videoAsset?: T;
   substackId?: T;
+  substackURL?: T;
+  crosspostReviewStatus?: T;
   populatedAuthors?:
     | T
     | {
@@ -2320,6 +2342,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
+  meta?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2525,6 +2548,24 @@ export interface Brand {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: string;
+  stats?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -2666,6 +2707,16 @@ export interface BrandSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -2673,6 +2724,14 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSubstackSync".
+ */
+export interface TaskSubstackSync {
+  input?: unknown;
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

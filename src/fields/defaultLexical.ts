@@ -13,6 +13,7 @@ import {
   BlockquoteFeature,
   SuperscriptFeature,
   SubscriptFeature,
+  UploadFeature,
   type LinkFields,
 } from '@payloadcms/richtext-lexical'
 
@@ -29,6 +30,9 @@ export const defaultLexical = lexicalEditor({
     BlockquoteFeature(),
     SuperscriptFeature(),
     SubscriptFeature(),
+    UploadFeature({
+      enabledCollections: ['media'],
+    }),
     LinkFeature({
       enabledCollections: ['pages', 'posts'],
       fields: ({ defaultFields }) => {

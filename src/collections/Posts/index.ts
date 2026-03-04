@@ -6,6 +6,7 @@ import {
   HeadingFeature,
   HorizontalRuleFeature,
   InlineToolbarFeature,
+  UploadFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
@@ -48,7 +49,7 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
-    defaultColumns: ['title', 'slug', 'publishedAt', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'crosspostReviewStatus', 'publishedAt', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -90,6 +91,9 @@ export const Posts: CollectionConfig<'posts'> = {
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
                     BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    UploadFeature({
+                      enabledCollections: ['media'],
+                    }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),
@@ -219,6 +223,32 @@ export const Posts: CollectionConfig<'posts'> = {
         description: 'Substack post GUID for sync deduplication. Set by sync-substack script.',
         readOnly: true,
       },
+    },
+    {
+      name: 'substackURL',
+      type: 'text',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Original Substack post URL. Set by Substack sync.',
+        readOnly: true,
+        condition: (data) => Boolean(data?.substackId),
+      },
+    },
+    {
+      name: 'crosspostReviewStatus',
+      type: 'select',
+      admin: {
+        position: 'sidebar',
+        description: 'Cross-post workflow status for imported Substack posts.',
+        condition: (data) => Boolean(data?.substackId),
+      },
+      options: [
+        { label: 'In review', value: 'in_review' },
+        { label: 'Approved', value: 'approved' },
+        { label: 'Rejected', value: 'rejected' },
+        { label: 'Auto published', value: 'auto_published' },
+      ],
     },
     // This field is only used to populate the user data via the `populateAuthors` hook
     // This is because the `user` collection has access control locked to protect user privacy
