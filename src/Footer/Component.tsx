@@ -50,25 +50,22 @@ const hasLocalMediaFile = (mediaUrl: string): boolean => {
 const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
 
-const getSubstackFormAction = (): string | null => {
+const getSubstackPublicationURL = (): string => {
   const raw = process.env.SUBSTACK_SUBSCRIBE_URL?.trim()
-  if (!raw) return 'https://erinjerri.substack.com/api/v1/free?nojs=true'
+  if (!raw) return 'https://erinjerri.substack.com'
 
   const trimmed = raw.replace(/\/$/, '')
   const lower = trimmed.toLowerCase()
 
   if (lower.includes('/api/v1/free')) {
-    return trimmed.includes('?') ? trimmed : `${trimmed}?nojs=true`
+    return trimmed.replace(/\/api\/v1\/free(\?.*)?$/i, '')
   }
 
   if (lower.endsWith('.substack.com') || lower.includes('.substack.com/')) {
-    const publicationURL = lower.endsWith('/subscribe')
-      ? trimmed.replace(/\/subscribe$/i, '')
-      : trimmed
-    return `${publicationURL}/api/v1/free?nojs=true`
+    return lower.endsWith('/subscribe') ? trimmed.replace(/\/subscribe$/i, '') : trimmed
   }
 
-  return null
+  return 'https://erinjerri.substack.com'
 }
 
 function SocialIcon({
@@ -125,7 +122,8 @@ function SocialIcon({
 }
 
 export async function Footer() {
-  const substackFormAction = getSubstackFormAction()
+  const substackPublicationURL = getSubstackPublicationURL()
+  const substackEmbedSrc = `${substackPublicationURL.replace(/\/$/, '')}/embed`
   let footerData: Footer | null = null
   try {
     footerData = await getCachedGlobal('footer', 2)()
@@ -154,7 +152,7 @@ export async function Footer() {
 
             {subscribeSection?.showSubscribe !== false && (
               <SubscribeForm
-                action={substackFormAction || 'https://erinjerri.substack.com/api/v1/free?nojs=true'}
+                action={substackEmbedSrc}
               />
             )}
 

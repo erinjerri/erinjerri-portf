@@ -87,7 +87,7 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
   const associateTag =
     process.env.AMAZON_ASSOCIATE_TAG?.trim() ||
     process.env.NEXT_PUBLIC_AMAZON_ASSOCIATE_TAG?.trim() ||
-    ''
+    'erinjerrimalo-20'
 
   return (
     <section className="container" id={id ? `block-${id}` : undefined}>

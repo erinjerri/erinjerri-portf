@@ -929,7 +929,10 @@ export interface AffiliateProductsBlock {
    */
   showDisclosure?: boolean | null;
   disclosureText?: string | null;
-  products: (string | AffiliateProduct)[];
+  /**
+   * Select products to show. You can leave this empty while drafting the page.
+   */
+  products?: (string | AffiliateProduct)[] | null;
   /**
    * Controls grid columns on desktop. Mobile is always 1 column.
    */

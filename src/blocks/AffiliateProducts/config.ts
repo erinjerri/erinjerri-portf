@@ -34,7 +34,9 @@ export const AffiliateProductsBlock: Block = {
       type: 'relationship',
       relationTo: 'affiliateProducts',
       hasMany: true,
-      required: true,
+      admin: {
+        description: 'Select products to show. You can leave this empty while drafting the page.',
+      },
     },
     {
       name: 'columns',
