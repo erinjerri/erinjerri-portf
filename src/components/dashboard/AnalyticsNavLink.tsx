@@ -1,19 +1,38 @@
 'use client'
 
-import { useConfig } from '@payloadcms/ui'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 /**
- * Nav link to the Analytics Dashboard view. Add to admin.components.afterNavLinks.
+ * Nav link to the Analytics view. Add to admin.components.afterNavLinks.
+ * Avoids useConfig to prevent "state update on unmounted component" during admin hydration.
  */
 export default function AnalyticsNavLink() {
-  const { config } = useConfig()
-  const basePath = config?.routes?.admin ?? '/admin'
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--base)',
+          padding: 'var(--base)',
+          color: 'var(--theme-elevation-500)',
+        }}
+      >
+        <span>Analytics</span>
+      </div>
+    )
+  }
 
   return (
     <Link
-      href={`${basePath}/analytics-dashboard`}
+      href="/admin/analytics"
       style={{
         display: 'flex',
         alignItems: 'center',
