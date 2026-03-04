@@ -74,6 +74,7 @@ export interface Config {
     media: Media;
     documents: Document;
     categories: Category;
+    affiliateProducts: AffiliateProduct;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -99,6 +100,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    affiliateProducts: AffiliateProductsSelect<false> | AffiliateProductsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -231,13 +233,13 @@ export interface Page {
          */
         displayStyle?: ('default' | 'fullWidthTransition' | 'heroOverlay') | null;
         /**
-         * Overlay opacity (0–100). Darkens the image so overlay links are readable.
-         */
-        overlayOpacity?: number | null;
-        /**
          * For hero overlay or book image with links: High Impact increases height and font size.
          */
         overlayVariant?: ('standard' | 'highImpact') | null;
+        /**
+         * Overlay opacity (0–100). Darkens the image so overlay links are readable.
+         */
+        overlayOpacity?: number | null;
         /**
          * Links overlay the center of the image (e.g. O'Reilly, Amazon).
          */
@@ -314,6 +316,7 @@ export interface Page {
         blockType: 'mediaBlock';
       }
     | ArchiveBlock
+    | AffiliateProductsBlock
     | WatchBlock
     | VideoBackgroundTransitionBlock
     | FormBlock
@@ -917,6 +920,50 @@ export interface Watch {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AffiliateProductsBlock".
+ */
+export interface AffiliateProductsBlock {
+  heading?: string | null;
+  /**
+   * Recommended for compliance. Shows an affiliate disclosure line near the product grid.
+   */
+  showDisclosure?: boolean | null;
+  disclosureText?: string | null;
+  products: (string | AffiliateProduct)[];
+  /**
+   * Controls grid columns on desktop. Mobile is always 1 column.
+   */
+  columns?: ('2' | '3' | '4') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'affiliateProductsBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliateProducts".
+ */
+export interface AffiliateProduct {
+  id: string;
+  title: string;
+  brand?: string | null;
+  description?: string | null;
+  /**
+   * Paste an Amazon product URL (or any URL). The site will append your Amazon Associates tag at render-time when applicable.
+   */
+  productURL: string;
+  /**
+   * Optional. Amazon ASIN, useful for your own bookkeeping.
+   */
+  asin?: string | null;
+  image?: (string | null) | Media;
+  ctaLabel?: string | null;
+  openInNewTab?: boolean | null;
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "WatchBlock".
  */
 export interface WatchBlock {
@@ -1447,6 +1494,10 @@ export interface PayloadLockedDocument {
         value: string | Category;
       } | null)
     | ({
+        relationTo: 'affiliateProducts';
+        value: string | AffiliateProduct;
+      } | null)
+    | ({
         relationTo: 'users';
         value: string | User;
       } | null)
@@ -1550,6 +1601,7 @@ export interface PagesSelect<T extends boolean = true> {
         documentBlock?: T | DocumentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
+        affiliateProductsBlock?: T | AffiliateProductsBlockSelect<T>;
         watchBlock?: T | WatchBlockSelect<T>;
         videoBackgroundTransition?: T | VideoBackgroundTransitionBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
@@ -1644,6 +1696,7 @@ export interface DocumentBlockSelect<T extends boolean = true> {
 export interface MediaBlockSelect<T extends boolean = true> {
   mediaType?: T;
   displayStyle?: T;
+  overlayVariant?: T;
   overlayOpacity?: T;
   links?:
     | T
@@ -1683,6 +1736,19 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   categories?: T;
   limit?: T;
   selectedDocs?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AffiliateProductsBlock_select".
+ */
+export interface AffiliateProductsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  showDisclosure?: T;
+  disclosureText?: T;
+  products?: T;
+  columns?: T;
   id?: T;
   blockName?: T;
 }
@@ -1980,6 +2046,23 @@ export interface CategoriesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliateProducts_select".
+ */
+export interface AffiliateProductsSelect<T extends boolean = true> {
+  title?: T;
+  brand?: T;
+  description?: T;
+  productURL?: T;
+  asin?: T;
+  image?: T;
+  ctaLabel?: T;
+  openInNewTab?: T;
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2632,13 +2715,13 @@ export interface MediaBlock {
    */
   displayStyle?: ('default' | 'fullWidthTransition' | 'heroOverlay') | null;
   /**
-   * Overlay opacity (0–100). Darkens the image so overlay links are readable.
-   */
-  overlayOpacity?: number | null;
-  /**
    * For hero overlay or book image with links: High Impact increases height and font size.
    */
   overlayVariant?: ('standard' | 'highImpact') | null;
+  /**
+   * Overlay opacity (0–100). Darkens the image so overlay links are readable.
+   */
+  overlayOpacity?: number | null;
   /**
    * Links overlay the center of the image (e.g. O'Reilly, Amazon).
    */

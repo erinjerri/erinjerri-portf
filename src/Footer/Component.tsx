@@ -52,7 +52,7 @@ const isBrokenR2Url = (u: string | null | undefined): boolean =>
 
 const getSubstackFormAction = (): string | null => {
   const raw = process.env.SUBSTACK_SUBSCRIBE_URL?.trim()
-  if (!raw) return null
+  if (!raw) return 'https://erinjerri.substack.com/api/v1/free?nojs=true'
 
   const trimmed = raw.replace(/\/$/, '')
   const lower = trimmed.toLowerCase()
@@ -153,7 +153,9 @@ export async function Footer() {
             </Link>
 
             {subscribeSection?.showSubscribe !== false && (
-              <SubscribeForm isConfigured={Boolean(substackFormAction)} />
+              <SubscribeForm
+                action={substackFormAction || 'https://erinjerri.substack.com/api/v1/free?nojs=true'}
+              />
             )}
 
             {subscribeSection?.slogan && (

@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Archive } from '../../blocks/ArchiveBlock/config'
+import { AffiliateProductsBlock } from '../../blocks/AffiliateProducts/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
 import { DocumentBlock } from '../../blocks/DocumentBlock/config'
@@ -82,6 +83,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 DocumentBlock,
                 MediaBlock,
                 Archive,
+                AffiliateProductsBlock,
                 WatchBlock,
                 VideoBackgroundTransition,
                 FormBlock,
