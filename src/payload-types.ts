@@ -235,6 +235,10 @@ export interface Page {
          */
         overlayOpacity?: number | null;
         /**
+         * For hero overlay or book image with links: High Impact increases height and font size.
+         */
+        overlayVariant?: ('standard' | 'highImpact') | null;
+        /**
          * Links overlay the center of the image (e.g. O'Reilly, Amazon).
          */
         links?:
@@ -2631,6 +2635,10 @@ export interface MediaBlock {
    * Overlay opacity (0–100). Darkens the image so overlay links are readable.
    */
   overlayOpacity?: number | null;
+  /**
+   * For hero overlay or book image with links: High Impact increases height and font size.
+   */
+  overlayVariant?: ('standard' | 'highImpact') | null;
   /**
    * Links overlay the center of the image (e.g. O'Reilly, Amazon).
    */

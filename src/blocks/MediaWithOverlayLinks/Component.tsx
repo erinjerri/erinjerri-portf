@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { cn } from '@/utilities/ui'
 import { Media as MediaComponent } from '@/components/Media'
 import { CMSLink } from '@/components/Link'
 import RichText from '@/components/RichText'
@@ -13,6 +14,7 @@ type MediaBlockShape = {
   media?: number | string | MediaDoc | null
   overlayOpacity?: number | null
   overlayRichText?: unknown
+  overlayVariant?: 'standard' | 'highImpact' | null
 }
 
 type ContentBlockShape = {
@@ -61,6 +63,7 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
 
   const opacity = Math.max(0, Math.min(100, mediaBlock.overlayOpacity ?? 60)) / 100
   const overlayRichText = mediaBlock.overlayRichText
+  const isHighImpact = mediaBlock.overlayVariant === 'highImpact'
   const hasOverlayRichText =
     overlayRichText &&
     typeof overlayRichText === 'object' &&
@@ -68,7 +71,12 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
     (overlayRichText as any).root.children.length > 0
 
   return (
-    <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden min-h-[40vh] md:min-h-[50vh]">
+    <div
+      className={cn(
+        'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden',
+        isHighImpact ? 'min-h-[60vh] md:min-h-[70vh]' : 'min-h-[40vh] md:min-h-[50vh]',
+      )}
+    >
       <div className="absolute inset-0">
         <MediaComponent
           fill
@@ -80,13 +88,25 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
       </div>
       <div className="absolute inset-0 bg-black" style={{ opacity }} />
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-8 text-center">
-        <div className="max-w-[36.5rem] md:text-center">
+        <div className={cn('max-w-[36.5rem] md:text-center', isHighImpact && 'max-w-[42rem]')}>
           {hasOverlayRichText ? (
-            <div className="mb-6 text-2xl md:text-3xl font-semibold text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_.prose_a]:text-white">
+            <div
+              className={cn(
+                'mb-6 font-semibold text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_.prose_a]:text-white',
+                isHighImpact ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl',
+              )}
+            >
               <RichText data={overlayRichText as any} enableGutter={false} />
             </div>
           ) : null}
-          <ul className="flex flex-wrap md:justify-center gap-4 text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_a]:text-white">
+          <ul
+            className={cn(
+              'flex flex-wrap md:justify-center gap-4 text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_a]:text-white',
+              isHighImpact
+                ? 'gap-6 [&_button]:text-lg [&_button]:md:text-xl [&_button]:px-6 [&_button]:py-3'
+                : '[&_button]:text-base [&_button]:md:text-lg',
+            )}
+          >
             {links.map(({ link }, i) => (
               <li key={i}>
                 <CMSLink {...(link as any)} appearance={link?.appearance || 'light'} />

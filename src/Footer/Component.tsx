@@ -153,7 +153,7 @@ export async function Footer() {
             </Link>
 
             {subscribeSection?.showSubscribe !== false && (
-              <SubscribeForm substackFormAction={substackFormAction} />
+              <SubscribeForm isConfigured={Boolean(substackFormAction)} />
             )}
 
             {subscribeSection?.slogan && (

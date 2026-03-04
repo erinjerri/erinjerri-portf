@@ -27,6 +27,7 @@ type Props = Omit<MediaBlockProps, 'media'> & {
   videoSource?: 'upload' | 'url' | null
   videoUrl?: string | null
   displayStyle?: 'default' | 'fullWidthTransition' | 'heroOverlay' | null
+  overlayVariant?: 'standard' | 'highImpact' | null
   disableInnerContainer?: boolean
   links?: Array<{
     link?: { label?: string | null; url?: string | null; appearance?: string | null }
@@ -85,10 +86,12 @@ export const MediaBlock: React.FC<Props> = (props) => {
     disableInnerContainer,
     links,
     overlayOpacity = 60,
+    overlayVariant,
   } = props
 
   const isFullWidthTransition = displayStyle === 'fullWidthTransition'
   const isHeroOverlay = displayStyle === 'heroOverlay' && mediaType === 'image'
+  const isHighImpact = overlayVariant === 'highImpact'
 
   const selectedMedia = (() => {
     if (mediaType === 'video') return videoSource === 'upload' ? video || media : null
@@ -118,7 +121,8 @@ export const MediaBlock: React.FC<Props> = (props) => {
     return (
       <div
         className={cn(
-          'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden min-h-[40vh] md:min-h-[50vh]',
+          'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden',
+          isHighImpact ? 'min-h-[60vh] md:min-h-[70vh]' : 'min-h-[40vh] md:min-h-[50vh]',
           className,
         )}
       >
@@ -135,7 +139,14 @@ export const MediaBlock: React.FC<Props> = (props) => {
         <div className="absolute inset-0 bg-black" style={{ opacity }} />
         {hasLinks && (
           <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-center px-6 py-8 text-center">
-            <ul className="flex flex-wrap justify-center gap-4 text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_a]:text-white">
+            <ul
+              className={cn(
+                'flex flex-wrap justify-center gap-4 text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_a]:text-white',
+                isHighImpact
+                  ? 'gap-6 [&_button]:text-lg [&_button]:md:text-xl [&_button]:px-6 [&_button]:py-3'
+                  : '[&_button]:text-base [&_button]:md:text-lg',
+              )}
+            >
               {links.map(({ link }, i) => (
                 <li key={i}>
                   <CMSLink {...(link as any)} appearance={link?.appearance || 'light'} />
@@ -148,6 +159,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
           <div
             className={cn(
               'absolute bottom-0 left-0 right-0 z-10 p-4 text-center text-white/90',
+              isHighImpact && 'text-lg md:text-xl',
               { container: !disableInnerContainer },
               captionClassName,
             )}

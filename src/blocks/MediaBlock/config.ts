@@ -67,6 +67,20 @@ export const MediaBlock: Block = {
       },
     },
     {
+      name: 'overlayVariant',
+      type: 'select',
+      defaultValue: 'standard',
+      options: [
+        { label: 'Standard', value: 'standard' },
+        { label: 'High Impact (taller, larger text)', value: 'highImpact' },
+      ],
+      admin: {
+        condition: (_, siblingData) => siblingData?.mediaType === 'image',
+        description:
+          'For hero overlay or book image with links: High Impact increases height and font size.',
+      },
+    },
+    {
       name: 'overlayOpacity',
       type: 'number',
       defaultValue: 60,
