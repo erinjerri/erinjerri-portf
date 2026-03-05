@@ -25,6 +25,7 @@ async function syncSubstack(): Promise<void> {
 
   const forceUpdateEnv = process.env.SUBSTACK_SYNC_FORCE_UPDATE?.trim()
   const downloadImagesEnv = process.env.SUBSTACK_SYNC_DOWNLOAD_IMAGES?.trim()
+  const includeImageSourceLinksEnv = process.env.SUBSTACK_SYNC_INCLUDE_IMAGE_SOURCE_LINKS?.trim()
 
   const { synced, skipped, errors } = await syncSubstackToPosts({
     payload,
@@ -39,6 +40,9 @@ async function syncSubstack(): Promise<void> {
         : undefined,
       forceUpdate: forceUpdateEnv ? forceUpdateEnv === 'true' : undefined,
       downloadImages: downloadImagesEnv ? downloadImagesEnv === 'true' : undefined,
+      includeImageSourceLinks: includeImageSourceLinksEnv
+        ? includeImageSourceLinksEnv === 'true'
+        : undefined,
       maxImagesPerPost: process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST
         ? Number(process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST)
         : undefined,

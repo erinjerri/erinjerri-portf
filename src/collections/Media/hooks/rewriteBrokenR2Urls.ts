@@ -6,6 +6,8 @@ const isBrokenR2Url = (u: string | null | undefined): boolean =>
 const toProxyUrl = (filename: string): string => {
   const publicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
   const publicReads = process.env.R2_PUBLIC_READS === 'true'
+  const useR2 = process.env.USE_R2_STORAGE === 'true'
+  const hasR2Bucket = Boolean(process.env.R2_BUCKET?.trim())
 
   if (publicHostname) {
     const base = publicHostname.replace(/^https?:\/\//, '')
@@ -17,7 +19,12 @@ const toProxyUrl = (filename: string): string => {
     return `https://${acct}.r2.cloudflarestorage.com/${encodeURIComponent(filename)}`
   }
 
-  // Fallback to app's public media path
+  // When R2 is in use but no public hostname: use app proxy (reads from R2 or local fallback)
+  if (useR2 && hasR2Bucket) {
+    return `/api/media/file/${encodeURIComponent(filename)}`
+  }
+
+  // Local storage: files live in public/media, served at /media/*
   return `/media/${encodeURIComponent(filename)}`
 }
 

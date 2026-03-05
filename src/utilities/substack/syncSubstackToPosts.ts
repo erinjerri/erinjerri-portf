@@ -1,10 +1,15 @@
+import https from 'node:https'
+import http from 'node:http'
 import Parser from 'rss-parser'
 import { JSDOM } from 'jsdom'
 
 import type { Payload, PayloadRequest } from 'payload'
 
+import type { RichTextField } from 'payload'
+
 import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
 
+import { Posts } from '../../collections/Posts'
 import { getServerSideURL } from '../getURL'
 import type { Post } from '../../payload-types'
 
@@ -48,6 +53,11 @@ export type SyncSubstackToPostsOptions = {
    * @default 25
    */
   maxImagesPerPost?: number
+  /**
+   * If true, append a source link paragraph under each successfully imported image.
+   * @default true
+   */
+  includeImageSourceLinks?: boolean
   /**
    * If true, always fetches the full post HTML from Substack (not just RSS).
    * @default true
@@ -101,31 +111,271 @@ function extFromMimeType(mimeType: string): string | undefined {
   return undefined
 }
 
-async function downloadImageAsFile(args: { src: string; nameHint: string }): Promise<PayloadFile | null> {
-  const { src, nameHint } = args
-  try {
-    const res = await fetch(src, { cache: 'no-store' })
-    if (!res.ok) return null
+/** Browser-like headers — Substack CDN often blocks Node's default User-Agent */
+const FETCH_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+} as const
 
-    const contentType = res.headers.get('content-type') || 'application/octet-stream'
-    if (!contentType.toLowerCase().startsWith('image/')) return null
-
-    const arrayBuffer = await res.arrayBuffer()
-    const data = Buffer.from(arrayBuffer)
-
-    const ext = extFromMimeType(contentType) || 'img'
-    const safeBase = toSlug(nameHint) || 'substack-image'
-    const name = `${safeBase}.${ext}`
-
-    return {
-      name,
-      data,
-      mimetype: contentType,
-      size: data.byteLength,
+/**
+ * Extract the underlying S3 URL from Substack CDN URLs.
+ * Format: substackcdn.com/image/fetch/w_1456,.../https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2F...
+ * S3 public buckets are often less restrictive than the CDN.
+ */
+function extractSubstackS3Url(src: string): string | null {
+  const tryDecode = (value: string): string => {
+    let cur = value
+    for (let i = 0; i < 5; i++) {
+      try {
+        const next = decodeURIComponent(cur)
+        if (next === cur) break
+        cur = next
+      } catch {
+        break
+      }
     }
+    return cur
+  }
+
+  try {
+    const url = new URL(src)
+    if (!url.hostname.includes('substackcdn.com') || !url.pathname.includes('/image/fetch/'))
+      return null
+
+    const candidates: string[] = []
+
+    // path segments often contain the encoded origin URL
+    candidates.push(...url.pathname.split('/').filter(Boolean))
+
+    // sometimes Substack includes the origin URL in query params
+    for (const [, v] of url.searchParams.entries()) {
+      if (v) candidates.push(v)
+    }
+
+    for (let i = candidates.length - 1; i >= 0; i--) {
+      const raw = candidates[i]
+      if (!raw) continue
+      if (!raw.includes('substack-post-media') && !raw.includes('https%3A') && !raw.includes('http'))
+        continue
+
+      const decoded = tryDecode(raw)
+      if (decoded.startsWith('http') && decoded.includes('substack-post-media')) {
+        return decoded
+      }
+    }
+    return null
   } catch {
     return null
   }
+}
+
+async function fetchImageToBuffer(
+  url: string,
+  opts: { referrer?: string; timeout?: number } = {},
+): Promise<{ data: Buffer; contentType: string } | null> {
+  const { referrer, timeout = 15_000 } = opts
+  const res = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      ...FETCH_HEADERS,
+      ...(referrer ? { Referer: referrer } : {}),
+    },
+    signal: AbortSignal.timeout(timeout),
+  })
+  if (!res.ok) {
+    if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+      console.warn(`[Substack sync] Image fetch HTTP ${res.status} for ${url}`)
+    }
+    return null
+  }
+  const contentType = res.headers.get('content-type') || 'application/octet-stream'
+  if (!contentType.toLowerCase().startsWith('image/')) {
+    if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+      console.warn(
+        `[Substack sync] Image fetch non-image content-type (${contentType}) for ${url}`,
+      )
+    }
+    return null
+  }
+  const arrayBuffer = await res.arrayBuffer()
+  return { data: Buffer.from(arrayBuffer), contentType }
+}
+
+/** Fallback: Node native https — sometimes works when fetch is blocked by CDN */
+function fetchImageViaHttps(
+  url: string,
+  opts: { referrer?: string; timeout?: number } = {},
+): Promise<{ data: Buffer; contentType: string } | null> {
+  return new Promise((resolve) => {
+    const { referrer, timeout = 15_000 } = opts
+    const parsed = new URL(url)
+    const isHttps = parsed.protocol === 'https:'
+    const client = isHttps ? https : http
+
+    const reqOpts: https.RequestOptions = {
+      hostname: parsed.hostname,
+      port: parsed.port || (isHttps ? 443 : 80),
+      path: parsed.pathname + parsed.search,
+      method: 'GET',
+      headers: {
+        ...FETCH_HEADERS,
+        ...(referrer ? { Referer: referrer } : {}),
+      },
+    }
+
+    const timer = setTimeout(() => {
+      req.destroy()
+      resolve(null)
+    }, timeout)
+
+    const req = client.request(reqOpts, (res) => {
+      clearTimeout(timer)
+      if (res.statusCode && res.statusCode >= 400) {
+        if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+          console.warn(`[Substack sync] Image https HTTP ${res.statusCode} for ${url}`)
+        }
+        resolve(null)
+        return
+      }
+      const contentType = res.headers['content-type'] || 'application/octet-stream'
+      if (!contentType.toLowerCase().startsWith('image/')) {
+        if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+          console.warn(
+            `[Substack sync] Image https non-image content-type (${contentType}) for ${url}`,
+          )
+        }
+        resolve(null)
+        return
+      }
+      const chunks: Uint8Array[] = []
+      res.on('data', (chunk: Buffer | Uint8Array) => chunks.push(Uint8Array.from(chunk)))
+      res.on('end', () => {
+        const total = chunks.reduce((acc, c) => acc + c.length, 0)
+        const data = new Uint8Array(total)
+        let offset = 0
+        for (const c of chunks) {
+          data.set(c, offset)
+          offset += c.length
+        }
+        resolve({ data: Buffer.from(data), contentType })
+      })
+      res.on('error', () => resolve(null))
+    })
+    req.on('error', () => {
+      clearTimeout(timer)
+      resolve(null)
+    })
+    req.end()
+  })
+}
+
+/** Optional fallback: Playwright request (more browser-like) */
+async function fetchImageViaPlaywright(
+  url: string,
+  opts: { referrer?: string; timeout?: number } = {},
+): Promise<{ data: Buffer; contentType: string } | null> {
+  if (process.env.SUBSTACK_SYNC_USE_PLAYWRIGHT !== 'true') return null
+
+  try {
+    const { referrer, timeout = 20_000 } = opts
+    // Lazy import so normal runs don't require Playwright at runtime
+    const pw = (await import('playwright')) as any
+    const context = await pw.request.newContext({
+      userAgent: FETCH_HEADERS['User-Agent'],
+      extraHTTPHeaders: {
+        ...FETCH_HEADERS,
+        ...(referrer ? { Referer: referrer } : {}),
+      },
+      timeout,
+    })
+
+    try {
+      const res = await context.get(url)
+      const status = res.status()
+      if (status >= 400) {
+        if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+          console.warn(`[Substack sync] Image playwright HTTP ${status} for ${url}`)
+        }
+        return null
+      }
+
+      const headers = res.headers()
+      const contentType = headers['content-type'] || 'application/octet-stream'
+      if (!String(contentType).toLowerCase().startsWith('image/')) {
+        if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+          console.warn(
+            `[Substack sync] Image playwright non-image content-type (${contentType}) for ${url}`,
+          )
+        }
+        return null
+      }
+
+      const body = await res.body()
+      return { data: Buffer.from(body), contentType }
+    } finally {
+      await context.dispose()
+    }
+  } catch (err) {
+    if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+      console.warn(`[Substack sync] Image playwright fetch failed for ${url}:`, err)
+    }
+    return null
+  }
+}
+
+async function downloadImageAsFile(args: {
+  src: string
+  nameHint: string
+  referrer?: string
+}): Promise<PayloadFile | null> {
+  const { src, nameHint, referrer } = args
+  const urlsToTry: string[] = [src]
+  const s3Url = extractSubstackS3Url(src)
+  if (s3Url && s3Url !== src) urlsToTry.push(s3Url)
+  if (process.env.DEBUG_SUBSTACK_SYNC === 'true' && s3Url) {
+    console.log(`[Substack sync] Extracted S3 origin URL: ${s3Url}`)
+  }
+
+  const tryWithReferrer = [true, false] as const
+  const fetchers: Array<
+    (u: string, o: { referrer?: string }) => Promise<{ data: Buffer; contentType: string } | null>
+  > = [
+    fetchImageToBuffer,
+    fetchImageViaHttps, // Fallback: native https sometimes works when fetch is blocked
+    fetchImageViaPlaywright, // Optional: most browser-like, enable with SUBSTACK_SYNC_USE_PLAYWRIGHT=true
+  ]
+
+  for (const url of urlsToTry) {
+    for (const useRef of tryWithReferrer) {
+      for (const fetcher of fetchers) {
+        try {
+          const result = await fetcher(url, {
+            referrer: useRef ? referrer : undefined,
+          })
+          if (!result) continue
+
+          const { data, contentType } = result
+          const ext = extFromMimeType(contentType) || 'img'
+          const safeBase = toSlug(nameHint) || 'substack-image'
+          const name = `${safeBase}.${ext}`
+
+          return {
+            name,
+            data,
+            mimetype: contentType,
+            size: data.byteLength,
+          }
+        } catch (err) {
+          if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+            console.warn(`[Substack sync] Failed to fetch (${url}, referrer=${useRef}):`, err)
+          }
+        }
+      }
+    }
+  }
+  return null
 }
 
 function getSlugBaseFromLink(link?: string): string | undefined {
@@ -302,6 +552,7 @@ export async function syncSubstackToPosts(args: {
   imported: ImportedPost[]
 }> {
   const { payload, req, options } = args
+  const shouldIncludeImageSourceLinks = options.includeImageSourceLinks !== false
 
   const parser = new Parser({
     customFields: {
@@ -317,7 +568,13 @@ export async function syncSubstackToPosts(args: {
       ? items.slice(0, options.maxItems)
       : items
 
-  const editorConfig = await editorConfigFactory.default({ config: payload.config })
+  const contentField = (Posts.fields ?? []).flatMap((f) =>
+    f.type === 'tabs' && 'tabs' in f ? (f.tabs ?? []).flatMap((t) => t.fields ?? []) : [f],
+  ).find((f): f is RichTextField => f.type === 'richText' && f.name === 'content')
+
+  const editorConfig = contentField
+    ? await editorConfigFactory.fromField({ field: contentField })
+    : await editorConfigFactory.default({ config: payload.config })
 
   let synced = 0
   let skipped = 0
@@ -364,6 +621,11 @@ export async function syncSubstackToPosts(args: {
     if (!html || html.trim().length < 10) html = '<p>No content.</p>'
 
     const shouldDownloadImages = options.downloadImages !== false
+    if (!shouldDownloadImages && process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+      console.log(
+        `[Substack sync][Media] Skip download for "${item.title ?? item.link}" because downloadImages=false`,
+      )
+    }
     if (shouldDownloadImages) {
       try {
         const dom = new JSDOM(html)
@@ -381,40 +643,116 @@ export async function syncSubstackToPosts(args: {
 
           const src = img.getAttribute('src') || ''
           if (!src || src.startsWith('data:')) continue
+          const altText = img.getAttribute('alt') || item.title || 'Substack image'
 
-          let mediaID = uploadedImageCache.get(src)
-          if (!mediaID) {
-            const file = await downloadImageAsFile({
-              src,
-              nameHint: `${item.title || 'post'}-${processed + 1}`,
-            })
-            if (!file) continue
+          try {
+            let mediaID = uploadedImageCache.get(src)
+            if (!mediaID) {
+              const file = await downloadImageAsFile({
+                src,
+                nameHint: `${item.title || 'post'}-${processed + 1}`,
+                referrer: item.link,
+              })
+              if (!file) {
+                if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+                  console.warn(`[Substack sync][Media] Failed to fetch image, falling back to link: ${src}`)
+                }
+                // Replace failed-download img with link so convertHTMLToLexical doesn't create invalid upload nodes
+                const link = document.createElement('a')
+                link.setAttribute('href', src)
+                link.setAttribute('rel', 'noopener noreferrer')
+                link.textContent = altText || '[Image]'
+                img.replaceWith(link)
+                continue
+              }
 
-            const createdMedia = await payload.create({
-              collection: 'media',
-              data: {
-                mediaType: 'image',
-                alt: img.getAttribute('alt') || item.title || 'Substack image',
-              },
-              file,
-              overrideAccess: true,
-              ...(req ? { req } : {}),
-            })
+              const createdMedia = await payload.create({
+                collection: 'media',
+                data: {
+                  mediaType: 'image',
+                  alt: altText,
+                },
+                file,
+                overrideAccess: true,
+                ...(req ? { req } : {}),
+              })
 
-            mediaID = String(createdMedia.id)
-            uploadedImageCache.set(src, mediaID)
+              if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+                const id = String(createdMedia.id)
+                const filename =
+                  typeof (createdMedia as { filename?: unknown }).filename === 'string'
+                    ? ((createdMedia as { filename: string }).filename as string)
+                    : null
+                const url =
+                  typeof (createdMedia as { url?: unknown }).url === 'string'
+                    ? ((createdMedia as { url: string }).url as string)
+                    : null
+
+                console.log(
+                  `[Substack sync] Uploaded image -> media:${id}${filename ? ` filename=${filename}` : ''}${
+                    url ? ` url=${url}` : ''
+                  }`,
+                )
+              }
+
+              mediaID = String(createdMedia.id)
+              uploadedImageCache.set(src, mediaID)
+              await new Promise((r) => setTimeout(r, 200))
+            }
+
+            img.setAttribute('data-lexical-upload-relation-to', 'media')
+            img.setAttribute('data-lexical-upload-id', mediaID)
+
+            if (shouldIncludeImageSourceLinks) {
+              const sourceParagraph = document.createElement('p')
+              sourceParagraph.append('Source: ')
+              const sourceLink = document.createElement('a')
+              sourceLink.setAttribute('href', src)
+              sourceLink.setAttribute('rel', 'noopener noreferrer')
+              sourceLink.textContent = 'Substack'
+              sourceParagraph.appendChild(sourceLink)
+              img.insertAdjacentElement('afterend', sourceParagraph)
+            }
+
+            processed++
+          } catch (err) {
+            if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+              console.warn(`[Substack sync][Payload] Validation/create failed for ${src}:`, err)
+            }
+            const link = document.createElement('a')
+            link.setAttribute('href', src)
+            link.setAttribute('rel', 'noopener noreferrer')
+            link.textContent = altText || '[Image]'
+            img.replaceWith(link)
           }
-
-          img.setAttribute('data-lexical-upload-relation-to', 'media')
-          img.setAttribute('data-lexical-upload-id', mediaID)
-          processed++
         }
 
         html = document.body.innerHTML || html
-      } catch {
-        // ignore image download failures; continue with HTML
+      } catch (err) {
+        if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+          console.warn(
+            `[Substack sync] Image import block failed for "${item.title ?? item.link}":`,
+            err,
+          )
+        }
       }
     }
+
+    // Replace any remaining external img (without data-lexical-upload-id) with links so
+    // convertHTMLToLexical doesn't produce invalid upload nodes
+    const domForCleanup = new JSDOM(html)
+    const docForCleanup = domForCleanup.window.document
+    docForCleanup.querySelectorAll('img[src^="http"]:not([data-lexical-upload-id])').forEach((img) => {
+      const src = img.getAttribute('src')
+      if (src) {
+        const link = docForCleanup.createElement('a')
+        link.setAttribute('href', src)
+        link.setAttribute('rel', 'noopener noreferrer')
+        link.textContent = img.getAttribute('alt') || '[Image]'
+        img.replaceWith(link)
+      }
+    })
+    html = docForCleanup.body.innerHTML || html
 
     let lexicalContent: Post['content']
     try {
@@ -423,8 +761,9 @@ export async function syncSubstackToPosts(args: {
         html,
         JSDOM,
       }) as Post['content']
-    } catch {
+    } catch (err) {
       errors++
+      console.error(`[Substack sync] Lexical conversion failed for "${item.title ?? item.link}":`, err)
       continue
     }
 
@@ -501,8 +840,16 @@ export async function syncSubstackToPosts(args: {
         substackURL: item.link,
       })
       synced++
-    } catch {
+    } catch (err) {
       errors++
+      const validationErrors =
+        err && typeof err === 'object' && 'data' in err && Array.isArray((err as { data?: { errors?: unknown } }).data?.errors)
+          ? (err as { data: { errors: unknown[] } }).data.errors
+          : []
+      console.error(
+        `[Substack sync] Create/update failed for "${item.title ?? item.link}":`,
+        validationErrors.length > 0 ? JSON.stringify(validationErrors, null, 2) : err,
+      )
     }
   }
 

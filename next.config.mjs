@@ -91,6 +91,11 @@ const nextConfig = {
         hostname: '**.r2.cloudflarestorage.com',
         protocol: 'https',
       },
+      // Substack CDN — for next/image if Substack URLs are ever displayed directly
+      { hostname: '**.substack.com', protocol: 'https' },
+      { hostname: 'cdn.substack.com', protocol: 'https' },
+      { hostname: 'substackcdn.com', protocol: 'https' },
+      { hostname: 'bucketeer-*.amazonaws.com', protocol: 'https' },
     ],
   },
   webpack: (webpackConfig, { dev }) => {

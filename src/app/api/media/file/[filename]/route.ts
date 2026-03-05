@@ -113,12 +113,16 @@ export async function GET(req: Request, context: any) {
     return new NextResponse('Invalid filename', { status: 400 })
   }
 
-  const bucket = process.env.R2_BUCKET
+  const cleanFilename = filename.replace(/^\/+/, '')
+  const bucket = process.env.R2_BUCKET?.trim()
+
+  // When R2 is not configured, serve from public/media only
   if (!bucket) {
-    return new NextResponse('R2 bucket not configured', { status: 500 })
+    const local = await readFromLocalPublicMedia(cleanFilename)
+    if (local) return local
+    return new NextResponse('Not found', { status: 404 })
   }
 
-  const cleanFilename = filename.replace(/^\/+/, '')
   const candidateKeys = Array.from(
     new Set([
       // Most common (storage-s3 prefix by collection slug)
@@ -130,7 +134,7 @@ export async function GET(req: Request, context: any) {
 
   try {
     const client = getS3Client()
-    const res = await tryGetObject(client, bucket as string, candidateKeys)
+    const res = await tryGetObject(client, bucket, candidateKeys)
 
     if (!res || !res.Body) {
       const local = await readFromLocalPublicMedia(cleanFilename)

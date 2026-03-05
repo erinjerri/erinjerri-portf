@@ -106,6 +106,7 @@ async function getPostBySlug(slug: string, draft: boolean) {
     const result = await payload.find({
       collection: 'posts',
       draft: true,
+      depth: 2,
       limit: 1,
       pagination: false,
       overrideAccess: true,
@@ -120,6 +121,7 @@ async function getPostBySlug(slug: string, draft: boolean) {
       const result = await payload.find({
         collection: 'posts',
         draft: false,
+        depth: 2,
         limit: 1,
         pagination: false,
         overrideAccess: false,
