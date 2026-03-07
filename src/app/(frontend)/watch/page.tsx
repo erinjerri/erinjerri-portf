@@ -1,100 +1,116 @@
-import type { Metadata } from 'next/types'
+import type { Metadata } from 'next'
 
-import { CategoryFilter } from '@/components/CategoryFilter'
-import { PageRange } from '@/components/PageRange'
-import { Pagination } from '@/components/Pagination'
+import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
 import React from 'react'
 import PageClient from './page.client'
+import { LivePreviewListener } from '@/components/LivePreviewListener'
 
-const getCachedWatchPage = unstable_cache(
-  async () => {
-    const payload = await getPayload({ config: configPromise })
-    const payloadAny = payload as any
-    return Promise.all([
-      payloadAny.find({
-        collection: 'watch',
-        depth: 1,
-        limit: 12,
-        overrideAccess: false,
-        sort: '-publishedAt',
-        select: {
-          title: true,
-          slug: true,
-          categories: true,
-          meta: true,
-        },
-      }),
-      payload.find({
-        collection: 'categories',
-        limit: 100,
-        overrideAccess: false,
-        sort: 'title',
-      }),
-    ])
-  },
-  ['watch-list'],
-  { revalidate: 60, tags: ['watch'] },
-)
+import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { RenderHero } from '@/heros/RenderHero'
+import { generateMeta } from '@/utilities/generateMeta'
+import { Media as MediaComponent } from '@/components/Media'
+
+const WATCH_PAGE_SLUG = 'watch'
 
 export default async function Page() {
+  const { isEnabled: draft } = await draftMode()
+  const url = `/${WATCH_PAGE_SLUG}`
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
-  let watchDocs: any
-  let categoriesResult: any
+  let page: any | null = null
 
   try {
-    ;[watchDocs, categoriesResult] = await getCachedWatchPage()
+    page = await getPageBySlug(WATCH_PAGE_SLUG, draft)
   } catch (err) {
     if (!isBuild) throw err
     console.warn('[watch/page] Skipping prerender because DB is unavailable:', err)
-    watchDocs = { docs: [], page: 1, totalPages: 1, totalDocs: 0 }
-    categoriesResult = { docs: [] }
+    page = null
   }
 
-  const categories = categoriesResult.docs.map((cat: { id: string; title: string; slug?: string | null }) => ({
-    id: cat.id,
-    title: cat.title,
-    slug: cat.slug ?? null,
-  }))
+  if (!page) {
+    if (isBuild) {
+      return (
+        <article className="pt-16 pb-24">
+          <div className="container">
+            <h1 className="text-2xl font-bold">Loading…</h1>
+          </div>
+        </article>
+      )
+    }
+    return <PayloadRedirects url={url} />
+  }
+
+  const { hero, layout, videoAsset } = page
+  const selectedVideo =
+    typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video') ? videoAsset : null
 
   return (
-    <div className="pt-24 pb-24">
+    <article className="pt-16 pb-24">
       <PageClient />
-      <div className="container mb-16">
-        <div className="prose dark:prose-invert max-w-none">
-          <h1>Videos</h1>
+
+      <PayloadRedirects disableNotFound url={url} />
+
+      {draft && <LivePreviewListener />}
+
+      <RenderHero {...hero} />
+      {selectedVideo && (
+        <div className="container mt-8">
+          <MediaComponent resource={selectedVideo} />
         </div>
-      </div>
-
-      <div className="container mb-8">
-        <PageRange
-          collection="watch"
-          currentPage={watchDocs.page}
-          limit={12}
-          totalDocs={watchDocs.totalDocs}
-        />
-      </div>
-
-      <CategoryFilter categories={categories} docs={watchDocs.docs} relationTo="watch" />
-
-      <div className="container">
-        {watchDocs.totalPages > 1 && watchDocs.page && (
-          <Pagination
-            page={watchDocs.page}
-            routePrefix="/watch/page"
-            totalPages={watchDocs.totalPages}
-          />
-        )}
-      </div>
-    </div>
+      )}
+      <RenderBlocks blocks={layout} />
+    </article>
   )
 }
 
-export function generateMetadata(): Metadata {
-  return {
-    title: `Videos`,
+export async function generateMetadata(): Promise<Metadata> {
+  const { isEnabled: draft } = await draftMode()
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+
+  try {
+    const page = await getPageBySlug(WATCH_PAGE_SLUG, draft)
+    return generateMeta({ doc: page })
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[watch/page] Skipping metadata because DB is unavailable:', err)
+    return generateMeta({ doc: null })
   }
+}
+
+async function getPageBySlug(slug: string, draft: boolean) {
+  if (draft) {
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload.find({
+      collection: 'pages',
+      draft: true,
+      limit: 1,
+      pagination: false,
+      overrideAccess: true,
+      where: { slug: { equals: slug } },
+    })
+    return result.docs?.[0] ?? null
+  }
+
+  const getCached = unstable_cache(
+    async () => {
+      const payload = await getPayload({ config: configPromise })
+      const result = await payload.find({
+        collection: 'pages',
+        draft: false,
+        limit: 1,
+        pagination: false,
+        overrideAccess: false,
+        where: { slug: { equals: slug } },
+      })
+      return result.docs?.[0] ?? null
+    },
+    ['page', slug],
+    { revalidate: 60, tags: [`page_${slug}`] },
+  )
+
+  return getCached()
 }

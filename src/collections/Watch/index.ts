@@ -260,7 +260,7 @@ export const Watch: CollectionConfig = {
   versions: {
     drafts: {
       autosave: {
-        interval: 100,
+        interval: 5000,
       },
       schedulePublish: true,
     },
