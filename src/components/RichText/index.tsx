@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import {
   DefaultNodeTypes,
@@ -26,6 +28,8 @@ type NodeTypes =
   | DefaultNodeTypes
   | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps>
 
+const BLOCK_NODE_TYPES = new Set(['heading', 'paragraph', 'list', 'quote', 'code', 'block'])
+
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   const { value, relationTo } = linkNode.fields.doc!
   if (typeof value !== 'object') {
@@ -38,6 +42,18 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
 const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) => ({
   ...defaultConverters,
   ...LinkJSXConverter({ internalDocToHref }),
+  heading: ({ node, nodesToJSX }) => {
+    const Tag = (node.tag as keyof JSX.IntrinsicElements) || 'h2'
+    const children = node.children ?? []
+    const inline = children.filter((c) => !BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
+    const blocks = children.filter((c) => BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
+    return (
+      <>
+        <Tag>{nodesToJSX({ nodes: inline })}</Tag>
+        {blocks.length > 0 ? nodesToJSX({ nodes: blocks }) : null}
+      </>
+    )
+  },
   paragraph: ({ node, nodesToJSX }) => {
     // Use <div> instead of <p> to avoid hydration errors when block elements
     // (headings, other divs) are nested inside paragraph nodes from Lexical
