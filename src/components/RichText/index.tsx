@@ -48,10 +48,10 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
     const inline = children.filter((c) => !BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
     const blocks = children.filter((c) => BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
     return (
-      <>
+      <div>
         <Tag>{nodesToJSX({ nodes: inline })}</Tag>
         {blocks.length > 0 ? nodesToJSX({ nodes: blocks }) : null}
-      </>
+      </div>
     )
   },
   paragraph: ({ node, nodesToJSX }) => {

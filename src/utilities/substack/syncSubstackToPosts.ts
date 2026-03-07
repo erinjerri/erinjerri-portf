@@ -402,11 +402,18 @@ const SUBSTACK_BODY_SELECTORS = [
   'article',
 ]
 
+export type FetchFullArticleResult = {
+  html: string
+  /** og:image URL from page head — canonical hero/featured image */
+  ogImage?: string
+}
+
 /**
  * Fetch full article HTML from Substack when RSS only has excerpt.
- * Extracts the post body and rewrites relative image URLs to absolute.
+ * Extracts the post body, rewrites relative image URLs to absolute,
+ * and returns og:image for hero image when available.
  */
-async function fetchFullArticleHtml(articleUrl: string): Promise<string | null> {
+async function fetchFullArticleHtml(articleUrl: string): Promise<FetchFullArticleResult | null> {
   try {
     const res = await fetch(articleUrl, {
       headers: {
@@ -421,6 +428,9 @@ async function fetchFullArticleHtml(articleUrl: string): Promise<string | null> 
     const dom = new JSDOM(html)
     const doc = dom.window.document
     const baseUrl = new URL(articleUrl)
+
+    const ogImage =
+      doc.querySelector('meta[property="og:image"]')?.getAttribute('content')?.trim() || undefined
 
     const extractFromNextData = (): string | null => {
       const script = doc.querySelector('script#__NEXT_DATA__')?.textContent
@@ -489,10 +499,19 @@ async function fetchFullArticleHtml(articleUrl: string): Promise<string | null> 
       }
     })
 
-    return body.innerHTML
+    return { html: body.innerHTML, ogImage }
   } catch {
     return null
   }
+}
+
+/** Extract hero image URL: prefer og:image, else first img in HTML */
+function extractHeroImageUrl(html: string, ogImage?: string): string | null {
+  if (ogImage && ogImage.startsWith('http')) return ogImage
+  const dom = new JSDOM(html)
+  const firstImg = dom.window.document.querySelector('img[src^="http"]')
+  const src = firstImg?.getAttribute('src')
+  return src && !src.startsWith('data:') ? src : null
 }
 
 /** RSS content is often excerpt-only; use full article fetch when content looks truncated */
@@ -610,15 +629,21 @@ export async function syncSubstackToPosts(args: {
     }
 
     let html = item['content:encoded'] || item.content || ''
+    let ogImage: string | undefined
 
     const alwaysFetch = options.alwaysFetchFullArticle !== false
     if ((alwaysFetch || shouldFetchFullArticle(item)) && item.link) {
-      const fullHtml = await fetchFullArticleHtml(item.link)
-      if (fullHtml) html = fullHtml
+      const fullResult = await fetchFullArticleHtml(item.link)
+      if (fullResult) {
+        html = fullResult.html
+        ogImage = fullResult.ogImage
+      }
       await new Promise((r) => setTimeout(r, 600))
     }
 
     if (!html || html.trim().length < 10) html = '<p>No content.</p>'
+
+    const heroImageUrl = extractHeroImageUrl(html, ogImage)
 
     const shouldDownloadImages = options.downloadImages !== false
     if (!shouldDownloadImages && process.env.DEBUG_SUBSTACK_SYNC === 'true') {
@@ -754,6 +779,42 @@ export async function syncSubstackToPosts(args: {
     })
     html = docForCleanup.body.innerHTML || html
 
+    let heroMediaId: string | undefined
+    if (heroImageUrl && options.downloadImages) {
+      heroMediaId = uploadedImageCache.get(heroImageUrl)
+      if (!heroMediaId) {
+        const heroFile = await downloadImageAsFile({
+          src: heroImageUrl,
+          nameHint: `${item.title || 'post'}-hero`,
+          referrer: item.link,
+        })
+        if (heroFile) {
+          try {
+            const createdMedia = await payload.create({
+              collection: 'media',
+              data: {
+                mediaType: 'image',
+                alt: item.title || 'Hero image',
+              },
+              file: heroFile,
+              overrideAccess: true,
+              ...(req ? { req } : {}),
+            })
+            heroMediaId = String(createdMedia.id)
+            uploadedImageCache.set(heroImageUrl, heroMediaId)
+            if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+              console.log(`[Substack sync] Hero image uploaded -> media:${heroMediaId}`)
+            }
+            await new Promise((r) => setTimeout(r, 200))
+          } catch (err) {
+            if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+              console.warn(`[Substack sync] Hero image create failed for ${heroImageUrl}:`, err)
+            }
+          }
+        }
+      }
+    }
+
     let lexicalContent: Post['content']
     try {
       lexicalContent = convertHTMLToLexical({
@@ -797,7 +858,7 @@ export async function syncSubstackToPosts(args: {
 
     try {
       const crosspostStatus = shouldAutoPublish ? ('auto_published' as const) : ('in_review' as const)
-    const data = {
+      const data = {
         title: item.title || 'Untitled',
         slug,
         content: lexicalContent,
@@ -807,6 +868,7 @@ export async function syncSubstackToPosts(args: {
         crosspostReviewStatus: crosspostStatus,
         _status: (shouldAutoPublish ? 'published' : 'draft') as 'published' | 'draft',
         ...(authors?.length ? { authors } : {}),
+        ...(heroMediaId ? { heroImage: heroMediaId } : {}),
         meta: {
           description: item.contentSnippet?.slice(0, 160) ?? undefined,
         },
@@ -822,6 +884,7 @@ export async function syncSubstackToPosts(args: {
               substackURL: data.substackURL,
               crosspostReviewStatus: data.crosspostReviewStatus,
               meta: data.meta,
+              ...(heroMediaId ? { heroImage: heroMediaId } : {}),
             },
             overrideAccess: true,
             ...(req ? { req } : {}),
