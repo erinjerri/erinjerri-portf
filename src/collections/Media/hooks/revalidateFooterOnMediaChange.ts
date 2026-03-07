@@ -9,16 +9,15 @@ import { revalidateTag } from 'next/cache'
 export const revalidateFooterOnMediaChange: CollectionAfterChangeHook = ({
   req: { payload, context },
 }) => {
-  if (!context?.disableRevalidate) {
-    payload.logger.info('[Media] Revalidating footer (media changed)')
-    try {
-      revalidateTag('global_footer', 'max')
-    } catch (err) {
-      // CLI/background jobs don't run with Next's static generation store.
-      // Don't fail media writes when revalidation isn't available.
-      payload.logger.warn(
-        `[Media] Skipping footer revalidation in this runtime: ${String((err as Error)?.message || err)}`,
-      )
+  if (context?.disableRevalidate) return
+
+  payload.logger.info('[Media] Revalidating footer (media changed)')
+  try {
+    revalidateTag('global_footer', 'max')
+  } catch (err) {
+    const msg = String((err as Error)?.message || err)
+    if (!msg.includes('static generation store')) {
+      payload.logger.warn(`[Media] Skipping footer revalidation in this runtime: ${msg}`)
     }
   }
 }
@@ -26,14 +25,15 @@ export const revalidateFooterOnMediaChange: CollectionAfterChangeHook = ({
 export const revalidateFooterOnMediaDelete: CollectionAfterDeleteHook = ({
   req: { payload, context },
 }) => {
-  if (!context?.disableRevalidate) {
-    payload.logger.info('[Media] Revalidating footer (media deleted)')
-    try {
-      revalidateTag('global_footer', 'max')
-    } catch (err) {
-      payload.logger.warn(
-        `[Media] Skipping footer revalidation in this runtime: ${String((err as Error)?.message || err)}`,
-      )
+  if (context?.disableRevalidate) return
+
+  payload.logger.info('[Media] Revalidating footer (media deleted)')
+  try {
+    revalidateTag('global_footer', 'max')
+  } catch (err) {
+    const msg = String((err as Error)?.message || err)
+    if (!msg.includes('static generation store')) {
+      payload.logger.warn(`[Media] Skipping footer revalidation in this runtime: ${msg}`)
     }
   }
 }

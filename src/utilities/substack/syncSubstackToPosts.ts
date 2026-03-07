@@ -89,6 +89,16 @@ type PayloadFile = {
   size: number
 }
 
+function relationID(value: unknown): string | undefined {
+  if (!value) return undefined
+  if (typeof value === 'string' || typeof value === 'number') return String(value)
+  if (typeof value === 'object' && 'id' in value) {
+    const id = (value as { id?: unknown }).id
+    if (typeof id === 'string' || typeof id === 'number') return String(id)
+  }
+  return undefined
+}
+
 function toSlug(input: string): string {
   return input
     .trim()
@@ -165,6 +175,57 @@ function extractSubstackS3Url(src: string): string | null {
         return decoded
       }
     }
+    return null
+  } catch {
+    return null
+  }
+}
+
+const SUBSTACK_POST_MEDIA_HOST = 'substack-post-media.s3.amazonaws.com'
+const SUBSTACK_POST_MEDIA_PATH_FRAGMENT = '/public/images/'
+
+type NormalizedImageSrc = {
+  original: string
+  /**
+   * If the src is a substackcdn.com/image/fetch URL, this will be the decoded underlying S3 URL.
+   * We use it for dedupe because Substack can emit many CDN variants for the same origin.
+   */
+  s3Url?: string
+  /** Stable cache key used for dedupe (prefer s3Url, else cleaned original). */
+  cacheKey: string
+  /** True only for real Substack post-media images (filters out UI icons/avatars/etc.). */
+  isSubstackPostMedia: boolean
+}
+
+function normalizeImageSrc(src: string): NormalizedImageSrc {
+  const original = src
+  const s3Url = extractSubstackS3Url(src) ?? undefined
+  const keyBase = s3Url ?? src
+
+  let cacheKey = keyBase
+  try {
+    const u = new URL(keyBase)
+    // Drop query/hash so different variants dedupe
+    cacheKey = `${u.origin}${u.pathname}`
+  } catch {
+    // leave as-is
+  }
+
+  const isSubstackPostMedia =
+    cacheKey.includes(SUBSTACK_POST_MEDIA_HOST) && cacheKey.includes(SUBSTACK_POST_MEDIA_PATH_FRAGMENT)
+
+  return { original, s3Url, cacheKey, isSubstackPostMedia }
+}
+
+function getStableSubstackImageIdFromS3Url(s3Url: string): string | null {
+  try {
+    const u = new URL(s3Url)
+    const last = u.pathname.split('/').filter(Boolean).pop()
+    if (!last) return null
+    const base = last.split('.').slice(0, -1).join('.')
+    const id = base.split('_')[0]
+    // UUID-ish: 36 chars with dashes
+    if (id && id.length >= 32) return id
     return null
   } catch {
     return null
@@ -600,6 +661,30 @@ export async function syncSubstackToPosts(args: {
   let errors = 0
   const imported: ImportedPost[] = []
   const uploadedImageCache = new Map<string, string>()
+  const existingMediaByFilenameCache = new Map<string, string | null>()
+
+  const findExistingMediaIDByFilename = async (filename: string): Promise<string | undefined> => {
+    if (!filename) return undefined
+    if (existingMediaByFilenameCache.has(filename)) {
+      const cached = existingMediaByFilenameCache.get(filename)
+      return cached ?? undefined
+    }
+
+    const found = await payload.find({
+      collection: 'media',
+      where: { filename: { equals: filename } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    const id = found.docs?.[0]?.id
+    const asString =
+      typeof id === 'string' || typeof id === 'number' ? String(id) : null
+
+    existingMediaByFilenameCache.set(filename, asString)
+    return asString ?? undefined
+  }
 
   const ordered = [...limitedItems].reverse()
   for (const item of ordered) {
@@ -644,6 +729,7 @@ export async function syncSubstackToPosts(args: {
     if (!html || html.trim().length < 10) html = '<p>No content.</p>'
 
     const heroImageUrl = extractHeroImageUrl(html, ogImage)
+    const heroNormalized = heroImageUrl ? normalizeImageSrc(heroImageUrl) : null
 
     const shouldDownloadImages = options.downloadImages !== false
     if (!shouldDownloadImages && process.env.DEBUG_SUBSTACK_SYNC === 'true') {
@@ -663,19 +749,30 @@ export async function syncSubstackToPosts(args: {
             : 25
 
         let processed = 0
+        const perPostSeen = new Set<string>()
         for (const img of images) {
           if (processed >= maxImagesPerPost) break
 
           const src = img.getAttribute('src') || ''
           if (!src || src.startsWith('data:')) continue
+
+          const normalized = normalizeImageSrc(src)
+          // Skip non-post-media images (icons, avatars, UI chrome) to avoid massive over-import
+          if (!normalized.isSubstackPostMedia) continue
+
+          // Deduplicate within the post by stable key (prefer decoded S3 origin)
+          if (perPostSeen.has(normalized.cacheKey)) continue
+          perPostSeen.add(normalized.cacheKey)
+
           const altText = img.getAttribute('alt') || item.title || 'Substack image'
 
           try {
-            let mediaID = uploadedImageCache.get(src)
+            let mediaID = uploadedImageCache.get(normalized.cacheKey)
             if (!mediaID) {
+              const stableId = normalized.s3Url ? getStableSubstackImageIdFromS3Url(normalized.s3Url) : null
               const file = await downloadImageAsFile({
                 src,
-                nameHint: `${item.title || 'post'}-${processed + 1}`,
+                nameHint: stableId ? `substack-${stableId}` : `${item.title || 'post'}-${processed + 1}`,
                 referrer: item.link,
               })
               if (!file) {
@@ -691,37 +788,51 @@ export async function syncSubstackToPosts(args: {
                 continue
               }
 
-              const createdMedia = await payload.create({
-                collection: 'media',
-                data: {
-                  mediaType: 'image',
-                  alt: altText,
-                },
-                file,
-                overrideAccess: true,
-                ...(req ? { req } : {}),
-              })
-
-              if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
-                const id = String(createdMedia.id)
-                const filename =
-                  typeof (createdMedia as { filename?: unknown }).filename === 'string'
-                    ? ((createdMedia as { filename: string }).filename as string)
-                    : null
-                const url =
-                  typeof (createdMedia as { url?: unknown }).url === 'string'
-                    ? ((createdMedia as { url: string }).url as string)
-                    : null
-
-                console.log(
-                  `[Substack sync] Uploaded image -> media:${id}${filename ? ` filename=${filename}` : ''}${
-                    url ? ` url=${url}` : ''
-                  }`,
-                )
+              const existingMediaID = await findExistingMediaIDByFilename(file.name)
+              let createdMedia:
+                | Awaited<ReturnType<typeof payload.create>>
+                | undefined
+              if (!existingMediaID) {
+                createdMedia = await payload.create({
+                  collection: 'media',
+                  data: {
+                    mediaType: 'image',
+                    alt: altText,
+                  },
+                  file,
+                  overrideAccess: true,
+                  context: { disableRevalidate: true },
+                  ...(req ? { req } : {}),
+                })
               }
 
-              mediaID = String(createdMedia.id)
+              if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+                if (existingMediaID) {
+                  console.log(`[Substack sync] Reused existing image -> media:${existingMediaID} filename=${file.name}`)
+                } else {
+                  const id = String(createdMedia!.id)
+                  const filename =
+                    typeof (createdMedia as { filename?: unknown }).filename === 'string'
+                      ? ((createdMedia as { filename: string }).filename as string)
+                      : null
+                  const url =
+                    typeof (createdMedia as { url?: unknown }).url === 'string'
+                      ? ((createdMedia as { url: string }).url as string)
+                      : null
+
+                  console.log(
+                    `[Substack sync] Uploaded image -> media:${id}${filename ? ` filename=${filename}` : ''}${
+                      url ? ` url=${url}` : ''
+                    }`,
+                  )
+                }
+              }
+
+              mediaID = existingMediaID ?? String(createdMedia!.id)
+              // Cache on stable key so different CDN variants dedupe in future runs
+              uploadedImageCache.set(normalized.cacheKey, mediaID)
               uploadedImageCache.set(src, mediaID)
+              if (normalized.s3Url) uploadedImageCache.set(normalized.s3Url, mediaID)
               await new Promise((r) => setTimeout(r, 200))
             }
 
@@ -780,30 +891,44 @@ export async function syncSubstackToPosts(args: {
     html = docForCleanup.body.innerHTML || html
 
     let heroMediaId: string | undefined
-    if (heroImageUrl && options.downloadImages) {
-      heroMediaId = uploadedImageCache.get(heroImageUrl)
+    if (heroNormalized?.isSubstackPostMedia && options.downloadImages) {
+      heroMediaId = uploadedImageCache.get(heroNormalized.cacheKey)
       if (!heroMediaId) {
+        const stableId = heroNormalized.s3Url ? getStableSubstackImageIdFromS3Url(heroNormalized.s3Url) : null
         const heroFile = await downloadImageAsFile({
-          src: heroImageUrl,
-          nameHint: `${item.title || 'post'}-hero`,
+          src: heroNormalized.original,
+          nameHint: stableId ? `substack-${stableId}-hero` : `${item.title || 'post'}-hero`,
           referrer: item.link,
         })
         if (heroFile) {
           try {
-            const createdMedia = await payload.create({
-              collection: 'media',
-              data: {
-                mediaType: 'image',
-                alt: item.title || 'Hero image',
-              },
-              file: heroFile,
-              overrideAccess: true,
-              ...(req ? { req } : {}),
-            })
-            heroMediaId = String(createdMedia.id)
-            uploadedImageCache.set(heroImageUrl, heroMediaId)
+            const existingMediaID = await findExistingMediaIDByFilename(heroFile.name)
+            let createdMedia:
+              | Awaited<ReturnType<typeof payload.create>>
+              | undefined
+            if (!existingMediaID) {
+              createdMedia = await payload.create({
+                collection: 'media',
+                data: {
+                  mediaType: 'image',
+                  alt: item.title || 'Hero image',
+                },
+                file: heroFile,
+                overrideAccess: true,
+                context: { disableRevalidate: true },
+                ...(req ? { req } : {}),
+              })
+            }
+            heroMediaId = existingMediaID ?? String(createdMedia!.id)
+            uploadedImageCache.set(heroNormalized.cacheKey, heroMediaId)
+            uploadedImageCache.set(heroNormalized.original, heroMediaId)
+            if (heroNormalized.s3Url) uploadedImageCache.set(heroNormalized.s3Url, heroMediaId)
             if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
-              console.log(`[Substack sync] Hero image uploaded -> media:${heroMediaId}`)
+              console.log(
+                existingMediaID
+                  ? `[Substack sync] Reused existing hero image -> media:${heroMediaId} filename=${heroFile.name}`
+                  : `[Substack sync] Hero image uploaded -> media:${heroMediaId}`,
+              )
             }
             await new Promise((r) => setTimeout(r, 200))
           } catch (err) {
@@ -858,6 +983,12 @@ export async function syncSubstackToPosts(args: {
 
     try {
       const crosspostStatus = shouldAutoPublish ? ('auto_published' as const) : ('in_review' as const)
+      const existingHeroImageID = relationID((existingDoc as { heroImage?: unknown } | undefined)?.heroImage)
+      const existingMetaImageID = relationID(
+        (existingDoc as { meta?: { image?: unknown } } | undefined)?.meta?.image,
+      )
+      const resolvedHeroImageID = heroMediaId ?? existingHeroImageID
+      const resolvedMetaImageID = existingMetaImageID ?? resolvedHeroImageID
       const data = {
         title: item.title || 'Untitled',
         slug,
@@ -868,9 +999,11 @@ export async function syncSubstackToPosts(args: {
         crosspostReviewStatus: crosspostStatus,
         _status: (shouldAutoPublish ? 'published' : 'draft') as 'published' | 'draft',
         ...(authors?.length ? { authors } : {}),
-        ...(heroMediaId ? { heroImage: heroMediaId } : {}),
+        ...(resolvedHeroImageID ? { heroImage: resolvedHeroImageID } : {}),
         meta: {
+          ...((existingDoc as { meta?: Record<string, unknown> } | undefined)?.meta ?? {}),
           description: item.contentSnippet?.slice(0, 160) ?? undefined,
+          ...(resolvedMetaImageID ? { image: resolvedMetaImageID } : {}),
         },
       }
 
@@ -884,15 +1017,17 @@ export async function syncSubstackToPosts(args: {
               substackURL: data.substackURL,
               crosspostReviewStatus: data.crosspostReviewStatus,
               meta: data.meta,
-              ...(heroMediaId ? { heroImage: heroMediaId } : {}),
+              ...(resolvedHeroImageID ? { heroImage: resolvedHeroImageID } : {}),
             },
             overrideAccess: true,
+            context: { disableRevalidate: true },
             ...(req ? { req } : {}),
           })
         : await payload.create({
             collection: 'posts',
             data,
             overrideAccess: true,
+            context: { disableRevalidate: true },
             ...(req ? { req } : {}),
           })
 
