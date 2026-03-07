@@ -43,7 +43,7 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
   ...defaultConverters,
   ...LinkJSXConverter({ internalDocToHref }),
   heading: ({ node, nodesToJSX }) => {
-    const Tag = (node.tag as keyof JSX.IntrinsicElements) || 'h2'
+    const Tag = (node.tag as keyof React.JSX.IntrinsicElements) || 'h2'
     const children = node.children ?? []
     const inline = children.filter((c) => !BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
     const blocks = children.filter((c) => BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
