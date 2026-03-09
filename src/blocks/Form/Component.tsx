@@ -84,7 +84,7 @@ export const FormBlock: React.FC<
 
             setError({
               message: data.errors?.[0]?.message || 'Internal Server Error',
-              status: res.status,
+              status: String(res.status),
             })
 
             return
