@@ -32,7 +32,21 @@ const r2Hosts = Array.from(
     ]
       .concat(
         process.env.R2_PUBLIC_HOSTNAME
-          ? process.env.R2_PUBLIC_HOSTNAME.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+          ? (() => {
+              const raw = process.env.R2_PUBLIC_HOSTNAME.trim()
+              if (!raw) return []
+              try {
+                const url = raw.includes('://') ? new URL(raw) : new URL(`https://${raw}`)
+                return url.hostname ? [url.hostname] : []
+              } catch {
+                // Fall back to stripping protocol and any path/query fragment
+                const hostnameOnly = raw
+                  .replace(/^https?:\/\//, '')
+                  .split(/[/?#]/)[0]
+                  .replace(/\/+$/, '')
+                return hostnameOnly ? [hostnameOnly] : []
+              }
+            })()
           : [],
       )
       .filter(Boolean),

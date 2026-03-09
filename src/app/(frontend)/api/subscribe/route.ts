@@ -26,7 +26,8 @@ function normalizeSubstackSubscribeURL(raw: string): string {
 
 export async function POST(req: Request): Promise<Response> {
   try {
-    const body = (await req.json()) as { email?: string; currentUrl?: string; referrer?: string }
+    const raw = await req.text()
+    const body = raw ? (JSON.parse(raw) as { email?: string; currentUrl?: string; referrer?: string }) : {}
     const email = body?.email?.trim().toLowerCase()
 
     if (!email || !emailRegex.test(email)) {

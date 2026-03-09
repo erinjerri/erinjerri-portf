@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 export const Brand: GlobalConfig = {
   slug: 'brand',
+  lockDocuments: false,
   access: {
     read: () => true,
   },

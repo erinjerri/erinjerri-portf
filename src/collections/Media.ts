@@ -29,6 +29,7 @@ const getMediaTypeFromMimeType = (mimeType?: string | null): 'audio' | 'image' |
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  lockDocuments: false,
   folders: true,
   admin: {
     defaultColumns: ['filename', 'mediaType', 'updatedAt'],

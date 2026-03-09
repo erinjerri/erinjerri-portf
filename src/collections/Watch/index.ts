@@ -27,8 +27,11 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
+const devAutosaveInterval = Number(process.env.PAYLOAD_DEV_AUTOSAVE_INTERVAL_MS ?? 15000)
+
 export const Watch: CollectionConfig = {
   slug: 'watch',
+  lockDocuments: false,
   // Use existing MongoDB collection from when slug was 'watches'
   dbName: 'watches',
   labels: {
@@ -259,9 +262,10 @@ export const Watch: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 5000,
-      },
+      autosave:
+        process.env.NODE_ENV === 'development'
+          ? { interval: Number.isFinite(devAutosaveInterval) ? devAutosaveInterval : 15000 }
+          : { interval: 5000 },
       schedulePublish: true,
     },
     maxPerDoc: 50,

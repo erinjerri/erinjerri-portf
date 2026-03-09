@@ -63,7 +63,7 @@ export const FormBlock: React.FC<
         }, 1000)
 
         try {
-          const req = await fetch(`${getClientSideURL()}/api/form-submissions`, {
+          const res = await fetch(`${getClientSideURL()}/api/form-submissions`, {
             body: JSON.stringify({
               form: formID,
               submissionData: dataToSend,
@@ -74,15 +74,16 @@ export const FormBlock: React.FC<
             method: 'POST',
           })
 
-          const res = await req.json()
+          const text = await res.text()
+          const data = text ? JSON.parse(text) : {}
 
           clearTimeout(loadingTimerID)
 
-          if (req.status >= 400) {
+          if (res.status >= 400) {
             setIsLoading(false)
 
             setError({
-              message: res.errors?.[0]?.message || 'Internal Server Error',
+              message: data.errors?.[0]?.message || 'Internal Server Error',
               status: res.status,
             })
 

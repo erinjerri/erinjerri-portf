@@ -10,6 +10,7 @@ const dirname = path.dirname(filename)
 
 export const Documents: CollectionConfig = {
   slug: 'documents',
+  lockDocuments: false,
   labels: {
     singular: 'Document',
     plural: 'Documents',

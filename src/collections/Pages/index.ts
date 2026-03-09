@@ -26,8 +26,11 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
+const devAutosaveInterval = Number(process.env.PAYLOAD_DEV_AUTOSAVE_INTERVAL_MS ?? 15000)
+
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
+  lockDocuments: false,
   access: {
     create: authenticated,
     delete: authenticated,
@@ -156,9 +159,10 @@ export const Pages: CollectionConfig<'pages'> = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 5000,
-      },
+      autosave:
+        process.env.NODE_ENV === 'development'
+          ? { interval: Number.isFinite(devAutosaveInterval) ? devAutosaveInterval : 15000 }
+          : { interval: 5000 },
       schedulePublish: true,
     },
     maxPerDoc: 50,

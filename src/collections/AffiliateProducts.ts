@@ -5,6 +5,7 @@ import { authenticated } from '@/access/authenticated'
 
 export const AffiliateProducts: CollectionConfig<'affiliateProducts'> = {
   slug: 'affiliateProducts',
+  lockDocuments: false,
   labels: {
     singular: 'Affiliate Product',
     plural: 'Affiliate Products',

@@ -98,6 +98,10 @@ export default buildConfig({
   editor: defaultLexical,
   db: mongooseAdapter({
     url: dbURL,
+    connectOptions: {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+    },
   }),
   email: nodemailerAdapter({
     defaultFromAddress: process.env.PROTON_SMTP_USER ?? 'noreply@example.com',

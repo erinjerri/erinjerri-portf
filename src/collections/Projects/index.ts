@@ -27,8 +27,12 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
+const devAutosaveInterval = Number(process.env.PAYLOAD_DEV_AUTOSAVE_INTERVAL_MS ?? 15000)
+const devLivePreviewEnabled = process.env.PAYLOAD_DEV_LIVE_PREVIEW !== 'false'
+
 export const Projects: CollectionConfig<'projects'> = {
   slug: 'projects',
+  lockDocuments: false,
   access: {
     create: authenticated,
     delete: authenticated,
@@ -46,14 +50,16 @@ export const Projects: CollectionConfig<'projects'> = {
   },
   admin: {
     defaultColumns: ['title', 'slug', 'publishedAt', 'updatedAt'],
-    livePreview: {
-      url: ({ data, req }) =>
-        generatePreviewPath({
-          slug: data?.slug,
-          collection: 'projects',
-          req,
-        }),
-    },
+    ...((process.env.NODE_ENV !== 'development' || devLivePreviewEnabled) && {
+      livePreview: {
+        url: ({ data, req }) =>
+          generatePreviewPath({
+            slug: data?.slug,
+            collection: 'projects',
+            req,
+          }),
+      },
+    }),
     preview: (data, { req }) =>
       generatePreviewPath({
         slug: data?.slug as string,
@@ -230,9 +236,10 @@ export const Projects: CollectionConfig<'projects'> = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 100,
-      },
+      autosave:
+        process.env.NODE_ENV === 'development'
+          ? { interval: Number.isFinite(devAutosaveInterval) ? devAutosaveInterval : 15000 }
+          : { interval: 5000 },
       schedulePublish: true,
     },
     maxPerDoc: 50,
