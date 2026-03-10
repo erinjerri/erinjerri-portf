@@ -100,10 +100,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     ? sizeFromProps
     : fill && priority
       ? '100vw'
-      : Object.entries(breakpoints)
-          .reverse()
-          .map(([, value]) => `(max-width: ${value}px) ${Math.min(value * 2, 1920)}px`)
-          .join(', ')
+      : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
 
   return (
     <picture className={cn(pictureClassName)}>
@@ -115,7 +112,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         placeholder="blur"
         blurDataURL={placeholderBlur}
         priority={priority}
-        quality={priority ? 85 : 80}
+        quality={priority ? 80 : 75}
         unoptimized={disableOptimization}
         loading={loading}
         sizes={sizes}

@@ -68,8 +68,8 @@ const nextConfig = {
     unoptimized: false,
     // Prefer modern formats when the client supports them.
     formats: ['image/avif', 'image/webp'],
-    // Configure image qualities used by next/image. Next.js 16 will require explicit config.
-    qualities: [80, 85],
+    // Configure image qualities used by next/image. Include lower qualities for mobile.
+    qualities: [60, 70, 75, 80, 85],
     // Responsive breakpoints (helps Next generate right srcset candidates).
     deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1440, 1920, 2048],
     imageSizes: [16, 24, 32, 48, 64, 96, 128, 256, 384],

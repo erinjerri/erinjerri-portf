@@ -87,7 +87,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                         <div className="flex gap-4 items-center">
                           {icon && typeof icon === 'object' && icon !== null && (
                             <div className="shrink-0 flex items-center [&_img]:w-8 [&_img]:h-8 [&_img]:object-contain [&_img]:opacity-90">
-                              <MediaComponent resource={icon} />
+                              <MediaComponent resource={icon} size="56px" />
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
