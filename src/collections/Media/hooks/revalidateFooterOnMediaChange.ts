@@ -13,7 +13,7 @@ export const revalidateFooterOnMediaChange: CollectionAfterChangeHook = ({
 
   payload.logger.info('[Media] Revalidating footer (media changed)')
   try {
-    revalidateTag('global_footer', 'max')
+    revalidateTag('global_footer')
   } catch (err) {
     const msg = String((err as Error)?.message || err)
     if (!msg.includes('static generation store')) {
@@ -29,7 +29,7 @@ export const revalidateFooterOnMediaDelete: CollectionAfterDeleteHook = ({
 
   payload.logger.info('[Media] Revalidating footer (media deleted)')
   try {
-    revalidateTag('global_footer', 'max')
+    revalidateTag('global_footer')
   } catch (err) {
     const msg = String((err as Error)?.message || err)
     if (!msg.includes('static generation store')) {

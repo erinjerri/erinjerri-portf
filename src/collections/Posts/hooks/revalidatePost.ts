@@ -14,7 +14,7 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
   const safeRevalidate = (path: string) => {
     try {
       revalidatePath(path)
-      revalidateTag('posts-sitemap', 'max')
+      revalidateTag('posts-sitemap')
     } catch (err) {
       const msg = String((err as Error)?.message || err)
       // Expected in CLI/background jobs (no Next.js static generation store)
@@ -45,7 +45,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({ doc, req: { 
   const path = `/posts/${doc?.slug}`
   try {
     revalidatePath(path)
-    revalidateTag('posts-sitemap', 'max')
+    revalidateTag('posts-sitemap')
   } catch {
     // ignore - can run in CLI/background contexts
   }

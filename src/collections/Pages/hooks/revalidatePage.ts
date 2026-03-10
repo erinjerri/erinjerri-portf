@@ -16,8 +16,8 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
       payload.logger.info(`Revalidating page at path: ${path}`)
 
       revalidatePath(path)
-      revalidateTag(`page_${doc.slug}`, 'max')
-      revalidateTag('pages-sitemap', 'max')
+      revalidateTag(`page_${doc.slug}`)
+      revalidateTag('pages-sitemap')
     }
 
     // If the page was previously published, we need to revalidate the old path
@@ -27,8 +27,8 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
       payload.logger.info(`Revalidating old page at path: ${oldPath}`)
 
       revalidatePath(oldPath)
-      revalidateTag(`page_${previousDoc.slug}`, 'max')
-      revalidateTag('pages-sitemap', 'max')
+      revalidateTag(`page_${previousDoc.slug}`)
+      revalidateTag('pages-sitemap')
     }
   }
   return doc
@@ -38,8 +38,8 @@ export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { 
   if (!context.disableRevalidate) {
     const path = doc?.slug === 'home' ? '/' : `/${doc?.slug}`
     revalidatePath(path)
-    if (doc?.slug) revalidateTag(`page_${doc.slug}`, 'max')
-    revalidateTag('pages-sitemap', 'max')
+    if (doc?.slug) revalidateTag(`page_${doc.slug}`)
+    revalidateTag('pages-sitemap')
   }
 
   return doc

@@ -18,8 +18,8 @@ export const revalidateProject: CollectionAfterChangeHook<Project> = ({
       revalidatePath(path)
       revalidatePath('/projects')
       revalidatePath('/projects/page')
-      revalidateTag('projects', 'max')
-      revalidateTag('projects-sitemap', 'max')
+      revalidateTag('projects')
+      revalidateTag('projects-sitemap')
     }
 
     if (previousDoc._status === 'published' && doc._status !== 'published') {
@@ -30,8 +30,8 @@ export const revalidateProject: CollectionAfterChangeHook<Project> = ({
       revalidatePath(oldPath)
       revalidatePath('/projects')
       revalidatePath('/projects/page')
-      revalidateTag('projects', 'max')
-      revalidateTag('projects-sitemap', 'max')
+      revalidateTag('projects')
+      revalidateTag('projects-sitemap')
     }
   }
   return doc
@@ -44,8 +44,8 @@ export const revalidateDelete: CollectionAfterDeleteHook<Project> = ({ doc, req:
     revalidatePath(path)
     revalidatePath('/projects')
     revalidatePath('/projects/page')
-    revalidateTag('projects', 'max')
-    revalidateTag('projects-sitemap', 'max')
+    revalidateTag('projects')
+    revalidateTag('projects-sitemap')
   }
 
   return doc
