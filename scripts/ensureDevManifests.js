@@ -55,10 +55,22 @@ function ensureDevManifests(cwd = process.cwd()) {
       2,
     ),
   )
-  writeIfMissing(
-    path.join(nextDevDir, 'routes-manifest.json'),
-    JSON.stringify({ version: 1, pages: {}, dynamicRoutes: {} }, null, 2),
+  const routesManifest = JSON.stringify(
+    {
+      version: 1,
+      pages: {},
+      dynamicRoutes: {},
+      middleware: {
+        beforeFiles: [],
+        afterFiles: [],
+        fallback: [],
+      },
+    },
+    null,
+    2,
   )
+
+  writeIfMissing(path.join(nextDevDir, 'routes-manifest.json'), routesManifest)
   writeIfMissing(
     path.join(nextDevDir, 'app-paths-manifest.json'),
     JSON.stringify({}, null, 2),
@@ -80,10 +92,7 @@ function ensureDevManifests(cwd = process.cwd()) {
       2,
     ),
   )
-  writeIfMissing(
-    path.join(nextDir, 'routes-manifest.json'),
-    JSON.stringify({ version: 1, pages: {}, dynamicRoutes: {} }, null, 2),
-  )
+  writeIfMissing(path.join(nextDir, 'routes-manifest.json'), routesManifest)
 }
 
 module.exports = { ensureDevManifests }
