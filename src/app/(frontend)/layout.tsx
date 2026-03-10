@@ -4,6 +4,7 @@ import { cn } from '@/utilities/ui'
 import React from 'react'
 import Script from 'next/script'
 import { Jost, League_Spartan } from 'next/font/google'
+import { Suspense } from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/Footer/Component'
@@ -40,13 +41,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <head>
         <InitTheme />
-        <link rel="dns-prefetch" href="//cdn.fontshare.com" />
-        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
-          rel="stylesheet"
-        />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
@@ -60,7 +54,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           <Header />
           {children}
-          <Footer />
+          <Suspense
+            fallback={<div className="mt-auto min-h-[380px] border-t border-border bg-transparent" />}
+          >
+            <Footer />
+          </Suspense>
         </Providers>
       </body>
       <AnalyticsScripts measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
