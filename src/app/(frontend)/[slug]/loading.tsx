@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function Loading() {
   return (
     <article className="pt-16 pb-24 animate-pulse">

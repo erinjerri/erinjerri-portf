@@ -685,6 +685,10 @@ export interface ContentBlock {
          * Select an existing media asset or upload a new one.
          */
         media?: (string | null) | Media;
+        /**
+         * Optional icon shown to the left of the title (e.g. for HIRE Me cards).
+         */
+        icon?: (string | null) | Media;
         enableLink?: boolean | null;
         link?: {
           type?: ('reference' | 'custom' | 'archive') | null;
@@ -1489,42 +1493,6 @@ export interface PayloadLockedDocument {
   id: string;
   document?:
     | ({
-        relationTo: 'pages';
-        value: string | Page;
-      } | null)
-    | ({
-        relationTo: 'posts';
-        value: string | Post;
-      } | null)
-    | ({
-        relationTo: 'projects';
-        value: string | Project;
-      } | null)
-    | ({
-        relationTo: 'watch';
-        value: string | Watch;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: string | Media;
-      } | null)
-    | ({
-        relationTo: 'documents';
-        value: string | Document;
-      } | null)
-    | ({
-        relationTo: 'categories';
-        value: string | Category;
-      } | null)
-    | ({
-        relationTo: 'affiliateProducts';
-        value: string | AffiliateProduct;
-      } | null)
-    | ({
-        relationTo: 'users';
-        value: string | User;
-      } | null)
-    | ({
         relationTo: 'redirects';
         value: string | Redirect;
       } | null)
@@ -1686,6 +1654,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
         whiteStyleMode?: T;
         richText?: T;
         media?: T;
+        icon?: T;
         enableLink?: T;
         link?:
           | T

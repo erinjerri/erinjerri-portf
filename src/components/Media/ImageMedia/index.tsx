@@ -76,6 +76,11 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     src = getMediaUrl(mediaUrl, cacheTag)
   }
 
+  // Skip render when resource is ID-only (unpopulated) or src is invalid — avoids NextImage errors
+  if (!src || typeof src !== 'string') {
+    return null
+  }
+
   // Enable Next.js optimization for all images — same-origin URLs work with remotePatterns
   const disableOptimization = false
 

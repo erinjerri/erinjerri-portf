@@ -124,6 +124,7 @@ async function getPageBySlug(slug: string, draft: boolean) {
     const payload = await getPayload({ config: configPromise })
     const result = await payload.find({
       collection: 'pages',
+      depth: 2,
       draft: true,
       limit: 1,
       pagination: false,
@@ -138,6 +139,7 @@ async function getPageBySlug(slug: string, draft: boolean) {
       const payload = await getPayload({ config: configPromise })
       const result = await payload.find({
         collection: 'pages',
+        depth: 2,
         draft: false,
         limit: 1,
         pagination: false,
@@ -146,7 +148,7 @@ async function getPageBySlug(slug: string, draft: boolean) {
       })
       return result.docs?.[0] ?? null
     },
-    ['page', slug],
+    ['page', slug, 'depth-2'],
     { revalidate: 60, tags: [`page_${slug}`] },
   )
   return getCached()

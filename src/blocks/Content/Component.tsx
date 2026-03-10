@@ -16,6 +16,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     columnStyle?: 'default' | 'blackBgWhiteText' | 'whiteBgBlackText' | null
     whiteStyleMode?: 'boxed' | 'fullBleed' | null
     media?: Media | number | string | null
+    icon?: Media | number | string | null
   }
 
   const colsSpanClasses = {
@@ -43,7 +44,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
             columns.length > 0 &&
             columns.map((col, index) => {
               const typedCol = col as ColumnWithFlexibleContent
-              const { columnStyle, contentType, enableLink, link, media, richText, size, whiteStyleMode } =
+              const { columnStyle, contentType, enableLink, icon, link, media, richText, size, whiteStyleMode } =
                 typedCol
               const shouldRenderText = !contentType || contentType === 'text'
               const shouldRenderMedia = contentType === 'media' && Boolean(media)
@@ -82,7 +83,18 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                           columnStyle === 'whiteBgBlackText',
                       })}
                     >
-                      {shouldRenderText && richText && <RichText data={richText} enableGutter={false} />}
+                      {shouldRenderText && richText && (
+                        <div className="flex gap-4 items-center">
+                          {icon && typeof icon === 'object' && icon !== null && (
+                            <div className="shrink-0 flex items-center [&_img]:w-8 [&_img]:h-8 [&_img]:object-contain [&_img]:opacity-90">
+                              <MediaComponent resource={icon} />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <RichText data={richText} enableGutter={false} />
+                          </div>
+                        </div>
+                      )}
                       {shouldRenderMedia && <MediaComponent resource={media} />}
 
                       {enableLink && (

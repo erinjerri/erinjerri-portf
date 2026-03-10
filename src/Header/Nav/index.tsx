@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import type { Header as HeaderType } from '@/payload-types'
 
@@ -38,6 +39,7 @@ const resolveHref = (link: HeaderLink): string | null => {
 export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
   const navItems = data?.navItems || []
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
@@ -59,17 +61,26 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
       <div className="hidden md:flex items-center justify-center gap-8 uppercase tracking-[0.18em] text-[11px] md:text-xs font-semibold">
         {navLinks.map(({ id, link, href }) => {
           const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
-
           return (
-            <CMSLink
+            <span
               key={id}
-              {...link}
-              appearance="inline"
-                  className={cn(
-                    'rounded px-3 py-2 transition-colors font-semibold',
-                isActive ? 'text-white bg-white/15' : 'text-white/85 hover:text-white hover:bg-white/10',
-              )}
-            />
+              onMouseEnter={() => {
+                try {
+                  if (href) router.prefetch(href)
+                } catch (e) {
+                  /* ignore prefetch errors */
+                }
+              }}
+            >
+              <CMSLink
+                {...link}
+                appearance="inline"
+                className={cn(
+                  'rounded px-3 py-2 transition-colors font-semibold',
+                  isActive ? 'text-white bg-white/15' : 'text-white/85 hover:text-white hover:bg-white/10',
+                )}
+              />
+            </span>
           )
         })}
       </div>

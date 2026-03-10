@@ -121,6 +121,15 @@ const columnFields: Field[] = [
     },
   },
   {
+    name: 'icon',
+    type: 'upload',
+    relationTo: 'media',
+    admin: {
+      condition: (_, siblingData) => siblingData?.contentType === 'text',
+      description: 'Optional icon shown to the left of the title (e.g. for HIRE Me cards).',
+    },
+  },
+  {
     name: 'enableLink',
     type: 'checkbox',
   },
