@@ -10,12 +10,13 @@
     "build:fast": "cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next build --webpack",
     "build:turbo": "cross-env NODE_OPTIONS=--no-deprecation next build --turbo",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
-    "dev:fast": "cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next dev --webpack",
+    "dev": "node ./scripts/dev.js",
+    "dev:fast": "node ./scripts/dev.js --fast",
     "dev:clean": "rm -rf .next",
     "dev:reset": "lsof -ti :3000 | xargs kill 2>/dev/null || true; pnpm dev",
     "dev:fresh": "rm -rf .next && pnpm build && pnpm dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
+    "lighthouse": "pnpm build && pnpm start",
     "generate:importmap": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" payload generate:types",
     "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
@@ -120,6 +121,15 @@
       "@aws-sdk/client-s3": "3.717.0",
       "@aws-sdk/lib-storage": "3.717.0",
       "@aws-sdk/s3-request-presigner": "3.717.0"
+    },
+    "supportedArchitectures": {
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64",
+        "arm64"
+      ]
     },
     "onlyBuiltDependencies": [
       "sharp",

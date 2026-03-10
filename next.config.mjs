@@ -123,11 +123,6 @@ const nextConfig = {
       '../build/polyfills/polyfill-module': false,
       'next/dist/build/polyfills/polyfill-module': false,
     }
-    webpackConfig.resolve.extensionAlias = {
-      '.cjs': ['.cts', '.cjs'],
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-      '.mjs': ['.mts', '.mjs'],
-    }
 
     return webpackConfig
   },
