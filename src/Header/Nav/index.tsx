@@ -65,10 +65,12 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
             <span
               key={id}
               onMouseEnter={() => {
-                try {
-                  if (href) router.prefetch(href)
-                } catch (e) {
-                  /* ignore prefetch errors */
+                if (href) {
+                  try {
+                    router.prefetch(href)
+                  } catch {
+                    /* ignore prefetch errors */
+                  }
                 }
               }}
             >

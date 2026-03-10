@@ -7,6 +7,7 @@ import React, { Fragment } from 'react'
 import type { Media as MediaType } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { getDocumentUrl } from '@/utilities/getDocumentUrl'
 
 type CardCategory = {
   id: number | string
@@ -18,11 +19,18 @@ type CardMeta = {
   image?: number | string | MediaType | null
 }
 
+type SlidesDoc = {
+  url?: string | null
+  filename?: string | null
+  title?: string | null
+}
+
 export type CardDocData = {
   categories?: (number | string | CardCategory | null)[] | null
   meta?: CardMeta | null
   slug?: string | null
   title?: string | null
+  slides?: number | string | SlidesDoc | null
 }
 
 export type CardRelationTo = 'posts' | 'projects' | 'watch'
@@ -38,10 +46,19 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo = 'posts', showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title } = doc || {}
+  const { slug, categories, meta, title, slides } = doc || {}
   const { description, image: metaImage } = meta || {}
 
   const hasCategories = categories && Array.isArray(categories) && categories.length > 0
+  const slidesDoc =
+    slides && typeof slides === 'object' && slides !== null ? (slides as SlidesDoc) : null
+  const slidesPdfUrl =
+    slidesDoc && (slidesDoc.url || slidesDoc.filename)
+      ? getDocumentUrl(
+          typeof slidesDoc.url === 'string' ? slidesDoc.url : null,
+          slidesDoc.filename,
+        )
+      : null
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
   const href = `/${relationTo}/${slug}`
@@ -95,6 +112,20 @@ export const Card: React.FC<{
           </div>
         )}
         {description && <div className="mt-2">{description && <p>{sanitizedDescription}</p>}</div>}
+        {relationTo === 'watch' && slidesPdfUrl && (
+          <div className="mt-4">
+            <a
+              href={slidesPdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="text-sky-500 hover:text-sky-400 hover:underline font-medium transition-colors"
+            >
+              Download slides
+              <span aria-hidden> →</span>
+            </a>
+          </div>
+        )}
       </div>
     </article>
   )

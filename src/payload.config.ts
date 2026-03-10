@@ -102,6 +102,9 @@ export default buildConfig({
       serverSelectionTimeoutMS: 10000,
       connectTimeoutMS: 10000,
     },
+    // Disable transactions to avoid MongoExpiredSessionError when using MongoDB
+    // without a replica set (e.g. Atlas free tier, local dev)
+    transactionOptions: false,
   }),
   email: nodemailerAdapter({
     defaultFromAddress: process.env.PROTON_SMTP_USER ?? 'noreply@example.com',

@@ -35,7 +35,7 @@ export const ArchiveBlock: React.FC<
     const fetchedDocs = await (payload as any).find({
       collection: relationTo,
       draft: isDraftMode,
-      depth: 1,
+      depth: 2,
       limit,
       overrideAccess: isDraftMode ? true : false,
       sort: '-publishedAt',

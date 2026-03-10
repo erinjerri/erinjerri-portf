@@ -233,6 +233,15 @@ export const Watch: CollectionConfig = {
       },
     },
     {
+      name: 'slides',
+      type: 'upload',
+      relationTo: 'documents',
+      admin: {
+        position: 'sidebar',
+        description: 'Optional PDF slides for this talk. Visitors can view or download.',
+      },
+    },
+    {
       name: 'populatedAuthors',
       type: 'array',
       access: {

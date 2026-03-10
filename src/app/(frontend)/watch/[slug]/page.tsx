@@ -12,6 +12,7 @@ import RichText from '@/components/RichText'
 import type { Project } from '@/payload-types'
 
 import { WatchVideoHero } from '@/heros/WatchVideoHero'
+import { WatchSlidesSection } from '@/components/WatchSlidesSection'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -119,11 +120,13 @@ export default async function WatchPage({ params: paramsPromise }: Args) {
           <RichText data={watchDoc.content} enableGutter={false} />
         </div>
 
-        {/* Placeholder for future: slides, downloads, etc. */}
-        {/* <div className="mt-12 border-t pt-8">
-          <h2 className="text-xl font-semibold mb-4">Resources</h2>
-          ...
-        </div> */}
+        {watchDoc.slides &&
+          typeof watchDoc.slides === 'object' &&
+          watchDoc.slides !== null && (
+            <div className="mt-12 border-t border-white/10 pt-8">
+              <WatchSlidesSection document={watchDoc.slides as any} />
+            </div>
+          )}
 
         {watchDoc.relatedWatch && watchDoc.relatedWatch.length > 0 && (
           <div className="mt-16">

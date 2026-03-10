@@ -918,6 +918,10 @@ export interface Watch {
    * Dropdown select for uploaded video assets from Media.
    */
   videoAsset?: (string | null) | Media;
+  /**
+   * Optional PDF slides for this talk. Visitors can view or download.
+   */
+  slides?: (string | null) | Document;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -1894,6 +1898,7 @@ export interface WatchSelect<T extends boolean = true> {
   videoSource?: T;
   videoUrl?: T;
   videoAsset?: T;
+  slides?: T;
   populatedAuthors?:
     | T
     | {

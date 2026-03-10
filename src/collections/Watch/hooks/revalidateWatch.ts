@@ -1,51 +1,76 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { getServerSideURL } from '../../../utilities/getURL'
+
+type RevalidateArgs = {
+  paths?: string[]
+  tags?: string[]
+}
+
+function triggerNextRevalidate(payloadLogger: { warn: (msg: string) => void }, args: RevalidateArgs) {
+  const secret = process.env.PAYLOAD_SECRET
+  if (!secret) return
+
+  const baseURL = String(getServerSideURL() || '').replace(/\/$/, '')
+  if (!baseURL) return
+
+  void fetch(`${baseURL}/api/revalidate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: `Bearer ${secret}`,
+    },
+    body: JSON.stringify(args),
+  }).catch((err) => {
+    payloadLogger.warn(`[Watch] Revalidate request failed: ${String((err as Error)?.message || err)}`)
+  })
+}
 
 export const revalidateWatch: CollectionAfterChangeHook = ({
   doc,
   previousDoc,
   req: { payload, context },
 }) => {
-  if (!context.disableRevalidate) {
-    // Watch listing pages cache off the "watch" tag (see /watch/page.tsx)
-    revalidateTag('watch', 'max')
+  if (context.disableRevalidate) return doc
 
-    if (doc._status === 'published') {
-      const path = `/watch/${doc.slug}`
+  // Watch listing pages cache off the "watch" tag (see /watch/page.tsx)
+  triggerNextRevalidate(payload.logger, {
+    tags: ['watch'],
+    paths: ['/watch', '/watch/page'],
+  })
 
-      payload.logger.info(`Revalidating watch doc at path: ${path}`)
+  if (doc._status === 'published') {
+    const path = `/watch/${doc.slug}`
+    payload.logger.info(`Revalidating watch doc at path: ${path}`)
+    triggerNextRevalidate(payload.logger, {
+      tags: ['watch', 'watch-sitemap'],
+      paths: [path, '/watch', '/watch/page'],
+    })
+  }
 
-      revalidatePath(path)
-      revalidatePath('/watch')
-      revalidatePath('/watch/page')
-      revalidateTag('watch-sitemap', 'max')
-    }
-
-    if (previousDoc?._status === 'published' && doc._status !== 'published') {
-      const oldPath = `/watch/${previousDoc.slug}`
-
-      payload.logger.info(`Revalidating old watch doc at path: ${oldPath}`)
-
-      revalidatePath(oldPath)
-      revalidatePath('/watch')
-      revalidatePath('/watch/page')
-      revalidateTag('watch-sitemap', 'max')
-    }
+  if (previousDoc?._status === 'published' && doc._status !== 'published') {
+    const oldPath = `/watch/${previousDoc.slug}`
+    payload.logger.info(`Revalidating old watch doc at path: ${oldPath}`)
+    triggerNextRevalidate(payload.logger, {
+      tags: ['watch', 'watch-sitemap'],
+      paths: [oldPath, '/watch', '/watch/page'],
+    })
   }
   return doc
 }
 
 export const revalidateDelete: CollectionAfterDeleteHook = ({ doc, req: { context } }) => {
-  if (!context.disableRevalidate) {
-    const path = `/watch/${doc?.slug}`
+  if (context.disableRevalidate) return doc
 
-    revalidatePath(path)
-    revalidatePath('/watch')
-    revalidatePath('/watch/page')
-    revalidateTag('watch', 'max')
-    revalidateTag('watch-sitemap', 'max')
-  }
+  const path = `/watch/${doc?.slug}`
+  triggerNextRevalidate(
+    // no access to payload logger here, so use console-like interface
+    { warn: () => {} },
+    {
+      tags: ['watch', 'watch-sitemap'],
+      paths: [path, '/watch', '/watch/page'],
+    },
+  )
 
   return doc
 }
