@@ -11,7 +11,7 @@ import RichText from '@/components/RichText'
 
 import type { Project } from '@/payload-types'
 
-import { Media as MediaComponent } from '@/components/Media'
+import { VideoEmbed } from '@/components/VideoEmbed'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
@@ -57,6 +57,8 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
     typeof project?.videoAsset === 'object' && project.videoAsset?.mimeType?.includes('video')
       ? project.videoAsset
       : null
+  const videoSource = project?.videoSource ?? 'upload'
+  const videoUrl = typeof project?.videoUrl === 'string' ? project.videoUrl : null
 
   if (!project) return <PayloadRedirects url={url} />
 
@@ -70,11 +72,7 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <PostHero post={project} />
-      {selectedVideo && (
-        <div className="container mt-8">
-          <MediaComponent resource={selectedVideo} />
-        </div>
-      )}
+      <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
 
       <div className="flex flex-col items-center gap-4 pt-8">
         <div className="container">

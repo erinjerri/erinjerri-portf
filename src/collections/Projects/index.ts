@@ -193,6 +193,28 @@ export const Projects: CollectionConfig<'projects'> = {
       relationTo: 'users',
     },
     {
+      name: 'videoSource',
+      type: 'select',
+      options: [
+        { label: 'Upload', value: 'upload' },
+        { label: 'External URL', value: 'url' },
+      ],
+      defaultValue: 'upload',
+      admin: {
+        position: 'sidebar',
+        description: 'Use an uploaded video or link to an external video.',
+      },
+    },
+    {
+      name: 'videoUrl',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        condition: (data) => data?.videoSource === 'url',
+        description: 'Paste a YouTube, Vimeo, or direct video URL.',
+      },
+    },
+    {
       name: 'videoAsset',
       type: 'relationship',
       relationTo: 'media',
@@ -203,6 +225,7 @@ export const Projects: CollectionConfig<'projects'> = {
       },
       admin: {
         position: 'sidebar',
+        condition: (data) => data?.videoSource !== 'url',
         description: 'Dropdown select for uploaded video assets from Media.',
       },
     },

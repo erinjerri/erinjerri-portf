@@ -29,7 +29,11 @@ export const Documents: CollectionConfig = {
   },
   upload: {
     staticDir: path.resolve(dirname, '../public/media'),
-    mimeTypes: ['application/pdf'],
+    mimeTypes: [
+      'application/pdf',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    ],
     adminThumbnail: () => '/favicon.svg',
   },
   fields: [

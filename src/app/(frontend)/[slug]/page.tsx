@@ -10,7 +10,7 @@ import React from 'react'
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
-import { Media as MediaComponent } from '@/components/Media'
+import { VideoEmbed } from '@/components/VideoEmbed'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -77,7 +77,7 @@ export default async function Page({ params: paramsPromise }: Args) {
     return <PayloadRedirects url={url} />
   }
 
-  const { hero, layout, videoAsset } = page
+  const { hero, layout, videoAsset, videoSource, videoUrl } = page
   const selectedVideo = typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video')
     ? videoAsset
     : null
@@ -91,11 +91,7 @@ export default async function Page({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <RenderHero {...hero} />
-      {selectedVideo && (
-        <div className="container mt-8">
-          <MediaComponent resource={selectedVideo} />
-        </div>
-      )}
+      <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
       <RenderBlocks blocks={layout} />
     </article>
   )

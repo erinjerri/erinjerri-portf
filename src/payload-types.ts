@@ -335,6 +335,14 @@ export interface Page {
   };
   publishedAt?: string | null;
   /**
+   * Use an uploaded video or link to an external video.
+   */
+  videoSource?: ('upload' | 'url') | null;
+  /**
+   * Paste a YouTube, Vimeo, or direct video URL.
+   */
+  videoUrl?: string | null;
+  /**
    * Dropdown select for uploaded video assets from Media.
    */
   videoAsset?: (string | null) | Media;
@@ -382,6 +390,14 @@ export interface Post {
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
+  /**
+   * Use an uploaded video or link to an external video.
+   */
+  videoSource?: ('upload' | 'url') | null;
+  /**
+   * Paste a YouTube, Vimeo, or direct video URL.
+   */
+  videoUrl?: string | null;
   /**
    * Dropdown select for uploaded video assets from Media.
    */
@@ -852,6 +868,14 @@ export interface Project {
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
+  /**
+   * Use an uploaded video or link to an external video.
+   */
+  videoSource?: ('upload' | 'url') | null;
+  /**
+   * Paste a YouTube, Vimeo, or direct video URL.
+   */
+  videoUrl?: string | null;
   /**
    * Dropdown select for uploaded video assets from Media.
    */
@@ -1610,6 +1634,8 @@ export interface PagesSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  videoSource?: T;
+  videoUrl?: T;
   videoAsset?: T;
   generateSlug?: T;
   slug?: T;
@@ -1828,6 +1854,8 @@ export interface PostsSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   authors?: T;
+  videoSource?: T;
+  videoUrl?: T;
   videoAsset?: T;
   substackId?: T;
   substackURL?: T;
@@ -1863,6 +1891,8 @@ export interface ProjectsSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   authors?: T;
+  videoSource?: T;
+  videoUrl?: T;
   videoAsset?: T;
   populatedAuthors?:
     | T
