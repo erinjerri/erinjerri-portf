@@ -35,6 +35,7 @@ import { default as default_730b936cb44e7ca811301604904ddf96 } from '@/component
 import { default as default_f804a2f22915f9d0cc2e74cde7c6072f } from '@/components/AdminGraphics/Logo'
 import { default as default_aaa7ca8e68147c2c7193d1c8e5029c2e } from '@/components/dashboard/AnalyticsNavLink'
 import { default as default_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
+import { default as default_841bf41b8d9d87b643fb67b28cc549b1 } from '@/components/LoadLexicalList'
 import { default as default_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { default as default_d2a05cc0963d064af3e35c8fd6f1ba5a } from '@/components/dashboard/AnalyticsView'
@@ -78,6 +79,7 @@ export const importMap = {
   "@/components/AdminGraphics/Logo#default": default_f804a2f22915f9d0cc2e74cde7c6072f,
   "@/components/dashboard/AnalyticsNavLink#default": default_aaa7ca8e68147c2c7193d1c8e5029c2e,
   "@/components/BeforeDashboard#default": default_1a7510af427896d367a49dbf838d2de6,
+  "@/components/LoadLexicalList#default": default_841bf41b8d9d87b643fb67b28cc549b1,
   "@/components/BeforeLogin#default": default_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@/components/dashboard/AnalyticsView#default": default_d2a05cc0963d064af3e35c8fd6f1ba5a,
