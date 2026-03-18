@@ -271,10 +271,9 @@ export const Watch: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave:
-        process.env.NODE_ENV === 'development'
-          ? { interval: Number.isFinite(devAutosaveInterval) ? devAutosaveInterval : 15000 }
-          : { interval: 5000 },
+      // Autosave disabled: populates Lexical block uploads with objects instead of IDs, causing
+      // "Upload value should be a string or number" errors. Re-enable when fixed upstream.
+      autosave: false,
       schedulePublish: true,
     },
     maxPerDoc: 50,

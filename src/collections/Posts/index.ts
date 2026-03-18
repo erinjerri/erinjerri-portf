@@ -309,10 +309,10 @@ export const Posts: CollectionConfig<'posts'> = {
   },
   versions: {
     drafts: {
-      autosave:
-        process.env.NODE_ENV === 'development'
-          ? { interval: Number.isFinite(devAutosaveInterval) ? devAutosaveInterval : 15000 }
-          : { interval: 5000 },
+      // Autosave disabled: when enabled, it can populate upload nodes in Lexical content with
+      // full objects instead of IDs, causing "Upload value should be a string or number" errors.
+      // Re-enable when Payload fixes: https://github.com/payloadcms/payload/issues/13643
+      autosave: false,
       schedulePublish: true,
     },
     maxPerDoc: 50,
