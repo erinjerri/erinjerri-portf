@@ -288,6 +288,29 @@ export const Watch: CollectionConfig = {
       ],
     },
     {
+      name: 'cardQALink',
+      type: 'group',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Optional Q&A or interview link (e.g. InfoQ presentation page with transcript). Shown on the card.',
+      },
+      fields: [
+        {
+          name: 'url',
+          type: 'text',
+          label: 'URL',
+          admin: { description: 'e.g. https://www.infoq.com/presentations/ai-spatial-intelligence-world/' },
+        },
+        {
+          name: 'label',
+          type: 'text',
+          label: 'Label',
+          admin: { description: 'Button label (default: "Q&A")' },
+        },
+      ],
+    },
+    {
       name: 'populatedAuthors',
       type: 'array',
       access: {

@@ -122,12 +122,17 @@ export async function GET(
     return new NextResponse('Not found', { status: 404 })
   }
 
+  // Payload S3/R2 storage may use encoded filenames in keys; try multiple variants
+  const encodedFilename = encodeURIComponent(cleanFilename)
   const candidateKeys = Array.from(
     new Set([
-      // Most common (storage-s3 prefix by collection slug)
+      // Payload storage: prefix/encodedFilename (e.g. media/Lightbulb%20Icon.png)
+      R2_MEDIA_PREFIX ? `${R2_MEDIA_PREFIX}/${encodedFilename}` : encodedFilename,
+      // Prefix with raw filename
       R2_MEDIA_PREFIX ? `${R2_MEDIA_PREFIX}/${cleanFilename}` : cleanFilename,
-      // Some setups store at bucket root
+      // Bucket root
       cleanFilename,
+      encodedFilename,
     ]),
   )
 

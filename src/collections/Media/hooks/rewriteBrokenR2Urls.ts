@@ -1,7 +1,11 @@
 import type { CollectionAfterReadHook } from 'payload'
 
 const isBrokenR2Url = (u: string | null | undefined): boolean =>
-  Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
+  Boolean(
+    u &&
+      typeof u === 'string' &&
+      (u.includes('r2.cloudflarestorage.com') || u.includes('.r2.dev')),
+  )
 
 const MEDIA_PREFIX = (process.env.R2_MEDIA_PREFIX?.trim() || 'media').replace(/^\/+|\/+$/g, '')
 
@@ -13,6 +17,11 @@ const toProxyUrl = (filename: string): string => {
   const encodedFilename = encodeURIComponent(filename)
   const keyPath = MEDIA_PREFIX ? `${MEDIA_PREFIX}/${encodedFilename}` : encodedFilename
 
+  // R2 public URLs (.r2.dev, cloudflarestorage) often 404; prefer proxy for reliable loading.
+  if (useR2 && hasR2Bucket) {
+    return `/api/media/file/${encodeURIComponent(filename)}`
+  }
+
   if (publicHostname) {
     const base = publicHostname.replace(/^https?:\/\//, '')
     return `https://${base}/${keyPath}`
@@ -21,11 +30,6 @@ const toProxyUrl = (filename: string): string => {
   if (publicReads && process.env.R2_ACCOUNT_ID) {
     const acct = process.env.R2_ACCOUNT_ID.trim()
     return `https://${acct}.r2.cloudflarestorage.com/${keyPath}`
-  }
-
-  // When R2 is in use but no public hostname: use app proxy (reads from R2 or local fallback)
-  if (useR2 && hasR2Bucket) {
-    return `/api/media/file/${encodeURIComponent(filename)}`
   }
 
   // Local storage: files live in public/media, served at /media/*

@@ -69,16 +69,14 @@ export function getDocumentUrl(
         parsed.hostname.endsWith('.r2.cloudflarestorage.com')
 
       if (isR2Host) {
-        const pathParts = parsed.pathname.split('/').filter(Boolean)
-        const fn = pathParts[pathParts.length - 1] ?? filename
-        if (fn) {
-          if (forcePayloadProxyReads()) {
-            return `/api/documents/file/${encodeURIComponent(fn)}`
-          }
-
-          const directUrl = getPublicR2DocumentUrl(fn)
-          if (directUrl) return directUrl
+        if (forcePayloadProxyReads()) {
+          const pathParts = parsed.pathname.split('/').filter(Boolean)
+          const fn = pathParts[pathParts.length - 1] ?? filename
+          if (fn) return `/api/documents/file/${encodeURIComponent(fn)}`
         }
+        // Return as-is to avoid hydration mismatch: getPublicR2DocumentUrl uses
+        // process.env.R2_* which is undefined on the client (not NEXT_PUBLIC_*).
+        return url
       }
       return url
     } catch {

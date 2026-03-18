@@ -971,6 +971,19 @@ export interface Watch {
     label?: string | null;
     newTab?: boolean | null;
   };
+  /**
+   * Optional Q&A or interview link (e.g. InfoQ presentation page with transcript). Shown on the card.
+   */
+  cardQALink?: {
+    /**
+     * e.g. https://www.infoq.com/presentations/ai-spatial-intelligence-world/
+     */
+    url?: string | null;
+    /**
+     * Button label (default: "Q&A")
+     */
+    label?: string | null;
+  };
   populatedAuthors?:
     | {
         id?: string | null;
@@ -1962,6 +1975,12 @@ export interface WatchSelect<T extends boolean = true> {
         reference?: T;
         label?: T;
         newTab?: T;
+      };
+  cardQALink?:
+    | T
+    | {
+        url?: T;
+        label?: T;
       };
   populatedAuthors?:
     | T

@@ -85,8 +85,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const disableOptimization = false
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
-  // Must use values from next.config images.qualities. Use 70 for LCP hero images to reduce transfer (~26KB savings).
-  const quality = fill && priority ? 70 : priority ? 75 : 75
+  // Higher quality for hero images (90) so they render sharp; 85 for other priority, 80 for lazy.
+  const quality = fill && priority ? 90 : priority ? 85 : 80
 
   // Use Payload focal point for object-position when using fill (hero images).
   // Set focalX/focalY in Payload admin (Media → edit image → focal point) to keep faces visible on mobile.

@@ -6,6 +6,7 @@ import { unstable_cache } from 'next/cache'
 import React, { cache } from 'react'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { HeroImagePreload } from '@/components/HeroImagePreload'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient } from '@/utilities/getPayloadClient'
@@ -82,15 +83,18 @@ export default async function Page({ params: paramsPromise }: Args) {
     : null
 
   return (
-    <article className="pt-16 pb-24">
-      <PageClient />
+    <>
+      <HeroImagePreload hero={hero} />
+      <article className="pt-16 pb-24">
+        <PageClient />
 
-      {draft && <LivePreviewListener />}
+        {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
+        <RenderHero {...hero} />
       <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
       <RenderBlocks blocks={layout} />
     </article>
+    </>
   )
 }
 

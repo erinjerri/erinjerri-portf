@@ -34,6 +34,11 @@ type CardVideoLink = {
   newTab?: boolean | null
 }
 
+type CardQALink = {
+  url?: string | null
+  label?: string | null
+}
+
 export type CardDocData = {
   categories?: (number | string | CardCategory | null)[] | null
   meta?: CardMeta | null
@@ -43,6 +48,7 @@ export type CardDocData = {
   videoUrl?: string | null
   videoSource?: 'upload' | 'url' | null
   cardVideoLink?: CardVideoLink | null
+  cardQALink?: CardQALink | null
 }
 
 export type CardRelationTo = 'posts' | 'projects' | 'watch'
@@ -58,7 +64,7 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo = 'posts', showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title, slides, videoUrl, videoSource, cardVideoLink } =
+  const { slug, categories, meta, title, slides, videoUrl, videoSource, cardVideoLink, cardQALink } =
     doc || {}
   const { description, image: metaImage } = meta || {}
 
@@ -111,6 +117,13 @@ export const Card: React.FC<{
     return null
   }
   const videoLink = isWatch ? resolveVideoLink() : null
+  const qaLink =
+    isWatch && cardQALink?.url?.trim()
+      ? {
+          url: cardQALink.url.trim(),
+          label: cardQALink.label?.trim() || 'Q&A',
+        }
+      : null
 
   return (
     <article
@@ -182,7 +195,7 @@ export const Card: React.FC<{
           </div>
         )}
         {description && <div className="mt-2">{description && <p>{sanitizedDescription}</p>}</div>}
-        {relationTo === 'watch' && (slidesPdfUrl || videoLink) && (
+        {relationTo === 'watch' && (slidesPdfUrl || videoLink || qaLink) && (
           <div className="mt-4 flex flex-wrap items-center gap-3">
             {videoLink && (
               <Button asChild size="sm" variant="default">
@@ -193,6 +206,13 @@ export const Card: React.FC<{
                 >
                   {videoLink.label}
                 </Link>
+              </Button>
+            )}
+            {qaLink && (
+              <Button asChild size="sm" variant="light">
+                <a href={qaLink.url} target="_blank" rel="noopener noreferrer">
+                  {qaLink.label}
+                </a>
               </Button>
             )}
             {slidesPdfUrl && (

@@ -17,7 +17,7 @@ export const AnalyticsScripts: React.FC<Props> = ({ measurementId, clarityProjec
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
-            strategy="afterInteractive"
+            strategy="lazyOnload"
             onError={(e) => {
               // Inline logging only — avoid throwing.
               // eslint-disable-next-line no-console
@@ -27,7 +27,7 @@ export const AnalyticsScripts: React.FC<Props> = ({ measurementId, clarityProjec
 
           <Script
             id="google-analytics"
-            strategy="afterInteractive"
+            strategy="lazyOnload"
             onError={(e) => {
               // eslint-disable-next-line no-console
               console.warn('Google Analytics inline script error:', (e as any)?.message ?? e)
@@ -46,7 +46,7 @@ export const AnalyticsScripts: React.FC<Props> = ({ measurementId, clarityProjec
       {clarityProjectId ? (
         <Script
           id="microsoft-clarity"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           onError={(e) => {
             // eslint-disable-next-line no-console
             console.warn('Microsoft Clarity inline script error:', (e as any)?.message ?? e)

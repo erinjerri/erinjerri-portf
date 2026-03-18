@@ -93,15 +93,31 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     return `${value}${separator}${cacheTag}`
   }
 
-  if (!forcePayloadProxyReads) {
-    if (url.startsWith('/media/')) {
-      const directUrl = getPublicR2MediaUrl(url.replace(/^\/media\//, ''))
-      if (directUrl) return appendCacheTag(directUrl)
+  // Use proxy for /media/ paths so images load reliably (R2 direct URLs often 404).
+  if (url.startsWith('/media/')) {
+    let filename = url.replace(/^\/media\//, '').split('?')[0]
+    if (filename) {
+      try {
+        filename = decodeURIComponent(filename)
+      } catch {
+        /* keep as-is */
+      }
+      const proxyPath = `/api/media/file/${encodeURIComponent(filename)}`
+      return appendCacheTag(proxyPath)
     }
+  }
 
-    if (url.startsWith('/api/media/file/')) {
-      const directUrl = getPublicR2MediaUrl(url.replace(/^\/api\/media\/file\//, ''))
-      if (directUrl) return appendCacheTag(directUrl)
+  if (url.startsWith('/api/media/file/')) {
+    // Already a proxy path; ensure it's clean (no double encoding)
+    const filename = url.replace(/^\/api\/media\/file\//, '').split('?')[0]
+    if (filename) {
+      try {
+        const decoded = decodeURIComponent(filename)
+        const proxyPath = `/api/media/file/${encodeURIComponent(decoded)}`
+        return appendCacheTag(proxyPath)
+      } catch {
+        return appendCacheTag(url.split('?')[0])
+      }
     }
   }
 
@@ -110,11 +126,8 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     try {
       const parsed = new URL(url)
 
-      // If the source is an R2 URL, prefer serving the image from the site's
-      // public `/media/<filename>` path (served by the app) so Next.js can treat it
-      // as a remote asset matching remotePatterns or a direct /media path.
-      // This avoids returning proxy endpoints like `/api/media/file/...` which
-      // can cause next/image to validate against localPatterns and trigger proxy fetches.
+      // R2 public URLs often 404 (public access not enabled, key mismatch, etc).
+      // Always use the Payload proxy for R2 URLs: it fetches via S3 API and serves reliably.
       try {
         const isR2 =
           parsed.hostname.endsWith('r2.cloudflarestorage.com') ||
@@ -139,14 +152,6 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
             }
           }
           if (filename) {
-            const directUrl = getPublicR2MediaUrl(filename)
-            if (directUrl) {
-              // R2 returns 404 for URLs with query params; omit cache tag
-              return directUrl
-            }
-
-            // Fallback: serve via the Payload proxy to avoid broken /media paths
-            // when local media files aren't present.
             const proxyPath = `/api/media/file/${encodeURIComponent(filename)}`
             return appendCacheTag(proxyPath)
           }
