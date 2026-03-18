@@ -61,7 +61,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </Suspense>
         </Providers>
       </body>
-      <AnalyticsScripts measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+      <AnalyticsScripts
+        measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+        clarityProjectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}
+      />
     </html>
   )
 }
