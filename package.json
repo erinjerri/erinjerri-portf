@@ -32,6 +32,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "sync:substack": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/sync-substack.ts",
     "compress:media": "tsx src/scripts/compress-media.ts",
+    "duplicate:post-to-watch": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx scripts/duplicate-post-to-watch.ts",
     "upload:media": "tsx src/scripts/upload-media-to-r2.ts"
   },
   "dependencies": {
