@@ -3,6 +3,10 @@ import 'dotenv/config'
 import { getPayload } from 'payload'
 
 import config from '../src/payload.config'
+import type { Watch } from '../src/payload-types'
+
+/** Data shape for creating a Watch document (Post and Watch share compatible content structure) */
+type WatchCreateData = Omit<Watch, 'id' | 'updatedAt' | 'createdAt'>
 
 /**
  * Copy one blog post into a watch talk entry so the media blocks stay linked.
@@ -44,8 +48,9 @@ function parseArgs(): CLIArgs {
 function toRelationId(value: unknown): string | undefined {
   if (!value) return undefined
   if (typeof value === 'string') return value
-  if (typeof value === 'object' && value !== null && 'id' in value && typeof (value as any).id === 'string') {
-    return (value as any).id
+  const obj = value as { id?: unknown }
+  if (typeof obj === 'object' && obj !== null && typeof obj.id === 'string') {
+    return obj.id
   }
   return undefined
 }
@@ -92,7 +97,7 @@ async function main(): Promise<void> {
     process.exit(1)
   }
 
-  const watchData: Record<string, unknown> = {
+  const watchData = {
     title: post.title,
     slug: watchSlug,
     heroImage: toRelationId(post.heroImage),
@@ -118,7 +123,9 @@ async function main(): Promise<void> {
       })
     : await payload.create({
         collection: 'watch',
-        data: watchData,
+        data: watchData as WatchCreateData,
+        draft: false,
+        overrideAccess: true,
       })
 
   console.log(`${existing ? 'Updated' : 'Created'} watch doc: ${result.slug} (${result.id})`)

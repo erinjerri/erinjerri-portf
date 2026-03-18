@@ -1,7 +1,6 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { Facebook, Github, Linkedin, Mail, Youtube } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import path from 'path'
 import React from 'react'
@@ -13,6 +12,7 @@ import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
 import { SubscribeForm } from './SubscribeForm'
+import { SocialIconImage } from './SocialIconImage'
 
 const resolveFallbackSocialIcon = (
   label: string,
@@ -91,10 +91,15 @@ function SocialIcon({
   // Omit cache tag: R2 rejects URLs with ?timestamp query params; footer icons don't need cache-busting
   const iconUrl = urlToResolve ? getMediaUrl(urlToResolve, null) : null
   const fallbackIcon = resolveFallbackSocialIcon(label, url)
-  const resolvedIconUrl = iconUrl && hasLocalMediaFile(iconUrl) ? iconUrl : null
+  // Use icon URL when: local /media/ file exists, or it's an external URL (R2, etc.)
+  const resolvedIconUrl =
+    iconUrl && (hasLocalMediaFile(iconUrl) || iconUrl.startsWith('http'))
+      ? iconUrl
+      : null
   const href =
     url.includes('@') && !url.includes('://') && !url.startsWith('mailto:') ? `mailto:${url}` : url
   const isExternal = href.startsWith('http://') || href.startsWith('https://')
+  const FallbackIcon = fallbackIcon
 
   return (
     <Link
@@ -105,33 +110,37 @@ function SocialIcon({
       aria-label={label}
     >
       {resolvedIconUrl ? (
-        <Image
+        <SocialIconImage
           src={resolvedIconUrl}
           alt=""
           className="h-5 w-5 object-contain"
-          width={20}
-          height={20}
+          fallback={<FallbackIcon className="h-5 w-5" />}
         />
       ) : (
-        React.createElement(fallbackIcon, {
-          className: 'h-5 w-5',
-        })
+        <FallbackIcon className="h-5 w-5" />
       )}
     </Link>
   )
 }
 
-export async function Footer() {
+interface FooterProps {
+  data?: Footer | null
+}
+
+export async function Footer({ data }: FooterProps = {}) {
   const substackPublicationURL = getSubstackPublicationURL()
   const substackEmbedSrc = `${substackPublicationURL.replace(/\/$/, '')}/embed`
-  let footerData: Footer | null = null
-  try {
-    footerData = await getCachedGlobal('footer', 2)()
-  } catch (err) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('[Footer] Failed to fetch footer:', err)
+  let footerData: Footer | null = data ?? null
+
+  if (data === undefined) {
+    try {
+      footerData = (await getCachedGlobal('footer', 2)()) as Footer
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Footer] Failed to fetch footer:', err)
+      }
+      // Fallback so layout still renders if footer query stalls/errors
     }
-    // Fallback so layout still renders if footer query stalls/errors
   }
 
   const subscribeSection = footerData?.subscribeSection

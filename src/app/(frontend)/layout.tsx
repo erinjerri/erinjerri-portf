@@ -13,7 +13,8 @@ import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { draftMode } from 'next/headers'
+import { getCachedGlobal } from '@/utilities/getGlobals'
+import type { Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -31,7 +32,18 @@ const jost = Jost({
 })
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled } = await draftMode()
+  let headerData: HeaderType | null = null
+  const headerStartedAt = Date.now()
+  const headerResult = await Promise.allSettled([getCachedGlobal('header', 1)()])
+
+  if (headerResult[0].status === 'fulfilled') {
+    headerData = headerResult[0].value as HeaderType
+  } else if (process.env.NODE_ENV === 'development') {
+    console.error('[Layout] Failed to fetch header:', headerResult[0].reason)
+  }
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[layout] header ${Date.now() - headerStartedAt}ms`)
+  }
 
   return (
     <html
@@ -46,13 +58,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <Providers>
-          <AdminBar
-            adminBarProps={{
-              preview: isEnabled,
-            }}
-          />
+          <AdminBar />
 
-          <Header />
+          <Header data={headerData} />
           {children}
           <Suspense
             fallback={<div className="mt-auto min-h-[380px] border-t border-border bg-transparent" />}

@@ -24,11 +24,54 @@ const encodePathPreserveQuery = (value: string): string => {
   return query ? `${encodedPath}?${query}` : encodedPath
 }
 
+const toPayloadProxyPath = (value: string): string =>
+  value.startsWith('/media/') ? value.replace(/^\/media\//, '/api/media/file/') : value
+
+const MEDIA_PREFIX = (process.env.R2_MEDIA_PREFIX?.trim() || 'media').replace(/^\/+|\/+$/g, '')
+
+const getPublicR2MediaUrl = (filename: string): string | null => {
+  const cleanFilename = filename.replace(/^\/+/, '')
+  const publicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
+  const publicReads = process.env.R2_PUBLIC_READS === 'true'
+  const accountId = process.env.R2_ACCOUNT_ID?.trim()
+  let normalizedFilename = cleanFilename
+
+  try {
+    let prev = normalizedFilename
+    for (let i = 0; i < 5; i++) {
+      const decoded = decodeURIComponent(prev)
+      if (decoded === prev) break
+      prev = decoded
+    }
+    normalizedFilename = prev
+  } catch {
+    normalizedFilename = cleanFilename
+  }
+
+  const encodedFilename = encodeURIComponent(normalizedFilename)
+  const keyPath = MEDIA_PREFIX ? `${MEDIA_PREFIX}/${encodedFilename}` : encodedFilename
+
+  if (publicHostname) {
+    const base = publicHostname.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+    return `https://${base}/${keyPath}`
+  }
+
+  if (publicReads && accountId) {
+    return `https://${accountId}.r2.cloudflarestorage.com/${keyPath}`
+  }
+
+  return null
+}
+
 const toPayloadFileEndpoint = (value: string): string => {
-  // Do not rewrite local /media/ paths to the Payload proxy endpoint here.
-  // Returning `/api/media/file/...` causes next/image to treat images as local proxy
-  // assets and can trigger heavy proxy fetches during SSG. Keep the original value
-  // so callers can decide whether to use a proxy or direct URL.
+  // In dev, or when explicitly requested, allow proxy reads for /media paths so
+  // images still load when local media files aren't present.
+  const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
+  if (forcePayloadProxyReads && value.startsWith('/media/')) {
+    return toPayloadProxyPath(value)
+  }
+
+  // Otherwise keep the original value to avoid proxy fetches during SSG.
   return value
 }
 
@@ -44,6 +87,18 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     if (!cacheTag) return value
     const separator = value.includes('?') ? '&' : '?'
     return `${value}${separator}${cacheTag}`
+  }
+
+  if (!forcePayloadProxyReads) {
+    if (url.startsWith('/media/')) {
+      const directUrl = getPublicR2MediaUrl(url.replace(/^\/media\//, ''))
+      if (directUrl) return appendCacheTag(directUrl)
+    }
+
+    if (url.startsWith('/api/media/file/')) {
+      const directUrl = getPublicR2MediaUrl(url.replace(/^\/api\/media\/file\//, ''))
+      if (directUrl) return appendCacheTag(directUrl)
+    }
   }
 
   // Check if URL already has http/https protocol
@@ -80,25 +135,15 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
             }
           }
           if (filename) {
-            // If the R2 bucket is configured for public reads or a public hostname is provided,
-            // prefer returning the public R2 URL so Next.js can treat it as a remote image.
-            const publicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
-            const publicReads = process.env.R2_PUBLIC_READS === 'true'
-            if (publicHostname) {
-              const base = publicHostname.replace(/^https?:\/\//, '')
-              return appendCacheTag(`https://${base}/${encodeURIComponent(filename)}`)
+            const directUrl = getPublicR2MediaUrl(filename)
+            if (directUrl) {
+              return appendCacheTag(directUrl)
             }
 
-            if (publicReads && process.env.R2_ACCOUNT_ID) {
-              const acct = process.env.R2_ACCOUNT_ID.trim()
-              return appendCacheTag(
-                `https://${acct}.r2.cloudflarestorage.com/${encodeURIComponent(filename)}`,
-              )
-            }
-
-            // Fallback: serve via the app's /media/<filename> path (absolute)
-            const serverBase = getServerSideURL() || ''
-            return appendCacheTag(`${serverBase}/media/${encodeURIComponent(filename)}`)
+            // Fallback: serve via the Payload proxy to avoid broken /media paths
+            // when local media files aren't present.
+            const proxyPath = `/api/media/file/${encodeURIComponent(filename)}`
+            return appendCacheTag(proxyPath)
           }
         }
 

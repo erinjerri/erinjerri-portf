@@ -1,12 +1,21 @@
 import { getPayload } from 'payload'
 
 import config from '../payload.config'
+import type { Page } from '../payload-types'
 
 type AnyPage = {
   id: number | string
   layout?: unknown
   slug?: string | null
   title?: string | null
+}
+
+type NavItem = {
+  link?: {
+    type?: string
+    url?: string
+    reference?: { value?: string } | string
+  }
 }
 
 type AnyHeader = {
@@ -38,7 +47,7 @@ function appendAffiliateProductsBlock(layout: unknown): unknown[] {
 }
 
 function headerHasShopLink(header: AnyHeader, pageId?: string): boolean {
-  const navItems = asArray<any>(header.navItems)
+  const navItems = asArray<NavItem>(header.navItems)
 
   return navItems.some((item) => {
     const link = item?.link
@@ -52,7 +61,7 @@ function headerHasShopLink(header: AnyHeader, pageId?: string): boolean {
       const reference = link.reference
       const value =
         typeof reference === 'object' && reference !== null && 'value' in reference
-          ? String((reference as any).value)
+          ? String((reference as { value?: string }).value)
           : typeof reference === 'string'
             ? reference
             : undefined
@@ -97,7 +106,7 @@ async function run(): Promise<void> {
           type: 'none',
         },
         layout: appendAffiliateProductsBlock([]),
-      } as any,
+      } as Partial<Page>,
     })) as unknown as AnyPage
 
     payload.logger.info(`Created store page: /${storeSlug}`)
@@ -107,12 +116,12 @@ async function run(): Promise<void> {
     if (!hasAffiliateProductsBlock(storePage.layout)) {
       await payload.update({
         collection: 'pages',
-        id: storePage.id as any,
+        id: storePage.id,
         depth: 0,
         overrideAccess: true,
         data: {
           layout: appendAffiliateProductsBlock(storePage.layout),
-        } as any,
+        } as Partial<Page>,
       })
       payload.logger.info('Appended Affiliate Products block to store page layout.')
     }
@@ -127,7 +136,7 @@ async function run(): Promise<void> {
   })) as unknown as AnyHeader
 
   if (!headerHasShopLink(header, storePageId)) {
-    const navItems = asArray<any>(header.navItems)
+    const navItems = asArray<NavItem>(header.navItems)
 
     await payload.updateGlobal({
       slug: 'header',
@@ -148,7 +157,7 @@ async function run(): Promise<void> {
             },
           },
         ],
-      } as any,
+      },
     })
 
     payload.logger.info('Added Shop link to Header global navItems.')

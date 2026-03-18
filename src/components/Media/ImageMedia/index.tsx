@@ -85,6 +85,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const disableOptimization = false
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
+  // Must use values from next.config images.qualities (60–88)
+  const quality = fill && priority ? 85 : priority ? 80 : 75
 
   // Use Payload focal point for object-position when using fill (hero images).
   // Set focalX/focalY in Payload admin (Media → edit image → focal point) to keep faces visible on mobile.
@@ -112,7 +114,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         placeholder="blur"
         blurDataURL={placeholderBlur}
         priority={priority}
-        quality={priority ? 70 : 65}
+        quality={quality}
         unoptimized={disableOptimization}
         loading={loading}
         sizes={sizes}

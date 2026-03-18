@@ -3,18 +3,22 @@ import type { CollectionAfterReadHook } from 'payload'
 const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
 
+const MEDIA_PREFIX = (process.env.R2_MEDIA_PREFIX?.trim() || 'media').replace(/^\/+|\/+$/g, '')
+
 const toProxyUrl = (filename: string): string => {
   const publicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
   const publicReads = process.env.R2_PUBLIC_READS === 'true'
+  const encodedFilename = encodeURIComponent(filename)
+  const keyPath = MEDIA_PREFIX ? `${MEDIA_PREFIX}/${encodedFilename}` : encodedFilename
 
   if (publicHostname) {
     const base = publicHostname.replace(/^https?:\/\//, '')
-    return `https://${base}/${encodeURIComponent(filename)}`
+    return `https://${base}/${keyPath}`
   }
 
   if (publicReads && process.env.R2_ACCOUNT_ID) {
     const acct = process.env.R2_ACCOUNT_ID.trim()
-    return `https://${acct}.r2.cloudflarestorage.com/${encodeURIComponent(filename)}`
+    return `https://${acct}.r2.cloudflarestorage.com/${keyPath}`
   }
 
   // Fallback to app's public media path

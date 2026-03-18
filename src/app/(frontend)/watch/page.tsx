@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
 
 import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
-import React from 'react'
+import React, { cache } from 'react'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -13,6 +11,7 @@ import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { Media as MediaComponent } from '@/components/Media'
+import { getPayloadClient } from '@/utilities/getPayloadClient'
 
 const WATCH_PAGE_SLUG = 'watch'
 
@@ -52,8 +51,6 @@ export default async function Page() {
     <article className="pt-16 pb-24">
       <PageClient />
 
-      <PayloadRedirects disableNotFound url={url} />
-
       {draft && <LivePreviewListener />}
 
       <RenderHero {...hero} />
@@ -81,9 +78,9 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-async function getPageBySlug(slug: string, draft: boolean) {
+const getPageBySlug = cache(async (slug: string, draft: boolean) => {
   if (draft) {
-    const payload = await getPayload({ config: configPromise })
+    const payload = await getPayloadClient()
     const result = await payload.find({
       collection: 'pages',
       draft: true,
@@ -97,7 +94,7 @@ async function getPageBySlug(slug: string, draft: boolean) {
 
   const getCached = unstable_cache(
     async () => {
-      const payload = await getPayload({ config: configPromise })
+      const payload = await getPayloadClient()
       const result = await payload.find({
         collection: 'pages',
         draft: false,
@@ -113,4 +110,4 @@ async function getPageBySlug(slug: string, draft: boolean) {
   )
 
   return getCached()
-}
+})

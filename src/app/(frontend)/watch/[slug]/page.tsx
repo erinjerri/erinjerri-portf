@@ -2,11 +2,9 @@ import type { Metadata } from 'next'
 
 import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
-import React from 'react'
+import React, { cache } from 'react'
 import RichText from '@/components/RichText'
 
 import type { Project } from '@/payload-types'
@@ -16,13 +14,14 @@ import { WatchSlidesSection } from '@/components/WatchSlidesSection'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { generateMeta } from '@/utilities/generateMeta'
+import { getPayloadClient } from '@/utilities/getPayloadClient'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayload({ config: configPromise })
+    const payload = await getPayloadClient()
     const payloadAny = payload as any
 
     const watchDocs = await payloadAny.find({
@@ -75,8 +74,6 @@ export default async function WatchPage({ params: paramsPromise }: Args) {
     <article className="pt-16 pb-24">
       <ReadingProgress />
       <PageClient />
-
-      <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
@@ -152,9 +149,9 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   return generateMeta({ doc: watchDoc as Project })
 }
 
-async function getWatchBySlug(slug: string, draft: boolean) {
+const getWatchBySlug = cache(async (slug: string, draft: boolean) => {
   if (draft) {
-    const payload = await getPayload({ config: configPromise })
+    const payload = await getPayloadClient()
     const result = await (payload as any).find({
       collection: 'watch',
       draft: true,
@@ -169,7 +166,7 @@ async function getWatchBySlug(slug: string, draft: boolean) {
 
   const getCached = unstable_cache(
     async () => {
-      const payload = await getPayload({ config: configPromise })
+      const payload = await getPayloadClient()
       const result = await (payload as any).find({
         collection: 'watch',
         draft: false,
@@ -185,4 +182,4 @@ async function getWatchBySlug(slug: string, draft: boolean) {
     { revalidate: 60, tags: [`watch_${slug}`] },
   )
   return getCached()
-}
+})

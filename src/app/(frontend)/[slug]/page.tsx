@@ -1,22 +1,21 @@
 import type { Metadata } from 'next'
 
 import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
-import React from 'react'
+import React, { cache } from 'react'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
+import { getPayloadClient } from '@/utilities/getPayloadClient'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayload({ config: configPromise })
+    const payload = await getPayloadClient()
     const pages = await payload.find({
       collection: 'pages',
       draft: false,
@@ -85,8 +84,6 @@ export default async function Page({ params: paramsPromise }: Args) {
   return (
     <article className="pt-16 pb-24">
       <PageClient />
-      {/* Allows redirects for valid pages too */}
-      <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
@@ -115,9 +112,9 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   // Unreachable
 }
 
-async function getPageBySlug(slug: string, draft: boolean) {
+const getPageBySlug = cache(async (slug: string, draft: boolean) => {
   if (draft) {
-    const payload = await getPayload({ config: configPromise })
+    const payload = await getPayloadClient()
     const result = await payload.find({
       collection: 'pages',
       depth: 2,
@@ -132,7 +129,7 @@ async function getPageBySlug(slug: string, draft: boolean) {
 
   const getCached = unstable_cache(
     async () => {
-      const payload = await getPayload({ config: configPromise })
+      const payload = await getPayloadClient()
       const result = await payload.find({
         collection: 'pages',
         depth: 2,
@@ -148,4 +145,4 @@ async function getPageBySlug(slug: string, draft: boolean) {
     { revalidate: 60, tags: [`page_${slug}`] },
   )
   return getCached()
-}
+})

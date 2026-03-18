@@ -91,13 +91,12 @@ const tryGetObject = async (
   return null
 }
 
-export async function GET(req: Request, context: any) {
-  // In Next.js route handlers params may need to be awaited before accessing properties.
-  const params =
-    context?.params && typeof context.params?.then === 'function'
-      ? ((await context.params) as { filename?: string } | undefined)
-      : (context?.params as { filename?: string } | undefined)
-  let filename = params?.filename
+export async function GET(
+  _req: Request,
+  context: { params: Promise<{ filename: string }> },
+) {
+  const params = await context.params
+  let filename = params.filename
   if (!filename) {
     return new NextResponse('Missing filename', { status: 400 })
   }
@@ -157,9 +156,10 @@ export async function GET(req: Request, context: any) {
         ? await body.transformToByteArray()
         : await streamToBuffer(body as NodeJS.ReadableStream)
     return new Response(bytes, { status: 200, headers })
-  } catch (err: any) {
+  } catch (err: unknown) {
     const local = await readFromLocalPublicMedia(cleanFilename)
     if (local) return local
-    return new NextResponse(`Error fetching file: ${String(err?.message || err)}`, { status: 502 })
+    const message = err instanceof Error ? err.message : String(err)
+    return new NextResponse(`Error fetching file: ${message}`, { status: 502 })
   }
 }

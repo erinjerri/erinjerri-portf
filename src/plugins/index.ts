@@ -66,7 +66,10 @@ export const plugins: Plugin[] = [
                   ...(r2PublicHostname && {
                     generateFileURL: ({ filename, prefix }) => {
                       const base = `https://${r2PublicHostname.replace(/^https?:\/\//, '')}`
-                      const path = [prefix, filename].filter(Boolean).join('/')
+                      const encodedFilename = encodeURIComponent(
+                        typeof filename === 'string' ? filename.replace(/^\/+/, '') : String(filename),
+                      )
+                      const path = prefix ? `${prefix}/${encodedFilename}` : encodedFilename
                       return `${base}/${path}`
                     },
                   }),
@@ -78,7 +81,10 @@ export const plugins: Plugin[] = [
                   ...(r2PublicHostname && {
                     generateFileURL: ({ filename, prefix }) => {
                       const base = `https://${r2PublicHostname.replace(/^https?:\/\//, '')}`
-                      const path = [prefix, filename].filter(Boolean).join('/')
+                      const encodedFilename = encodeURIComponent(
+                        typeof filename === 'string' ? filename.replace(/^\/+/, '') : String(filename),
+                      )
+                      const path = prefix ? `${prefix}/${encodedFilename}` : encodedFilename
                       return `${base}/${path}`
                     },
                   }),

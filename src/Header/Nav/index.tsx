@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 import type { Header as HeaderType } from '@/payload-types'
 
@@ -39,7 +38,6 @@ const resolveHref = (link: HeaderLink): string | null => {
 export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
   const navItems = data?.navItems || []
   const pathname = usePathname()
-  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
@@ -62,20 +60,10 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
         {navLinks.map(({ id, link, href }) => {
           const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
           return (
-            <span
-              key={id}
-              onMouseEnter={() => {
-                if (href) {
-                  try {
-                    router.prefetch(href)
-                  } catch {
-                    /* ignore prefetch errors */
-                  }
-                }
-              }}
-            >
+            <span key={id}>
               <CMSLink
                 {...link}
+                prefetch={false}
                 appearance="inline"
                 className={cn(
                   'rounded px-3 py-2 transition-colors font-semibold',
@@ -126,6 +114,7 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
                 <CMSLink
                   key={id}
                   {...link}
+                  prefetch={false}
                   appearance="inline"
                   className={cn(
                     'rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold transition-colors',

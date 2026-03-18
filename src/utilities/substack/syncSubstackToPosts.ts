@@ -342,8 +342,8 @@ async function fetchImageViaPlaywright(
   try {
     const { referrer, timeout = 20_000 } = opts
     // Lazy import so normal runs don't require Playwright at runtime
-    const pw = (await import('playwright')) as any
-    const context = await pw.request.newContext({
+    const { default: playwright } = await import('playwright')
+    const context = await playwright.request.newContext({
       userAgent: FETCH_HEADERS['User-Agent'],
       extraHTTPHeaders: {
         ...FETCH_HEADERS,
