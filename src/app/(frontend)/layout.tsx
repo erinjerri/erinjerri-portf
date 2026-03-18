@@ -55,6 +55,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        {/* Preconnect to analytics origins to reduce connection latency when scripts load */}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
+          <link rel="preconnect" href="https://www.googletagmanager.com" />
+        ) : null}
+        {process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ? (
+          <>
+            <link rel="preconnect" href="https://www.clarity.ms" />
+            <link rel="dns-prefetch" href="https://scripts.clarity.ms" />
+          </>
+        ) : null}
       </head>
       <body>
         <Providers>

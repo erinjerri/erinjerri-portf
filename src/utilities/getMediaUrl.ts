@@ -75,6 +75,10 @@ const toPayloadFileEndpoint = (value: string): string => {
   return value
 }
 
+/** R2 public URLs return 404 when query params (e.g. cache-bust) are appended. Omit cache tag for R2. */
+const isR2Url = (u: string): boolean =>
+  u.includes('r2.cloudflarestorage.com') || u.includes('.r2.dev')
+
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
   const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
@@ -84,7 +88,7 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
   }
 
   const appendCacheTag = (value: string): string => {
-    if (!cacheTag) return value
+    if (!cacheTag || isR2Url(value)) return value
     const separator = value.includes('?') ? '&' : '?'
     return `${value}${separator}${cacheTag}`
   }
@@ -137,7 +141,8 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
           if (filename) {
             const directUrl = getPublicR2MediaUrl(filename)
             if (directUrl) {
-              return appendCacheTag(directUrl)
+              // R2 returns 404 for URLs with query params; omit cache tag
+              return directUrl
             }
 
             // Fallback: serve via the Payload proxy to avoid broken /media paths

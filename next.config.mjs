@@ -56,6 +56,8 @@ const r2Hosts = Array.from(
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
+    // Inline critical CSS to reduce render-blocking (est. 440ms savings). Experimental.
+    inlineCss: true,
     optimizePackageImports:
       process.env.NODE_ENV === 'development'
         ? []
