@@ -20,6 +20,8 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { mediumSyncTask } from './jobs/mediumSync'
+import { paragraphSyncTask } from './jobs/paragraphSync'
 import { substackSyncTask } from './jobs/substackSync'
 
 const filename = fileURLToPath(import.meta.url)
@@ -151,7 +153,7 @@ export default buildConfig({
         return authHeader === `Bearer ${secret}`
       },
     },
-    tasks: [substackSyncTask],
+    tasks: [substackSyncTask, mediumSyncTask, paragraphSyncTask],
   },
   onInit: async (payload) => {
     const hasDatabaseURL = Boolean(process.env.DATABASE_URL)

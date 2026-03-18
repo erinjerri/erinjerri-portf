@@ -11,7 +11,7 @@ import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { Media as MediaComponent } from '@/components/Media'
-import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
 
 const WATCH_PAGE_SLUG = 'watch'
 
@@ -83,6 +83,7 @@ const getPageBySlug = cache(async (slug: string, draft: boolean) => {
     const payload = await getPayloadClient()
     const result = await payload.find({
       collection: 'pages',
+      depth: 2,
       draft: true,
       limit: 1,
       pagination: false,
@@ -93,19 +94,19 @@ const getPageBySlug = cache(async (slug: string, draft: boolean) => {
   }
 
   const getCached = unstable_cache(
-    async () => {
-      const payload = await getPayloadClient()
-      const result = await payload.find({
-        collection: 'pages',
-        draft: false,
-        limit: 1,
-        pagination: false,
-        overrideAccess: false,
-        where: { slug: { equals: slug } },
-      })
-      return result.docs?.[0] ?? null
-    },
-    ['page', slug],
+    async () =>
+      withPayloadClientRetry((payload) =>
+        payload.find({
+          collection: 'pages',
+          depth: 2,
+          draft: false,
+          limit: 1,
+          pagination: false,
+          overrideAccess: false,
+          where: { slug: { equals: slug } },
+        }),
+      ).then((result) => result.docs?.[0] ?? null),
+    ['page', slug, 'depth-2'],
     { revalidate: 60, tags: [`page_${slug}`] },
   )
 

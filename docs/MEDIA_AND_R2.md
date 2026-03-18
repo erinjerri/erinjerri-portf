@@ -56,11 +56,11 @@ R2_PUBLIC_READS=true
 
 This uses the direct R2 S3 URL, which is typically not publicly readable. Prefer Option A or B.
 
-## Substack sync and images
+## Substack, Medium, and Paragraph sync images
 
-When syncing Substack posts with `downloadImages: true`, the sync:
+When syncing Substack, Medium, or Paragraph posts with image downloads enabled, the sync:
 
-1. Downloads images from Substack CDN
+1. Downloads source images from the origin CDN
 2. Creates Media documents via `payload.create`
 3. Stores files in `public/media` (local) or R2 (when enabled)
 4. Rewrites post HTML so Lexical creates Upload nodes referencing those Media docs
@@ -68,6 +68,8 @@ When syncing Substack posts with `downloadImages: true`, the sync:
 If images appear as **links** instead of embedded media, the image download is failing (Substack CDN may block Node’s default fetch). Try:
 
 - `DEBUG_SUBSTACK_SYNC=true pnpm sync:substack` to see which URLs fail
+- `DEBUG_MEDIUM_SYNC=true pnpm sync:medium` to see which Medium image URLs fail
+- `DEBUG_PARAGRAPH_SYNC=true pnpm sync:paragraph` to see which Paragraph image URLs fail
 - Running sync with the dev server and using the image proxy (if implemented)
 
 ## File flow summary

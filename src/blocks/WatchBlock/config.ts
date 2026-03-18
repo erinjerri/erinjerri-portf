@@ -36,7 +36,7 @@ export const WatchBlock: Block = {
     {
       name: 'limit',
       type: 'number',
-      defaultValue: 10,
+      defaultValue: 100,
       label: 'Limit',
       admin: {
         step: 1,

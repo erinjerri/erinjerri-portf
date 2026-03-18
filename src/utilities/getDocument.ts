@@ -1,22 +1,22 @@
 import type { Config } from 'src/payload-types'
 
 import { unstable_cache } from 'next/cache'
-import { getPayloadClient } from './getPayloadClient'
+import { withPayloadClientRetry } from './getPayloadClient'
 
 type Collection = keyof Config['collections']
 
 async function getDocument(collection: Collection, slug: string, depth = 0) {
-  const payload = await getPayloadClient()
-
-  const page = await payload.find({
-    collection,
-    depth,
-    where: {
-      slug: {
-        equals: slug,
+  const page = await withPayloadClientRetry((payload) =>
+    payload.find({
+      collection,
+      depth,
+      where: {
+        slug: {
+          equals: slug,
+        },
       },
-    },
-  })
+    }),
+  )
 
   return page.docs[0]
 }

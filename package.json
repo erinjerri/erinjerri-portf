@@ -31,6 +31,8 @@
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "sync:substack": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/sync-substack.ts",
+    "sync:medium": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/sync-medium.ts",
+    "sync:paragraph": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/sync-paragraph.ts",
     "compress:media": "tsx src/scripts/compress-media.ts",
     "duplicate:post-to-watch": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx scripts/duplicate-post-to-watch.ts",
     "upload:media": "tsx src/scripts/upload-media-to-r2.ts"

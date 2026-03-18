@@ -18,9 +18,11 @@ export const ArchiveBlock: React.FC<
   const { categories, id, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
   const { isEnabled: isDraftMode } = await draftMode()
 
-  const limit = limitFromProps || 3
-
   const relationTo = (props.relationTo || 'posts') as CardRelationTo
+  const limit =
+    relationTo === 'watch'
+      ? Math.max(limitFromProps ?? 100, 100)
+      : limitFromProps ?? 24
 
   let docs: (Post | Project)[] = []
 

@@ -263,12 +263,56 @@ export const Posts: CollectionConfig<'posts'> = {
       },
     },
     {
+      name: 'mediumId',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Medium post GUID for sync deduplication. Set by sync-medium script.',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'mediumURL',
+      type: 'text',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Original Medium post URL. Set by Medium sync.',
+        readOnly: true,
+        condition: (data) => Boolean(data?.mediumId),
+      },
+    },
+    {
+      name: 'paragraphId',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Paragraph post ID for sync deduplication. Set by sync-paragraph script.',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'paragraphURL',
+      type: 'text',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Original Paragraph post URL. Set by Paragraph sync.',
+        readOnly: true,
+        condition: (data) => Boolean(data?.paragraphId),
+      },
+    },
+    {
       name: 'crosspostReviewStatus',
       type: 'select',
       admin: {
         position: 'sidebar',
-        description: 'Cross-post workflow status for imported Substack posts.',
-        condition: (data) => Boolean(data?.substackId),
+        description: 'Cross-post workflow status for imported external posts.',
+        condition: (data) => Boolean(data?.substackId || data?.mediumId || data?.paragraphId),
       },
       options: [
         { label: 'In review', value: 'in_review' },

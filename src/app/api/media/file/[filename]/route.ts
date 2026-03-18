@@ -124,15 +124,19 @@ export async function GET(
 
   // Payload S3/R2 storage may use encoded filenames in keys; try multiple variants
   const encodedFilename = encodeURIComponent(cleanFilename)
+  const spaceAsPlus = cleanFilename.replace(/ /g, '+')
   const candidateKeys = Array.from(
     new Set([
       // Payload storage: prefix/encodedFilename (e.g. media/Lightbulb%20Icon.png)
       R2_MEDIA_PREFIX ? `${R2_MEDIA_PREFIX}/${encodedFilename}` : encodedFilename,
       // Prefix with raw filename
       R2_MEDIA_PREFIX ? `${R2_MEDIA_PREFIX}/${cleanFilename}` : cleanFilename,
+      // Space as + (some systems)
+      R2_MEDIA_PREFIX ? `${R2_MEDIA_PREFIX}/${spaceAsPlus}` : spaceAsPlus,
       // Bucket root
       cleanFilename,
       encodedFilename,
+      spaceAsPlus,
     ]),
   )
 

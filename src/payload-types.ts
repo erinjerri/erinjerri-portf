@@ -137,6 +137,8 @@ export interface Config {
   jobs: {
     tasks: {
       substackSync: TaskSubstackSync;
+      mediumSync: TaskMediumSync;
+      paragraphSync: TaskParagraphSync;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -411,7 +413,23 @@ export interface Post {
    */
   substackURL?: string | null;
   /**
-   * Cross-post workflow status for imported Substack posts.
+   * Medium post GUID for sync deduplication. Set by sync-medium script.
+   */
+  mediumId?: string | null;
+  /**
+   * Original Medium post URL. Set by Medium sync.
+   */
+  mediumURL?: string | null;
+  /**
+   * Paragraph post ID for sync deduplication. Set by sync-paragraph script.
+   */
+  paragraphId?: string | null;
+  /**
+   * Original Paragraph post URL. Set by Paragraph sync.
+   */
+  paragraphURL?: string | null;
+  /**
+   * Cross-post workflow status for imported external posts.
    */
   crosspostReviewStatus?: ('in_review' | 'approved' | 'rejected' | 'auto_published') | null;
   populatedAuthors?:
@@ -1502,7 +1520,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'substackSync' | 'schedulePublish';
+        taskSlug: 'inline' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1535,7 +1553,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'substackSync' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1897,6 +1915,10 @@ export interface PostsSelect<T extends boolean = true> {
   videoAsset?: T;
   substackId?: T;
   substackURL?: T;
+  mediumId?: T;
+  mediumURL?: T;
+  paragraphId?: T;
+  paragraphURL?: T;
   crosspostReviewStatus?: T;
   populatedAuthors?:
     | T
@@ -2787,6 +2809,22 @@ export interface CollectionsWidget {
  * via the `definition` "TaskSubstackSync".
  */
 export interface TaskSubstackSync {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskMediumSync".
+ */
+export interface TaskMediumSync {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskParagraphSync".
+ */
+export interface TaskParagraphSync {
   input?: unknown;
   output?: unknown;
 }

@@ -6,10 +6,9 @@ import { unstable_cache } from 'next/cache'
 import React, { cache } from 'react'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { HeroImagePreload } from '@/components/HeroImagePreload'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
-import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
@@ -84,7 +83,6 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   return (
     <>
-      <HeroImagePreload hero={hero} />
       <article className="pt-16 pb-24">
         <PageClient />
 
@@ -132,19 +130,18 @@ const getPageBySlug = cache(async (slug: string, draft: boolean) => {
   }
 
   const getCached = unstable_cache(
-    async () => {
-      const payload = await getPayloadClient()
-      const result = await payload.find({
-        collection: 'pages',
-        depth: 2,
-        draft: false,
-        limit: 1,
-        pagination: false,
-        overrideAccess: false,
-        where: { slug: { equals: slug } },
-      })
-      return result.docs?.[0] ?? null
-    },
+    async () =>
+      withPayloadClientRetry((payload) =>
+        payload.find({
+          collection: 'pages',
+          depth: 2,
+          draft: false,
+          limit: 1,
+          pagination: false,
+          overrideAccess: false,
+          where: { slug: { equals: slug } },
+        }),
+      ).then((result) => result.docs?.[0] ?? null),
     ['page', slug, 'depth-2'],
     { revalidate: 60, tags: [`page_${slug}`] },
   )

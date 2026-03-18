@@ -1,7 +1,7 @@
 import type { Config } from 'src/payload-types'
 
 import { unstable_cache } from 'next/cache'
-import { getPayloadClient } from './getPayloadClient'
+import { withPayloadClientRetry } from './getPayloadClient'
 
 type Global = keyof Config['globals']
 
@@ -26,12 +26,12 @@ async function getGlobal(slug: Global, depth = 0): Promise<unknown> {
   }
 
   const startedAt = Date.now()
-  const payload = await getPayloadClient()
-
-  const global = await payload.findGlobal({
-    slug,
-    depth,
-  })
+  const global = await withPayloadClientRetry((payload) =>
+    payload.findGlobal({
+      slug,
+      depth,
+    }),
+  )
 
   if (process.env.NODE_ENV === 'development') {
     const elapsedMs = Date.now() - startedAt

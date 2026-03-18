@@ -18,7 +18,7 @@ export const WatchBlockComponent: React.FC<Props> = async (props) => {
       categories={categories as any}
       id={id}
       introContent={introContent as any}
-      limit={limit ?? 10}
+      limit={limit ?? 100}
       populateBy="collection"
       relationTo="watch"
     />
