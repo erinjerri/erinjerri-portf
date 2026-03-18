@@ -7,6 +7,7 @@ import React, { Fragment } from 'react'
 import type { Media as MediaType } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { Button } from '@/components/ui/button'
 import { getDocumentUrl } from '@/utilities/getDocumentUrl'
 
 type CardCategory = {
@@ -25,12 +26,23 @@ type SlidesDoc = {
   title?: string | null
 }
 
+type CardVideoLink = {
+  type?: 'default' | 'custom' | 'reference' | null
+  url?: string | null
+  reference?: { slug?: string | null; relationTo?: string } | string | null
+  label?: string | null
+  newTab?: boolean | null
+}
+
 export type CardDocData = {
   categories?: (number | string | CardCategory | null)[] | null
   meta?: CardMeta | null
   slug?: string | null
   title?: string | null
   slides?: number | string | SlidesDoc | null
+  videoUrl?: string | null
+  videoSource?: 'upload' | 'url' | null
+  cardVideoLink?: CardVideoLink | null
 }
 
 export type CardRelationTo = 'posts' | 'projects' | 'watch'
@@ -46,7 +58,8 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo = 'posts', showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title, slides } = doc || {}
+  const { slug, categories, meta, title, slides, videoUrl, videoSource, cardVideoLink } =
+    doc || {}
   const { description, image: metaImage } = meta || {}
 
   const hasCategories = categories && Array.isArray(categories) && categories.length > 0
@@ -63,6 +76,41 @@ export const Card: React.FC<{
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
   const href = `/${relationTo}/${slug}`
   const isWatch = relationTo === 'watch'
+
+  const resolveVideoLink = (): { url: string; label: string; newTab: boolean } | null => {
+    const cvl = cardVideoLink
+    const defaultLabel = cvl?.label?.trim() || 'Watch video'
+    const newTab = Boolean(cvl?.newTab)
+
+    if (cvl?.type === 'custom' && cvl.url?.trim()) {
+      return { url: cvl.url.trim(), label: defaultLabel, newTab }
+    }
+    if (cvl?.type === 'reference' && cvl.reference && typeof cvl.reference === 'object') {
+      const ref = cvl.reference as { slug?: string | null; relationTo?: string }
+      const refSlug = ref.slug
+      if (refSlug) {
+        const base = ref.relationTo === 'pages' ? '' : `/${ref.relationTo || 'watch'}`
+        return { url: `${base}/${refSlug}`.replace(/^\/\//, '/'), label: defaultLabel, newTab }
+      }
+    }
+    if (cvl?.type === 'default' || !cvl?.type) {
+      if (videoSource === 'url' && videoUrl?.trim()) {
+        return { url: videoUrl.trim(), label: defaultLabel, newTab }
+      }
+      if (slug) {
+        return { url: href, label: defaultLabel, newTab: false }
+      }
+    }
+    if (!cvl && (videoSource === 'url' ? videoUrl?.trim() : slug)) {
+      return {
+        url: videoSource === 'url' && videoUrl?.trim() ? videoUrl.trim() : href,
+        label: defaultLabel,
+        newTab: videoSource === 'url',
+      }
+    }
+    return null
+  }
+  const videoLink = isWatch ? resolveVideoLink() : null
 
   return (
     <article
@@ -134,18 +182,31 @@ export const Card: React.FC<{
           </div>
         )}
         {description && <div className="mt-2">{description && <p>{sanitizedDescription}</p>}</div>}
-        {relationTo === 'watch' && slidesPdfUrl && (
-          <div className="mt-4">
-            <a
-              href={slidesPdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              className="text-sky-500 hover:text-sky-400 hover:underline font-medium transition-colors"
-            >
-              Download slides
-              <span aria-hidden> →</span>
-            </a>
+        {relationTo === 'watch' && (slidesPdfUrl || videoLink) && (
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            {videoLink && (
+              <Button asChild size="sm" variant="default">
+                <Link
+                  href={videoLink.url}
+                  {...(videoLink.newTab && { target: '_blank', rel: 'noopener noreferrer' })}
+                  prefetch={!videoLink.newTab}
+                >
+                  {videoLink.label}
+                </Link>
+              </Button>
+            )}
+            {slidesPdfUrl && (
+              <Button asChild size="sm" variant="light">
+                <a
+                  href={slidesPdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                >
+                  Download slides
+                </a>
+              </Button>
+            )}
           </div>
         )}
       </div>

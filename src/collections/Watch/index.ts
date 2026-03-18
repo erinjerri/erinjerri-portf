@@ -242,6 +242,52 @@ export const Watch: CollectionConfig = {
       },
     },
     {
+      name: 'cardVideoLink',
+      type: 'group',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Video link shown on the card next to "Download slides". Leave empty to use the external video URL or the watch page.',
+      },
+      fields: [
+        {
+          name: 'type',
+          type: 'radio',
+          defaultValue: 'default',
+          options: [
+            { label: 'Default (external URL or watch page)', value: 'default' },
+            { label: 'Custom URL', value: 'custom' },
+            { label: 'Internal page', value: 'reference' },
+          ],
+        },
+        {
+          name: 'url',
+          type: 'text',
+          admin: { condition: (_, siblingData) => siblingData?.type === 'custom' },
+          label: 'URL',
+        },
+        {
+          name: 'reference',
+          type: 'relationship',
+          relationTo: ['pages', 'posts', 'watch'],
+          admin: { condition: (_, siblingData) => siblingData?.type === 'reference' },
+          label: 'Page to link to',
+        },
+        {
+          name: 'label',
+          type: 'text',
+          admin: { description: 'Button label (default: "Watch video")' },
+          label: 'Label',
+        },
+        {
+          name: 'newTab',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Open in new tab',
+        },
+      ],
+    },
+    {
       name: 'populatedAuthors',
       type: 'array',
       access: {

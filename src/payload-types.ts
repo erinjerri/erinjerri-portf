@@ -946,6 +946,31 @@ export interface Watch {
    * Optional PDF slides for this talk. Visitors can view or download.
    */
   slides?: (string | null) | Document;
+  /**
+   * Video link shown on the card next to "Download slides". Leave empty to use the external video URL or the watch page.
+   */
+  cardVideoLink?: {
+    type?: ('default' | 'custom' | 'reference') | null;
+    url?: string | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null)
+      | ({
+          relationTo: 'watch';
+          value: string | Watch;
+        } | null);
+    /**
+     * Button label (default: "Watch video")
+     */
+    label?: string | null;
+    newTab?: boolean | null;
+  };
   populatedAuthors?:
     | {
         id?: string | null;
@@ -1929,6 +1954,15 @@ export interface WatchSelect<T extends boolean = true> {
   videoUrl?: T;
   videoAsset?: T;
   slides?: T;
+  cardVideoLink?:
+    | T
+    | {
+        type?: T;
+        url?: T;
+        reference?: T;
+        label?: T;
+        newTab?: T;
+      };
   populatedAuthors?:
     | T
     | {
