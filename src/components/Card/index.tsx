@@ -62,18 +62,40 @@ export const Card: React.FC<{
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
   const href = `/${relationTo}/${slug}`
+  const isWatch = relationTo === 'watch'
 
   return (
     <article
       className={cn(
-        'rounded-lg overflow-hidden border border-white/30 bg-[linear-gradient(180deg,rgba(186,230,253,0.24),rgba(56,189,248,0.12))] backdrop-blur-lg shadow-[0_10px_30px_rgba(8,47,73,0.28)] transition-colors hover:cursor-pointer hover:border-cyan-200/70',
+        'group rounded-lg overflow-hidden border border-white/30 bg-[linear-gradient(180deg,rgba(186,230,253,0.24),rgba(56,189,248,0.12))] backdrop-blur-lg shadow-[0_10px_30px_rgba(8,47,73,0.28)] transition-colors hover:cursor-pointer hover:border-cyan-200/70',
         className,
       )}
       ref={card.ref}
     >
-      <div className="relative w-full ">
+      <div className="relative w-full">
         {!metaImage && <div className="">No image</div>}
         {metaImage && typeof metaImage !== 'string' && <Media resource={metaImage} size="33vw" />}
+        {isWatch && metaImage && (
+          <>
+            <div className="pointer-events-none absolute inset-0 bg-black/35 transition-opacity duration-300 group-hover:opacity-45" />
+            <Link
+              aria-label={`Play video${titleToUse ? `: ${titleToUse}` : ''}`}
+              className="absolute inset-0 flex items-center justify-center"
+              href={href}
+            >
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/90 ring-1 ring-white/60 backdrop-blur-sm transition-transform duration-200 group-hover:scale-105">
+                <svg
+                  aria-hidden
+                  className="h-5 w-5 translate-x-[1px]"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 8.5v7l7-3.5-7-3.5z" />
+                </svg>
+              </span>
+            </Link>
+          </>
+        )}
       </div>
       <div className="p-4">
         {showCategories && hasCategories && (

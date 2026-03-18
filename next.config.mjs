@@ -56,12 +56,15 @@ const r2Hosts = Array.from(
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    optimizePackageImports: [
-      '@radix-ui/react-checkbox',
-      '@radix-ui/react-label',
-      '@radix-ui/react-select',
-      '@radix-ui/react-slot',
-    ],
+    optimizePackageImports:
+      process.env.NODE_ENV === 'development'
+        ? []
+        : [
+            '@radix-ui/react-checkbox',
+            '@radix-ui/react-label',
+            '@radix-ui/react-select',
+            '@radix-ui/react-slot',
+          ],
   },
   images: {
     // Make sure image optimization stays enabled (some wrappers/platform presets toggle this).
