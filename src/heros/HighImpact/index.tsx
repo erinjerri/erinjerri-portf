@@ -45,14 +45,14 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         </div>
       )}
 
-      {/* Content grid: text left, portrait right on desktop; text then portrait on mobile */}
-      <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-16 lg:grid-cols-2 lg:gap-12 lg:px-8">
+      {/* Content grid: text left, portrait right on xl+; portrait on top centered on mobile/tablet */}
+      <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-16 xl:grid-cols-2 xl:gap-12 xl:px-8">
         {/* Text block */}
-        <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
+        <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
           <div className="max-w-[36.5rem]">
             {richText && <RichText className="mb-6" data={richText} enableGutter={false} />}
             {Array.isArray(links) && links.length > 0 && (
-              <ul className="flex flex-wrap justify-center gap-4 md:justify-start">
+              <ul className="flex flex-wrap justify-center gap-4 xl:justify-start">
                 {links.map(({ link }, i) => (
                   <li key={i}>
                     <CMSLink {...link} />
@@ -65,11 +65,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
         {/* Portrait: show whenever we have media; background uses backgroundMedia when set, else media */}
         {hasPortrait && (
-          <div className="order-1 flex min-h-[200px] justify-center lg:order-2 lg:min-h-0">
-            <div className="relative h-[220px] w-full max-w-[220px] sm:h-[260px] sm:max-w-[260px] lg:h-[320px] lg:max-w-[320px]">
+          <div className="order-1 flex min-h-[200px] justify-center xl:order-2 xl:min-h-0">
+            <div className="relative h-[220px] w-full max-w-[220px] sm:h-[260px] sm:max-w-[260px] xl:h-[320px] xl:max-w-[320px]">
               <Media
                 fill
-                imgClassName="object-contain object-bottom"
+                imgClassName="object-contain object-top xl:object-center"
                 pictureClassName="relative block h-full w-full"
                 priority
                 resource={media}

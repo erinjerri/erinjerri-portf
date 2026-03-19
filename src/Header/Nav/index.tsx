@@ -93,7 +93,7 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
 
       <div
         className={cn(
-          'md:hidden fixed inset-0 z-40 transition-transform duration-300 ease-in-out',
+          'md:hidden fixed inset-0 z-40 bg-[#0a0b10] transition-transform duration-300 ease-in-out',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
@@ -101,8 +101,9 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
           className="absolute inset-0 bg-[#0a0b10]"
           onClick={() => setMobileOpen(false)}
           aria-hidden
+          style={{ backgroundColor: '#0a0b10' }}
         />
-        <div className="relative z-10 h-full w-[85%] max-w-sm bg-[#0a0b10] border-r border-white/10 p-6 flex flex-col shadow-2xl">
+        <div className="relative z-10 h-full w-[85%] max-w-sm border-r border-white/10 p-6 flex flex-col shadow-2xl" style={{ backgroundColor: '#0a0b10' }}>
           <div className="flex items-center justify-between mb-8">
             <span className="text-xl font-semibold text-white">Menu</span>
             <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu">
