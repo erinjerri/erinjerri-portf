@@ -1,5 +1,5 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
-import { revalidateTag } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 /**
  * Revalidate footer cache when media changes.
@@ -11,9 +11,11 @@ export const revalidateFooterOnMediaChange: CollectionAfterChangeHook = ({
 }) => {
   if (context?.disableRevalidate) return
 
-  payload.logger.info('[Media] Revalidating footer (media changed)')
+  payload.logger.info('[Media] Revalidating footer and home page (media changed)')
   try {
     revalidateTag('global_footer')
+    revalidateTag('page_home')
+    revalidatePath('/')
   } catch (err) {
     const msg = String((err as Error)?.message || err)
     if (!msg.includes('static generation store')) {
@@ -27,9 +29,11 @@ export const revalidateFooterOnMediaDelete: CollectionAfterDeleteHook = ({
 }) => {
   if (context?.disableRevalidate) return
 
-  payload.logger.info('[Media] Revalidating footer (media deleted)')
+  payload.logger.info('[Media] Revalidating footer and home page (media deleted)')
   try {
     revalidateTag('global_footer')
+    revalidateTag('page_home')
+    revalidatePath('/')
   } catch (err) {
     const msg = String((err as Error)?.message || err)
     if (!msg.includes('static generation store')) {

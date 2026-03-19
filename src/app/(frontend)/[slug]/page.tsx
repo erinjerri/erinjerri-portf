@@ -129,21 +129,27 @@ const getPageBySlug = cache(async (slug: string, draft: boolean) => {
     return result.docs?.[0] ?? null
   }
 
-  const getCached = unstable_cache(
-    async () =>
-      withPayloadClientRetry((payload) =>
-        payload.find({
-          collection: 'pages',
-          depth: 2,
-          draft: false,
-          limit: 1,
-          pagination: false,
-          overrideAccess: false,
-          where: { slug: { equals: slug } },
-        }),
-      ).then((result) => result.docs?.[0] ?? null),
-    ['page', slug, 'depth-2'],
-    { revalidate: 60, tags: [`page_${slug}`] },
-  )
+  const fetchPage = async () =>
+    withPayloadClientRetry((payload) =>
+      payload.find({
+        collection: 'pages',
+        depth: 2,
+        draft: false,
+        limit: 1,
+        pagination: false,
+        overrideAccess: false,
+        where: { slug: { equals: slug } },
+      }),
+    ).then((result) => result.docs?.[0] ?? null)
+
+  if (process.env.NODE_ENV === 'development') {
+    return fetchPage()
+  }
+
+  const getCached = unstable_cache(fetchPage, ['page', slug, 'depth-2'], {
+    revalidate: 60,
+    tags: [`page_${slug}`],
+  })
+
   return getCached()
 })

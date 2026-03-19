@@ -49,6 +49,8 @@ async function getGlobal(slug: Global, depth = 0): Promise<unknown> {
  * Returns a unstable_cache function mapped with the cache tag for the slug
  */
 export const getCachedGlobal = (slug: Global, depth = 0) =>
-  unstable_cache(async () => getGlobal(slug, depth), [slug, String(depth)], {
-    tags: [`global_${slug}`],
-  })
+  process.env.NODE_ENV === 'development'
+    ? async () => getGlobal(slug, depth)
+    : unstable_cache(async () => getGlobal(slug, depth), [slug, String(depth)], {
+        tags: [`global_${slug}`],
+      })
