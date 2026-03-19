@@ -85,10 +85,22 @@ export const hero: Field = {
       },
     }),
     {
+      name: 'backgroundMedia',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description: 'Background image (e.g. neural gradient). Falls back to CSS gradient if empty.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Background Image',
+    },
+    {
       name: 'media',
       type: 'upload',
       admin: {
         condition: (_, { type } = {}) => ['highImpact', 'mediumImpact', 'topline'].includes(type),
+        description: 'High Impact: portrait/foreground image. Other types: main media.',
       },
       filterOptions: ({ data }) => {
         if (data?.hero?.type === 'topline') {

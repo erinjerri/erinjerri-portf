@@ -222,6 +222,13 @@ export interface Page {
           id?: string | null;
         }[]
       | null;
+    /**
+     * Background image (e.g. neural gradient). Falls back to CSS gradient if empty.
+     */
+    backgroundMedia?: (string | null) | Media;
+    /**
+     * High Impact: portrait/foreground image. Other types: main media.
+     */
     media?: (string | null) | Media;
   };
   layout: (
@@ -1666,6 +1673,7 @@ export interface PagesSelect<T extends boolean = true> {
                   };
               id?: T;
             };
+        backgroundMedia?: T;
         media?: T;
       };
   layout?:

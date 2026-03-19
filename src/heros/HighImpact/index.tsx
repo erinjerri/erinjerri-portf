@@ -7,33 +7,77 @@ import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
-export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
+type HeroProps = Page['hero'] & { backgroundMedia?: Page['hero']['media'] }
+
+export const HighImpactHero: React.FC<HeroProps> = ({
+  links,
+  media,
+  richText,
+  backgroundMedia,
+}) => {
+  const hasBackground =
+    backgroundMedia && typeof backgroundMedia === 'object'
+  const hasPortrait = media && typeof media === 'object'
+  const backgroundImage = hasBackground ? backgroundMedia : hasPortrait ? media : null
+
   return (
     <div
-      className="relative -mt-[6.75rem] md:-mt-[10.4rem] flex items-center justify-center text-foreground w-full min-h-[60vh] overflow-hidden"
+      className="relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] w-full overflow-hidden text-foreground"
       data-theme="dark"
     >
       <HeaderThemeSetter theme="dark" />
-      {media && typeof media === 'object' && (
-        <div className="absolute inset-0">
-          <Media fill priority imgClassName="-z-10 object-cover" pictureClassName="h-full w-full" resource={media} />
+
+      {/* Background: gradient fallback, background image, or media (when no separate background) */}
+      <div
+        className="absolute inset-0 -z-10 bg-gradient-to-br from-[#000815] via-[#0c1633] to-[#020712]"
+        aria-hidden
+      />
+      {backgroundImage && (
+        <div className="absolute inset-0 -z-10">
+          <Media
+            fill
+            className="absolute inset-0 h-full w-full"
+            imgClassName="object-cover"
+            pictureClassName="relative block h-full w-full"
+            priority
+            resource={backgroundImage}
+          />
         </div>
       )}
-      <div className="container mb-4 z-10 relative flex items-center justify-center">
-        <div className="max-w-[36.5rem] md:text-center">
-          {richText && <RichText className="mb-6" data={richText} enableGutter={false} />}
-          {Array.isArray(links) && links.length > 0 && (
-            <ul className="flex md:justify-center gap-4">
-              {links.map(({ link }, i) => {
-                return (
+
+      {/* Content grid: text left, portrait right on desktop; text then portrait on mobile */}
+      <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-16 lg:grid-cols-2 lg:gap-12 lg:px-8">
+        {/* Text block */}
+        <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
+          <div className="max-w-[36.5rem]">
+            {richText && <RichText className="mb-6" data={richText} enableGutter={false} />}
+            {Array.isArray(links) && links.length > 0 && (
+              <ul className="flex flex-wrap justify-center gap-4 md:justify-start">
+                {links.map(({ link }, i) => (
                   <li key={i}>
                     <CMSLink {...link} />
                   </li>
-                )
-              })}
-            </ul>
-          )}
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
+
+        {/* Portrait: show whenever we have media; background uses backgroundMedia when set, else media */}
+        {hasPortrait && (
+          <div className="order-1 flex min-h-[200px] justify-center lg:order-2 lg:min-h-0">
+            <div className="relative h-[220px] w-full max-w-[220px] sm:h-[260px] sm:max-w-[260px] lg:h-[320px] lg:max-w-[320px]">
+              <Media
+                fill
+                imgClassName="object-contain object-bottom"
+                pictureClassName="relative block h-full w-full"
+                priority
+                resource={media}
+                size="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

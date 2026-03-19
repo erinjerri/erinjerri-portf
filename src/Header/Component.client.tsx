@@ -49,7 +49,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
       className={cn(
         'sticky top-0 z-50 w-full border-b transition-all duration-300',
         scrolled
-          ? 'bg-background/70 backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]'
+          ? 'bg-[#0a0b10]/95 backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
           : 'bg-transparent border-transparent',
       )}
       {...(theme ? { 'data-theme': theme } : {})}

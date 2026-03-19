@@ -63,7 +63,7 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
             <span key={id}>
               <CMSLink
                 {...link}
-                prefetch={false}
+                prefetch={true}
                 appearance="inline"
                 className={cn(
                   'rounded px-3 py-2 transition-colors font-semibold',
@@ -97,8 +97,12 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <div className="absolute inset-0 bg-black/80" onClick={() => setMobileOpen(false)} />
-        <div className="relative h-full w-4/5 max-w-sm bg-[#0a0b10] border-r border-white/15 p-6 flex flex-col">
+        <div
+          className="absolute inset-0 bg-[#0a0b10]"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden
+        />
+        <div className="relative z-10 h-full w-[85%] max-w-sm bg-[#0a0b10] border-r border-white/10 p-6 flex flex-col shadow-2xl">
           <div className="flex items-center justify-between mb-8">
             <span className="text-xl font-semibold text-white">Menu</span>
             <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu">
@@ -111,24 +115,25 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
               const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
 
               return (
-                <CMSLink
-                  key={id}
-                  {...link}
-                  prefetch={false}
-                  appearance="inline"
-                  className={cn(
-                    'rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold transition-colors',
-                    isActive
-                      ? 'bg-white/15 text-white'
-                      : 'text-white/80 hover:bg-white/10 hover:text-white',
-                  )}
-                />
+                <div key={id} onClick={() => setMobileOpen(false)}>
+                  <CMSLink
+                    {...link}
+                    prefetch={true}
+                    appearance="inline"
+                    className={cn(
+                      'block rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold transition-colors',
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'text-white hover:bg-white/10',
+                    )}
+                  />
+                </div>
               )
             })}
 
             <Link
               href="/search"
-              className="mt-4 rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="mt-4 block rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold text-white hover:bg-white/10 transition-colors"
               onClick={() => setMobileOpen(false)}
             >
               Search
