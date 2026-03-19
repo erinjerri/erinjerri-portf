@@ -1,6 +1,6 @@
 'use client'
 
-import '@lexical/list'
+import '@payloadcms/richtext-lexical/lexical/list'
 
 export default function LoadLexicalList() {
   return null

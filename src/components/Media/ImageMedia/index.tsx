@@ -85,9 +85,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const disableOptimization = false
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
-  // Keep mobile transfers smaller: hero images stay reasonably sharp, while non-critical
-  // images compress more aggressively for PageSpeed/LCP.
-  const quality = fill && priority ? 75 : priority ? 70 : 60
+  // Hero images (fill+priority): quality 90 for sharpness; non-priority grid: 60.
+  const quality = fill && priority ? 90 : priority ? 70 : 60
 
   // Use Payload focal point for object-position when using fill (hero images).
   // Set focalX/focalY in Payload admin (Media → edit image → focal point) to keep faces visible on mobile.

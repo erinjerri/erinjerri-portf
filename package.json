@@ -11,6 +11,7 @@
     "build:turbo": "cross-env NODE_OPTIONS=--no-deprecation next build --turbo",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "node scripts/ensureMiddlewareManifest.js && cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev:turbo": "node scripts/ensureMiddlewareManifest.js && cross-env NODE_OPTIONS=--no-deprecation next dev --turbo",
     "dev:fast": "node scripts/ensureMiddlewareManifest.js && cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next dev",
     "dev:clean": "rm -rf .next",
     "dev:reset": "lsof -ti :3000 | xargs kill 2>/dev/null || true; pnpm dev",

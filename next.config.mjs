@@ -56,17 +56,14 @@ const r2Hosts = Array.from(
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    // Inline critical CSS to reduce render-blocking (est. 440ms savings). Experimental.
-    inlineCss: true,
-    optimizePackageImports:
-      process.env.NODE_ENV === 'development'
-        ? []
-        : [
-            '@radix-ui/react-checkbox',
-            '@radix-ui/react-label',
-            '@radix-ui/react-select',
-            '@radix-ui/react-slot',
-          ],
+    // Inline critical CSS in prod only; skip in dev to speed up compilation.
+    inlineCss: process.env.NODE_ENV !== 'development',
+    optimizePackageImports: [
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-label',
+      '@radix-ui/react-select',
+      '@radix-ui/react-slot',
+    ],
   },
   images: {
     // Make sure image optimization stays enabled (some wrappers/platform presets toggle this).
