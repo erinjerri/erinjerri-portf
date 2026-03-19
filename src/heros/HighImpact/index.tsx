@@ -37,7 +37,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           <Media
             fill
             className="absolute inset-0 h-full w-full"
-            imgClassName="object-cover"
+            imgClassName="object-cover object-[50%_22%] md:object-center"
             pictureClassName="relative block h-full w-full"
             priority
             resource={backgroundImage}
