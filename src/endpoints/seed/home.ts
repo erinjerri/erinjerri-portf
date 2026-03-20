@@ -2,12 +2,16 @@ import type { RequiredDataFromCollectionSlug } from 'payload'
 import type { Media } from '@/payload-types'
 
 type HomeArgs = {
-  heroImage: Media
+  heroImage1: Media
+  heroImage2: Media
+  heroImage3: Media
   metaImage: Media
 }
 
 export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
-  heroImage,
+  heroImage1,
+  heroImage2,
+  heroImage3,
   metaImage,
 }) => {
   return {
@@ -33,7 +37,9 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
           },
         },
       ],
-      media: heroImage.id,
+      heroImage1: heroImage1.id,
+      heroImage2: heroImage2.id,
+      heroImage3: heroImage3.id,
       richText: {
         root: {
           type: 'root',
@@ -69,7 +75,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                       format: 0,
                       mode: 'normal',
                       style: '',
-                      text: 'Visit the admin dashboard',
+                      text: 'Explore the site',
                       version: 1,
                     },
                   ],
@@ -77,7 +83,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                   fields: {
                     linkType: 'custom',
                     newTab: false,
-                    url: '/admin',
+                    url: '/posts',
                   },
                   format: '',
                   indent: 0,
@@ -89,7 +95,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                   format: 0,
                   mode: 'normal',
                   style: '',
-                  text: " to begin managing this site's content. The code for this template is completely open-source and can be found ",
+                    text: ' to browse recent posts and updates. The code for this site is completely open-source and can be found ',
                   version: 1,
                 },
                 {
@@ -192,7 +198,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                         format: 0,
                         mode: 'normal',
                         style: '',
-                        text: 'Admin Dashboard',
+                        text: 'Featured Work',
                         version: 1,
                       },
                     ],
@@ -211,7 +217,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                         format: 0,
                         mode: 'normal',
                         style: '',
-                        text: "Manage this site's pages and posts from the ",
+                        text: 'Browse this site from the ',
                         version: 1,
                       },
                       {
@@ -223,7 +229,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                             format: 0,
                             mode: 'normal',
                             style: '',
-                            text: 'admin dashboard',
+                            text: 'site editor',
                             version: 1,
                           },
                         ],
@@ -231,7 +237,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                         fields: {
                           linkType: 'custom',
                           newTab: false,
-                          url: '/admin',
+                            url: '/contact',
                         },
                         format: '',
                         indent: 0,
@@ -414,7 +420,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                             format: 0,
                             mode: 'normal',
                             style: '',
-                            text: 'admin dashboard',
+                            text: 'site editor',
                             version: 1,
                           },
                         ],
@@ -422,7 +428,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                         fields: {
                           linkType: 'custom',
                           newTab: false,
-                          url: '/admin',
+                            url: '/contact',
                         },
                         format: '',
                         indent: 0,
@@ -628,7 +634,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                         format: 0,
                         mode: 'normal',
                         style: '',
-                        text: 'configured in the admin dashboard',
+                        text: 'configured in the site editor',
                         version: 1,
                       },
                     ],
@@ -636,7 +642,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                     fields: {
                       linkType: 'custom',
                       newTab: false,
-                      url: '/admin',
+                      url: '/contact',
                     },
                     format: '',
                     indent: 0,
@@ -669,7 +675,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
     ],
     meta: {
       description: 'An open-source website built with Payload and Next.js.',
-      image: heroImage.id,
+      image: metaImage.id,
       title: 'Erin Jerri',
     },
     title: 'Home',

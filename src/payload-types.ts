@@ -223,11 +223,23 @@ export interface Page {
         }[]
       | null;
     /**
-     * Background image (e.g. neural gradient). Falls back to CSS gradient if empty.
+     * Optional background image for the high-impact home hero. Falls back to a CSS gradient if empty.
      */
     backgroundMedia?: (string | null) | Media;
     /**
-     * High Impact: portrait/foreground image. Other types: main media.
+     * Optional top image (wide) for the home hero.
+     */
+    heroImage1?: (string | null) | Media;
+    /**
+     * Optional bottom-left image for the home hero.
+     */
+    heroImage2?: (string | null) | Media;
+    /**
+     * Optional bottom-right image for the home hero.
+     */
+    heroImage3?: (string | null) | Media;
+    /**
+     * Main image for the medium-impact/about hero. Topline also uses this media field.
      */
     media?: (string | null) | Media;
   };
@@ -1674,6 +1686,9 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
             };
         backgroundMedia?: T;
+        heroImage1?: T;
+        heroImage2?: T;
+        heroImage3?: T;
         media?: T;
       };
   layout?:

@@ -89,18 +89,51 @@ export const hero: Field = {
       type: 'upload',
       admin: {
         condition: (_, { type } = {}) => type === 'highImpact',
-        description: 'Background image (e.g. neural gradient). Falls back to CSS gradient if empty.',
+        description: 'Optional background image for the high-impact home hero. Falls back to a CSS gradient if empty.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
       relationTo: 'media',
       label: 'Background Image',
     },
     {
+      name: 'heroImage1',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description: 'Optional top image (wide) for the home hero.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Hero Image 1 (Top)',
+    },
+    {
+      name: 'heroImage2',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description: 'Optional bottom-left image for the home hero.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Hero Image 2 (Bottom Left)',
+    },
+    {
+      name: 'heroImage3',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description: 'Optional bottom-right image for the home hero.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Hero Image 3 (Bottom Right)',
+    },
+    {
       name: 'media',
       type: 'upload',
       admin: {
-        condition: (_, { type } = {}) => ['highImpact', 'mediumImpact', 'topline'].includes(type),
-        description: 'High Impact: portrait/foreground image. Other types: main media.',
+        condition: (_, { type } = {}) => ['mediumImpact', 'topline'].includes(type),
+        description: 'Main image for the medium-impact/about hero. Topline also uses this media field.',
       },
       filterOptions: ({ data }) => {
         if (data?.hero?.type === 'topline') {
@@ -114,7 +147,17 @@ export const hero: Field = {
         return true
       },
       relationTo: 'media',
-      required: true,
+      required: false,
+      validate: (
+        val: unknown,
+        args: { siblingData?: { type?: string } },
+      ) => {
+        const { siblingData } = args
+        if (siblingData?.type === 'mediumImpact' || siblingData?.type === 'topline') {
+          return val != null ? true : 'Media is required.'
+        }
+        return true
+      },
     },
   ],
   label: false,

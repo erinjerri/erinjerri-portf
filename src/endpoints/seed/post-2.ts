@@ -72,7 +72,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                               format: 0,
                               mode: 'normal',
                               style: '',
-                              text: 'navigate to the admin dashboard.',
+                              text: 'read the full article.',
                               version: 1,
                             },
                           ],
@@ -80,7 +80,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                           fields: {
                             linkType: 'custom',
                             newTab: true,
-                            url: '/admin',
+                            url: '/posts',
                           },
                           format: '',
                           indent: 0,

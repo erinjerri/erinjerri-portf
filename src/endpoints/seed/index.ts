@@ -171,14 +171,34 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding media...`)
 
-  const [image1Buffer, image2Buffer, image3Buffer, hero1Buffer] = await Promise.all([
+  const [
+    image1Buffer,
+    image2Buffer,
+    image3Buffer,
+    hero1Buffer,
+    homeHeroTopBuffer,
+    homeHeroBottomLeftBuffer,
+    homeHeroBottomRightBuffer,
+  ] = await Promise.all([
     fetchFileByPath(path.join(dirname, 'image-post1.webp')),
     fetchFileByPath(path.join(dirname, 'image-post2.webp')),
     fetchFileByPath(path.join(dirname, 'image-post3.webp')),
     fetchFileByPath(path.join(dirname, 'image-hero1.webp')),
+    fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'dimensions-background-curves.webp')),
+    fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'Erin-Book-Headshot.webp')),
+    fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'erin-AVP-headshot-95op.png')),
   ])
 
-  const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
+  const [
+    demoAuthor,
+    image1Doc,
+    image2Doc,
+    image3Doc,
+    imageHomeDoc,
+    homeHeroTopDoc,
+    homeHeroBottomLeftDoc,
+    homeHeroBottomRightDoc,
+  ] = await Promise.all([
     payload.create({
       collection: 'users',
       data: {
@@ -210,6 +230,33 @@ export const seed = async ({
       collection: 'media',
       data: imageHero1,
       file: hero1Buffer,
+      req,
+    }),
+    payload.create({
+      collection: 'media',
+      data: {
+        alt: 'Abstract background curves for the homepage hero',
+        mediaType: 'image',
+      },
+      file: homeHeroTopBuffer,
+      req,
+    }),
+    payload.create({
+      collection: 'media',
+      data: {
+        alt: 'Erin holding a book',
+        mediaType: 'image',
+      },
+      file: homeHeroBottomLeftBuffer,
+      req,
+    }),
+    payload.create({
+      collection: 'media',
+      data: {
+        alt: 'Erin wearing an AVP headset',
+        mediaType: 'image',
+      },
+      file: homeHeroBottomRightBuffer,
       req,
     }),
     ...categories.map((category) =>
@@ -299,7 +346,12 @@ export const seed = async ({
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+      data: home({
+        heroImage1: homeHeroTopDoc,
+        heroImage2: homeHeroBottomLeftDoc,
+        heroImage3: homeHeroBottomRightDoc,
+        metaImage: imageHomeDoc,
+      }),
       req,
     }),
     payload.create({
@@ -317,6 +369,13 @@ export const seed = async ({
       slug: 'header',
       data: {
         navItems: [
+          {
+            link: {
+              type: 'custom',
+              label: 'Home',
+              url: '/',
+            },
+          },
           {
             link: {
               type: 'custom',

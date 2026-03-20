@@ -7,9 +7,11 @@ import React from 'react'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
+import { resolveHeroMedia } from '@/heros/resolveHeroMedia'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { VideoEmbed } from '@/components/VideoEmbed'
+import { homeStatic } from '@/endpoints/seed/home-static'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -62,7 +64,9 @@ export default async function Page({ params: paramsPromise }: Args) {
     page = null
   }
 
-  if (!page) {
+  const renderedPage = page ?? (isBuild && decodedSlug === 'home' ? homeStatic : null)
+
+  if (!renderedPage) {
     if (isBuild) {
       // Avoid DB-backed redirects lookup during build when the DB is unavailable.
       return (
@@ -76,7 +80,25 @@ export default async function Page({ params: paramsPromise }: Args) {
     return <PayloadRedirects url={url} />
   }
 
-  const { hero, layout, videoAsset, videoSource, videoUrl } = page
+  const resolvedHero = await resolveHeroMedia(renderedPage.hero)
+
+  const hasHomeGridMedia =
+    decodedSlug === 'home' &&
+    Boolean(
+      resolvedHero?.backgroundMedia ||
+      resolvedHero?.heroImage1 ||
+      resolvedHero?.heroImage2 ||
+      resolvedHero?.heroImage3,
+    )
+
+  const hero = hasHomeGridMedia
+    ? {
+        ...resolvedHero,
+        type: 'highImpact' as const,
+      }
+    : resolvedHero
+
+  const { layout, videoAsset, videoSource, videoUrl } = renderedPage
   const selectedVideo = typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video')
     ? videoAsset
     : null
@@ -89,9 +111,9 @@ export default async function Page({ params: paramsPromise }: Args) {
         {draft && <LivePreviewListener />}
 
         <RenderHero {...hero} />
-      <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
-      <RenderBlocks blocks={layout} />
-    </article>
+        <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
+        <RenderBlocks blocks={layout} />
+      </article>
     </>
   )
 }
@@ -104,11 +126,11 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
   try {
     const page = await getPageBySlug(decodedSlug, draft)
-    return generateMeta({ doc: page })
+    return generateMeta({ doc: page ?? (isBuild && decodedSlug === 'home' ? homeStatic : null) })
   } catch (err) {
     if (!isBuild) throw err
     console.warn('[slug/page] Skipping metadata because DB is unavailable:', err)
-    return generateMeta({ doc: null })
+    return generateMeta({ doc: decodedSlug === 'home' ? homeStatic : null })
   }
 
   // Unreachable

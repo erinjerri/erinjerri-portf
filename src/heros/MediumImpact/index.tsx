@@ -6,22 +6,28 @@ import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
-export const MediumImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
+export const MediumImpactHero: React.FC<Page['hero']> = ({
+  links,
+  media,
+  richText,
+}) => {
+  const heroMedia = media && typeof media === 'object' ? media : null
+
   return (
     <div className="container">
       <div className="flex flex-col md:flex-row md:items-start md:gap-8 lg:gap-10">
         {/* Left: media (book cover) */}
-        {media && typeof media === 'object' && (
+        {heroMedia && (
           <div className="flex-shrink-0 mb-6 md:mb-0 md:w-1/3 lg:w-2/5">
             <Media
               className="w-full max-w-[280px] md:max-w-none"
               imgClassName="object-contain"
               priority
-              resource={media}
+              resource={heroMedia}
             />
-            {media?.caption && (
+            {heroMedia?.caption && (
               <div className="mt-3">
-                <RichText data={media.caption} enableGutter={false} />
+                <RichText data={heroMedia.caption} enableGutter={false} />
               </div>
             )}
           </div>

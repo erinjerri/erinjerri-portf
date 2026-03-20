@@ -27,42 +27,6 @@ const encodePathPreserveQuery = (value: string): string => {
 const toPayloadProxyPath = (value: string): string =>
   value.startsWith('/media/') ? value.replace(/^\/media\//, '/api/media/file/') : value
 
-const MEDIA_PREFIX = (process.env.R2_MEDIA_PREFIX?.trim() || 'media').replace(/^\/+|\/+$/g, '')
-
-const getPublicR2MediaUrl = (filename: string): string | null => {
-  const cleanFilename = filename.replace(/^\/+/, '')
-  const publicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()
-  const publicReads = process.env.R2_PUBLIC_READS === 'true'
-  const accountId = process.env.R2_ACCOUNT_ID?.trim()
-  let normalizedFilename = cleanFilename
-
-  try {
-    let prev = normalizedFilename
-    for (let i = 0; i < 5; i++) {
-      const decoded = decodeURIComponent(prev)
-      if (decoded === prev) break
-      prev = decoded
-    }
-    normalizedFilename = prev
-  } catch {
-    normalizedFilename = cleanFilename
-  }
-
-  const encodedFilename = encodeURIComponent(normalizedFilename)
-  const keyPath = MEDIA_PREFIX ? `${MEDIA_PREFIX}/${encodedFilename}` : encodedFilename
-
-  if (publicHostname) {
-    const base = publicHostname.replace(/^https?:\/\//, '').replace(/\/+$/, '')
-    return `https://${base}/${keyPath}`
-  }
-
-  if (publicReads && accountId) {
-    return `https://${accountId}.r2.cloudflarestorage.com/${keyPath}`
-  }
-
-  return null
-}
-
 const toPayloadFileEndpoint = (value: string): string => {
   // In dev, or when explicitly requested, allow proxy reads for /media paths so
   // images still load when local media files aren't present.
@@ -81,7 +45,6 @@ const isR2Url = (u: string): boolean =>
 
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
-  const forcePayloadProxyReads = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
 
   if (cacheTag && cacheTag !== '') {
     cacheTag = encodeURIComponent(cacheTag)
@@ -93,18 +56,10 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     return `${value}${separator}${cacheTag}`
   }
 
-  // Use proxy for /media/ paths so images load reliably (R2 direct URLs often 404).
+  // Keep /media paths direct by default so static files in public/media work during builds.
+  // Only proxy them when NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=true.
   if (url.startsWith('/media/')) {
-    let filename = url.replace(/^\/media\//, '').split('?')[0]
-    if (filename) {
-      try {
-        filename = decodeURIComponent(filename)
-      } catch {
-        /* keep as-is */
-      }
-      const proxyPath = `/api/media/file/${encodeURIComponent(filename)}`
-      return appendCacheTag(proxyPath)
-    }
+    return appendCacheTag(toPayloadFileEndpoint(url).split('?')[0])
   }
 
   if (url.startsWith('/api/media/file/')) {

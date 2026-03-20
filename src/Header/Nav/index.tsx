@@ -45,12 +45,22 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
   }, [pathname])
 
   const navLinks = useMemo(
-    () =>
-      navItems.map(({ id, link }, i) => ({
-        id: id || String(i),
-        link,
-        href: resolveHref(link),
-      })),
+    () => {
+      const seen = new Set<string>()
+
+      return navItems
+        .map(({ id, link }, i) => ({
+          id: id || String(i),
+          link,
+          href: resolveHref(link),
+        }))
+        .filter(({ href, id }) => {
+          const dedupeKey = normalizePath(href ?? id)
+          if (seen.has(dedupeKey)) return false
+          seen.add(dedupeKey)
+          return true
+        })
+    },
     [navItems],
   )
 
@@ -103,7 +113,10 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
           aria-hidden
           style={{ backgroundColor: '#0a0b10' }}
         />
-        <div className="relative z-10 h-full w-[85%] max-w-sm border-r border-white/10 p-6 flex flex-col shadow-2xl" style={{ backgroundColor: '#0a0b10' }}>
+        <div
+          className="relative z-10 flex h-full w-[85%] max-w-sm flex-col border-r border-white/10 p-6 shadow-2xl"
+          style={{ backgroundColor: '#0a0b10' }}
+        >
           <div className="flex items-center justify-between mb-8">
             <span className="text-xl font-semibold text-white">Menu</span>
             <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu">

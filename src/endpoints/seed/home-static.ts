@@ -5,7 +5,25 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
   slug: 'home',
   _status: 'published',
   hero: {
-    type: 'lowImpact',
+    type: 'highImpact',
+    links: [
+      {
+        link: {
+          type: 'custom',
+          appearance: 'default',
+          label: 'All posts',
+          url: '/posts',
+        },
+      },
+      {
+        link: {
+          type: 'custom',
+          appearance: 'outline',
+          label: 'Contact',
+          url: '/contact',
+        },
+      },
+    ],
     richText: {
       root: {
         type: 'root',
@@ -41,7 +59,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
                     format: 0,
                     mode: 'normal',
                     style: '',
-                    text: 'Visit the admin dashboard',
+                    text: 'Explore the site',
                     version: 1,
                   },
                 ],
@@ -49,7 +67,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
                 fields: {
                   linkType: 'custom',
                   newTab: false,
-                  url: '/admin',
+                  url: '/posts',
                 },
                 format: '',
                 indent: 0,
@@ -61,7 +79,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: ' to make your account and seed content for your website.',
+                  text: ' to browse recent posts and updates.',
                 version: 1,
               },
             ],
