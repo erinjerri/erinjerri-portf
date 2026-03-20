@@ -32,7 +32,7 @@ export default function AnalyticsNavLink() {
 
   return (
     <Link
-      href="/admin/analytics"
+      href="/admin/analytics-dashboard"
       style={{
         display: 'flex',
         alignItems: 'center',

@@ -28,8 +28,8 @@ export function TrafficCard({
         </ul>
       ) : (
         <p style={{ color: 'var(--theme-elevation-500)', margin: 0, fontSize: '0.875rem' }}>
-          Connect GA4 Reporting API for traffic data. Set GA_MEASUREMENT_ID and configure service
-          account.
+          Connect GA4 Reporting API for traffic data. Set NEXT_PUBLIC_GA_MEASUREMENT_ID and your
+          GA4 service account credentials.
         </p>
       )}
     </div>

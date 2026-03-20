@@ -71,6 +71,8 @@ export interface Config {
     posts: Post;
     projects: Project;
     watch: Watch;
+    'analytics-snapshots': AnalyticsSnapshot;
+    'linkedin-metrics': LinkedinMetric;
     media: Media;
     documents: Document;
     categories: Category;
@@ -97,6 +99,8 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     watch: WatchSelect<false> | WatchSelect<true>;
+    'analytics-snapshots': AnalyticsSnapshotsSelect<false> | AnalyticsSnapshotsSelect<true>;
+    'linkedin-metrics': LinkedinMetricsSelect<false> | LinkedinMetricsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
@@ -131,11 +135,15 @@ export interface Config {
   };
   locale: null;
   widgets: {
+    'conversion-overview': ConversionOverviewWidget;
+    'source-performance': SourcePerformanceWidget;
+    'sync-health': SyncHealthWidget;
     collections: CollectionsWidget;
   };
   user: User;
   jobs: {
     tasks: {
+      analyticsSync: TaskAnalyticsSync;
       substackSync: TaskSubstackSync;
       mediumSync: TaskMediumSync;
       paragraphSync: TaskParagraphSync;
@@ -1389,6 +1397,62 @@ export interface ToplineHeaderBlock {
   blockType: 'toplineHeader';
 }
 /**
+ * Normalized analytics metrics for dashboard widgets and conversion reporting.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analytics-snapshots".
+ */
+export interface AnalyticsSnapshot {
+  id: string;
+  provider: 'ga4' | 'linkedin' | 'substack' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'manual';
+  platform: 'linkedin' | 'substack' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'site';
+  metricCategory: 'traffic' | 'engagement' | 'audience' | 'conversion' | 'revenue' | 'health';
+  metricKey: string;
+  metricLabel: string;
+  metricValue: number;
+  snapshotDate: string;
+  timeframe: 'daily' | 'weekly' | 'monthly' | 'lifetime';
+  conversionGoal?:
+    | ('newsletter_signup' | 'affiliate_click' | 'contact_submit' | 'tool_click' | 'book_call' | 'resume_download')
+    | null;
+  entityType?: ('account' | 'post' | 'page' | 'video' | 'newsletter' | 'landing_page' | 'campaign') | null;
+  entityId?: string | null;
+  externalId?: string | null;
+  externalName?: string | null;
+  landingPath?: string | null;
+  campaign?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * LinkedIn follower and engagement metrics synced from the LinkedIn API.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "linkedin-metrics".
+ */
+export interface LinkedinMetric {
+  id: string;
+  /**
+   * Date for this metrics snapshot.
+   */
+  date: string;
+  /**
+   * Total LinkedIn followers.
+   */
+  followers?: number | null;
+  /**
+   * LinkedIn newsletter subscribers.
+   */
+  newsletterSubscribers?: number | null;
+  /**
+   * Total post views for the period.
+   */
+  postViews?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1539,7 +1603,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish';
+        taskSlug: 'inline' | 'analyticsSync' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1572,7 +1636,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'analyticsSync' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1595,6 +1659,14 @@ export interface PayloadJob {
 export interface PayloadLockedDocument {
   id: string;
   document?:
+    | ({
+        relationTo: 'analytics-snapshots';
+        value: string | AnalyticsSnapshot;
+      } | null)
+    | ({
+        relationTo: 'linkedin-metrics';
+        value: string | LinkedinMetric;
+      } | null)
     | ({
         relationTo: 'redirects';
         value: string | Redirect;
@@ -2038,6 +2110,42 @@ export interface WatchSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analytics-snapshots_select".
+ */
+export interface AnalyticsSnapshotsSelect<T extends boolean = true> {
+  provider?: T;
+  platform?: T;
+  metricCategory?: T;
+  metricKey?: T;
+  metricLabel?: T;
+  metricValue?: T;
+  snapshotDate?: T;
+  timeframe?: T;
+  conversionGoal?: T;
+  entityType?: T;
+  entityId?: T;
+  externalId?: T;
+  externalName?: T;
+  landingPath?: T;
+  campaign?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "linkedin-metrics_select".
+ */
+export interface LinkedinMetricsSelect<T extends boolean = true> {
+  date?: T;
+  followers?: T;
+  newsletterSubscribers?: T;
+  postViews?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2819,6 +2927,45 @@ export interface PayloadJobsStatsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conversion-overview_widget".
+ */
+export interface ConversionOverviewWidget {
+  data?: {
+    title?: string | null;
+    timeframe?: ('7d' | '30d' | '90d') | null;
+    platform?: ('all' | 'linkedin' | 'substack' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'site') | null;
+    goal?:
+      | ('newsletter_signup' | 'affiliate_click' | 'contact_submit' | 'tool_click' | 'book_call' | 'resume_download')
+      | null;
+  };
+  width: 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "source-performance_widget".
+ */
+export interface SourcePerformanceWidget {
+  data?: {
+    title?: string | null;
+    timeframe?: ('7d' | '30d' | '90d') | null;
+    goal?:
+      | ('newsletter_signup' | 'affiliate_click' | 'contact_submit' | 'tool_click' | 'book_call' | 'resume_download')
+      | null;
+  };
+  width: 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sync-health_widget".
+ */
+export interface SyncHealthWidget {
+  data?: {
+    title?: string | null;
+  };
+  width: 'medium' | 'large';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -2826,6 +2973,14 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskAnalyticsSync".
+ */
+export interface TaskAnalyticsSync {
+  input?: unknown;
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -39,6 +39,9 @@ import { default as default_841bf41b8d9d87b643fb67b28cc549b1 } from '@/component
 import { default as default_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { default as default_d2a05cc0963d064af3e35c8fd6f1ba5a } from '@/components/dashboard/AnalyticsView'
+import { default as default_3c2387709bf741a13edb9818b1640481 } from '@/components/dashboard/widgets/ConversionOverviewWidget'
+import { default as default_75595b03c1bb1dd4e2ac2ff5bb5e0df5 } from '@/components/dashboard/widgets/SourcePerformanceWidget'
+import { default as default_e36d9368e4dd6917630aa97539b1bf1e } from '@/components/dashboard/widgets/SyncHealthWidget'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -83,5 +86,8 @@ export const importMap = {
   "@/components/BeforeLogin#default": default_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@/components/dashboard/AnalyticsView#default": default_d2a05cc0963d064af3e35c8fd6f1ba5a,
+  "@/components/dashboard/widgets/ConversionOverviewWidget#default": default_3c2387709bf741a13edb9818b1640481,
+  "@/components/dashboard/widgets/SourcePerformanceWidget#default": default_75595b03c1bb1dd4e2ac2ff5bb5e0df5,
+  "@/components/dashboard/widgets/SyncHealthWidget#default": default_e36d9368e4dd6917630aa97539b1bf1e,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
