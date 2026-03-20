@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
-import React, { cache } from 'react'
+import React from 'react'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -78,7 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-const getPageBySlug = cache(async (slug: string, draft: boolean) => {
+const getPageBySlug = async (slug: string, draft: boolean) => {
   if (draft) {
     const payload = await getPayloadClient()
     const result = await payload.find({
@@ -111,4 +111,4 @@ const getPageBySlug = cache(async (slug: string, draft: boolean) => {
   )
 
   return getCached()
-})
+}

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
-import React, { cache } from 'react'
+import React from 'react'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
@@ -114,12 +114,12 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   // Unreachable
 }
 
-const getPageBySlug = cache(async (slug: string, draft: boolean) => {
+const getPageBySlug = async (slug: string, draft: boolean) => {
   if (draft) {
     const payload = await getPayloadClient()
     const result = await payload.find({
       collection: 'pages',
-      depth: 2,
+      depth: 3,
       draft: true,
       limit: 1,
       pagination: false,
@@ -133,7 +133,7 @@ const getPageBySlug = cache(async (slug: string, draft: boolean) => {
     withPayloadClientRetry((payload) =>
       payload.find({
         collection: 'pages',
-        depth: 2,
+        depth: 3,
         draft: false,
         limit: 1,
         pagination: false,
@@ -146,10 +146,10 @@ const getPageBySlug = cache(async (slug: string, draft: boolean) => {
     return fetchPage()
   }
 
-  const getCached = unstable_cache(fetchPage, ['page', slug, 'depth-2'], {
+  const getCached = unstable_cache(fetchPage, ['page', slug, 'depth-3'], {
     revalidate: 60,
     tags: [`page_${slug}`],
   })
 
   return getCached()
-})
+}

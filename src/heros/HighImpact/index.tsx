@@ -20,6 +20,13 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasPortrait = media && typeof media === 'object'
   const backgroundImage = hasBackground ? backgroundMedia : hasPortrait ? media : null
 
+  if (process.env.NODE_ENV === 'development' && hasBackground && !hasPortrait) {
+    console.warn(
+      '[HighImpactHero] Portrait not showing: hero.media is',
+      media === undefined ? 'undefined' : typeof media === 'string' ? `ID "${media}" (not populated)` : typeof media,
+    )
+  }
+
   return (
     <div
       className="relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] w-full overflow-hidden text-foreground"
@@ -65,15 +72,14 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
         {/* Portrait: show whenever we have media; background uses backgroundMedia when set, else media */}
         {hasPortrait && (
-          <div className="order-1 flex min-h-[200px] justify-center xl:order-2 xl:min-h-0">
-            <div className="relative h-[220px] w-full max-w-[220px] sm:h-[260px] sm:max-w-[260px] xl:h-[320px] xl:max-w-[320px]">
+          <div className="order-1 flex min-h-[260px] justify-center xl:order-2 xl:min-h-0 xl:justify-end">
+            <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]">
               <Media
-                fill
-                imgClassName="object-contain object-top xl:object-center"
-                pictureClassName="relative block h-full w-full"
+                imgClassName="h-auto w-full object-contain object-top drop-shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
+                pictureClassName="relative block w-full"
                 priority
                 resource={media}
-                size="(max-width: 1024px) 100vw, 50vw"
+                size="(max-width: 640px) 78vw, (max-width: 1280px) 42vw, 520px"
               />
             </div>
           </div>

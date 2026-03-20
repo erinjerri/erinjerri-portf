@@ -4,7 +4,7 @@ import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
-import React, { cache } from 'react'
+import React from 'react'
 import RichText from '@/components/RichText'
 
 import type { Post } from '@/payload-types'
@@ -94,7 +94,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   return generateMeta({ doc: post })
 }
 
-const getPostBySlug = cache(async (slug: string, draft: boolean) => {
+const getPostBySlug = async (slug: string, draft: boolean) => {
   if (draft) {
     const payload = await getPayloadClient()
     const result = await payload.find({
@@ -127,4 +127,4 @@ const getPostBySlug = cache(async (slug: string, draft: boolean) => {
     { revalidate: 60, tags: [`post_${slug}`] },
   )
   return getCached()
-})
+}
