@@ -182,7 +182,7 @@ export interface Page {
   id: string;
   title: string;
   hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'topline';
+    type: 'none' | 'highImpact' | 'backgroundCover' | 'mediumImpact' | 'lowImpact' | 'topline';
     /**
      * Large white text over the media (example: Experience).
      */
@@ -231,7 +231,7 @@ export interface Page {
         }[]
       | null;
     /**
-     * Optional background image for the high-impact home hero. Falls back to a CSS gradient if empty.
+     * Background image for high-impact or background-cover heroes. Background Cover uses only this image.
      */
     backgroundMedia?: (string | null) | Media;
     /**

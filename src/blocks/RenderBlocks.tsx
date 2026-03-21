@@ -17,6 +17,61 @@ function asMediaBlock(b: LayoutBlock | null | undefined): MediaBlockType | null 
     : null
 }
 
+function getMediaBlockKind(b: LayoutBlock | null | undefined): 'audio' | 'image' | 'video' | null {
+  const mediaBlock = asMediaBlock(b)
+
+  if (!mediaBlock) return null
+  if (mediaBlock.mediaType) return mediaBlock.mediaType
+  if (mediaBlock.image) return 'image'
+  if (mediaBlock.video) return 'video'
+  if (mediaBlock.audio) return 'audio'
+
+  const legacyMedia = mediaBlock.media
+  if (legacyMedia && typeof legacyMedia === 'object' && 'mimeType' in legacyMedia) {
+    const mimeType = (legacyMedia as { mimeType?: string | null }).mimeType
+    if (mimeType?.startsWith('image/')) return 'image'
+    if (mimeType?.startsWith('video/')) return 'video'
+    if (mimeType?.startsWith('audio/')) return 'audio'
+  }
+
+  // Legacy pages often used `media` as an image-only field before `mediaType` existed.
+  if (legacyMedia) return 'image'
+
+  return null
+}
+
+function hasToplineMedia(b: LayoutBlock | null | undefined): boolean {
+  if (!b || (b as { blockType?: string }).blockType !== 'toplineHeader') return false
+  return Boolean((b as { media?: unknown }).media)
+}
+
+function hasVideoBackgroundMedia(b: LayoutBlock | null | undefined): boolean {
+  if (!b || (b as { blockType?: string }).blockType !== 'videoBackgroundTransition') return false
+  return Boolean((b as { media?: unknown }).media)
+}
+
+function isLeadingHeroLikeBlock(b: LayoutBlock | null | undefined): boolean {
+  if (!b) return false
+
+  if (hasToplineMedia(b) || hasVideoBackgroundMedia(b)) {
+    return true
+  }
+
+  const mediaBlock = asMediaBlock(b)
+  if (!mediaBlock) return false
+
+  const mediaKind = getMediaBlockKind(b)
+  if (mediaKind !== 'image' && mediaKind !== 'video') return false
+
+  const displayStyle = mediaBlock.displayStyle
+  return (
+    displayStyle === 'default' ||
+    displayStyle === 'fullWidthTransition' ||
+    displayStyle === 'heroOverlay' ||
+    !displayStyle
+  )
+}
+
 /** Check if content block has columns with links */
 function contentHasLinks(b: LayoutBlock | null | undefined): boolean {
   if (!b) return false
@@ -58,23 +113,33 @@ const blockComponents = {
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
-  /** When set, skips the first mediaBlock (image, default display) to avoid duplicating the hero background on pages like /watch */
+  /** When set, skips the first mediaBlock (image, default display) to avoid duplicating the hero background on pages like /watch, /read */
   pageSlug?: string
 }> = (props) => {
   const { blocks, pageSlug } = props
 
   const hasBlocks = blocks && Array.isArray(blocks) && blocks.length > 0
 
-  const isFirstBlockRedundantMedia =
-    pageSlug === 'watch' &&
-    blocks?.[0] &&
-    (blocks[0] as { blockType?: string; mediaType?: string; displayStyle?: string }).blockType ===
-      'mediaBlock' &&
-    (blocks[0] as { mediaType?: string }).mediaType === 'image' &&
-    ((blocks[0] as { displayStyle?: string }).displayStyle === 'default' ||
-      !(blocks[0] as { displayStyle?: string }).displayStyle)
+  const trimLeadingHeroLikeBlocks = pageSlug === 'watch' || pageSlug === 'read'
+  let leadingTrimCount = 0
 
-  const blocksToRender = isFirstBlockRedundantMedia ? blocks.slice(1) : blocks
+  if (trimLeadingHeroLikeBlocks && Array.isArray(blocks)) {
+    while (leadingTrimCount < blocks.length && isLeadingHeroLikeBlock(blocks[leadingTrimCount])) {
+      leadingTrimCount += 1
+
+      const maybeLinksBlock = blocks[leadingTrimCount]
+      const mergedLinksBlock =
+        maybeLinksBlock &&
+        ((maybeLinksBlock.blockType === 'content' && contentHasLinks(maybeLinksBlock)) ||
+          (maybeLinksBlock.blockType === 'cta' && ctaHasLinks(maybeLinksBlock)))
+
+      if (mergedLinksBlock) {
+        leadingTrimCount += 1
+      }
+    }
+  }
+
+  const blocksToRender = leadingTrimCount > 0 ? blocks.slice(leadingTrimCount) : blocks
 
   if (hasBlocks) {
     return (

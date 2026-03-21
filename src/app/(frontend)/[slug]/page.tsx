@@ -112,7 +112,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
         <RenderHero {...hero} />
         <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
-        <RenderBlocks blocks={layout} />
+        <RenderBlocks blocks={layout} pageSlug={decodedSlug} />
       </article>
     </>
   )

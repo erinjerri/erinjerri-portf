@@ -28,6 +28,10 @@ export const hero: Field = {
           value: 'highImpact',
         },
         {
+          label: 'Background Cover',
+          value: 'backgroundCover',
+        },
+        {
           label: 'Medium Impact',
           value: 'mediumImpact',
         },
@@ -47,7 +51,7 @@ export const hero: Field = {
       type: 'text',
       validate: (
         value: unknown,
-        { siblingData }: { siblingData?: { type?: 'highImpact' | 'lowImpact' | 'mediumImpact' | 'none' | 'topline' } },
+        { siblingData }: { siblingData?: { type?: 'backgroundCover' | 'highImpact' | 'lowImpact' | 'mediumImpact' | 'none' | 'topline' } },
       ) => {
         if (siblingData?.type !== 'topline') return true
         if (typeof value === 'string' && value.trim().length > 0) return true
@@ -88,12 +92,19 @@ export const hero: Field = {
       name: 'backgroundMedia',
       type: 'upload',
       admin: {
-        condition: (_, { type } = {}) => type === 'highImpact',
-        description: 'Optional background image for the high-impact home hero. Falls back to a CSS gradient if empty.',
+        condition: (_, { type } = {}) => type === 'highImpact' || type === 'backgroundCover',
+        description:
+          'Background image for high-impact or background-cover heroes. Background Cover uses only this image.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
       relationTo: 'media',
       label: 'Background Image',
+      validate: (value: unknown, { siblingData }: { siblingData?: { type?: string } }) => {
+        if (siblingData?.type === 'backgroundCover') {
+          return value != null ? true : 'Background image is required.'
+        }
+        return true
+      },
     },
     {
       name: 'heroImage1',

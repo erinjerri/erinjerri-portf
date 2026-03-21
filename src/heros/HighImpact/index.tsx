@@ -53,7 +53,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasGridMedia =
     isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
   const showGridLayout = hasAnyGridFields || hasGridMedia
-  const backgroundImage = hasBackground ? backgroundMedia : !showGridLayout && hasPortrait ? media : null
+  const backgroundImage = hasBackground ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
 
   const renderHeroSlot = (

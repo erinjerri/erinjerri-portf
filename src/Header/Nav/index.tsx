@@ -36,7 +36,15 @@ const resolveHref = (link: HeaderLink): string | null => {
   return link.url || null
 }
 
-export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
+/** When true, use white text (header has dark bg). When false and theme is light, use dark text for contrast on light pages. */
+const useLightText = (scrolled: boolean, theme: string | null) =>
+  scrolled || theme !== 'light'
+
+export const HeaderNav: React.FC<{
+  data: HeaderType | null
+  scrolled?: boolean
+  theme?: string | null
+}> = ({ data, scrolled = false, theme = null }) => {
   const navItems = data?.navItems || []
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -59,6 +67,7 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
     }
   }, [mounted, mobileOpen])
 
+  const lightText = useLightText(scrolled, theme ?? null)
   const navLinks = useMemo(
     () => {
       const seen = new Set<string>()
@@ -92,7 +101,13 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
                 appearance="inline"
                 className={cn(
                   'rounded px-3 py-2 transition-colors font-semibold',
-                  isActive ? 'text-white bg-white/15' : 'text-white/85 hover:text-white hover:bg-white/10',
+                  lightText
+                    ? isActive
+                      ? 'text-white bg-white/15'
+                      : 'text-white/85 hover:text-white hover:bg-white/10'
+                    : isActive
+                      ? 'text-foreground bg-black/10'
+                      : 'text-foreground/85 hover:text-foreground hover:bg-black/5',
                 )}
               />
             </span>
@@ -101,7 +116,10 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
       </div>
       <Link
         href="/search"
-        className="absolute right-12 hidden md:inline-flex text-white/85 hover:text-white transition-colors"
+        className={cn(
+          'absolute right-12 hidden md:inline-flex transition-colors',
+          lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
+        )}
         aria-label="Search"
       >
         <span className="sr-only">Search</span>
@@ -110,7 +128,10 @@ export const HeaderNav: React.FC<{ data: HeaderType | null }> = ({ data }) => {
       <button
         type="button"
         onClick={() => setMobileOpen((prev) => !prev)}
-        className="absolute right-0 md:hidden text-white/85 hover:text-white p-2 rounded-md transition-colors"
+        className={cn(
+          'absolute right-0 md:hidden p-2 rounded-md transition-colors',
+          lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
+        )}
         aria-label="Toggle navigation menu"
       >
         {mobileOpen ? <X size={26} /> : <Menu size={26} />}
