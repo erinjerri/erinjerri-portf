@@ -1,5 +1,4 @@
 import { chromium } from 'playwright'
-import fetch from 'node-fetch'
 
 async function run() {
   const browser = await chromium.launch({ headless: true })

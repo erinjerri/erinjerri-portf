@@ -1,6 +1,35 @@
 import React, { Fragment } from 'react'
 
-import type { Page } from '@/payload-types'
+import type {
+  CallToActionBlock as CtaBlockType,
+  ContentBlock as ContentBlockType,
+  MediaBlock as MediaBlockType,
+  Page,
+} from '@/payload-types'
+
+/** Layout block - element of page layout array */
+type LayoutBlock = Page['layout'] extends (infer B)[] ? B : Page['layout'] extends readonly (infer B)[] ? B : Record<string, unknown> & { blockType?: string }
+
+/** Narrow layout block to MediaBlock */
+function asMediaBlock(b: LayoutBlock | null | undefined): MediaBlockType | null {
+  return b && (b as { blockType?: string }).blockType === 'mediaBlock'
+    ? (b as MediaBlockType)
+    : null
+}
+
+/** Check if content block has columns with links */
+function contentHasLinks(b: LayoutBlock | null | undefined): boolean {
+  if (!b) return false
+  const c = b as ContentBlockType
+  return Array.isArray(c.columns) && c.columns.some((col) => col?.enableLink && col?.link)
+}
+
+/** Check if CTA block has links */
+function ctaHasLinks(b: LayoutBlock | null | undefined): boolean {
+  if (!b) return false
+  const c = b as CtaBlockType
+  return Array.isArray(c.links) && c.links.length > 0
+}
 
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { AffiliateProductsBlock } from '@/blocks/AffiliateProducts/Component'
@@ -55,17 +84,14 @@ export const RenderBlocks: React.FC<{
           const nextBlock = blocksToRender[index + 1]
 
           // Merge mediaBlock (image) + content/cta with links into hero-style overlay
+          const blockMedia = asMediaBlock(block)
           const isMediaBlockWithImage =
-            blockType === 'mediaBlock' &&
-            (block as any).mediaType === 'image' &&
-            ((block as any).image || (block as any).media)
+            blockMedia &&
+            blockMedia.mediaType === 'image' &&
+            (blockMedia.image || blockMedia.media)
           const nextHasLinks =
-            nextBlock?.blockType === 'content' &&
-            ((nextBlock as any).columns?.some((c: any) => c?.enableLink && c?.link) ?? false)
-          const nextCtaHasLinks =
-            nextBlock?.blockType === 'cta' &&
-            Array.isArray((nextBlock as any).links) &&
-            (nextBlock as any).links.length > 0
+            nextBlock?.blockType === 'content' && contentHasLinks(nextBlock)
+          const nextCtaHasLinks = nextBlock?.blockType === 'cta' && ctaHasLinks(nextBlock)
           const shouldMergeWithOverlay =
             isMediaBlockWithImage && (nextHasLinks || nextCtaHasLinks)
 
@@ -78,8 +104,12 @@ export const RenderBlocks: React.FC<{
                 key={index}
               >
                 <MediaWithOverlayLinksBlock
-                  mediaBlock={block as any}
-                  linksBlock={nextBlock as any}
+                  mediaBlock={block as MediaBlockType}
+                  linksBlock={
+                    nextBlock as React.ComponentProps<
+                      typeof MediaWithOverlayLinksBlock
+                    >['linksBlock']
+                  }
                 />
               </div>
             )
@@ -88,16 +118,14 @@ export const RenderBlocks: React.FC<{
           // Skip rendering the links block when we merged it with the previous media block
           if (index > 0 && (blockType === 'content' || blockType === 'cta')) {
             const prevBlock = blocksToRender[index - 1]
+            const prevMedia = prevBlock ? asMediaBlock(prevBlock) : null
             const prevIsMediaBlockWithImage =
-              prevBlock?.blockType === 'mediaBlock' &&
-              (prevBlock as any).mediaType === 'image' &&
-              ((prevBlock as any).image || (prevBlock as any).media)
+              prevMedia &&
+              prevMedia.mediaType === 'image' &&
+              (prevMedia.image || prevMedia.media)
             const thisHasLinks =
-              (blockType === 'cta' &&
-                Array.isArray((block as any).links) &&
-                (block as any).links.length > 0) ||
-              (blockType === 'content' &&
-                (block as any).columns?.some((c: any) => c?.enableLink && c?.link))
+              (blockType === 'cta' && ctaHasLinks(block)) ||
+              (blockType === 'content' && contentHasLinks(block))
             if (prevIsMediaBlockWithImage && thisHasLinks) {
               return null
             }
@@ -126,16 +154,13 @@ export const RenderBlocks: React.FC<{
               const prevIsLinksBlock =
                 prevBlock &&
                 (prevBlock.blockType === 'content' || prevBlock.blockType === 'cta') &&
-                ((prevBlock.blockType === 'cta' &&
-                  Array.isArray((prevBlock as any).links) &&
-                  (prevBlock as any).links.length > 0) ||
-                  (prevBlock.blockType === 'content' &&
-                    (prevBlock as any).columns?.some((c: any) => c?.enableLink && c?.link)))
+                ((prevBlock.blockType === 'cta' && ctaHasLinks(prevBlock)) ||
+                  (prevBlock.blockType === 'content' && contentHasLinks(prevBlock)))
+              const prevPrev = index >= 2 ? blocksToRender[index - 2] : null
               const prevPrevIsMedia =
-                index >= 2 &&
-                blocksToRender[index - 2] &&
-                ((blocksToRender[index - 2] as any).blockType === 'mediaBlock' ||
-                  (blocksToRender[index - 2] as any).blockType === 'videoBackgroundTransition')
+                prevPrev &&
+                (prevPrev.blockType === 'mediaBlock' ||
+                  prevPrev.blockType === 'videoBackgroundTransition')
               const isCtaAfterMergedOverlay =
                 blockType === 'cta' && prevIsLinksBlock && prevPrevIsMedia
 
@@ -154,8 +179,9 @@ export const RenderBlocks: React.FC<{
 
               return (
                 <div className={marginClass} key={index}>
-                  {/* @ts-expect-error there may be some mismatch between the expected types here */}
-                  <Block {...block} disableInnerContainer />
+                  {/* Block component expects its specific block type; block is a layout union */}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <Block {...(block as any)} disableInnerContainer />
                 </div>
               )
             }
