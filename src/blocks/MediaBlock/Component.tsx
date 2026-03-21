@@ -250,6 +250,11 @@ export const MediaBlock: React.FC<Props> = (props) => {
             imgClassName,
           )}
           resource={selectedMedia}
+          size={
+            isFullWidthTransition
+              ? '100vw'
+              : '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px'
+          }
           src={staticImage}
         />
       )}

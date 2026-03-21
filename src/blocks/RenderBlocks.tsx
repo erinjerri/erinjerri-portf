@@ -29,17 +29,30 @@ const blockComponents = {
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
+  /** When set, skips the first mediaBlock (image, default display) to avoid duplicating the hero background on pages like /watch */
+  pageSlug?: string
 }> = (props) => {
-  const { blocks } = props
+  const { blocks, pageSlug } = props
 
   const hasBlocks = blocks && Array.isArray(blocks) && blocks.length > 0
+
+  const isFirstBlockRedundantMedia =
+    pageSlug === 'watch' &&
+    blocks?.[0] &&
+    (blocks[0] as { blockType?: string; mediaType?: string; displayStyle?: string }).blockType ===
+      'mediaBlock' &&
+    (blocks[0] as { mediaType?: string }).mediaType === 'image' &&
+    ((blocks[0] as { displayStyle?: string }).displayStyle === 'default' ||
+      !(blocks[0] as { displayStyle?: string }).displayStyle)
+
+  const blocksToRender = isFirstBlockRedundantMedia ? blocks.slice(1) : blocks
 
   if (hasBlocks) {
     return (
       <Fragment>
-        {blocks.map((block, index) => {
+        {blocksToRender.map((block, index) => {
           const { blockType } = block
-          const nextBlock = blocks[index + 1]
+          const nextBlock = blocksToRender[index + 1]
 
           // Merge mediaBlock (image) + content/cta with links into hero-style overlay
           const isMediaBlockWithImage =
@@ -74,7 +87,7 @@ export const RenderBlocks: React.FC<{
 
           // Skip rendering the links block when we merged it with the previous media block
           if (index > 0 && (blockType === 'content' || blockType === 'cta')) {
-            const prevBlock = blocks[index - 1]
+            const prevBlock = blocksToRender[index - 1]
             const prevIsMediaBlockWithImage =
               prevBlock?.blockType === 'mediaBlock' &&
               (prevBlock as any).mediaType === 'image' &&
@@ -94,7 +107,7 @@ export const RenderBlocks: React.FC<{
             const Block = blockComponents[blockType]
 
             if (Block) {
-              const prevBlock = blocks[index - 1]
+              const prevBlock = blocksToRender[index - 1]
               const isMedia =
                 blockType === 'mediaBlock' || blockType === 'videoBackgroundTransition'
               const prevIsCta = prevBlock?.blockType === 'cta'
@@ -120,9 +133,9 @@ export const RenderBlocks: React.FC<{
                     (prevBlock as any).columns?.some((c: any) => c?.enableLink && c?.link)))
               const prevPrevIsMedia =
                 index >= 2 &&
-                blocks[index - 2] &&
-                ((blocks[index - 2] as any).blockType === 'mediaBlock' ||
-                  (blocks[index - 2] as any).blockType === 'videoBackgroundTransition')
+                blocksToRender[index - 2] &&
+                ((blocksToRender[index - 2] as any).blockType === 'mediaBlock' ||
+                  (blocksToRender[index - 2] as any).blockType === 'videoBackgroundTransition')
               const isCtaAfterMergedOverlay =
                 blockType === 'cta' && prevIsLinksBlock && prevPrevIsMedia
 

@@ -9,6 +9,7 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
+import { resolveHeroMedia } from '@/heros/resolveHeroMedia'
 import { generateMeta } from '@/utilities/generateMeta'
 import { Media as MediaComponent } from '@/components/Media'
 import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
@@ -44,6 +45,7 @@ export default async function Page() {
   }
 
   const { hero, layout, videoAsset } = page
+  const resolvedHero = await resolveHeroMedia(hero)
   const selectedVideo =
     typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video') ? videoAsset : null
 
@@ -53,13 +55,13 @@ export default async function Page() {
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
+      <RenderHero {...resolvedHero} />
       {selectedVideo && (
         <div className="container mt-8">
           <MediaComponent resource={selectedVideo} />
         </div>
       )}
-      <RenderBlocks blocks={layout} />
+      <RenderBlocks blocks={layout} pageSlug="watch" />
     </article>
   )
 }
@@ -83,7 +85,7 @@ const getPageBySlug = async (slug: string, draft: boolean) => {
     const payload = await getPayloadClient()
     const result = await payload.find({
       collection: 'pages',
-      depth: 2,
+      depth: 3,
       draft: true,
       limit: 1,
       pagination: false,
@@ -98,7 +100,7 @@ const getPageBySlug = async (slug: string, draft: boolean) => {
       withPayloadClientRetry((payload) =>
         payload.find({
           collection: 'pages',
-          depth: 2,
+          depth: 3,
           draft: false,
           limit: 1,
           pagination: false,
@@ -106,7 +108,7 @@ const getPageBySlug = async (slug: string, draft: boolean) => {
           where: { slug: { equals: slug } },
         }),
       ).then((result) => result.docs?.[0] ?? null),
-    ['page', slug, 'depth-2'],
+    ['page', slug, 'depth-3'],
     { revalidate: 60, tags: [`page_${slug}`] },
   )
 

@@ -71,7 +71,7 @@ const nextConfig = {
     // Prefer modern formats when the client supports them.
     formats: ['image/avif', 'image/webp'],
     // Configure image qualities used by next/image. Include lower qualities for mobile, 90 for sharp hero images.
-    qualities: [60, 65, 70, 75, 80, 85, 90],
+    qualities: [60, 65, 70, 75, 80, 82, 85, 90],
     // Responsive breakpoints (helps Next generate right srcset candidates). 2560/3840 for retina.
     deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1440, 1920, 2048, 2560, 3840],
     imageSizes: [16, 24, 32, 48, 64, 96, 128, 256, 384],

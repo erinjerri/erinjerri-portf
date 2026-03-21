@@ -4,7 +4,7 @@ import type { StaticImageData } from 'next/image'
 
 import { cn } from '@/utilities/ui'
 import NextImage from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import type { Props as MediaProps } from '../types'
 
@@ -46,12 +46,14 @@ const placeholderBlur =
  */
 
 export const ImageMedia: React.FC<MediaProps> = (props) => {
+  const [imageError, setImageError] = useState(false)
   const {
     alt: altFromProps,
     fill,
     pictureClassName,
     imgClassName,
     priority,
+    quality: qualityFromProps,
     resource,
     size: sizeFromProps,
     src: srcFromProps,
@@ -71,13 +73,22 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     alt = altFromResource || ''
 
     const cacheTag = resource.updatedAt
-    // Use Payload-provided URL (R2 public, proxy, or rewritten); fallback to /media/ for local static files.
-    const mediaUrl = url ?? (filename ? `/media/${encodeURI(filename.replace(/^\/+/, ''))}` : null)
+    // Use Payload-provided URL when valid; fallback to /media/filename. encodeURIComponent handles @, spaces, etc.
+    const rawFilename = typeof filename === 'string' ? filename.replace(/^\/+/, '') : null
+    const mediaUrl =
+      typeof url === 'string' && url.trim()
+        ? url
+        : rawFilename
+          ? `/media/${encodeURIComponent(rawFilename)}`
+          : null
     src = getMediaUrl(mediaUrl, cacheTag)
   }
 
-  // Skip render when resource is ID-only (unpopulated) or src is invalid — avoids NextImage errors
-  if (!src || typeof src !== 'string') {
+  const srcKey = typeof src === 'string' ? src : ''
+  useEffect(() => setImageError(false), [srcKey])
+
+  // Skip render when resource is ID-only (unpopulated), src is invalid, or image failed to load (404/deleted)
+  if (!src || typeof src !== 'string' || imageError) {
     return null
   }
 
@@ -85,8 +96,13 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const disableOptimization = false
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
-  // Hero images (fill+priority): keep detail while reducing transfer size for mobile LCP.
-  const quality = fill && priority ? 75 : priority ? 70 : 60
+  // Quality: must match next.config images.qualities [60,65,70,75,80,85,90]
+  const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90] as const
+  const rawQuality =
+    qualityFromProps ?? (fill && priority ? 80 : priority ? 85 : 85)
+  const quality = ALLOWED_QUALITIES.includes(rawQuality as (typeof ALLOWED_QUALITIES)[number])
+    ? rawQuality
+    : 85
 
   // Use Payload focal point for object-position when using fill (hero images).
   // Set focalX/focalY in Payload admin (Media → edit image → focal point) to keep faces visible on mobile.
@@ -95,14 +111,13 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
       ? `${resource.focalX ?? 50}% ${resource.focalY ?? 50}%`
       : undefined
 
-  // NOTE: this is used by the browser to determine which image to download at different screen sizes
-  // Reverse breakpoint order so smallest viewport matches first (avoids 4K images on phones)
-  // Cap at 1920px to avoid oversized requests
+  // NOTE: sizes tells the browser display width so it picks the right srcset. Larger values = sharper on retina.
+  // Grid (3-col): 640px ensures ~2x for 33vw on 1440px. Full-width hero: 100vw.
   const sizes = sizeFromProps
     ? sizeFromProps
     : fill && priority
       ? '100vw'
-      : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+      : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px'
 
   return (
     <picture className={cn(pictureClassName)}>
@@ -111,6 +126,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         className={cn(imgClassName)}
         fill={fill}
         height={!fill ? height : undefined}
+        onError={() => setImageError(true)}
         placeholder="blur"
         blurDataURL={placeholderBlur}
         priority={priority}

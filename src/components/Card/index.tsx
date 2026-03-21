@@ -135,7 +135,12 @@ export const Card: React.FC<{
     >
       <div className="relative w-full">
         {!metaImage && <div className="">No image</div>}
-        {metaImage && typeof metaImage !== 'string' && <Media resource={metaImage} size="33vw" />}
+        {metaImage && typeof metaImage !== 'string' && (
+            <Media
+              resource={metaImage}
+              size="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px"
+            />
+          )}
         {isWatch && metaImage && (
           <>
             <div className="pointer-events-none absolute inset-0 bg-black/35 transition-opacity duration-300 group-hover:opacity-45" />

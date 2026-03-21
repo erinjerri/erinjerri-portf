@@ -120,7 +120,10 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
             >
               <div className="relative aspect-[16/10] w-full bg-black/10">
                 {product.image && typeof product.image !== 'string' ? (
-                  <Media resource={product.image} size="33vw" />
+                  <Media
+                    resource={product.image}
+                    size="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-sm text-white/70">
                     No image
