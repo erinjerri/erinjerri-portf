@@ -62,10 +62,50 @@ Optional env vars:
    - `SUBSTACK_SYNC_FORCE_UPDATE` (optional)
    - `SUBSTACK_SYNC_CRON` (optional; default `0 0 * * * *`)
    - `SUBSTACK_SYNC_QUEUE` (optional; default `substack`)
-   - `CRON_SECRET` (required if running jobs unauthenticated)
-2. Trigger the job runner on a schedule (Vercel Cron / external cron) by calling:
-   - `GET /api/payload-jobs/run?queue=substack`
-   - with header: `Authorization: Bearer $CRON_SECRET`
+   - `CRON_SECRET` (required if triggering sync via external cron)
+2. Trigger sync on a schedule (cron-job.org / UptimeRobot / etc.) by calling:
+   - `POST /next/sync-substack`
+   - header: `Authorization: Bearer $CRON_SECRET`
+
+## Medium cross-post sync
+
+Import Medium posts (via RSS) into the `posts` collection. Same modes as Substack: **review** (drafts) or **auto_publish**.
+
+### One-time import
+
+- `pnpm sync:medium`
+
+Requires: `DATABASE_URL` (or `MONGODB_URI`) and `PAYLOAD_SECRET` in `.env`.
+
+Optional env vars:
+- `MEDIUM_RSS_URL` (default: `https://medium.com/feed/@erinjerri`)
+- `MEDIUM_SYNC_MODE` (`review` or `auto_publish`) — use `auto_publish` if you want posts to show on `/posts` immediately
+- `MEDIUM_SYNC_DOWNLOAD_IMAGES=true` (import images into Media)
+- `MEDIUM_SYNC_MAX_ITEMS`, `MEDIUM_SYNC_FORCE_UPDATE`, etc.
+
+### Automated sync
+
+- `MEDIUM_SYNC_ENABLED=true`
+- `MEDIUM_RSS_URL`, `MEDIUM_SYNC_MODE`, etc. (see `.env.example`)
+- Trigger: `POST /next/sync-content` with header `Authorization: Bearer $CRON_SECRET`
+
+## Paragraph cross-post sync
+
+Import Paragraph posts into the `posts` collection. Same modes as Substack.
+
+### One-time import
+
+- `pnpm sync:paragraph`
+
+Optional env vars:
+- `PARAGRAPH_PUBLICATION` (default: `@cypherpinay`) — slug or full publication URL
+- `PARAGRAPH_SYNC_MODE` (`review` or `auto_publish`)
+- `PARAGRAPH_SYNC_DOWNLOAD_IMAGES=true`, etc.
+
+### Automated sync
+
+- `PARAGRAPH_SYNC_ENABLED=true`
+- Trigger: `POST /next/sync-content` with header `Authorization: Bearer $CRON_SECRET`
 
 ## Branding / theme tokens
 
