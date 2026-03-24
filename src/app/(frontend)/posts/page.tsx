@@ -15,10 +15,16 @@ const getCachedPostsPage = unstable_cache(
     return Promise.all([
       payload.find({
         collection: 'posts',
+        draft: false,
         depth: 1,
         limit: 12,
         overrideAccess: false,
         sort: '-publishedAt',
+        where: {
+          _status: {
+            equals: 'published',
+          },
+        },
         select: {
           title: true,
           slug: true,

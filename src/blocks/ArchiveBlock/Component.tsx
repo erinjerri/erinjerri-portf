@@ -1,7 +1,5 @@
 import type { ArchiveBlock as ArchiveBlockProps, Post, Project } from '@/payload-types'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
 import RichText from '@/components/RichText'
 import { draftMode } from 'next/headers'
@@ -9,6 +7,11 @@ import { draftMode } from 'next/headers'
 import { CategoryFilter } from '@/components/CategoryFilter'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import type { CardRelationTo } from '@/components/Card'
+import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
+
+type ArchiveFetchedDocs = {
+  docs: (Post | Project)[]
+}
 
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
@@ -22,34 +25,36 @@ export const ArchiveBlock: React.FC<
   const limit =
     relationTo === 'watch'
       ? Math.max(limitFromProps ?? 100, 100)
-      : limitFromProps ?? 24
+      : relationTo === 'posts'
+        ? Math.max(limitFromProps ?? 100, 100)
+        : limitFromProps ?? 24
 
   let docs: (Post | Project)[] = []
 
   if (populateBy === 'collection') {
-    const payload = await getPayload({ config: configPromise })
-
     const flattenedCategories = categories?.map((category) => {
       if (typeof category === 'object') return category.id
       else return category
     })
 
-    const fetchedDocs = await (payload as any).find({
-      collection: relationTo,
-      draft: isDraftMode,
-      depth: 2,
-      limit,
-      overrideAccess: isDraftMode ? true : false,
-      sort: '-publishedAt',
-      ...(flattenedCategories && flattenedCategories.length > 0
-        ? {
-            where: {
-              categories: {
-                in: flattenedCategories,
+    const fetchedDocs = await withPayloadClientRetry<ArchiveFetchedDocs>((payload) => {
+      return (payload as any).find({
+        collection: relationTo,
+        draft: isDraftMode,
+        depth: 2,
+        limit,
+        overrideAccess: isDraftMode ? true : false,
+        sort: '-publishedAt',
+        ...(flattenedCategories && flattenedCategories.length > 0
+          ? {
+              where: {
+                categories: {
+                  in: flattenedCategories,
+                },
               },
-            },
-          }
-        : {}),
+            }
+          : {}),
+      }) as Promise<ArchiveFetchedDocs>
     })
 
     docs = fetchedDocs.docs as (Post | Project)[]

@@ -9,7 +9,7 @@
  * Optional: set SUBSTACK_SYNC_DOWNLOAD_IMAGES=true to import images into the Media collection.
  */
 
-import 'dotenv/config'
+import './loadEnv'
 
 import { getPayload } from 'payload'
 

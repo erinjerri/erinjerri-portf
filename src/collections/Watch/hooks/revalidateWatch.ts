@@ -7,11 +7,28 @@ type RevalidateArgs = {
   tags?: string[]
 }
 
+function resolveRevalidateBaseURL() {
+  const configuredBaseURL = String(getServerSideURL() || '').replace(/\/$/, '')
+  const runningInHostedEnv = Boolean(
+    process.env.VERCEL ||
+      process.env.NETLIFY ||
+      process.env.CF_PAGES_URL ||
+      process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+      process.env.DEPLOY_PRIME_URL,
+  )
+
+  if (runningInHostedEnv) return configuredBaseURL
+
+  // Local/CLI runs often have NEXT_PUBLIC_SERVER_URL set to production;
+  // force local revalidate endpoint so local cache is actually invalidated.
+  return 'http://localhost:3000'
+}
+
 function triggerNextRevalidate(payloadLogger: { warn: (msg: string) => void }, args: RevalidateArgs) {
   const secret = process.env.PAYLOAD_SECRET
   if (!secret) return
 
-  const baseURL = String(getServerSideURL() || '').replace(/\/$/, '')
+  const baseURL = resolveRevalidateBaseURL()
   if (!baseURL) return
 
   void fetch(`${baseURL}/api/revalidate`, {

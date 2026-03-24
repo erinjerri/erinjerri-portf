@@ -19,6 +19,7 @@ import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
 import { sanitizeLexicalUploads } from './hooks/sanitizeLexicalUploads'
+import { syncCrosspostWorkflow } from './hooks/syncCrosspostWorkflow'
 
 import {
   MetaDescriptionField,
@@ -348,6 +349,7 @@ export const Posts: CollectionConfig<'posts'> = {
     slugField(),
   ],
   hooks: {
+    beforeChange: [syncCrosspostWorkflow],
     afterChange: [revalidatePost],
     afterRead: [sanitizeLexicalUploads, populateAuthors],
     afterDelete: [revalidateDelete],

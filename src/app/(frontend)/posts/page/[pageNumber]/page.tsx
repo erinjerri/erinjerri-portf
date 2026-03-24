@@ -34,11 +34,17 @@ export default async function Page({ params: paramsPromise }: Args) {
     ;[posts, categoriesResult] = await Promise.all([
       payload.find({
         collection: 'posts',
+        draft: false,
         depth: 1,
         limit: 12,
         page: sanitizedPageNumber,
         overrideAccess: false,
         sort: '-publishedAt',
+        where: {
+          _status: {
+            equals: 'published',
+          },
+        },
         select: {
           title: true,
           slug: true,
@@ -105,9 +111,17 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 export async function generateStaticParams() {
   try {
     const payload = await getPayload({ config: configPromise })
-    const { totalDocs } = await payload.count({
+    const { totalDocs } = await payload.find({
       collection: 'posts',
+      draft: false,
+      depth: 0,
+      limit: 1,
       overrideAccess: false,
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
     })
 
     const totalPages = Math.ceil(totalDocs / 10)

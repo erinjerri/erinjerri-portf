@@ -37,6 +37,7 @@ const dirname = path.dirname(filename)
 const dbURL = process.env.DATABASE_URL || process.env.MONGODB_URI || ''
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.length > 0
+// schedulePublishTask is auto-injected by Payload when collections/globals have schedulePublish: true
 
 const allowedOrigins = Array.from(
   new Set(
@@ -275,7 +276,11 @@ export default buildConfig({
   onInit: async (payload) => {
     const hasDatabaseURL = Boolean(process.env.DATABASE_URL)
     const hasMongoDBURI = Boolean(process.env.MONGODB_URI)
-    const selectedEnvVar = hasDatabaseURL ? 'DATABASE_URL' : hasMongoDBURI ? 'MONGODB_URI (legacy)' : 'none'
+    const selectedEnvVar = hasDatabaseURL
+      ? 'DATABASE_URL'
+      : hasMongoDBURI
+        ? 'MONGODB_URI (legacy)'
+        : 'none'
     const useR2Storage = process.env.USE_R2_STORAGE === 'true'
     const forcePayloadMediaProxy = process.env.NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY === 'true'
     const r2PublicHostname = process.env.R2_PUBLIC_HOSTNAME?.trim()

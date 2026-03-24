@@ -85,6 +85,14 @@ function relationID(value: unknown): string | undefined {
   return undefined
 }
 
+function getPreservedCrosspostStatus(
+  existingDoc: Post | undefined,
+  fallback: 'in_review' | 'auto_published',
+): 'in_review' | 'approved' | 'rejected' | 'auto_published' {
+  const existingStatus = existingDoc?.crosspostReviewStatus
+  return existingStatus ?? fallback
+}
+
 function toSlug(input: string): string {
   return input
     .trim()
@@ -759,7 +767,10 @@ export async function syncMediumToPosts(args: {
 
     const publishedAt = item.isoDate ? new Date(item.isoDate) : new Date()
     const shouldAutoPublish = options.mode === 'auto_publish'
-    const crosspostStatus = shouldAutoPublish ? ('auto_published' as const) : ('in_review' as const)
+    const crosspostStatus = getPreservedCrosspostStatus(
+      existingDoc,
+      shouldAutoPublish ? 'auto_published' : 'in_review',
+    )
     const existingHeroImageID = relationID((existingDoc as { heroImage?: unknown } | undefined)?.heroImage)
     const existingMetaImageID = relationID(
       (existingDoc as { meta?: { image?: unknown } } | undefined)?.meta?.image,
@@ -795,6 +806,7 @@ export async function syncMediumToPosts(args: {
               content: data.content,
               mediumURL: data.mediumURL,
               crosspostReviewStatus: data.crosspostReviewStatus,
+              publishedAt: data.publishedAt,
               meta: data.meta,
               ...(resolvedHeroImageID ? { heroImage: resolvedHeroImageID } : {}),
             },

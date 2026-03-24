@@ -24,11 +24,16 @@ export const SyncContentButton: React.FC = () => {
         if (!res.ok) {
           throw new Error(text || 'Sync failed.')
         }
-        const data = JSON.parse(text) as { medium?: { synced?: number; skipped?: number }; paragraph?: { synced?: number; skipped?: number } }
+        const data = JSON.parse(text) as {
+          medium?: { synced?: number; skipped?: number }
+          paragraph?: { synced?: number; skipped?: number }
+          repair?: { repaired?: number }
+        }
         const m = data.medium ?? {}
         const p = data.paragraph ?? {}
+        const repaired = data.repair?.repaired ?? 0
         toast.success(
-          `Synced: Medium ${m.synced ?? 0} (${m.skipped ?? 0} skipped), Paragraph ${p.synced ?? 0} (${p.skipped ?? 0} skipped). Check Posts collection.`,
+          `Synced: Medium ${m.synced ?? 0} (${m.skipped ?? 0} skipped), Paragraph ${p.synced ?? 0} (${p.skipped ?? 0} skipped), repaired ${repaired} approved cross-posts.`,
         )
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Sync failed.')

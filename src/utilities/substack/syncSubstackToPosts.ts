@@ -99,6 +99,14 @@ function relationID(value: unknown): string | undefined {
   return undefined
 }
 
+function getPreservedCrosspostStatus(
+  existingDoc: Post | undefined,
+  fallback: 'in_review' | 'auto_published',
+): 'in_review' | 'approved' | 'rejected' | 'auto_published' {
+  const existingStatus = existingDoc?.crosspostReviewStatus
+  return existingStatus ?? fallback
+}
+
 function toSlug(input: string): string {
   return input
     .trim()
@@ -982,7 +990,10 @@ export async function syncSubstackToPosts(args: {
     const shouldAutoPublish = options.mode === 'auto_publish'
 
     try {
-      const crosspostStatus = shouldAutoPublish ? ('auto_published' as const) : ('in_review' as const)
+      const crosspostStatus = getPreservedCrosspostStatus(
+        existingDoc,
+        shouldAutoPublish ? 'auto_published' : 'in_review',
+      )
       const existingHeroImageID = relationID((existingDoc as { heroImage?: unknown } | undefined)?.heroImage)
       const existingMetaImageID = relationID(
         (existingDoc as { meta?: { image?: unknown } } | undefined)?.meta?.image,
@@ -1008,7 +1019,7 @@ export async function syncSubstackToPosts(args: {
       }
 
       // On update, filter relatedPosts to only valid IDs (avoids "invalid selections" when refs are deleted)
-      let validRelatedIds: string[] = []
+      const validRelatedIds: string[] = []
       if (isUpdate && existingDoc) {
         const raw = (existingDoc as { relatedPosts?: Array<unknown> }).relatedPosts ?? []
         const ids = raw
@@ -1040,6 +1051,7 @@ export async function syncSubstackToPosts(args: {
               content: data.content,
               substackURL: data.substackURL,
               crosspostReviewStatus: data.crosspostReviewStatus,
+              publishedAt: data.publishedAt,
               meta: data.meta,
               ...(resolvedHeroImageID ? { heroImage: resolvedHeroImageID } : {}),
               relatedPosts: validRelatedIds,

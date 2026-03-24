@@ -128,6 +128,14 @@ function relationID(value: unknown): string | undefined {
   return undefined
 }
 
+function getPreservedCrosspostStatus(
+  existingDoc: Post | undefined,
+  fallback: 'in_review' | 'auto_published',
+): 'in_review' | 'approved' | 'rejected' | 'auto_published' {
+  const existingStatus = existingDoc?.crosspostReviewStatus
+  return existingStatus ?? fallback
+}
+
 /** Parse Paragraph's publishedAt (epoch seconds or ISO string) to a valid Date. */
 function parseParagraphDate(value: string | number | null | undefined): Date {
   if (value == null || value === '') return new Date()
@@ -1183,7 +1191,10 @@ export async function syncParagraphToPosts(args: {
 
     const publishedAt = parseParagraphDate(paragraphPost.publishedAt)
     const shouldAutoPublish = options.mode === 'auto_publish'
-    const crosspostStatus = shouldAutoPublish ? ('auto_published' as const) : ('in_review' as const)
+    const crosspostStatus = getPreservedCrosspostStatus(
+      existingDoc,
+      shouldAutoPublish ? 'auto_published' : 'in_review',
+    )
     const existingHeroImageID = relationID((existingDoc as { heroImage?: unknown } | undefined)?.heroImage)
     const existingMetaImageID = relationID(
       (existingDoc as { meta?: { image?: unknown } } | undefined)?.meta?.image,
@@ -1221,6 +1232,7 @@ export async function syncParagraphToPosts(args: {
             title: createData.title,
             content: createData.content,
             crosspostReviewStatus: createData.crosspostReviewStatus,
+            publishedAt: createData.publishedAt,
             meta: createData.meta,
             ...(resolvedHeroImageID ? { heroImage: resolvedHeroImageID } : {}),
           },

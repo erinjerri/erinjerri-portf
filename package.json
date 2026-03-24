@@ -26,6 +26,7 @@
     "payload": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" payload",
     "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/restore.ts",
     "ensure:store": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-store-page.ts",
+    "repair:crossposts": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/repair-crosspost-publish-state.ts",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
@@ -40,6 +41,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.717.0",
+    "@netlify/functions": "^3.0.0",
     "@payloadcms/admin-bar": "3.78.0",
     "@payloadcms/db-mongodb": "3.78.0",
     "@payloadcms/email-nodemailer": "3.78.0",

@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 
 import { syncMediumToPosts } from '@/utilities/medium/syncMediumToPosts'
 import { syncParagraphToPosts } from '@/utilities/paragraph/syncParagraphToPosts'
+import { repairCrosspostPublishState } from '@/utilities/crossposts/repairCrosspostPublishState'
 
 export const maxDuration = 300
 
@@ -59,6 +60,8 @@ export async function POST(): Promise<Response> {
       }),
     ])
 
+    const repairResult = await repairCrosspostPublishState({ payload, req })
+
     return Response.json({
       success: true,
       medium: { synced: mediumResult.synced, skipped: mediumResult.skipped, errors: mediumResult.errors },
@@ -66,6 +69,15 @@ export async function POST(): Promise<Response> {
         synced: paragraphResult.synced,
         skipped: paragraphResult.skipped,
         errors: paragraphResult.errors,
+      },
+      repair: {
+        repaired: repairResult.totalRepaired,
+        posts: repairResult.repaired.map((post) => ({
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          workflowStatus: post.workflowStatus,
+        })),
       },
     })
   } catch (e) {
