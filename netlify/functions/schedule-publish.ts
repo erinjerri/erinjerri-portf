@@ -1,8 +1,7 @@
 import { schedule } from '@netlify/functions'
 
-const CRON = process.env.PAYLOAD_SCHEDULE_PUBLISH_CRON || '*/5 * * * *'
-
-export const handler = schedule(CRON, async () => {
+// Netlify's bundler requires the cron expression to be a string literal in this file.
+export const handler = schedule('*/5 * * * *', async () => {
   const baseURL =
     process.env.URL || process.env.DEPLOY_PRIME_URL || process.env.NEXT_PUBLIC_SERVER_URL || ''
 
