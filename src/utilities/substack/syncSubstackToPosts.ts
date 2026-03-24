@@ -1019,28 +1019,32 @@ export async function syncSubstackToPosts(args: {
       }
 
       // On update, filter relatedPosts to only valid IDs (avoids "invalid selections" when refs are deleted)
-      const validRelatedIds: string[] = []
-      if (isUpdate && existingDoc) {
-        const raw = (existingDoc as { relatedPosts?: Array<unknown> }).relatedPosts ?? []
-        const ids = raw
-          .map((r) => (typeof r === 'object' && r && 'id' in r ? (r as { id: string }).id : r))
-          .filter((id): id is string => typeof id === 'string')
-        const selfId = String(existingDoc.id)
-        for (const rid of ids) {
-          if (rid === selfId) continue
-          try {
-            const found = await payload.findByID({
-              collection: 'posts',
-              id: rid,
-              depth: 0,
-              overrideAccess: true,
-            })
-            if (found) validRelatedIds.push(rid)
-          } catch {
-            // Ref deleted or invalid; skip
-          }
-        }
-      }
+      const validRelatedIds =
+        isUpdate && existingDoc
+          ? await (async () => {
+              const raw = (existingDoc as { relatedPosts?: Array<unknown> }).relatedPosts ?? []
+              const ids = raw
+                .map((r) => (typeof r === 'object' && r && 'id' in r ? (r as { id: string }).id : r))
+                .filter((id): id is string => typeof id === 'string')
+              const selfId = String(existingDoc.id)
+              const out: string[] = []
+              for (const rid of ids) {
+                if (rid === selfId) continue
+                try {
+                  const found = await payload.findByID({
+                    collection: 'posts',
+                    id: rid,
+                    depth: 0,
+                    overrideAccess: true,
+                  })
+                  if (found) out.push(rid)
+                } catch {
+                  // Ref deleted or invalid; skip
+                }
+              }
+              return out
+            })()
+          : []
 
       const result = isUpdate
         ? await payload.update({
