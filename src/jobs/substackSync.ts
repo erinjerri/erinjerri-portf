@@ -11,6 +11,8 @@ type SubstackSyncTaskIO = {
   }
 }
 
+// Registers Payload’s scheduled task. On serverless (e.g. Netlify), something must still
+// invoke sync — see netlify/functions/substack-sync-cron.ts or POST /next/sync-substack.
 const enabled = process.env.SUBSTACK_SYNC_ENABLED === 'true'
 const rssURL = process.env.SUBSTACK_RSS_URL || 'https://erinjerri.substack.com/feed'
 const mode: 'auto_publish' | 'review' =

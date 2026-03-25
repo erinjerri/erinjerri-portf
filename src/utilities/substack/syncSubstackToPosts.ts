@@ -99,12 +99,23 @@ function relationID(value: unknown): string | undefined {
   return undefined
 }
 
-function getPreservedCrosspostStatus(
+/**
+ * When `auto_publish` is on, upgrade `in_review` to `auto_published` on each sync so a post that was
+ * first imported under `review` mode (or before env was set) can still go live. Rejected stays rejected.
+ */
+function resolveCrosspostStatusForSync(
   existingDoc: Post | undefined,
-  fallback: 'in_review' | 'auto_published',
+  mode: SyncMode,
 ): 'in_review' | 'approved' | 'rejected' | 'auto_published' {
-  const existingStatus = existingDoc?.crosspostReviewStatus
-  return existingStatus ?? fallback
+  const existing = existingDoc?.crosspostReviewStatus
+  if (existing === 'rejected') return 'rejected'
+
+  if (mode === 'auto_publish') {
+    if (existing === 'approved' || existing === 'auto_published') return existing
+    return 'auto_published'
+  }
+
+  return existing ?? 'in_review'
 }
 
 function toSlug(input: string): string {
@@ -990,10 +1001,7 @@ export async function syncSubstackToPosts(args: {
     const shouldAutoPublish = options.mode === 'auto_publish'
 
     try {
-      const crosspostStatus = getPreservedCrosspostStatus(
-        existingDoc,
-        shouldAutoPublish ? 'auto_published' : 'in_review',
-      )
+      const crosspostStatus = resolveCrosspostStatusForSync(existingDoc, options.mode)
       const existingHeroImageID = relationID((existingDoc as { heroImage?: unknown } | undefined)?.heroImage)
       const existingMetaImageID = relationID(
         (existingDoc as { meta?: { image?: unknown } } | undefined)?.meta?.image,
@@ -1059,6 +1067,9 @@ export async function syncSubstackToPosts(args: {
               meta: data.meta,
               ...(resolvedHeroImageID ? { heroImage: resolvedHeroImageID } : {}),
               relatedPosts: validRelatedIds,
+              ...(shouldAutoPublish && crosspostStatus !== 'rejected'
+                ? { _status: 'published' as const }
+                : {}),
             },
             overrideAccess: true,
             context: { disableRevalidate: true },

@@ -60,11 +60,14 @@ Optional env vars:
    - `SUBSTACK_SYNC_NOTIFY_EMAIL` (optional)
    - `SUBSTACK_SYNC_DOWNLOAD_IMAGES` (optional)
    - `SUBSTACK_SYNC_FORCE_UPDATE` (optional)
-   - `SUBSTACK_SYNC_CRON` (optional; default `0 0 * * * *`)
+   - `SUBSTACK_SYNC_CRON` (optional; default `0 0 * * * *`) — used by Payload’s job **schedule** in config; on Netlify you still need a runner (below).
    - `SUBSTACK_SYNC_QUEUE` (optional; default `substack`)
-   - `CRON_SECRET` (required if triggering sync via external cron)
-2. Trigger sync on a schedule (cron-job.org / UptimeRobot / etc.) by calling:
-   - `POST /next/sync-substack`
+   - `CRON_SECRET` (required for any automated trigger: Netlify scheduler or external cron)
+
+2. **Netlify:** with `SUBSTACK_SYNC_ENABLED=true` and `CRON_SECRET` set, the scheduled function `netlify/functions/substack-sync-cron.ts` runs **hourly** and `POST`s `/next/sync-substack` (same as manual cron). The separate `schedule-publish` function only drains the `schedulePublish` queue — it does **not** import Substack by itself.
+
+3. **Other hosts / extra triggers:** use an external cron (cron-job.org, UptimeRobot, etc.) calling:
+   - `POST https://your-site/next/sync-substack`
    - header: `Authorization: Bearer $CRON_SECRET`
 
 ## Medium cross-post sync
