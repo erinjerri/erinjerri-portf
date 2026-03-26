@@ -6,6 +6,7 @@ import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
 import React from 'react'
 import RichText from '@/components/RichText'
+import type { Where } from 'payload'
 
 import type { Post } from '@/payload-types'
 
@@ -18,6 +19,12 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
 export async function generateStaticParams() {
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+  if (isBuild) {
+    // Avoid hard-failing builds when the DB/TLS connection is flaky during prerender.
+    return []
+  }
+
   try {
     const payload = await getPayloadClient()
     const posts = await payload.find({
@@ -47,10 +54,19 @@ type Args = {
 export default async function Post({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
-  const post = await getPostBySlug(decodedSlug, draft)
+  let post: Awaited<ReturnType<typeof getPostBySlug>> | null = null
+
+  try {
+    post = await getPostBySlug(decodedSlug, draft)
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[posts/[slug]] Skipping prerender because DB is unavailable:', err)
+    post = null
+  }
   const selectedVideo =
     typeof post?.videoAsset === 'object' && post.videoAsset?.mimeType?.includes('video')
       ? post.videoAsset
@@ -58,7 +74,19 @@ export default async function Post({ params: paramsPromise }: Args) {
   const videoSource = post?.videoSource ?? 'upload'
   const videoUrl = typeof post?.videoUrl === 'string' ? post.videoUrl : null
 
-  if (!post) return <PayloadRedirects url={url} />
+  if (!post) {
+    if (isBuild) {
+      return (
+        <article className="pt-16 pb-16">
+          <div className="container">
+            <h1 className="text-2xl font-bold">Loading...</h1>
+          </div>
+        </article>
+      )
+    }
+
+    return <PayloadRedirects url={url} />
+  }
 
   return (
     <article className="pt-16 pb-16">
@@ -89,12 +117,34 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
-  const post = await getPostBySlug(decodedSlug, draft)
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
-  return generateMeta({ doc: post })
+  try {
+    const post = await getPostBySlug(decodedSlug, draft)
+
+    return generateMeta({ doc: post })
+  } catch (err) {
+    if (!isBuild) throw err
+    console.warn('[posts/[slug]] Skipping metadata because DB is unavailable:', err)
+    return generateMeta({ doc: null })
+  }
+
+  // Unreachable
 }
 
 const getPostBySlug = async (slug: string, draft: boolean) => {
+  const fallbackConditions: Where[] = [
+    { slug: { like: slug } },
+    { title: { like: slug } },
+    { mediumURL: { like: slug } },
+    { substackURL: { like: slug } },
+    { paragraphURL: { like: slug } },
+  ]
+
+  const fallbackWhere = {
+    or: fallbackConditions,
+  }
+
   if (draft) {
     const payload = await getPayloadClient()
     const result = await payload.find({
@@ -106,7 +156,19 @@ const getPostBySlug = async (slug: string, draft: boolean) => {
       overrideAccess: true,
       where: { slug: { equals: slug } },
     })
-    return result.docs?.[0] ?? null
+    if (result.docs?.[0]) return result.docs[0]
+
+    const fallback = await payload.find({
+      collection: 'posts',
+      draft: true,
+      depth: 2,
+      limit: 2,
+      pagination: false,
+      overrideAccess: true,
+      where: fallbackWhere,
+    })
+
+    return fallback.docs.length === 1 ? fallback.docs[0] : null
   }
 
   const getCached = unstable_cache(
@@ -121,7 +183,19 @@ const getPostBySlug = async (slug: string, draft: boolean) => {
         overrideAccess: false,
         where: { slug: { equals: slug } },
       })
-      return result.docs?.[0] ?? null
+      if (result.docs?.[0]) return result.docs[0]
+
+      const fallback = await payload.find({
+        collection: 'posts',
+        draft: false,
+        depth: 2,
+        limit: 2,
+        pagination: false,
+        overrideAccess: false,
+        where: fallbackWhere,
+      })
+
+      return fallback.docs.length === 1 ? fallback.docs[0] : null
     },
     ['post', slug],
     { revalidate: 60, tags: [`post_${slug}`] },
