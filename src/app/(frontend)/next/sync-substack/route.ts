@@ -10,6 +10,12 @@ const RSS_URL = process.env.SUBSTACK_RSS_URL || 'https://erinjerri.substack.com/
 const MODE: 'auto_publish' | 'review' =
   process.env.SUBSTACK_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 
+function resolveSyncMode(headers: Headers): 'auto_publish' | 'review' {
+  const requested = headers.get('x-substack-sync-mode')
+  if (requested === 'auto_publish' || requested === 'review') return requested
+  return MODE
+}
+
 function isAuthorizedByCronSecret(authorization: string | null): boolean {
   const secret = process.env.CRON_SECRET
   if (!secret || !authorization) return false
@@ -30,13 +36,14 @@ export async function POST(): Promise<Response> {
 
   try {
     const req = user ? await createLocalReq({ user }, payload) : undefined
+    const mode = resolveSyncMode(requestHeaders)
 
     const result = await syncSubstackToPosts({
       payload,
       req,
       options: {
         rssURL: RSS_URL,
-        mode: MODE,
+        mode,
         notifyEmail: process.env.SUBSTACK_SYNC_NOTIFY_EMAIL,
         defaultAuthorID: process.env.SUBSTACK_DEFAULT_AUTHOR_ID,
         defaultAuthorEmail: process.env.SUBSTACK_DEFAULT_AUTHOR_EMAIL,
@@ -52,7 +59,7 @@ export async function POST(): Promise<Response> {
       },
     })
 
-    return Response.json({ success: true, ...result })
+    return Response.json({ success: true, mode, ...result })
   } catch (e) {
     payload.logger.error({ err: e, message: 'Error syncing Substack posts' })
     return new Response('Error syncing Substack posts.', { status: 500 })

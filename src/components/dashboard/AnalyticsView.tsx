@@ -42,9 +42,6 @@ export default async function AnalyticsView({
       visibleEntities={initPageResult.visibleEntities}
     >
       <Gutter>
-        <h1 style={{ marginBottom: 'var(--base)', color: 'var(--theme-text)' }}>
-          Analytics Dashboard
-        </h1>
         <AnalyticsDashboard req={req} />
       </Gutter>
     </DefaultTemplate>

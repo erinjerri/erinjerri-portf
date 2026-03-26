@@ -14,8 +14,10 @@ import { schedule } from '@netlify/functions'
  * Optional: SUBSTACK_SYNC_ENABLED=true (if unset/false, handler no-ops successfully)
  */
 export const handler = schedule('0 * * * *', async () => {
-  if (process.env.SUBSTACK_SYNC_ENABLED !== 'true') {
-    console.log('[substack-sync-cron] SUBSTACK_SYNC_ENABLED is not true; skipping.')
+  const syncEnabledRaw = process.env.SUBSTACK_SYNC_ENABLED?.trim().toLowerCase()
+  const syncEnabled = syncEnabledRaw !== 'false'
+  if (!syncEnabled) {
+    console.log('[substack-sync-cron] SUBSTACK_SYNC_ENABLED=false; skipping.')
     return { statusCode: 200, body: 'Substack sync disabled.' }
   }
 
@@ -34,11 +36,13 @@ export const handler = schedule('0 * * * *', async () => {
   }
 
   const endpoint = new URL('/next/sync-substack', baseURL)
+  const syncMode = process.env.SUBSTACK_SYNC_MODE === 'review' ? 'review' : 'auto_publish'
 
   const res = await fetch(endpoint, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${secret}`,
+      'x-substack-sync-mode': syncMode,
     },
   })
 
@@ -47,7 +51,7 @@ export const handler = schedule('0 * * * *', async () => {
   if (!res.ok) {
     console.warn('[substack-sync-cron] Sync failed:', res.status, body)
   } else {
-    console.log('[substack-sync-cron] Sync OK:', body)
+    console.log(`[substack-sync-cron] Sync OK (mode=${syncMode}):`, body)
   }
 
   return {

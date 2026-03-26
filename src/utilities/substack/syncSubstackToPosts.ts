@@ -148,6 +148,101 @@ const FETCH_HEADERS = {
   'Accept-Language': 'en-US,en;q=0.9',
 } as const
 
+const RSS_HEADERS = {
+  'User-Agent': FETCH_HEADERS['User-Agent'],
+  Accept: 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
+  'Accept-Language': FETCH_HEADERS['Accept-Language'],
+} as const
+
+/** Match RSS/article fetches — Substack often blocks non-browser or bot-like User-Agents */
+const SUBSTACK_ARTICLE_HEADERS = {
+  ...FETCH_HEADERS,
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+  'Upgrade-Insecure-Requests': '1',
+} as const
+
+function refererForUrl(url: string): string {
+  try {
+    return `${new URL(url).origin}/`
+  } catch {
+    return 'https://substack.com/'
+  }
+}
+
+function normalizeSubstackPostURL(input?: string): string | undefined {
+  if (!input) return undefined
+
+  try {
+    const url = new URL(input)
+    url.hash = ''
+    url.search = ''
+
+    if (url.hostname === 'open.substack.com') {
+      const parts = url.pathname.split('/').filter(Boolean)
+      const pubIndex = parts.indexOf('pub')
+      const postIndex = parts.indexOf('p')
+      const publication = pubIndex >= 0 ? parts[pubIndex + 1] : undefined
+      const slug = postIndex >= 0 ? parts[postIndex + 1] : undefined
+
+      if (publication && slug) {
+        return `https://${publication}.substack.com/p/${slug}`
+      }
+    }
+
+    return url.toString()
+  } catch {
+    return input
+  }
+}
+
+async function fetchSubstackFeed(args: {
+  parser: Parser
+  rssURL: string
+}): Promise<Parser.Output<SubstackItem>> {
+  const { parser, rssURL } = args
+  const urlsToTry = [rssURL]
+  if (!rssURL.includes('?')) {
+    urlsToTry.push(`${rssURL}?output=rss`)
+    urlsToTry.push(`${rssURL}?format=rss`)
+  }
+
+  let lastError: unknown
+
+  for (const feedURL of urlsToTry) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(feedURL, {
+          cache: 'no-store',
+          headers: {
+            ...RSS_HEADERS,
+            Referer: refererForUrl(feedURL),
+          },
+          signal: AbortSignal.timeout(20_000),
+        })
+
+        if (!res.ok) {
+          const body = await res.text().catch(() => '')
+          throw new Error(`Substack RSS fetch failed with HTTP ${res.status} for ${feedURL}${body ? `: ${body.slice(0, 200)}` : ''}`)
+        }
+
+        const xml = await res.text()
+        const parsed = await parser.parseString(xml)
+        if ((parsed.items ?? []).length > 0) return parsed as Parser.Output<SubstackItem>
+
+        throw new Error(`Substack RSS returned no items for ${feedURL}`)
+      } catch (err) {
+        lastError = err
+        if (attempt < 3) {
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1_500))
+          continue
+        }
+      }
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('Failed to fetch Substack RSS feed')
+}
+
 /**
  * Extract the underlying S3 URL from Substack CDN URLs.
  * Format: substackcdn.com/image/fetch/w_1456,.../https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2F...
@@ -489,22 +584,10 @@ export type FetchFullArticleResult = {
 }
 
 /**
- * Fetch full article HTML from Substack when RSS only has excerpt.
- * Extracts the post body, rewrites relative image URLs to absolute,
- * and returns og:image for hero image when available.
+ * Parse already-downloaded Substack post HTML into body markup + og:image.
  */
-async function fetchFullArticleHtml(articleUrl: string): Promise<FetchFullArticleResult | null> {
+function parseArticleHtmlFromPage(html: string, articleUrl: string): FetchFullArticleResult | null {
   try {
-    const res = await fetch(articleUrl, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (compatible; SubstackSync/1.0; +https://github.com/payloadcms)',
-      },
-      cache: 'no-store',
-    })
-    if (!res.ok) return null
-
-    const html = await res.text()
     const dom = new JSDOM(html)
     const doc = dom.window.document
     const baseUrl = new URL(articleUrl)
@@ -532,7 +615,6 @@ async function fetchFullArticleHtml(articleUrl: string): Promise<FetchFullArticl
           }
           if (typeof value === 'object') {
             for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-              // prioritize common Substack keys
               if (
                 k === 'body_html' ||
                 k === 'bodyHtml' ||
@@ -567,7 +649,6 @@ async function fetchFullArticleHtml(articleUrl: string): Promise<FetchFullArticl
     const candidateDom = new JSDOM(candidateHtml)
     const body = candidateDom.window.document.body
 
-    // Rewrite relative img src to absolute (Substack CDN)
     body.querySelectorAll('img[src]').forEach((img) => {
       const src = img.getAttribute('src')
       if (src && !src.startsWith('http')) {
@@ -583,6 +664,49 @@ async function fetchFullArticleHtml(articleUrl: string): Promise<FetchFullArticl
   } catch {
     return null
   }
+}
+
+/**
+ * Fetch full article HTML from Substack when RSS only has excerpt.
+ * Uses the same browser-like headers as RSS/image fetches — bot UAs are often blocked.
+ */
+async function fetchFullArticleHtml(articleUrl: string): Promise<FetchFullArticleResult | null> {
+  const referer = refererForUrl(articleUrl)
+  let lastErr: unknown
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(articleUrl, {
+        cache: 'no-store',
+        headers: {
+          ...SUBSTACK_ARTICLE_HEADERS,
+          Referer: referer,
+        },
+        signal: AbortSignal.timeout(25_000),
+      })
+
+      if (!res.ok) {
+        lastErr = new Error(`HTTP ${res.status}`)
+        if (attempt < 3) await new Promise((r) => setTimeout(r, attempt * 1_500))
+        continue
+      }
+
+      const html = await res.text()
+      const parsed = parseArticleHtmlFromPage(html, articleUrl)
+      if (parsed) return parsed
+
+      lastErr = new Error('Could not parse article body from HTML')
+      if (attempt < 3) await new Promise((r) => setTimeout(r, attempt * 1_500))
+    } catch (err) {
+      lastErr = err
+      if (attempt < 3) await new Promise((r) => setTimeout(r, attempt * 1_500))
+    }
+  }
+
+  if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+    console.warn(`[Substack sync] Full article fetch failed for ${articleUrl}:`, lastErr)
+  }
+  return null
 }
 
 /** Extract hero image URL: prefer og:image, else first img in HTML */
@@ -659,7 +783,10 @@ export async function syncSubstackToPosts(args: {
     },
   })
 
-  const feed = await parser.parseURL(options.rssURL)
+  const feed = await fetchSubstackFeed({
+    parser,
+    rssURL: options.rssURL,
+  })
   const items = (feed.items ?? []) as SubstackItem[]
 
   const limitedItems =
@@ -707,7 +834,9 @@ export async function syncSubstackToPosts(args: {
 
   const ordered = [...limitedItems].reverse()
   for (const item of ordered) {
-    const substackId = item.guid || item.link
+    const normalizedLink = normalizeSubstackPostURL(item.link)
+    const normalizedGuid = normalizeSubstackPostURL(item.guid)
+    const substackId = normalizedGuid || normalizedLink || item.guid || item.link
     if (!substackId) {
       skipped++
       continue
@@ -715,7 +844,13 @@ export async function syncSubstackToPosts(args: {
 
     const existing = await payload.find({
       collection: 'posts',
-      where: { substackId: { equals: substackId } },
+      where: {
+        or: [
+          { substackId: { equals: substackId } },
+          ...(normalizedLink ? [{ substackURL: { equals: normalizedLink } }] : []),
+          ...(item.link ? [{ substackURL: { equals: item.link } }] : []),
+        ],
+      },
       limit: 1,
       depth: 0,
       overrideAccess: true,
@@ -736,8 +871,8 @@ export async function syncSubstackToPosts(args: {
     let ogImage: string | undefined
 
     const alwaysFetch = options.alwaysFetchFullArticle !== false
-    if ((alwaysFetch || shouldFetchFullArticle(item)) && item.link) {
-      const fullResult = await fetchFullArticleHtml(item.link)
+    if ((alwaysFetch || shouldFetchFullArticle(item)) && (normalizedLink || item.link)) {
+      const fullResult = await fetchFullArticleHtml(normalizedLink || item.link!)
       if (fullResult) {
         html = fullResult.html
         ogImage = fullResult.ogImage
@@ -792,7 +927,7 @@ export async function syncSubstackToPosts(args: {
               const file = await downloadImageAsFile({
                 src,
                 nameHint: stableId ? `substack-${stableId}` : `${item.title || 'post'}-${processed + 1}`,
-                referrer: item.link,
+                referrer: normalizedLink || item.link,
               })
               if (!file) {
                 if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
@@ -917,7 +1052,7 @@ export async function syncSubstackToPosts(args: {
         const heroFile = await downloadImageAsFile({
           src: heroNormalized.original,
           nameHint: stableId ? `substack-${stableId}-hero` : `${item.title || 'post'}-hero`,
-          referrer: item.link,
+          referrer: normalizedLink || item.link,
         })
         if (heroFile) {
           try {
@@ -972,7 +1107,7 @@ export async function syncSubstackToPosts(args: {
       continue
     }
 
-    const slugBase = getSlugBaseFromLink(item.link) || toSlug(item.title || 'untitled')
+    const slugBase = getSlugBaseFromLink(normalizedLink || item.link) || toSlug(item.title || 'untitled')
     let slug = isUpdate ? (existingDoc!.slug as string) : slugBase || `substack-${Date.now().toString(36)}`
     let attempts = 0
 
@@ -1014,7 +1149,7 @@ export async function syncSubstackToPosts(args: {
         content: lexicalContent,
         publishedAt: publishedAt.toISOString(),
         substackId,
-        substackURL: item.link,
+        substackURL: normalizedLink || item.link,
         crosspostReviewStatus: crosspostStatus,
         _status: (shouldAutoPublish ? 'published' : 'draft') as 'published' | 'draft',
         ...(authors?.length ? { authors } : {}),
@@ -1087,7 +1222,7 @@ export async function syncSubstackToPosts(args: {
         id: String(result.id),
         slug: result.slug as string,
         title: result.title as string,
-        substackURL: item.link,
+        substackURL: normalizedLink || item.link,
       })
       synced++
     } catch (err) {

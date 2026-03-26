@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
 import React from 'react'
-import Script from 'next/script'
 import { Jost, League_Spartan } from 'next/font/google'
 import { Suspense } from 'react'
 
@@ -12,6 +11,7 @@ import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
+import { GoogleTagManagerHead, GoogleTagManagerNoScript } from '@/components/GoogleTagManager'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Header as HeaderType } from '@/payload-types'
@@ -45,6 +45,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     console.log(`[layout] header ${Date.now() - headerStartedAt}ms`)
   }
 
+  const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
+
   return (
     <html
       className={cn(leagueSpartan.variable, jost.variable)}
@@ -56,9 +58,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {/* Preconnect to analytics origins to reduce connection latency when scripts load */}
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || gtmContainerId ? (
           <link rel="preconnect" href="https://www.googletagmanager.com" />
         ) : null}
+        {gtmContainerId ? <GoogleTagManagerHead containerId={gtmContainerId} /> : null}
         {process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ? (
           <>
             <link rel="preconnect" href="https://www.clarity.ms" />
@@ -67,6 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ) : null}
       </head>
       <body>
+        {gtmContainerId ? <GoogleTagManagerNoScript containerId={gtmContainerId} /> : null}
         <Providers>
           <AdminBar />
 
@@ -78,11 +82,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Footer />
           </Suspense>
         </Providers>
+        <AnalyticsScripts
+          measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+          clarityProjectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}
+        />
       </body>
-      <AnalyticsScripts
-        measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
-        clarityProjectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}
-      />
     </html>
   )
 }

@@ -54,7 +54,7 @@ Optional env vars:
 ### Automated (scheduled) sync
 
 1. Set environment variables:
-   - `SUBSTACK_SYNC_ENABLED=true`
+   - `SUBSTACK_SYNC_ENABLED` (optional; defaults to enabled unless explicitly `false`)
    - `SUBSTACK_RSS_URL` (optional)
    - `SUBSTACK_SYNC_MODE` (optional)
    - `SUBSTACK_SYNC_NOTIFY_EMAIL` (optional)
@@ -64,7 +64,7 @@ Optional env vars:
    - `SUBSTACK_SYNC_QUEUE` (optional; default `substack`)
    - `CRON_SECRET` (required for any automated trigger: Netlify scheduler or external cron)
 
-2. **Netlify:** with `SUBSTACK_SYNC_ENABLED=true` and `CRON_SECRET` set, the scheduled function `netlify/functions/substack-sync-cron.ts` runs **hourly** and `POST`s `/next/sync-substack` (same as manual cron). The separate `schedule-publish` function only drains the `schedulePublish` queue — it does **not** import Substack by itself.
+2. **Netlify:** with `CRON_SECRET` set, the scheduled function `netlify/functions/substack-sync-cron.ts` runs **hourly** and `POST`s `/next/sync-substack` (same as manual cron). It forwards `x-substack-sync-mode` (`auto_publish` by default, or `review` if `SUBSTACK_SYNC_MODE=review`). Set `SUBSTACK_SYNC_ENABLED=false` to disable. The separate `schedule-publish` function only drains the `schedulePublish` queue — it does **not** import Substack by itself.
 
 3. **Other hosts / extra triggers:** use an external cron (cron-job.org, UptimeRobot, etc.) calling:
    - `POST https://your-site/next/sync-substack`
