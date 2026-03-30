@@ -2962,7 +2962,7 @@ export interface SyncHealthWidget {
   data?: {
     title?: string | null;
   };
-  width: 'medium' | 'large';
+  width: 'large' | 'x-large' | 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

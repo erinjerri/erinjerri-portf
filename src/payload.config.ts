@@ -116,8 +116,8 @@ export default buildConfig({
           slug: 'sync-health',
           label: 'Analytics Connection Health',
           ComponentPath: '@/components/dashboard/widgets/SyncHealthWidget',
-          minWidth: 'medium',
-          maxWidth: 'large',
+          minWidth: 'large',
+          maxWidth: 'full',
           fields: [
             {
               name: 'title',
@@ -138,19 +138,19 @@ export default buildConfig({
           },
         },
         {
-          widgetSlug: 'sync-health',
-          width: 'medium',
-          data: {
-            title: 'Provider Setup Status',
-          },
-        },
-        {
           widgetSlug: 'source-performance',
           width: 'full',
           data: {
             title: 'Source Performance',
             timeframe: '30d',
             goal: 'newsletter_signup',
+          },
+        },
+        {
+          widgetSlug: 'sync-health',
+          width: 'large',
+          data: {
+            title: 'Provider Setup Status',
           },
         },
         { widgetSlug: 'collections', width: 'full' },

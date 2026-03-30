@@ -10,6 +10,7 @@ import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { validateSpeakingRequestTopics } from '@/hooks/validateSpeakingRequestTopics'
 
 import type { Page, Post, Project } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -159,6 +160,11 @@ export const plugins: Plugin[] = [
           }
           return field
         })
+      },
+    },
+    formSubmissionOverrides: {
+      hooks: {
+        beforeChange: [validateSpeakingRequestTopics],
       },
     },
   }),

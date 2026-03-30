@@ -10,6 +10,17 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { fields } from './fields'
 
+const speakingTopicFieldNames = [
+  'topic-ai-agentic-systems',
+  'topic-spatial-computing',
+  'topic-future-of-work',
+  'topic-multimodal-interfaces',
+  'topic-ai-creativity',
+  'topic-woc-tech-leadership',
+  'topic-founder-journey',
+  'topic-custom-selected',
+] as const
+
 export type FormBlockType = {
   blockName?: string
   blockType?: 'formBlock'
@@ -50,6 +61,21 @@ export const FormBlock: React.FC<
       let loadingTimerID: ReturnType<typeof setTimeout>
       const submitForm = async () => {
         setError(undefined)
+
+        if (formFromProps?.title?.trim().toLowerCase() === 'speaking request') {
+          const hasSelectedTopic = speakingTopicFieldNames.some((fieldName) => {
+            const value = (data as unknown as Record<string, unknown>)[fieldName]
+            return value === true
+          })
+
+          if (!hasSelectedTopic) {
+            setError({
+              message: 'Please select at least one topic you are interested in.',
+              status: '400',
+            })
+            return
+          }
+        }
 
         const dataToSend = Object.entries(data).map(([name, value]) => ({
           field: name,

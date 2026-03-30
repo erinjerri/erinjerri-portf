@@ -63,6 +63,15 @@ export type SyncSubstackToPostsOptions = {
    * @default true
    */
   alwaysFetchFullArticle?: boolean
+  /**
+   * Optional explicit Substack post URLs to import in addition to RSS feed items.
+   */
+  sourceURLs?: string[]
+  /**
+   * If true, discover missing post URLs from Substack archive/index pages.
+   * @default true
+   */
+  discoverFromArchive?: boolean
 }
 
 type SubstackItem = {
@@ -193,6 +202,117 @@ function normalizeSubstackPostURL(input?: string): string | undefined {
   } catch {
     return input
   }
+}
+
+function parseExplicitSourceUrls(raw: string[] | undefined): string[] {
+  if (!raw?.length) return []
+
+  return raw
+    .flatMap((value) => value.split(/[\n,]/g))
+    .map((value) => normalizeSubstackPostURL(value.trim()))
+    .filter((value): value is string => Boolean(value))
+}
+
+function deriveSubstackArchivePages(rssURL: string): string[] {
+  try {
+    const url = new URL(rssURL)
+    const basePath = url.pathname.replace(/\/feed\/?$/, '').replace(/\/$/, '')
+    const pages = [
+      `${url.origin}${basePath}/archive`,
+      `${url.origin}${basePath || ''}/`,
+    ]
+
+    return Array.from(new Set(pages.map((value) => value.replace(/([^:]\/)\/+/g, '$1'))))
+  } catch {
+    return []
+  }
+}
+
+async function fetchHtmlDocument(url: string): Promise<string | null> {
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          ...SUBSTACK_ARTICLE_HEADERS,
+          Referer: refererForUrl(url),
+        },
+        signal: AbortSignal.timeout(20_000),
+      })
+
+      if (!res.ok) {
+        lastError = new Error(`HTTP ${res.status}`)
+        if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, attempt * 1_500))
+        continue
+      }
+
+      return await res.text()
+    } catch (error) {
+      lastError = error
+      if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, attempt * 1_500))
+    }
+  }
+
+  if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
+    console.warn(`[Substack sync] HTML fetch failed for ${url}:`, lastError)
+  }
+
+  return null
+}
+
+function extractSubstackUrlsFromHtml(html: string, expectedOrigin: string): string[] {
+  try {
+    const dom = new JSDOM(html)
+    const links = dom.window.document.querySelectorAll('a[href]')
+    const urls = new Set<string>()
+
+    for (const link of links) {
+      const href = link.getAttribute('href')
+      if (!href) continue
+
+      try {
+        const normalized = normalizeSubstackPostURL(new URL(href, expectedOrigin).toString())
+        if (!normalized) continue
+
+        const parsed = new URL(normalized)
+        if (parsed.origin !== expectedOrigin) continue
+        if (!/^\/p\/[^/]+/.test(parsed.pathname)) continue
+
+        urls.add(normalized)
+      } catch {
+        continue
+      }
+    }
+
+    return [...urls]
+  } catch {
+    return []
+  }
+}
+
+async function discoverSubstackArchivePostUrls(rssURL: string): Promise<string[]> {
+  let expectedOrigin: string
+
+  try {
+    expectedOrigin = new URL(rssURL).origin
+  } catch {
+    return []
+  }
+
+  const discovered = new Set<string>()
+
+  for (const pageURL of deriveSubstackArchivePages(rssURL)) {
+    const html = await fetchHtmlDocument(pageURL)
+    if (!html) continue
+
+    for (const url of extractSubstackUrlsFromHtml(html, expectedOrigin)) {
+      discovered.add(url)
+    }
+  }
+
+  return [...discovered]
 }
 
 async function fetchSubstackFeed(args: {
@@ -581,6 +701,8 @@ export type FetchFullArticleResult = {
   html: string
   /** og:image URL from page head — canonical hero/featured image */
   ogImage?: string
+  title?: string
+  publishedAt?: string
 }
 
 /**
@@ -594,6 +716,14 @@ function parseArticleHtmlFromPage(html: string, articleUrl: string): FetchFullAr
 
     const ogImage =
       doc.querySelector('meta[property="og:image"]')?.getAttribute('content')?.trim() || undefined
+    const title =
+      doc.querySelector('meta[property="og:title"]')?.getAttribute('content')?.trim() ||
+      doc.querySelector('title')?.textContent?.trim() ||
+      undefined
+    const publishedAt =
+      doc.querySelector('meta[property="article:published_time"]')?.getAttribute('content')?.trim() ||
+      doc.querySelector('time[datetime]')?.getAttribute('datetime')?.trim() ||
+      undefined
 
     const extractFromNextData = (): string | null => {
       const script = doc.querySelector('script#__NEXT_DATA__')?.textContent
@@ -660,7 +790,7 @@ function parseArticleHtmlFromPage(html: string, articleUrl: string): FetchFullAr
       }
     })
 
-    return { html: body.innerHTML, ogImage }
+    return { html: body.innerHTML, ogImage, title, publishedAt }
   } catch {
     return null
   }
@@ -787,7 +917,33 @@ export async function syncSubstackToPosts(args: {
     parser,
     rssURL: options.rssURL,
   })
-  const items = (feed.items ?? []) as SubstackItem[]
+  const items = [...((feed.items ?? []) as SubstackItem[])]
+
+  const explicitSourceUrls = parseExplicitSourceUrls(options.sourceURLs)
+  const archiveUrls =
+    options.discoverFromArchive === false ? [] : await discoverSubstackArchivePostUrls(options.rssURL)
+  const knownUrls = new Set(
+    items
+      .flatMap((item) => [normalizeSubstackPostURL(item.link), normalizeSubstackPostURL(item.guid)])
+      .filter((value): value is string => Boolean(value)),
+  )
+
+  for (const sourceURL of [...archiveUrls, ...explicitSourceUrls]) {
+    if (knownUrls.has(sourceURL)) continue
+
+    const fullResult = await fetchFullArticleHtml(sourceURL)
+    if (!fullResult?.html) continue
+
+    items.push({
+      guid: sourceURL,
+      link: sourceURL,
+      title: fullResult.title || sourceURL.split('/').filter(Boolean).pop() || 'Untitled',
+      content: fullResult.html,
+      'content:encoded': fullResult.html,
+      isoDate: fullResult.publishedAt,
+    })
+    knownUrls.add(sourceURL)
+  }
 
   const limitedItems =
     typeof options.maxItems === 'number' && options.maxItems > 0

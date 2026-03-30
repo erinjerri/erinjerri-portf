@@ -20,6 +20,17 @@ const mode: 'auto_publish' | 'review' =
 const cron = process.env.SUBSTACK_SYNC_CRON || '0 0 * * * *'
 const queue = process.env.SUBSTACK_SYNC_QUEUE || 'substack'
 
+function parseSourceURLs(raw: string | undefined): string[] | undefined {
+  if (!raw?.trim()) return undefined
+
+  const parsed = raw
+    .split(/[\n,]/g)
+    .map((value) => value.trim())
+    .filter(Boolean)
+
+  return parsed.length > 0 ? parsed : undefined
+}
+
 export const substackSyncTask: TaskConfig<SubstackSyncTaskIO> = {
   slug: 'substackSync',
   label: 'Sync Substack posts',
@@ -34,6 +45,7 @@ export const substackSyncTask: TaskConfig<SubstackSyncTaskIO> = {
 
     const forceUpdateEnv = process.env.SUBSTACK_SYNC_FORCE_UPDATE?.trim()
     const downloadImagesEnv = process.env.SUBSTACK_SYNC_DOWNLOAD_IMAGES?.trim()
+    const sourceURLs = parseSourceURLs(process.env.SUBSTACK_SYNC_SOURCE_URLS)
 
     const { synced, skipped, errors } = await syncSubstackToPosts({
       payload: req.payload,
@@ -47,6 +59,7 @@ export const substackSyncTask: TaskConfig<SubstackSyncTaskIO> = {
         maxItems: Number.isFinite(maxItems) ? maxItems : undefined,
         forceUpdate: forceUpdateEnv ? forceUpdateEnv === 'true' : undefined,
         downloadImages: downloadImagesEnv ? downloadImagesEnv === 'true' : undefined,
+        sourceURLs,
         maxImagesPerPost: Number.isFinite(maxImagesPerPost) ? maxImagesPerPost : undefined,
       },
     })

@@ -25,6 +25,7 @@
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation next lint --fix",
     "payload": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" payload",
     "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/restore.ts",
+    "upsert:speaking-form": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/upsert-speaking-request-form.ts",
     "ensure:store": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-store-page.ts",
     "repair:crossposts": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/repair-crosspost-publish-state.ts",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",

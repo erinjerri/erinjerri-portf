@@ -5,6 +5,8 @@ import fs from 'fs/promises'
 
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
+import { speakingRequestFormData } from './speaking-request-form'
+import { aboutPage as aboutPageData } from './about-page'
 import { home } from './home'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
@@ -331,18 +333,26 @@ export const seed = async ({
     req,
   })
 
-  payload.logger.info(`— Seeding contact form...`)
+  payload.logger.info(`— Seeding forms...`)
 
-  const contactForm = await payload.create({
-    collection: 'forms',
-    depth: 0,
-    data: contactFormData,
-    req,
-  })
+  const [contactForm, speakingRequestForm] = await Promise.all([
+    payload.create({
+      collection: 'forms',
+      depth: 0,
+      data: contactFormData,
+      req,
+    }),
+    payload.create({
+      collection: 'forms',
+      depth: 0,
+      data: speakingRequestFormData,
+      req,
+    }),
+  ])
 
   payload.logger.info(`— Seeding pages...`)
 
-  const [_, contactPage] = await Promise.all([
+  const [_, contactPage, aboutPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
@@ -358,6 +368,12 @@ export const seed = async ({
       collection: 'pages',
       depth: 0,
       data: contactPageData({ contactForm: contactForm }),
+      req,
+    }),
+    payload.create({
+      collection: 'pages',
+      depth: 0,
+      data: aboutPageData({ speakingRequestForm: speakingRequestForm }),
       req,
     }),
   ])
@@ -381,6 +397,16 @@ export const seed = async ({
               type: 'custom',
               label: 'Posts',
               url: '/posts',
+            },
+          },
+          {
+            link: {
+              type: 'reference',
+              label: 'About',
+              reference: {
+                relationTo: 'pages',
+                value: aboutPage.id,
+              },
             },
           },
           {

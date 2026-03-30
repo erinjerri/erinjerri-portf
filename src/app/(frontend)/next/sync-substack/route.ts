@@ -1,6 +1,5 @@
 import { createLocalReq, getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
 
 import { syncSubstackToPosts } from '@/utilities/substack/syncSubstackToPosts'
 
@@ -10,10 +9,22 @@ const RSS_URL = process.env.SUBSTACK_RSS_URL || 'https://erinjerri.substack.com/
 const MODE: 'auto_publish' | 'review' =
   process.env.SUBSTACK_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 
-function resolveSyncMode(headers: Headers): 'auto_publish' | 'review' {
-  const requested = headers.get('x-substack-sync-mode')
+function resolveSyncMode(requestHeaders: Headers): 'auto_publish' | 'review' {
+  const requested = requestHeaders.get('x-substack-sync-mode')
   if (requested === 'auto_publish' || requested === 'review') return requested
   return MODE
+}
+
+function parseSourceURLs(raw: string[] | string | null | undefined): string[] | undefined {
+  if (!raw) return undefined
+
+  const values = Array.isArray(raw) ? raw : [raw]
+  const parsed = values
+    .flatMap((value) => value.split(/[\n,]/g))
+    .map((value) => value.trim())
+    .filter(Boolean)
+
+  return parsed.length > 0 ? parsed : undefined
 }
 
 function isAuthorizedByCronSecret(authorization: string | null): boolean {
@@ -22,9 +33,9 @@ function isAuthorizedByCronSecret(authorization: string | null): boolean {
   return authorization.trim() === `Bearer ${secret}`
 }
 
-export async function POST(): Promise<Response> {
+export async function POST(request: Request): Promise<Response> {
   const payload = await getPayload({ config })
-  const requestHeaders = await headers()
+  const requestHeaders = request.headers
   const authorization = requestHeaders.get('authorization')
 
   const allowCron = isAuthorizedByCronSecret(authorization)
@@ -37,6 +48,19 @@ export async function POST(): Promise<Response> {
   try {
     const req = user ? await createLocalReq({ user }, payload) : undefined
     const mode = resolveSyncMode(requestHeaders)
+    const body = request.headers.get('content-type')?.includes('application/json')
+      ? ((await request.json()) as
+          | {
+              sourceURL?: string
+              sourceURLs?: string[] | string
+            }
+          | null)
+      : null
+    const sourceURLs =
+      parseSourceURLs(body?.sourceURLs) ??
+      parseSourceURLs(body?.sourceURL) ??
+      parseSourceURLs(requestHeaders.get('x-substack-source-urls')) ??
+      parseSourceURLs(process.env.SUBSTACK_SYNC_SOURCE_URLS)
 
     const result = await syncSubstackToPosts({
       payload,
@@ -53,6 +77,7 @@ export async function POST(): Promise<Response> {
         includeImageSourceLinks: process.env.SUBSTACK_SYNC_INCLUDE_IMAGE_SOURCE_LINKS
           ? process.env.SUBSTACK_SYNC_INCLUDE_IMAGE_SOURCE_LINKS === 'true'
           : undefined,
+        sourceURLs,
         maxImagesPerPost: process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST
           ? Number(process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST)
           : undefined,
@@ -65,4 +90,3 @@ export async function POST(): Promise<Response> {
     return new Response('Error syncing Substack posts.', { status: 500 })
   }
 }
-
