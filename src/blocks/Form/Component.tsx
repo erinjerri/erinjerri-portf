@@ -35,6 +35,7 @@ export const FormBlock: React.FC<
   } & FormBlockType
 > = (props) => {
   const {
+    id: blockAnchorId,
     enableIntro,
     form: formFromProps,
     form: { id: formID, confirmationMessage, confirmationType, redirect, submitButtonLabel } = {},
@@ -140,7 +141,7 @@ export const FormBlock: React.FC<
   )
 
   return (
-    <div className="container lg:max-w-[48rem]">
+    <div className="container lg:max-w-[48rem]" id={blockAnchorId ?? undefined}>
       {enableIntro && introContent && !hasSubmitted && (
         <RichText className="mb-8 lg:mb-12" data={introContent} enableGutter={false} />
       )}

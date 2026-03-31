@@ -41,6 +41,8 @@ declare global {
       R2_FORCE_PATH_STYLE?: 'true' | 'false'
       /** S3/R2 key prefix for media (default: media). Set if Payload uses a different prefix. */
       R2_MEDIA_PREFIX?: string
+      /** Comma-separated page slugs that receive the default AR/VR book stat strip (see enhancePageForRoute). */
+      BOOK_PAGE_SLUG?: string
       ALLOW_SEED_IN_PROD?: 'true' | 'false'
       VERCEL_PROJECT_PRODUCTION_URL: string
     }

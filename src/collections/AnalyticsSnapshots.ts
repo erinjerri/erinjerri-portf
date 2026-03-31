@@ -22,6 +22,7 @@ export const AnalyticsSnapshots: CollectionConfig = {
     defaultColumns: ['provider', 'platform', 'metricKey', 'metricValue', 'snapshotDate'],
     description: 'Normalized analytics metrics for dashboard widgets and conversion reporting.',
     group: 'Analytics',
+    hidden: true,
     useAsTitle: 'metricLabel',
   },
   fields: [

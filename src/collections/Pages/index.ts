@@ -12,6 +12,10 @@ import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { ToplineHeader } from '../../blocks/ToplineHeader/config'
 import { VideoBackgroundTransition } from '../../blocks/VideoBackgroundTransition/config'
 import { WatchBlock } from '../../blocks/WatchBlock/config'
+import { StatStrip } from '../../blocks/StatStrip/config'
+import { TagPills } from '../../blocks/TagPills/config'
+import { SignatureTalks } from '../../blocks/SignatureTalks/config'
+import { BookAcclaimStrip } from '../../blocks/BookAcclaimStrip/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -91,6 +95,10 @@ export const Pages: CollectionConfig<'pages'> = {
                 VideoBackgroundTransition,
                 FormBlock,
                 ToplineHeader,
+                StatStrip,
+                TagPills,
+                SignatureTalks,
+                BookAcclaimStrip,
               ],
               required: true,
               admin: {

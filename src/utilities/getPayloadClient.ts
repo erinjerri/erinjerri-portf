@@ -36,7 +36,8 @@ export const withPayloadClientRetry = async <T>(
     baseDelayMs?: number
   },
 ): Promise<T> => {
-  const attempts = options?.attempts ?? 3
+  const attempts =
+    options?.attempts ?? (process.env.NODE_ENV === 'development' ? 6 : 3)
   const baseDelayMs = options?.baseDelayMs ?? 1500
 
   for (let attempt = 0; attempt < attempts; attempt++) {

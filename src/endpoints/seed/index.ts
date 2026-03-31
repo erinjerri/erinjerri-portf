@@ -7,6 +7,8 @@ import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { speakingRequestFormData } from './speaking-request-form'
 import { aboutPage as aboutPageData } from './about-page'
+import { speakingInfoPage as speakingInfoPageData } from './speaking-info-page'
+import { creatingArVrBookPage } from './creating-ar-vr-book-page'
 import { home } from './home'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
@@ -352,7 +354,7 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
-  const [_, contactPage, aboutPage] = await Promise.all([
+  const [_, contactPage, aboutPage, speakingInfoPage, _bookPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
@@ -374,6 +376,18 @@ export const seed = async ({
       collection: 'pages',
       depth: 0,
       data: aboutPageData({ speakingRequestForm: speakingRequestForm }),
+      req,
+    }),
+    payload.create({
+      collection: 'pages',
+      depth: 0,
+      data: speakingInfoPageData({ speakingRequestForm: speakingRequestForm }),
+      req,
+    }),
+    payload.create({
+      collection: 'pages',
+      depth: 0,
+      data: creatingArVrBookPage(),
       req,
     }),
   ])
@@ -412,6 +426,16 @@ export const seed = async ({
           {
             link: {
               type: 'reference',
+              label: 'Speaking',
+              reference: {
+                relationTo: 'pages',
+                value: speakingInfoPage.id,
+              },
+            },
+          },
+          {
+            link: {
+              type: 'reference',
               label: 'Contact',
               reference: {
                 relationTo: 'pages',
@@ -433,7 +457,19 @@ export const seed = async ({
         linkGroups: [
           {
             header: 'About',
-            links: [{ link: { type: 'custom', label: 'Home', url: '/' } }],
+            links: [
+              { link: { type: 'custom', label: 'Home', url: '/' } },
+              {
+                link: {
+                  type: 'reference',
+                  label: 'Speaking',
+                  reference: {
+                    relationTo: 'pages',
+                    value: speakingInfoPage.id,
+                  },
+                },
+              },
+            ],
           },
           {
             header: 'Read',

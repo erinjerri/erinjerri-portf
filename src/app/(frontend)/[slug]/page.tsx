@@ -8,6 +8,7 @@ import React from 'react'
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { resolveHeroMedia } from '@/heros/resolveHeroMedia'
+import { enhancePageForRoute } from '@/utilities/enhancePageForRoute'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { VideoEmbed } from '@/components/VideoEmbed'
@@ -80,7 +81,9 @@ export default async function Page({ params: paramsPromise }: Args) {
     return <PayloadRedirects url={url} />
   }
 
-  const resolvedHero = await resolveHeroMedia(renderedPage.hero)
+  const enhancedPage = enhancePageForRoute(renderedPage, decodedSlug)
+
+  const resolvedHero = await resolveHeroMedia(enhancedPage.hero)
 
   const hasHomeGridMedia =
     decodedSlug === 'home' &&
@@ -98,7 +101,7 @@ export default async function Page({ params: paramsPromise }: Args) {
       }
     : resolvedHero
 
-  const { layout, videoAsset, videoSource, videoUrl } = renderedPage
+  const { layout, videoAsset, videoSource, videoUrl } = enhancedPage
   const selectedVideo = typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video')
     ? videoAsset
     : null

@@ -82,16 +82,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const getPageBySlug = async (slug: string, draft: boolean) => {
   if (draft) {
-    const payload = await getPayloadClient()
-    const result = await payload.find({
-      collection: 'pages',
-      depth: 3,
-      draft: true,
-      limit: 1,
-      pagination: false,
-      overrideAccess: true,
-      where: { slug: { equals: slug } },
-    })
+    const result = await withPayloadClientRetry((payload) =>
+      payload.find({
+        collection: 'pages',
+        depth: 3,
+        draft: true,
+        limit: 1,
+        pagination: false,
+        overrideAccess: true,
+        where: { slug: { equals: slug } },
+      }),
+    )
     return result.docs?.[0] ?? null
   }
 

@@ -7,7 +7,7 @@ import { draftMode } from 'next/headers'
 import { CategoryFilter } from '@/components/CategoryFilter'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import type { CardRelationTo } from '@/components/Card'
-import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import { isMongoNotConnectedError, withPayloadClientRetry } from '@/utilities/getPayloadClient'
 
 type ArchiveFetchedDocs = {
   docs: (Post | Project)[]
@@ -37,27 +37,37 @@ export const ArchiveBlock: React.FC<
       else return category
     })
 
-    const fetchedDocs = await withPayloadClientRetry<ArchiveFetchedDocs>((payload) => {
-      return (payload as any).find({
-        collection: relationTo,
-        draft: isDraftMode,
-        depth: 2,
-        limit,
-        overrideAccess: isDraftMode ? true : false,
-        sort: '-publishedAt',
-        ...(flattenedCategories && flattenedCategories.length > 0
-          ? {
-              where: {
-                categories: {
-                  in: flattenedCategories,
+    try {
+      const fetchedDocs = await withPayloadClientRetry<ArchiveFetchedDocs>((payload) => {
+        return (payload as any).find({
+          collection: relationTo,
+          draft: isDraftMode,
+          depth: 2,
+          limit,
+          overrideAccess: isDraftMode ? true : false,
+          sort: '-publishedAt',
+          ...(flattenedCategories && flattenedCategories.length > 0
+            ? {
+                where: {
+                  categories: {
+                    in: flattenedCategories,
+                  },
                 },
-              },
-            }
-          : {}),
-      }) as Promise<ArchiveFetchedDocs>
-    })
+              }
+            : {}),
+        }) as Promise<ArchiveFetchedDocs>
+      })
 
-    docs = fetchedDocs.docs as (Post | Project)[]
+      docs = fetchedDocs.docs as (Post | Project)[]
+    } catch (error) {
+      if (isMongoNotConnectedError(error) && process.env.NODE_ENV === 'development') {
+        console.warn(
+          '[ArchiveBlock] MongoDB not connected — archive will render empty until DATABASE_URL works and the DB is reachable.',
+        )
+      } else {
+        throw error
+      }
+    }
   } else {
     if (selectedDocs?.length) {
       const filteredSelectedDocs = selectedDocs.map((doc) => {

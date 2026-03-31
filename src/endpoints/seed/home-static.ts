@@ -1,5 +1,7 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
+import { homeHireMeLayoutBlocks } from './home-hire-me-layout'
+
 // Used for pre-seeded content so that the homepage is not empty
 export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
   slug: 'home',
@@ -102,5 +104,5 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
     title: 'Erin Jerri',
   },
   title: 'Home',
-  layout: [],
+  layout: [...homeHireMeLayoutBlocks],
 }

@@ -7,6 +7,7 @@ import React from 'react'
 import { AffiliateLink } from '@/components/analytics/AffiliateLink'
 import { Media } from '@/components/Media'
 import { buildAmazonAffiliateURL } from '@/utilities/amazon/buildAmazonAffiliateURL'
+import { isMongoNotConnectedError } from '@/utilities/getPayloadClient'
 import { cn } from '@/utilities/ui'
 
 type Props = AffiliateProductsBlockProps & {
@@ -66,23 +67,37 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
   let resolvedProducts: AffiliateProduct[] = embeddedDocs
 
   if (missingIDs.length > 0) {
-    const payload = await getPayload({ config: configPromise })
-    const fetched = await payload.find({
-      collection: 'affiliateProducts',
-      depth: 1,
-      limit: missingIDs.length,
-      overrideAccess: false,
-      pagination: false,
-      where: {
-        id: {
-          in: missingIDs,
+    try {
+      const payload = await getPayload({ config: configPromise })
+      const fetched = await payload.find({
+        collection: 'affiliateProducts',
+        depth: 1,
+        limit: missingIDs.length,
+        overrideAccess: false,
+        pagination: false,
+        where: {
+          id: {
+            in: missingIDs,
+          },
         },
-      },
-    })
+      })
 
-    const fetchedDocs = fetched.docs as AffiliateProduct[]
-    resolvedProducts = [...embeddedDocs, ...fetchedDocs]
-    resolvedProducts = orderByRequestedIDs(resolvedProducts, products.map((p) => String(typeof p === 'object' ? p.id : p)))
+      const fetchedDocs = fetched.docs as AffiliateProduct[]
+      resolvedProducts = [...embeddedDocs, ...fetchedDocs]
+      resolvedProducts = orderByRequestedIDs(
+        resolvedProducts,
+        products.map((p) => String(typeof p === 'object' ? p.id : p)),
+      )
+    } catch (error) {
+      if (isMongoNotConnectedError(error) && process.env.NODE_ENV === 'development') {
+        console.warn(
+          '[AffiliateProductsBlock] MongoDB not connected — showing embedded products only.',
+        )
+        resolvedProducts = embeddedDocs
+      } else {
+        throw error
+      }
+    }
   }
 
   const associateTag =

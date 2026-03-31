@@ -353,6 +353,10 @@ export interface Page {
     | VideoBackgroundTransitionBlock
     | FormBlock
     | ToplineHeaderBlock
+    | StatStripBlock
+    | TagPillsBlock
+    | SignatureTalksBlock
+    | BookAcclaimStripBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1397,6 +1401,102 @@ export interface ToplineHeaderBlock {
   blockType: 'toplineHeader';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatStripBlock".
+ */
+export interface StatStripBlock {
+  /**
+   * Optional small label above the row.
+   */
+  eyebrow?: string | null;
+  emphasis?: ('default' | 'bold') | null;
+  /**
+   * Layout width for metrics or acclaim-style rows.
+   */
+  columns?: ('four' | 'three') | null;
+  items?:
+    | {
+        value: string;
+        /**
+         * Usually uppercase supporting line.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statStrip';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TagPillsBlock".
+ */
+export interface TagPillsBlock {
+  /**
+   * Optional line above the tags.
+   */
+  intro?: string | null;
+  tags?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'tagPills';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SignatureTalksBlock".
+ */
+export interface SignatureTalksBlock {
+  heading?: string | null;
+  /**
+   * Optional paragraph under the heading.
+   */
+  intro?: string | null;
+  talks?:
+    | {
+        /**
+         * Display index e.g. 01, 02
+         */
+        number: string;
+        title: string;
+        subtitle: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'signatureTalks';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BookAcclaimStripBlock".
+ */
+export interface BookAcclaimStripBlock {
+  heading?: string | null;
+  items?:
+    | {
+        variant?: ('numbered' | 'check' | 'text') | null;
+        /**
+         * Bold headline line (e.g. #1 Amazon Game Programming…)
+         */
+        lead: string;
+        /**
+         * Supporting line under the headline.
+         */
+        body?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'bookAcclaimStrip';
+}
+/**
  * Normalized analytics metrics for dashboard widgets and conversion reporting.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1776,6 +1876,10 @@ export interface PagesSelect<T extends boolean = true> {
         videoBackgroundTransition?: T | VideoBackgroundTransitionBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
         toplineHeader?: T | ToplineHeaderBlockSelect<T>;
+        statStrip?: T | StatStripBlockSelect<T>;
+        tagPills?: T | TagPillsBlockSelect<T>;
+        signatureTalks?: T | SignatureTalksBlockSelect<T>;
+        bookAcclaimStrip?: T | BookAcclaimStripBlockSelect<T>;
       };
   meta?:
     | T
@@ -1983,6 +2087,74 @@ export interface ToplineHeaderBlockSelect<T extends boolean = true> {
   title?: T;
   media?: T;
   height?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatStripBlock_select".
+ */
+export interface StatStripBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  emphasis?: T;
+  columns?: T;
+  items?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TagPillsBlock_select".
+ */
+export interface TagPillsBlockSelect<T extends boolean = true> {
+  intro?: T;
+  tags?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SignatureTalksBlock_select".
+ */
+export interface SignatureTalksBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  talks?:
+    | T
+    | {
+        number?: T;
+        title?: T;
+        subtitle?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BookAcclaimStripBlock_select".
+ */
+export interface BookAcclaimStripBlockSelect<T extends boolean = true> {
+  heading?: T;
+  items?:
+    | T
+    | {
+        variant?: T;
+        lead?: T;
+        body?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

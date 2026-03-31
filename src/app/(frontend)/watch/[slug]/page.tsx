@@ -14,26 +14,25 @@ import { WatchSlidesSection } from '@/components/WatchSlidesSection'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { generateMeta } from '@/utilities/generateMeta'
-import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayloadClient()
-    const payloadAny = payload as any
-
-    const watchDocs = await payloadAny.find({
-      collection: 'watch',
-      draft: false,
-      limit: 1000,
-      overrideAccess: false,
-      pagination: false,
-      select: {
-        slug: true,
-      },
-    })
+    const watchDocs = await withPayloadClientRetry<any>((payload) =>
+      (payload as any).find({
+        collection: 'watch',
+        draft: false,
+        limit: 1000,
+        overrideAccess: false,
+        pagination: false,
+        select: {
+          slug: true,
+        },
+      }),
+    )
 
     return watchDocs.docs.map(({ slug }: { slug: string }) => ({ slug }))
   } catch (err) {
@@ -151,33 +150,33 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
 const getWatchBySlug = async (slug: string, draft: boolean) => {
   if (draft) {
-    const payload = await getPayloadClient()
-    const result = await (payload as any).find({
-      collection: 'watch',
-      draft: true,
-      depth: 2,
-      limit: 1,
-      overrideAccess: true,
-      pagination: false,
-      where: { slug: { equals: slug } },
-    })
+    const result = await withPayloadClientRetry<any>((payload) =>
+      (payload as any).find({
+        collection: 'watch',
+        draft: true,
+        depth: 2,
+        limit: 1,
+        overrideAccess: true,
+        pagination: false,
+        where: { slug: { equals: slug } },
+      }),
+    )
     return result.docs?.[0] ?? null
   }
 
   const getCached = unstable_cache(
-    async () => {
-      const payload = await getPayloadClient()
-      const result = await (payload as any).find({
-        collection: 'watch',
-        draft: false,
-        depth: 2,
-        limit: 1,
-        overrideAccess: false,
-        pagination: false,
-        where: { slug: { equals: slug } },
-      })
-      return result.docs?.[0] ?? null
-    },
+    async () =>
+      withPayloadClientRetry<any>((payload) =>
+        (payload as any).find({
+          collection: 'watch',
+          draft: false,
+          depth: 2,
+          limit: 1,
+          overrideAccess: false,
+          pagination: false,
+          where: { slug: { equals: slug } },
+        }),
+      ).then((result) => result.docs?.[0] ?? null),
     ['watch', slug],
     { revalidate: 60, tags: [`watch_${slug}`] },
   )

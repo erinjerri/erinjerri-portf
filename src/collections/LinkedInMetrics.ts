@@ -14,6 +14,7 @@ export const LinkedInMetrics: CollectionConfig = {
     defaultColumns: ['date', 'followers', 'newsletterSubscribers', 'postViews'],
     description: 'LinkedIn follower and engagement metrics synced from the LinkedIn API.',
     group: 'Analytics',
+    hidden: true,
     useAsTitle: 'date',
   },
   fields: [

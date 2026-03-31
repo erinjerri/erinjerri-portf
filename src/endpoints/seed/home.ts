@@ -1,6 +1,8 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 import type { Media } from '@/payload-types'
 
+import { homeHireMeLayoutBlocks } from './home-hire-me-layout'
+
 type HomeArgs = {
   heroImage1: Media
   heroImage2: Media
@@ -146,6 +148,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
       },
     },
     layout: [
+      ...homeHireMeLayoutBlocks,
       {
         blockName: 'Content Block',
         blockType: 'content',

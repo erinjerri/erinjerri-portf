@@ -7,6 +7,39 @@ import type {
   Page,
 } from '@/payload-types'
 
+import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
+import { AffiliateProductsBlock } from '@/blocks/AffiliateProducts/Component'
+import { CallToActionBlock } from '@/blocks/CallToAction/Component'
+import { ContentBlock } from '@/blocks/Content/Component'
+import { DocumentBlockComponent } from '@/blocks/DocumentBlock/Component'
+import { FormBlock } from '@/blocks/Form/Component'
+import { MediaWithOverlayLinksBlock } from '@/blocks/MediaWithOverlayLinks/Component'
+import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { ToplineHeaderBlock } from '@/blocks/ToplineHeader/Component'
+import { VideoBackgroundTransitionBlock } from '@/blocks/VideoBackgroundTransition/Component'
+import { WatchBlockComponent } from '@/blocks/WatchBlock/Component'
+import { StatStripBlock } from '@/blocks/StatStrip/Component'
+import { TagPillsBlock } from '@/blocks/TagPills/Component'
+import { SignatureTalksBlock } from '@/blocks/SignatureTalks/Component'
+import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
+
+const blockComponents = {
+  archive: ArchiveBlock,
+  affiliateProductsBlock: AffiliateProductsBlock,
+  content: ContentBlock,
+  cta: CallToActionBlock,
+  documentBlock: DocumentBlockComponent,
+  formBlock: FormBlock,
+  mediaBlock: MediaBlock,
+  toplineHeader: ToplineHeaderBlock,
+  videoBackgroundTransition: VideoBackgroundTransitionBlock,
+  watchBlock: WatchBlockComponent,
+  statStrip: StatStripBlock,
+  tagPills: TagPillsBlock,
+  signatureTalks: SignatureTalksBlock,
+  bookAcclaimStrip: BookAcclaimStripBlock,
+}
+
 /** Layout block - element of page layout array */
 type LayoutBlock = Page['layout'] extends (infer B)[] ? B : Page['layout'] extends readonly (infer B)[] ? B : Record<string, unknown> & { blockType?: string }
 
@@ -84,31 +117,6 @@ function ctaHasLinks(b: LayoutBlock | null | undefined): boolean {
   if (!b) return false
   const c = b as CtaBlockType
   return Array.isArray(c.links) && c.links.length > 0
-}
-
-import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
-import { AffiliateProductsBlock } from '@/blocks/AffiliateProducts/Component'
-import { CallToActionBlock } from '@/blocks/CallToAction/Component'
-import { ContentBlock } from '@/blocks/Content/Component'
-import { DocumentBlockComponent } from '@/blocks/DocumentBlock/Component'
-import { FormBlock } from '@/blocks/Form/Component'
-import { MediaWithOverlayLinksBlock } from '@/blocks/MediaWithOverlayLinks/Component'
-import { MediaBlock } from '@/blocks/MediaBlock/Component'
-import { ToplineHeaderBlock } from '@/blocks/ToplineHeader/Component'
-import { VideoBackgroundTransitionBlock } from '@/blocks/VideoBackgroundTransition/Component'
-import { WatchBlockComponent } from '@/blocks/WatchBlock/Component'
-
-const blockComponents = {
-  archive: ArchiveBlock,
-  affiliateProductsBlock: AffiliateProductsBlock,
-  content: ContentBlock,
-  cta: CallToActionBlock,
-  documentBlock: DocumentBlockComponent,
-  formBlock: FormBlock,
-  mediaBlock: MediaBlock,
-  toplineHeader: ToplineHeaderBlock,
-  videoBackgroundTransition: VideoBackgroundTransitionBlock,
-  watchBlock: WatchBlockComponent,
 }
 
 export const RenderBlocks: React.FC<{
@@ -197,9 +205,9 @@ export const RenderBlocks: React.FC<{
           }
 
           if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType]
+            const Block = blockComponents[blockType as keyof typeof blockComponents]
 
-            if (Block) {
+            if (typeof Block === 'function') {
               const prevBlock = blocksToRender[index - 1]
               const isMedia =
                 blockType === 'mediaBlock' || blockType === 'videoBackgroundTransition'
