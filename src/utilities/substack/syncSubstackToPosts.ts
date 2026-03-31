@@ -685,6 +685,12 @@ function getSlugBaseFromLink(link?: string): string | undefined {
   }
 }
 
+function getItemTimestamp(item: SubstackItem): number {
+  if (!item.isoDate) return 0
+  const timestamp = Date.parse(item.isoDate)
+  return Number.isFinite(timestamp) ? timestamp : 0
+}
+
 /** Substack article body selectors (in order of preference) */
 const SUBSTACK_BODY_SELECTORS = [
   '.available-content',
@@ -988,7 +994,9 @@ export async function syncSubstackToPosts(args: {
     return asString ?? undefined
   }
 
-  const ordered = [...limitedItems].reverse()
+  // Process newest posts first so scheduled runs import fresh content before spending
+  // time on older force-updates or archive backfills.
+  const ordered = [...limitedItems].sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a))
   for (const item of ordered) {
     const normalizedLink = normalizeSubstackPostURL(item.link)
     const normalizedGuid = normalizeSubstackPostURL(item.guid)
