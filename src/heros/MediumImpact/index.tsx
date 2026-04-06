@@ -27,6 +27,7 @@ export const MediumImpactHero: React.FC<Page['hero']> = ({
               imgClassName="object-contain"
               priority
               resource={heroMedia}
+              size="(max-width: 640px) 100vw, (max-width: 1024px) 360px, (max-width: 1280px) 420px, 520px"
             />
             {heroMedia?.caption && (
               <div className="mt-3">

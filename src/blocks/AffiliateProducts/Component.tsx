@@ -1,13 +1,14 @@
 import type { AffiliateProduct, AffiliateProductsBlock as AffiliateProductsBlockProps } from '@/payload-types'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
 
 import { AffiliateLink } from '@/components/analytics/AffiliateLink'
 import { Media } from '@/components/Media'
 import { buildAmazonAffiliateURL } from '@/utilities/amazon/buildAmazonAffiliateURL'
-import { isMongoNotConnectedError } from '@/utilities/getPayloadClient'
+import {
+  isMongoConnectionRetryableError,
+  withPayloadClientRetry,
+} from '@/utilities/getPayloadClient'
 import { cn } from '@/utilities/ui'
 
 type Props = AffiliateProductsBlockProps & {
@@ -68,19 +69,20 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
 
   if (missingIDs.length > 0) {
     try {
-      const payload = await getPayload({ config: configPromise })
-      const fetched = await payload.find({
-        collection: 'affiliateProducts',
-        depth: 1,
-        limit: missingIDs.length,
-        overrideAccess: false,
-        pagination: false,
-        where: {
-          id: {
-            in: missingIDs,
+      const fetched = await withPayloadClientRetry((payload) =>
+        payload.find({
+          collection: 'affiliateProducts',
+          depth: 1,
+          limit: missingIDs.length,
+          overrideAccess: false,
+          pagination: false,
+          where: {
+            id: {
+              in: missingIDs,
+            },
           },
-        },
-      })
+        }),
+      )
 
       const fetchedDocs = fetched.docs as AffiliateProduct[]
       resolvedProducts = [...embeddedDocs, ...fetchedDocs]
@@ -89,10 +91,12 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
         products.map((p) => String(typeof p === 'object' ? p.id : p)),
       )
     } catch (error) {
-      if (isMongoNotConnectedError(error) && process.env.NODE_ENV === 'development') {
-        console.warn(
-          '[AffiliateProductsBlock] MongoDB not connected — showing embedded products only.',
-        )
+      if (isMongoConnectionRetryableError(error)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(
+            '[AffiliateProductsBlock] MongoDB unavailable — showing embedded products only.',
+          )
+        }
         resolvedProducts = embeddedDocs
       } else {
         throw error

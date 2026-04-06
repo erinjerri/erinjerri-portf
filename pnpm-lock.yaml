@@ -85,9 +85,6 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      cross-env:
-        specifier: ^7.0.3
-        version: 7.0.3
       dotenv:
         specifier: 16.4.7
         version: 16.4.7
@@ -182,6 +179,9 @@ importers:
       copyfiles:
         specifier: ^2.4.1
         version: 2.4.1
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       eslint:
         specifier: ^9.16.0
         version: 9.39.3(jiti@1.21.7)

@@ -26,6 +26,21 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     twoThirds: '8',
   }
 
+  /** Matches Tailwind container (`80rem` max at xl) so next/image picks enough pixels for full-width column media. */
+  const mediaSizesForColumn = (columnSize: string | null | undefined) => {
+    switch (columnSize ?? 'full') {
+      case 'half':
+        return '(max-width: 1024px) 100vw, min(50vw, 40rem)'
+      case 'oneThird':
+        return '(max-width: 1024px) 100vw, min(33vw, 26rem)'
+      case 'twoThirds':
+        return '(max-width: 1024px) 100vw, min(66vw, 52rem)'
+      case 'full':
+      default:
+        return '(max-width: 1024px) 100vw, min(100vw, 80rem)'
+    }
+  }
+
   return (
     <div
       className={cn('my-16', {
@@ -64,7 +79,9 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                     <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 bg-white py-6">
                       <div className="container px-8 text-black [&_.prose]:text-black [&_.prose_*]:text-black [&_a]:text-black">
                         {shouldRenderText && richText && <RichText data={richText} enableGutter={false} />}
-                        {shouldRenderMedia && <MediaComponent resource={media} />}
+                        {shouldRenderMedia && (
+                          <MediaComponent resource={media} size={mediaSizesForColumn(size)} />
+                        )}
                         {enableLink && (
                           <CMSLink
                             {...link}
@@ -95,7 +112,9 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                           </div>
                         </div>
                       )}
-                      {shouldRenderMedia && <MediaComponent resource={media} />}
+                      {shouldRenderMedia && (
+                        <MediaComponent resource={media} size={mediaSizesForColumn(size)} />
+                      )}
 
                       {enableLink && (
                         <CMSLink

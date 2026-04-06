@@ -26,8 +26,26 @@ export const getPayloadClient = async (options?: { forceRefresh?: boolean }) => 
   }
 }
 
-export const isMongoNotConnectedError = (error: unknown): error is Error =>
-  error instanceof Error && error.name === 'MongoNotConnectedError'
+/** Errors where resetting the Payload singleton and retrying usually fixes the issue */
+const MONGO_CONNECTION_RETRYABLE_NAMES = new Set([
+  'MongoNotConnectedError',
+  'MongoExpiredSessionError',
+])
+
+function mongoDisconnectMessage(error: Error): boolean {
+  const m = error.message
+  if (typeof m !== 'string') return false
+  return (
+    m.includes('Client must be connected') ||
+    m.includes('must be connected before running operations')
+  )
+}
+
+export const isMongoConnectionRetryableError = (error: unknown): error is Error =>
+  error instanceof Error &&
+  (MONGO_CONNECTION_RETRYABLE_NAMES.has(error.name) || mongoDisconnectMessage(error))
+
+export const isMongoNotConnectedError = isMongoConnectionRetryableError
 
 export const withPayloadClientRetry = async <T>(
   operation: (payload: Awaited<ReturnType<typeof getPayloadClient>>) => Promise<T>,
@@ -47,7 +65,7 @@ export const withPayloadClientRetry = async <T>(
       })
       return await operation(payload)
     } catch (error) {
-      if (!isMongoNotConnectedError(error) || attempt >= attempts - 1) {
+      if (!isMongoConnectionRetryableError(error) || attempt >= attempts - 1) {
         throw error
       }
 

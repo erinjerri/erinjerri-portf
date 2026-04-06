@@ -14,10 +14,15 @@ const isPopulated = (m: unknown): m is MediaDoc =>
 
 const heroFallbacks = {
   background: '/media/dimensions-background-curves.webp',
-  gridTop: '/media/CYR-CreatingARVR-X-cover-updated@1x.png',
+  gridTop: '/media/erin-AVP-headshot-original-2400.jpg',
   gridBottomLeft: '/media/Erin-Book-Headshot.webp',
   gridBottomRight: '/media/erin-AVP-headshot-95op.png',
 } as const
+
+const HERO_SOURCE_OVERRIDES: Record<string, string> = {
+  'Erin-AVP-1920x1080.png': '/media/erin-AVP-headshot-original-2400.jpg',
+  'erin-AVP-headshot-95op.png': '/media/erin-AVP-headshot-original-2400.jpg',
+}
 
 const StaticHeroImage: React.FC<{
   alt: string
@@ -63,6 +68,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     size?: string,
   ) => {
     if (isPopulated(resource)) {
+      const filename = typeof resource.filename === 'string' ? resource.filename : ''
+      const overriddenSrc = HERO_SOURCE_OVERRIDES[filename]
+
       return (
         <Media
           fill
@@ -70,7 +78,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           imgClassName="object-cover"
           pictureClassName="relative block h-full w-full"
           priority
-          resource={resource}
+          {...(overriddenSrc ? { alt, src: overriddenSrc } : { resource })}
           size={size}
         />
       )
@@ -190,7 +198,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   heroImage1,
                   heroFallbacks.gridTop,
                   'Hero top',
-                  '(max-width: 1024px) 100vw, 50vw',
+                  '(max-width: 1279px) 100vw, 50vw',
                 )}
               </div>
               <div className="aspect-[3/4] overflow-hidden">
@@ -198,7 +206,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   heroImage2,
                   heroFallbacks.gridBottomLeft,
                   'Hero bottom left',
-                  '(max-width: 1024px) 50vw, 25vw',
+                  '(max-width: 1279px) 50vw, 25vw',
                 )}
               </div>
               <div className="aspect-[3/4] overflow-hidden">
@@ -206,7 +214,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   heroImage3,
                   heroFallbacks.gridBottomRight,
                   'Hero bottom right',
-                  '(max-width: 1024px) 50vw, 25vw',
+                  '(max-width: 1279px) 50vw, 25vw',
                 )}
               </div>
             </div>

@@ -7,7 +7,10 @@ import { draftMode } from 'next/headers'
 import { CategoryFilter } from '@/components/CategoryFilter'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import type { CardRelationTo } from '@/components/Card'
-import { isMongoNotConnectedError, withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import {
+  isMongoConnectionRetryableError,
+  withPayloadClientRetry,
+} from '@/utilities/getPayloadClient'
 
 type ArchiveFetchedDocs = {
   docs: (Post | Project)[]
@@ -60,10 +63,12 @@ export const ArchiveBlock: React.FC<
 
       docs = fetchedDocs.docs as (Post | Project)[]
     } catch (error) {
-      if (isMongoNotConnectedError(error) && process.env.NODE_ENV === 'development') {
-        console.warn(
-          '[ArchiveBlock] MongoDB not connected — archive will render empty until DATABASE_URL works and the DB is reachable.',
-        )
+      if (isMongoConnectionRetryableError(error)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(
+            '[ArchiveBlock] MongoDB unavailable — archive renders empty until the DB is reachable.',
+          )
+        }
       } else {
         throw error
       }
