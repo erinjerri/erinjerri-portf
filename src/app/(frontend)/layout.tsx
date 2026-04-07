@@ -98,4 +98,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     creator: '@payloadcms',
   },
+  other: {
+    'facebook-domain-verification': 'e7i7sx90g844e0evm09nqf9repc7pr',
+  },
 }
