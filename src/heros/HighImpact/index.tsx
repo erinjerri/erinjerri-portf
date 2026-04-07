@@ -77,7 +77,6 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           htmlElement={null}
           imgClassName="object-cover"
           pictureClassName="relative block h-full w-full"
-          priority
           {...(overriddenSrc ? { alt, src: overriddenSrc } : { resource })}
           size={size}
         />
@@ -198,7 +197,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   heroImage1,
                   heroFallbacks.gridTop,
                   'Hero top',
-                  '(max-width: 1279px) 100vw, 50vw',
+                  // Cap logical width so mobile does not pull 750w+ for a ~380px slot (PageSpeed / Slow 4G).
+                  '(max-width: 1279px) min(100vw - 2rem, 28rem), min(50vw, 36rem)',
                 )}
               </div>
               <div className="aspect-[3/4] overflow-hidden">
@@ -206,7 +206,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   heroImage2,
                   heroFallbacks.gridBottomLeft,
                   'Hero bottom left',
-                  '(max-width: 1279px) 50vw, 25vw',
+                  '(max-width: 1279px) min(50vw - 0.5rem, 14rem), min(25vw, 18rem)',
                 )}
               </div>
               <div className="aspect-[3/4] overflow-hidden">
@@ -214,7 +214,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   heroImage3,
                   heroFallbacks.gridBottomRight,
                   'Hero bottom right',
-                  '(max-width: 1279px) 50vw, 25vw',
+                  '(max-width: 1279px) min(50vw - 0.5rem, 14rem), min(25vw, 18rem)',
                 )}
               </div>
             </div>

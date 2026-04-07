@@ -36,7 +36,7 @@ export const HeroImagePreload: React.FC<{ hero: HeroWithMedia | null }> = ({ her
 
   // Next.js Image requests the optimized URL; preload that for best LCP
   const base = getServerSideURL()
-  const optimizedUrl = `${base}/_next/image?url=${encodeURIComponent(fullUrl)}&w=1920&q=80`
+  const optimizedUrl = `${base}/_next/image?url=${encodeURIComponent(fullUrl)}&w=1920&q=90`
 
   return (
     <link
