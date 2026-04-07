@@ -129,7 +129,7 @@ export const HeaderNav: React.FC<{
         type="button"
         onClick={() => setMobileOpen((prev) => !prev)}
         className={cn(
-          'absolute right-0 md:hidden p-2 rounded-md transition-colors',
+          'absolute right-0 md:hidden p-2 rounded-md',
           lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
         )}
         aria-label="Toggle navigation menu"
