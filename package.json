@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS=--no-deprecation next build",
-    "clean:next": "rm -rf .next",
+    "clean:next": "rm -rf .next .next-dev",
     "build": "pnpm clean:next && cross-env NODE_OPTIONS=--no-deprecation next build",
     "build:netlify": "node -e \"console.log('node', process.version)\" && node -e \"console.log('next', require('next/package.json').version)\" && node -e \"console.log('react', require('react/package.json').version)\" && cross-env NODE_OPTIONS=--no-deprecation next build",
     "build:fast": "pnpm clean:next && cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next build",
@@ -30,7 +30,8 @@
     "ensure:store": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-store-page.ts",
     "repair:crossposts": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/repair-crosspost-publish-state.ts",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "start": "pnpm build && cross-env NODE_OPTIONS=--no-deprecation next start",
+    "start:only": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "start:fresh": "pnpm clean:next && pnpm build && pnpm start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test --config=playwright.config.ts",
