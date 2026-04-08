@@ -14,15 +14,7 @@ const isPopulated = (m: unknown): m is MediaDoc =>
 
 const heroFallbacks = {
   background: '/media/dimensions-background-curves.webp',
-  gridTop: '/media/erin-AVP-headshot-original-2400.jpg',
-  gridBottomLeft: '/media/Erin-Book-Headshot.webp',
-  gridBottomRight: '/media/erin-AVP-headshot-95op.png',
 } as const
-
-const HERO_SOURCE_OVERRIDES: Record<string, string> = {
-  'Erin-AVP-1920x1080.png': '/media/erin-AVP-headshot-original-2400.jpg',
-  'erin-AVP-headshot-95op.png': '/media/erin-AVP-headshot-original-2400.jpg',
-}
 
 const StaticHeroImage: React.FC<{
   alt: string
@@ -39,6 +31,17 @@ const StaticHeroImage: React.FC<{
       backgroundPosition: position,
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
+    }}
+  />
+)
+
+const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
+  <div
+    aria-hidden
+    className={className}
+    style={{
+      background:
+        'linear-gradient(135deg, rgba(15,23,42,0.45) 0%, rgba(30,41,59,0.35) 100%)',
     }}
   />
 )
@@ -63,15 +66,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
   const renderHeroSlot = (
     resource: MediaDoc | string | number | null | undefined,
-    fallbackSrc: string,
     alt: string,
     size?: string,
     unoptimized?: boolean,
   ) => {
     if (isPopulated(resource)) {
-      const filename = typeof resource.filename === 'string' ? resource.filename : ''
-      const overriddenSrc = HERO_SOURCE_OVERRIDES[filename]
-
       return (
         <Media
           fill
@@ -80,20 +79,13 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           pictureClassName="relative block h-full w-full"
           quality={100}
           {...(unoptimized ? { unoptimized: true } : {})}
-          {...(overriddenSrc ? { alt, src: overriddenSrc } : { resource })}
+          resource={resource}
           size={size}
         />
       )
     }
 
-    return (
-      <StaticHeroImage
-        alt={alt}
-        className="h-full w-full"
-        src={fallbackSrc}
-        position="center"
-      />
-    )
+    return <StaticHeroSlot className="h-full w-full" />
   }
 
   return (
@@ -200,7 +192,6 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               <div className="col-span-2 aspect-[16/9] overflow-hidden">
                 {renderHeroSlot(
                   heroImage1,
-                  heroFallbacks.gridTop,
                   'Hero top',
                   // Cap logical width so mobile does not pull 750w+ for a ~380px slot (PageSpeed / Slow 4G).
                   '(max-width: 1279px) min(100vw - 2rem, 24rem), min(50vw, 32rem)',
@@ -209,16 +200,17 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               <div className="aspect-[3/4] overflow-hidden">
                 {renderHeroSlot(
                   heroImage2,
-                  heroFallbacks.gridBottomLeft,
                   'Hero bottom left',
-                  '(max-width: 1279px) min(50vw - 0.5rem, 12rem), min(25vw, 15rem)',
-                  process.env.NEXT_PUBLIC_DEBUG_UNOPTIMIZED_HERO2 === 'true',
+                  // This card grows wider than the previous sizes hint suggested, especially on
+                  // high-DPR desktop displays. Give the browser a truer width so it can request
+                  // a larger source candidate and avoid soft/pixelated rendering.
+                  '(max-width: 767px) min(50vw - 0.5rem, 16rem), (max-width: 1279px) min(50vw - 0.5rem, 18rem), min(25vw, 22rem)',
+                  true,
                 )}
               </div>
               <div className="aspect-[3/4] overflow-hidden">
                 {renderHeroSlot(
                   heroImage3,
-                  heroFallbacks.gridBottomRight,
                   'Hero bottom right',
                   '(max-width: 1279px) min(50vw - 0.5rem, 12rem), min(25vw, 15rem)',
                 )}

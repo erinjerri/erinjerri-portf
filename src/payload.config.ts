@@ -46,7 +46,16 @@ const allowedOrigins = Array.from(
       process.env.URL,
       process.env.DEPLOY_PRIME_URL,
       ...(process.env.NODE_ENV === 'development'
-        ? ['http://localhost:3000', 'http://127.0.0.1:3000']
+        ? [
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+            'http://[::1]:3000',
+            ...(process.env.NEXT_PUBLIC_DEV_EXTRA_ORIGINS
+              ? process.env.NEXT_PUBLIC_DEV_EXTRA_ORIGINS.split(',')
+                  .map((o) => o.trim())
+                  .filter(isNonEmptyString)
+              : []),
+          ]
         : []),
     ].filter(isNonEmptyString),
   ),

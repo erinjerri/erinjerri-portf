@@ -55,9 +55,10 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Keep dev/build artifacts isolated to avoid random manifest/path mismatches
-  // when switching between `next dev` and `next build`.
-  distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
+  // Payload admin uses Next Server Actions; default ~1MB body limit can break saves (rich text, uploads).
+  serverActions: {
+    bodySizeLimit: '25mb',
+  },
   experimental: {
     // Inline critical CSS in prod only; skip in dev to speed up compilation.
     inlineCss: process.env.NODE_ENV !== 'development',

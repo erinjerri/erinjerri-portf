@@ -112,8 +112,11 @@ const config = {
         DEFAULT: {
           css: [
             {
-              '--tw-prose-body': 'var(--text)',
-              '--tw-prose-headings': 'var(--text)',
+              // `--text` was never defined; body/headings fell back poorly. Links use theme primary blue.
+              '--tw-prose-body': 'hsl(var(--foreground))',
+              '--tw-prose-headings': 'hsl(var(--foreground))',
+              '--tw-prose-links': 'hsl(var(--primary))',
+              '--tw-prose-bold': 'hsl(var(--foreground))',
               h1: {
                 fontFamily: 'var(--font-title)',
                 fontWeight: 800,
@@ -131,8 +134,30 @@ const config = {
                 fontFamily: 'var(--font-copy)',
                 fontWeight: 400,
               },
+              a: {
+                color: 'hsl(var(--primary))',
+                fontWeight: '500',
+                textDecorationLine: 'underline',
+                textUnderlineOffset: '0.2em',
+              },
+              'a:hover': {
+                color: 'hsl(var(--primary) / 0.88)',
+              },
             },
           ],
+        },
+        // `prose-invert` (e.g. hero bio on dark) otherwise turns links into muted grey.
+        invert: {
+          css: {
+            '--tw-prose-invert-links': 'hsl(var(--primary))',
+            a: {
+              color: 'hsl(var(--primary))',
+              fontWeight: '500',
+            },
+            'a:hover': {
+              color: 'hsl(var(--primary) / 0.88)',
+            },
+          },
         },
         base: {
           css: [

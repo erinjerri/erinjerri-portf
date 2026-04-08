@@ -216,6 +216,7 @@ node_modules/
 # Accidental Finder/macOS duplicate folder name
 node_modules 2/
 .next/
+.next-dev/
 out/
 dist/
 *.tsbuildinfo

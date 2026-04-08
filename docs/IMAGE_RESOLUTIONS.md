@@ -11,6 +11,7 @@ Recommended minimum dimensions for sharp display on standard and retina screens.
 | **Event/speaking** | 1200px | 4:3 | Berkeley, Harvard WeCode, etc. |
 | **Book cover (overlay)** | 1200px | 3:4 | O'Reilly/Amazon overlay blocks |
 | **Icon / small** | 256px | 1:1 | Icons in content columns |
+| **Default OG / social share** | **2000–2400px** | varies (e.g. 2400×2654) | WebP; filename in `generateMeta` / `mergeOpenGraph`: `erinjerri-book-headshot-green-no-glare-2400x2654.webp` |
 
 ## High-Res Source Files
 
