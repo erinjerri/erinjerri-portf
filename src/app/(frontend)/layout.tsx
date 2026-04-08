@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 
-import { cn } from '@/utilities/ui'
 import React from 'react'
-import { Jost, League_Spartan } from 'next/font/google'
 import { Suspense } from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
@@ -18,18 +16,7 @@ import type { Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
-
-const leagueSpartan = League_Spartan({
-  subsets: ['latin'],
-  variable: '--font-league-spartan',
-  display: 'swap',
-})
-
-const jost = Jost({
-  subsets: ['latin'],
-  variable: '--font-jost',
-  display: 'swap',
-})
+import { defaultTheme } from '@/providers/Theme/ThemeSelector/types'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData: HeaderType | null = null
@@ -48,11 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
 
   return (
-    <html
-      className={cn(leagueSpartan.variable, jost.variable)}
-      lang="en"
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning data-theme={defaultTheme}>
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
@@ -96,7 +79,7 @@ export const metadata: Metadata = {
   openGraph: mergeOpenGraph(),
   twitter: {
     card: 'summary_large_image',
-    creator: '@payloadcms',
+    creator: '@erinjerri',
   },
   other: {
     'facebook-domain-verification': 'e7i7sx90g844e0evm09nqf9repc7pr',

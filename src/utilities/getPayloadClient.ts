@@ -15,7 +15,12 @@ export const getPayloadClient = async (options?: { forceRefresh?: boolean }) => 
   }
 
   if (!globalThis.__payloadClientPromise) {
-    globalThis.__payloadClientPromise = getPayload({ config: configPromise })
+    const promise = getPayload({ config: configPromise })
+    // Mark the singleton promise as handled so transient driver failures do not
+    // surface as process-level unhandledRejection noise when multiple callers
+    // race during startup/reconnect.
+    promise.catch(() => undefined)
+    globalThis.__payloadClientPromise = promise
   }
 
   try {

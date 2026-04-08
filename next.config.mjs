@@ -55,24 +55,20 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Keep dev/build artifacts isolated to avoid random manifest/path mismatches
+  // when switching between `next dev` and `next build`.
+  distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
   experimental: {
     // Inline critical CSS in prod only; skip in dev to speed up compilation.
     inlineCss: process.env.NODE_ENV !== 'development',
-    optimizePackageImports: [
-      '@radix-ui/react-checkbox',
-      '@radix-ui/react-label',
-      '@radix-ui/react-select',
-      '@radix-ui/react-slot',
-      'recharts',
-    ],
   },
   images: {
     // Make sure image optimization stays enabled (some wrappers/platform presets toggle this).
     unoptimized: false,
     // Prefer modern formats when the client supports them.
     formats: ['image/avif', 'image/webp'],
-    // Configure image qualities used by next/image. Include lower qualities for mobile, 90 for sharp hero images.
-    qualities: [60, 65, 70, 75, 80, 82, 85, 90],
+    // Configure image qualities used by next/image.
+    qualities: [60, 65, 70, 75, 80, 82, 85, 90, 100],
     // Responsive breakpoints (helps Next generate right srcset candidates). 2560/3840 for retina.
     deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1440, 1920, 2048, 2560, 3840],
     imageSizes: [16, 24, 32, 48, 64, 96, 128, 256, 384],

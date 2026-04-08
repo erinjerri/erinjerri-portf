@@ -16,7 +16,7 @@ export const BrandLogosBlock: React.FC<BrandLogosBlockProps> = (props) => {
   const muted = style === 'muted'
 
   return (
-    <div className="container my-10 lg:my-12">
+    <div className="container my-10 pb-8 lg:my-12 lg:pb-12">
       {heading ? (
         <h2 className="mb-3 text-center font-title text-xl font-semibold tracking-tight md:text-2xl">
           {heading}

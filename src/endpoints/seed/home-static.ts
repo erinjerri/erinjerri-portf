@@ -100,7 +100,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
     },
   },
   meta: {
-    description: 'An open-source website built with Payload and Next.js.',
+    description: 'Explore Erin Jerri’s latest writing, projects, speaking, and creative work.',
     title: 'Erin Jerri',
   },
   title: 'Home',

@@ -14,6 +14,11 @@ export const aboutPage = ({
   return {
     slug: 'about',
     _status: 'published',
+    meta: {
+      title: 'About Erin Jerri',
+      description:
+        'Learn more about Erin Jerri, explore speaking topics, and get in touch about consulting or events.',
+    },
     title: 'About',
     hero: {
       type: 'none',

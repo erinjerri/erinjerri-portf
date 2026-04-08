@@ -66,6 +66,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     fallbackSrc: string,
     alt: string,
     size?: string,
+    unoptimized?: boolean,
   ) => {
     if (isPopulated(resource)) {
       const filename = typeof resource.filename === 'string' ? resource.filename : ''
@@ -77,6 +78,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           htmlElement={null}
           imgClassName="object-cover"
           pictureClassName="relative block h-full w-full"
+          quality={100}
+          {...(unoptimized ? { unoptimized: true } : {})}
           {...(overriddenSrc ? { alt, src: overriddenSrc } : { resource })}
           size={size}
         />
@@ -113,7 +116,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             imgClassName="object-cover object-[50%_22%] md:object-center"
             pictureClassName="relative block h-full w-full"
             priority
+            quality={100}
             resource={backgroundImage}
+            size="(max-width: 768px) 100vw, (max-width: 1440px) 100vw, 1920px"
           />
         </div>
       )}
@@ -207,6 +212,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   heroFallbacks.gridBottomLeft,
                   'Hero bottom left',
                   '(max-width: 1279px) min(50vw - 0.5rem, 12rem), min(25vw, 15rem)',
+                  process.env.NEXT_PUBLIC_DEBUG_UNOPTIMIZED_HERO2 === 'true',
                 )}
               </div>
               <div className="aspect-[3/4] overflow-hidden">

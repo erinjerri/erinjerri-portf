@@ -58,7 +58,7 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
                   className="absolute inset-0 h-full w-full"
                   imgClassName="object-contain object-center"
                   pictureClassName="relative block h-full w-full"
-                  quality={75}
+                  quality={100}
                   resource={media}
                   size={COVER_SIZES}
                   fill

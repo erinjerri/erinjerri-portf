@@ -1,9 +1,16 @@
+@import '@fontsource/jost/400.css';
+@import '@fontsource/jost/800.css';
+@import '@fontsource/league-spartan/400.css';
+@import '@fontsource/league-spartan/800.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    --font-league-spartan: 'League Spartan';
+    --font-jost: 'Jost';
     --font-title: var(--font-league-spartan), var(--font-jost), 'Satoshi', 'Glacial Indifference',
       sans-serif;
     --font-copy: var(--font-jost), 'Satoshi', 'Glacial Indifference', var(--font-league-spartan),

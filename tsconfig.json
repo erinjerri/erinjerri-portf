@@ -39,11 +39,20 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next/types/**/*.ts",
     "next-env.d.ts",
     "next-sitemap.config.cjs",
     "next.config.mjs",
     "redirects.mjs",
-    ".next/types/**/*.ts"
+    ".next-dev/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next-env.d.ts",
+    "next-sitemap.config.cjs",
+    "next.config.mjs",
+    "redirects.mjs",
+    ".next/types/**/*.ts",
+    ".next-dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

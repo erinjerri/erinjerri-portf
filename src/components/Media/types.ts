@@ -14,6 +14,7 @@ export interface Props {
   onLoad?: () => void
   loading?: 'lazy' | 'eager' // for NextImage only
   priority?: boolean // for NextImage only
+  unoptimized?: boolean // for NextImage only, useful for debugging optimizer blur
   ref?: Ref<HTMLImageElement | HTMLVideoElement | null>
   quality?: number // Next.js Image quality (1-100). Default 85 for content, 75-80 for heroes.
   resource?: MediaType | string | number | null // for Payload media

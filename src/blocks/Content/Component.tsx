@@ -55,7 +55,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
           fill
           imgClassName="object-contain object-center"
           pictureClassName="relative block h-full w-full"
-          quality={85}
+          quality={100}
           resource={m}
           size={mediaSizesForColumn(columnSize)}
         />

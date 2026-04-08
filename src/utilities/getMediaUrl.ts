@@ -81,6 +81,24 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
     try {
       const parsed = new URL(url)
 
+      // If Payload stored an absolute URL for a local media path, normalize it back
+      // to a relative path so dev/build don't depend on DNS or env host reachability.
+      if (parsed.pathname.startsWith('/media/')) {
+        return appendCacheTag(toPayloadFileEndpoint(parsed.pathname).split('?')[0])
+      }
+
+      if (parsed.pathname.startsWith('/api/media/file/')) {
+        const filename = parsed.pathname.replace(/^\/api\/media\/file\//, '').split('?')[0]
+        if (filename) {
+          try {
+            const decoded = decodeURIComponent(filename)
+            return appendCacheTag(`/api/media/file/${encodeURIComponent(decoded)}`)
+          } catch {
+            return appendCacheTag(parsed.pathname.split('?')[0])
+          }
+        }
+      }
+
       // R2 public URLs often 404 (public access not enabled, key mismatch, etc).
       // Always use the Payload proxy for R2 URLs: it fetches via S3 API and serves reliably.
       try {

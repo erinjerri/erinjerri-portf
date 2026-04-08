@@ -74,6 +74,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     size: sizeFromProps,
     src: srcFromProps,
     loading: loadingFromProps,
+    unoptimized: unoptimizedFromProps,
   } = props
 
   let width: number | undefined
@@ -118,14 +119,13 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   // Preserve the original for PNG sources that visibly degrade through the optimizer.
   // Other images should stay optimized so mobile receives responsive srcset candidates.
   const isPngSource = typeof src === 'string' && /\.png($|\?)/i.test(src)
-  const disableOptimization = isPngSource
+  const disableOptimization = Boolean(unoptimizedFromProps) || isPngSource
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
-  // Quality: must match next.config images.qualities [60,65,70,75,80,85,90]
-  const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90] as const
-  // Fill + priority is used for LCP-style heroes, but 90 was too expensive on mobile.
+  // Quality: must match next.config images.qualities [60,65,70,75,80,85,90,100]
+  const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90, 100] as const
   const rawQuality =
-    qualityFromProps ?? (fill && priority ? 80 : priority ? 82 : 75)
+    qualityFromProps ?? (fill && priority ? 100 : priority ? 100 : 85)
   const quality = ALLOWED_QUALITIES.includes(rawQuality as (typeof ALLOWED_QUALITIES)[number])
     ? rawQuality
     : 85
@@ -141,8 +141,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   // Grid (3-col): 640px ensures ~2x for 33vw on 1440px. Full-width hero: 100vw.
   const sizes = sizeFromProps
     ? sizeFromProps
-    : fill && priority
-      ? '100vw'
+    : fill
+      ? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px'
       : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px'
 
   return (
