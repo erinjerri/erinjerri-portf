@@ -25,9 +25,9 @@ export const BrandLogos: Block = {
     {
       name: 'style',
       type: 'select',
-      defaultValue: 'muted',
+      defaultValue: 'color',
       options: [
-        { label: 'Muted (grayscale, brighten on hover)', value: 'muted' },
+        { label: 'Muted (lower opacity)', value: 'muted' },
         { label: 'Full color', value: 'color' },
       ],
     },

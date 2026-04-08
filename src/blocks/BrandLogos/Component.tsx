@@ -10,7 +10,7 @@ function isExternal(href: string) {
 }
 
 export const BrandLogosBlock: React.FC<BrandLogosBlockProps> = (props) => {
-  const { heading, intro, logos, style = 'muted' } = props
+  const { heading, intro, logos, style = 'color' } = props
   if (!logos?.length) return null
 
   const muted = style === 'muted'
@@ -48,8 +48,7 @@ export const BrandLogosBlock: React.FC<BrandLogosBlockProps> = (props) => {
               htmlElement={null}
               imgClassName={cn(
                 'h-9 w-auto max-w-[min(140px,28vw)] object-contain md:h-11 md:max-w-[160px]',
-                muted &&
-                  'opacity-80 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0',
+                muted && 'opacity-75 transition duration-300 hover:opacity-100',
                 !muted && 'opacity-90 transition duration-300 hover:opacity-100',
               )}
               pictureClassName="flex items-center justify-center"

@@ -44,12 +44,6 @@
     "next.config.mjs",
     "redirects.mjs",
     ".next/types/**/*.ts"
-    // NOTE: Excluding generated Next.js type helpers (.next/types) from the
-    // TypeScript program during CI/build prevents transient ENOENT errors when
-    // Next's type generation runs in a separate step. If you rely on these
-    // helpers for editor intellisense, consider adding them back locally.
-    ,
-    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
