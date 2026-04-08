@@ -6,7 +6,7 @@ import { Media } from '@/components/Media'
 
 /** Tuned for sharp covers: ~320–384px CSS width × 2–3× DPR → srcset pulls adequate pixels. */
 const COVER_SIZES =
-  '(max-width: 640px) min(92vw, 420px), (max-width: 1024px) min(45vw, 380px), min(33vw, 400px)'
+  '(max-width: 640px) min(88vw, 380px), (max-width: 1024px) min(42vw, 340px), min(30vw, 360px)'
 
 export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
   const { heading, intro, covers, aspectRatio = '2:3' } = props
@@ -58,7 +58,7 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
                   className="absolute inset-0 h-full w-full"
                   imgClassName="object-contain object-center"
                   pictureClassName="relative block h-full w-full"
-                  quality={85}
+                  quality={75}
                   resource={media}
                   size={COVER_SIZES}
                   fill

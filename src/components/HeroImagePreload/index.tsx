@@ -1,7 +1,5 @@
-import React from 'react'
-
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { getServerSideURL } from '@/utilities/getURL'
+import React from 'react'
 
 type MediaResource = {
   url?: string | null
@@ -27,22 +25,16 @@ export const HeroImagePreload: React.FC<{ hero: HeroWithMedia | null }> = ({ her
   const mediaUrl = media.url ?? (media.filename ? `/media/${media.filename}` : null)
   if (!mediaUrl) return null
 
-  let fullUrl = getMediaUrl(mediaUrl, media.updatedAt)
+  // Preload the same source URL the hero will render from and let next/image choose the
+  // responsive candidate. A fixed 1920px preload was oversized for mobile and competed with LCP.
+  const fullUrl = getMediaUrl(mediaUrl, media.updatedAt)
   if (!fullUrl) return null
-  // Ensure absolute URL for next/image (relative paths need base)
-  if (fullUrl.startsWith('/')) {
-    fullUrl = `${getServerSideURL()}${fullUrl}`
-  }
-
-  // Next.js Image requests the optimized URL; preload that for best LCP
-  const base = getServerSideURL()
-  const optimizedUrl = `${base}/_next/image?url=${encodeURIComponent(fullUrl)}&w=1920&q=90`
 
   return (
     <link
       rel="preload"
       as="image"
-      href={optimizedUrl}
+      href={fullUrl}
       fetchPriority="high"
     />
   )

@@ -357,6 +357,7 @@ export interface Page {
     | TagPillsBlock
     | BrandLogosBlock
     | BookCoverRowBlock
+    | HeroCredentialStripBlock
     | SignatureTalksBlock
     | BookAcclaimStripBlock
   )[];
@@ -1520,6 +1521,25 @@ export interface BookCoverRowBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroCredentialStripBlock".
+ */
+export interface HeroCredentialStripBlock {
+  phrases?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Separator between the 3 credibility phrases.
+   */
+  separator?: ('bullet' | 'middot' | 'pipe') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroCredentialStrip';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SignatureTalksBlock".
  */
 export interface SignatureTalksBlock {
@@ -1951,6 +1971,7 @@ export interface PagesSelect<T extends boolean = true> {
         tagPills?: T | TagPillsBlockSelect<T>;
         brandLogos?: T | BrandLogosBlockSelect<T>;
         bookCoverRow?: T | BookCoverRowBlockSelect<T>;
+        heroCredentialStrip?: T | HeroCredentialStripBlockSelect<T>;
         signatureTalks?: T | SignatureTalksBlockSelect<T>;
         bookAcclaimStrip?: T | BookAcclaimStripBlockSelect<T>;
       };
@@ -2230,6 +2251,21 @@ export interface BookCoverRowBlockSelect<T extends boolean = true> {
         caption?: T;
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroCredentialStripBlock_select".
+ */
+export interface HeroCredentialStripBlockSelect<T extends boolean = true> {
+  phrases?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  separator?: T;
   id?: T;
   blockName?: T;
 }

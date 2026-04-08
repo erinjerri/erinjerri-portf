@@ -225,27 +225,28 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
     ],
   },
   {
-    blockName: 'Speaker creds',
-    blockType: 'tagPills',
-    tags: [
-      { label: "O'REILLY AUTHOR" },
-      { label: 'UC BERKELEY' },
-      { label: 'QCON' },
-      { label: 'NVIDIA GTC' },
-      { label: 'HARVARD' },
-      { label: 'APPLE VISION PRO' },
+    blockName: 'Hero credential strip',
+    blockType: 'heroCredentialStrip',
+    separator: 'bullet',
+    phrases: [
+      { text: "O'Reilly author" },
+      { text: 'Founder & former CTO' },
+      { text: 'AWS, Meta, and Verizon Ventures fellow' },
     ],
   },
   {
-    blockName: 'Speaker metrics',
+    blockName: 'Credibility metrics',
     blockType: 'statStrip',
     columns: 'four',
     emphasis: 'bold',
     items: [
-      { value: '42+', label: 'COUNTRIES DISTRIBUTED' },
-      { value: '#1', label: 'AMAZON GAME PROGRAMMING' },
-      { value: '10K+', label: 'FOLLOWERS ACROSS PLATFORMS' },
-      { value: '3', label: 'LANGUAGES: EN · ZH · KO' },
+      { value: '#1 Amazon Title', label: "O'Reilly Author" },
+      { value: '42+ Countries', label: 'Global Distribution' },
+      {
+        value: '4 Entrepreneurial Fellowships',
+        label: 'AWS CTO Fellowship, Meta/Facebook AR/VR (Oculus) Launchpad, Alley (Verizon Ventures), Gitcoin Kernel',
+      },
+      { value: '10+ Years', label: 'Building in AI & Spatial Computing' },
     ],
   },
 ]

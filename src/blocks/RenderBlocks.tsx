@@ -22,6 +22,7 @@ import { StatStripBlock } from '@/blocks/StatStrip/Component'
 import { TagPillsBlock } from '@/blocks/TagPills/Component'
 import { BrandLogosBlock } from '@/blocks/BrandLogos/Component'
 import { BookCoverRowBlock } from '@/blocks/BookCoverRow/Component'
+import { HeroCredentialStripBlock } from '@/blocks/HeroCredentialStrip/Component'
 import { SignatureTalksBlock } from '@/blocks/SignatureTalks/Component'
 import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
 
@@ -40,6 +41,7 @@ const blockComponents = {
   tagPills: TagPillsBlock,
   brandLogos: BrandLogosBlock,
   bookCoverRow: BookCoverRowBlock,
+  heroCredentialStrip: HeroCredentialStripBlock,
   signatureTalks: SignatureTalksBlock,
   bookAcclaimStrip: BookAcclaimStripBlock,
 }

@@ -115,18 +115,17 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     return null
   }
 
-  // Next image optimizer can posterize some PNG photos. For fill+priority heroes, serving the
-  // original avoids extra /_next/image work on the critical path (main-thread decode + Slow 4G
-  // contention when multiple hero images are priority). Non-priority images still use the optimizer.
+  // Preserve the original for PNG sources that visibly degrade through the optimizer.
+  // Other images should stay optimized so mobile receives responsive srcset candidates.
   const isPngSource = typeof src === 'string' && /\.png($|\?)/i.test(src)
-  const disableOptimization = isPngSource || (fill && priority)
+  const disableOptimization = isPngSource
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
   // Quality: must match next.config images.qualities [60,65,70,75,80,85,90]
   const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90] as const
-  // Fill + priority is used for LCP-style heroes; keep quality high when optimization is on.
+  // Fill + priority is used for LCP-style heroes, but 90 was too expensive on mobile.
   const rawQuality =
-    qualityFromProps ?? (fill && priority ? 90 : priority ? 85 : 85)
+    qualityFromProps ?? (fill && priority ? 80 : priority ? 82 : 75)
   const quality = ALLOWED_QUALITIES.includes(rawQuality as (typeof ALLOWED_QUALITIES)[number])
     ? rawQuality
     : 85
