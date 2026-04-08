@@ -20,6 +20,8 @@ import { VideoBackgroundTransitionBlock } from '@/blocks/VideoBackgroundTransiti
 import { WatchBlockComponent } from '@/blocks/WatchBlock/Component'
 import { StatStripBlock } from '@/blocks/StatStrip/Component'
 import { TagPillsBlock } from '@/blocks/TagPills/Component'
+import { BrandLogosBlock } from '@/blocks/BrandLogos/Component'
+import { BookCoverRowBlock } from '@/blocks/BookCoverRow/Component'
 import { SignatureTalksBlock } from '@/blocks/SignatureTalks/Component'
 import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
 
@@ -36,6 +38,8 @@ const blockComponents = {
   watchBlock: WatchBlockComponent,
   statStrip: StatStripBlock,
   tagPills: TagPillsBlock,
+  brandLogos: BrandLogosBlock,
+  bookCoverRow: BookCoverRowBlock,
   signatureTalks: SignatureTalksBlock,
   bookAcclaimStrip: BookAcclaimStripBlock,
 }

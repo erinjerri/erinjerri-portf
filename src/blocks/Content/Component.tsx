@@ -41,6 +41,28 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     }
   }
 
+  /** Without `fill`, next/image uses Payload width/height — wrong metadata makes covers postage-stamp sized. */
+  const renderColumnMedia = (media: ColumnWithFlexibleContent['media'], columnSize: string | null | undefined) => {
+    if (!media || typeof media !== 'object') return null
+    const m = media as Media
+    const alt = (typeof m.alt === 'string' && m.alt.trim()) || 'Image'
+
+    return (
+      <div className="relative aspect-[2/3] w-full overflow-hidden rounded-md bg-black/10">
+        <MediaComponent
+          alt={alt}
+          className="absolute inset-0 h-full w-full"
+          fill
+          imgClassName="object-contain object-center"
+          pictureClassName="relative block h-full w-full"
+          quality={85}
+          resource={m}
+          size={mediaSizesForColumn(columnSize)}
+        />
+      </div>
+    )
+  }
+
   return (
     <div
       className={cn('my-16', {
@@ -79,9 +101,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                     <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 bg-white py-6">
                       <div className="container px-8 text-black [&_.prose]:text-black [&_.prose_*]:text-black [&_a]:text-black">
                         {shouldRenderText && richText && <RichText data={richText} enableGutter={false} />}
-                        {shouldRenderMedia && (
-                          <MediaComponent resource={media} size={mediaSizesForColumn(size)} />
-                        )}
+                        {shouldRenderMedia && renderColumnMedia(media, size)}
                         {enableLink && (
                           <CMSLink
                             {...link}
@@ -112,9 +132,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                           </div>
                         </div>
                       )}
-                      {shouldRenderMedia && (
-                        <MediaComponent resource={media} size={mediaSizesForColumn(size)} />
-                      )}
+                      {shouldRenderMedia && renderColumnMedia(media, size)}
 
                       {enableLink && (
                         <CMSLink

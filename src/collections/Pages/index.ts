@@ -14,6 +14,8 @@ import { VideoBackgroundTransition } from '../../blocks/VideoBackgroundTransitio
 import { WatchBlock } from '../../blocks/WatchBlock/config'
 import { StatStrip } from '../../blocks/StatStrip/config'
 import { TagPills } from '../../blocks/TagPills/config'
+import { BrandLogos } from '../../blocks/BrandLogos/config'
+import { BookCoverRow } from '../../blocks/BookCoverRow/config'
 import { SignatureTalks } from '../../blocks/SignatureTalks/config'
 import { BookAcclaimStrip } from '../../blocks/BookAcclaimStrip/config'
 import { hero } from '@/heros/config'
@@ -97,6 +99,8 @@ export const Pages: CollectionConfig<'pages'> = {
                 ToplineHeader,
                 StatStrip,
                 TagPills,
+                BrandLogos,
+                BookCoverRow,
                 SignatureTalks,
                 BookAcclaimStrip,
               ],

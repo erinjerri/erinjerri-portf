@@ -355,6 +355,8 @@ export interface Page {
     | ToplineHeaderBlock
     | StatStripBlock
     | TagPillsBlock
+    | BrandLogosBlock
+    | BookCoverRowBlock
     | SignatureTalksBlock
     | BookAcclaimStripBlock
   )[];
@@ -1449,6 +1451,75 @@ export interface TagPillsBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BrandLogosBlock".
+ */
+export interface BrandLogosBlock {
+  /**
+   * Optional section title (e.g. “Trusted by” or “Collaborations”).
+   */
+  heading?: string | null;
+  /**
+   * Optional line below the heading.
+   */
+  intro?: string | null;
+  style?: ('muted' | 'color') | null;
+  logos?:
+    | {
+        /**
+         * PNG or SVG on transparent background works best.
+         */
+        logo: string | Media;
+        /**
+         * Optional URL when the logo is clicked (https://…).
+         */
+        href?: string | null;
+        /**
+         * Accessible name if the image has no alt text in Media.
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'brandLogos';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BookCoverRowBlock".
+ */
+export interface BookCoverRowBlock {
+  /**
+   * Optional section title (e.g. “Editions”).
+   */
+  heading?: string | null;
+  /**
+   * Optional line under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Frame shape for each cover. Images use object-contain inside the frame.
+   */
+  aspectRatio?: ('2:3' | '3:4') | null;
+  covers?:
+    | {
+        /**
+         * Upload a high-resolution cover (e.g. 1200–1600px on the short edge).
+         */
+        image: string | Media;
+        /**
+         * e.g. English · 中文 · 한국어
+         */
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'bookCoverRow';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SignatureTalksBlock".
  */
 export interface SignatureTalksBlock {
@@ -1878,6 +1949,8 @@ export interface PagesSelect<T extends boolean = true> {
         toplineHeader?: T | ToplineHeaderBlockSelect<T>;
         statStrip?: T | StatStripBlockSelect<T>;
         tagPills?: T | TagPillsBlockSelect<T>;
+        brandLogos?: T | BrandLogosBlockSelect<T>;
+        bookCoverRow?: T | BookCoverRowBlockSelect<T>;
         signatureTalks?: T | SignatureTalksBlockSelect<T>;
         bookAcclaimStrip?: T | BookAcclaimStripBlockSelect<T>;
       };
@@ -2118,6 +2191,43 @@ export interface TagPillsBlockSelect<T extends boolean = true> {
     | T
     | {
         label?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BrandLogosBlock_select".
+ */
+export interface BrandLogosBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  style?: T;
+  logos?:
+    | T
+    | {
+        logo?: T;
+        href?: T;
+        label?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BookCoverRowBlock_select".
+ */
+export interface BookCoverRowBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  aspectRatio?: T;
+  covers?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
         id?: T;
       };
   id?: T;
