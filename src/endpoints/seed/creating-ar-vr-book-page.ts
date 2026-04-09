@@ -1,10 +1,15 @@
+import type { AffiliateProduct } from '@/payload-types'
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
 /**
- * Book landing page: bold metrics + acclaim strip (same story as the speaker kit).
+ * Book landing page: bold metrics + acclaim strip + Amazon CTA (same story as the speaker kit).
  * Slug: /creating-ar-vr-book — edit in CMS if your URL differs.
  */
-export const creatingArVrBookPage = (): RequiredDataFromCollectionSlug<'pages'> => {
+type Args = {
+  bookAffiliateProductId: AffiliateProduct['id']
+}
+
+export const creatingArVrBookPage = ({ bookAffiliateProductId }: Args): RequiredDataFromCollectionSlug<'pages'> => {
   return {
     slug: 'creating-ar-vr-book',
     _status: 'published',
@@ -52,6 +57,15 @@ export const creatingArVrBookPage = (): RequiredDataFromCollectionSlug<'pages'> 
             body: '',
           },
         ],
+      },
+      {
+        blockType: 'affiliateProductsBlock',
+        blockName: 'Buy the book',
+        heading: 'Buy the book',
+        showDisclosure: true,
+        disclosureText: 'As an Amazon Associate I earn from qualifying purchases.',
+        columns: '3',
+        products: [bookAffiliateProductId],
       },
       {
         blockType: 'content',

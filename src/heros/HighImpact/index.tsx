@@ -139,7 +139,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
       {/* Keep legacy single-image high-impact heroes working while supporting the new 3-image layout. */}
       {!showGridLayout && hasPortrait ? (
-        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
+        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-start gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
           <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
             <div className="max-w-[36.5rem]">
               {richText && (
@@ -161,8 +161,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             </div>
           </div>
 
-          <div className="order-1 flex min-h-[260px] justify-center xl:order-2 xl:min-h-0 xl:justify-end">
-              <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]">
+          <div className="order-1 flex min-h-[260px] justify-center self-start xl:order-2 xl:min-h-0 xl:justify-end">
+            <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]">
               <Media
                 alt={
                   (typeof media.alt === 'string' && media.alt.trim()) ||
@@ -199,7 +199,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : (
-        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
+        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-start gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
           <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
             <div className="max-w-[36.5rem]">
               {richText && (

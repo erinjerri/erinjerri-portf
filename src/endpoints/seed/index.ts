@@ -22,6 +22,7 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const collections: CollectionSlug[] = [
+  'affiliateProducts',
   'categories',
   'media',
   'pages',
@@ -180,6 +181,7 @@ export const seed = async ({
     image2Buffer,
     image3Buffer,
     hero1Buffer,
+    bookCoverBuffer,
     homeHeroTopBuffer,
     homeHeroBottomLeftBuffer,
     homeHeroBottomRightBuffer,
@@ -188,6 +190,9 @@ export const seed = async ({
     fetchFileByPath(path.join(dirname, 'image-post2.webp')),
     fetchFileByPath(path.join(dirname, 'image-post3.webp')),
     fetchFileByPath(path.join(dirname, 'image-hero1.webp')),
+    fetchFileByPath(
+      path.join(process.cwd(), 'public', 'media', 'CYR-CreatingARVR-X-cover-updated@1x.png'),
+    ),
     fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'dimensions-background-curves.webp')),
     fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'Erin-Book-Headshot.webp')),
     fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'erin-AVP-headshot-95op.png')),
@@ -199,6 +204,7 @@ export const seed = async ({
     image2Doc,
     image3Doc,
     imageHomeDoc,
+    bookCoverDoc,
     homeHeroTopDoc,
     homeHeroBottomLeftDoc,
     homeHeroBottomRightDoc,
@@ -239,6 +245,15 @@ export const seed = async ({
     payload.create({
       collection: 'media',
       data: {
+        alt: 'Creating Augmented and Virtual Realities book cover',
+        mediaType: 'image',
+      },
+      file: bookCoverBuffer,
+      req,
+    }),
+    payload.create({
+      collection: 'media',
+      data: {
         alt: 'Abstract background curves for the homepage hero',
         mediaType: 'image',
       },
@@ -274,6 +289,23 @@ export const seed = async ({
       }),
     ),
   ])
+
+  payload.logger.info(`— Seeding affiliate products...`)
+
+  const bookAffiliateProduct = await payload.create({
+    collection: 'affiliateProducts',
+    depth: 0,
+    data: {
+      title: 'Creating Augmented and Virtual Realities',
+      brand: "O'Reilly Media",
+      productURL: 'https://www.amazon.com/s?k=Creating+Augmented+and+Virtual+Realities',
+      ctaLabel: 'View on Amazon',
+      openInNewTab: true,
+      image: bookCoverDoc.id,
+      featured: true,
+    },
+    req,
+  })
 
   payload.logger.info(`— Seeding posts...`)
 
@@ -387,7 +419,9 @@ export const seed = async ({
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: creatingArVrBookPage(),
+      data: creatingArVrBookPage({
+        bookAffiliateProductId: String(bookAffiliateProduct.id),
+      }),
       req,
     }),
   ])
