@@ -178,7 +178,7 @@ export const RenderBlocks: React.FC<{
             return (
               <div
                 className={
-                  index === 0 ? 'mb-8' : 'my-8'
+                  index === 0 ? 'mb-20 md:mb-24 lg:mb-28' : 'my-20 md:my-24 lg:my-28'
                 }
                 key={index}
               >
@@ -243,17 +243,19 @@ export const RenderBlocks: React.FC<{
               const isCtaAfterMergedOverlay =
                 blockType === 'cta' && prevIsLinksBlock && prevPrevIsMedia
 
+              const sectionY = 'my-20 md:my-24 lg:my-28'
+              const sectionBottom = 'mb-20 md:mb-24 lg:mb-28'
               let marginClass: string
               if (index === 0) {
-                marginClass = 'mb-8'
+                marginClass = sectionBottom
               } else if (isCtaFollowedByMedia) {
-                marginClass = 'mt-8 mb-0'
+                marginClass = 'mt-20 md:mt-24 mb-0 md:mb-0 lg:mb-0'
               } else if (prevIsCta && isMedia) {
-                marginClass = 'mt-0 mb-8'
+                marginClass = 'mt-0 mb-20 md:mb-24 lg:mb-28'
               } else if (isCtaFollowedByMediaBlock || isCtaAfterMergedOverlay) {
-                marginClass = 'mt-12 mb-8'
+                marginClass = 'mt-24 mb-20 md:mt-28 md:mb-24 lg:mb-28'
               } else {
-                marginClass = 'my-8'
+                marginClass = sectionY
               }
 
               return (

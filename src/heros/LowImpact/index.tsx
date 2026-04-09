@@ -4,6 +4,8 @@ import type { Page } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import RichText from '@/components/RichText'
+import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
+import { cn } from '@/utilities/ui'
 
 type LowImpactHeroType =
   | (Omit<Page['hero'], 'richText'> & {
@@ -19,7 +21,14 @@ export const LowImpactHero: React.FC<LowImpactHeroType> = ({ children, links, ri
   return (
     <div className="container mt-16">
       <div className="max-w-[48rem]">
-        {children || (richText && <RichText className="mb-6" data={richText} enableGutter={false} />)}
+        {children ||
+          (richText && (
+            <RichText
+              className={cn('mb-6', heroBioRichTextClassName)}
+              data={richText}
+              enableGutter={false}
+            />
+          ))}
         {Array.isArray(links) && links.length > 0 && (
           <ul className="flex flex-wrap gap-4 mt-4">
             {links.map(({ link }, i) => (

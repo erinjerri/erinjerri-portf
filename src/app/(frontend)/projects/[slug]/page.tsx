@@ -81,6 +81,18 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
               relationTo="projects"
             />
           )}
+          {project.relatedPost && typeof project.relatedPost === 'object' && (
+            <div className="mt-12 max-w-[52rem]">
+              <h2 className="mb-6 font-title text-display-h2 font-semibold tracking-tight md:text-display-h2-md">
+                Related reading
+              </h2>
+              <RelatedPosts
+                className="lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
+                docs={[project.relatedPost]}
+                relationTo="posts"
+              />
+            </div>
+          )}
         </div>
       </div>
     </article>
@@ -93,7 +105,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const project = await getProjectBySlug(decodedSlug, draft)
 
-  return generateMeta({ doc: project })
+  return generateMeta({ doc: project, canonicalPath: `/projects/${decodedSlug}` })
 }
 
 const getProjectBySlug = async (slug: string, draft: boolean) => {
@@ -102,6 +114,7 @@ const getProjectBySlug = async (slug: string, draft: boolean) => {
     const result = await payload.find({
       collection: 'projects',
       draft: true,
+      depth: 2,
       limit: 1,
       pagination: false,
       overrideAccess: true,
@@ -116,6 +129,7 @@ const getProjectBySlug = async (slug: string, draft: boolean) => {
       const result = await payload.find({
         collection: 'projects',
         draft: false,
+        depth: 2,
         limit: 1,
         pagination: false,
         overrideAccess: false,

@@ -677,9 +677,10 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
       },
     ],
     meta: {
-      description: 'An open-source website built with Payload and Next.js.',
+      description:
+        'Software engineer, founder, and O’Reilly author building AI and spatial computing systems. Creator of TimeBite, a LifeOS for real-world workflows.',
       image: metaImage.id,
-      title: 'Erin Jerri',
+      title: 'Erin Jerri — AI, Spatial Computing, TimeBite',
     },
     title: 'Home',
   }

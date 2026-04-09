@@ -20,7 +20,7 @@ export const speakingInfoPage = ({
       type: 'none',
     },
     meta: {
-      title: 'Speaking — Erin Jerri Pañgilinan',
+      title: 'Speaking — AI, XR, and Systems',
       description:
         'Keynotes, panels, and workshops on AI, spatial computing, and building at the frontier. Submit a speaking request.',
     },

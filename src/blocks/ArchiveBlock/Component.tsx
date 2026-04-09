@@ -112,7 +112,7 @@ export const ArchiveBlock: React.FC<
   const filterCategories = Array.from(categoryMap.values())
 
   return (
-    <div className="my-16" id={`block-${id}`}>
+    <div className="my-20 md:my-24 lg:my-28" id={`block-${id}`}>
       {introContent && (
         <div className="container mb-16">
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />

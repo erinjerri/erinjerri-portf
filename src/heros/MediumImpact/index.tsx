@@ -6,6 +6,7 @@ import { CMSLink } from '@/components/Link'
 import { cn } from '@/utilities/ui'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
+import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
 export const MediumImpactHero: React.FC<Page['hero']> = ({
   links,
@@ -23,6 +24,10 @@ export const MediumImpactHero: React.FC<Page['hero']> = ({
         {heroMedia && (
           <div className="mb-6 w-full max-w-[420px]">
             <Media
+              alt={
+                (typeof heroMedia.alt === 'string' && heroMedia.alt.trim()) ||
+                'Erin Jerri — about and profile, AI and spatial computing'
+              }
               className="w-full"
               imgClassName="object-contain"
               priority
@@ -49,7 +54,7 @@ export const MediumImpactHero: React.FC<Page['hero']> = ({
         {/* Rich text below image + links */}
         {richText && (
           <div className="w-full max-w-[52rem]">
-            <RichText data={richText} enableGutter={false} />
+            <RichText className={heroBioRichTextClassName} data={richText} enableGutter={false} />
           </div>
         )}
       </div>

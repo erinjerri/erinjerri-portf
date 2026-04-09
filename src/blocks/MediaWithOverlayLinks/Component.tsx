@@ -141,8 +141,11 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
             {hasOverlayRichText ? (
               <div
                 className={cn(
-                  'mb-6 font-semibold',
-                  isHighImpact ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl',
+                  'mb-6 max-w-prose font-medium leading-relaxed',
+                  '[&_.prose]:text-base [&_.prose]:leading-relaxed md:[&_.prose]:text-lg',
+                  '[&_.prose_h1]:!text-xl [&_.prose_h1]:!leading-snug md:[&_.prose_h1]:!text-2xl',
+                  '[&_.prose_h2]:!text-lg [&_.prose_h2]:!leading-snug md:[&_.prose_h2]:!text-xl',
+                  '[&_.prose_h3]:!text-base [&_.prose_h3]:md:!text-lg',
                 )}
               >
                 <RichText data={overlayRichText as DefaultTypedEditorState} enableGutter={false} />
@@ -152,8 +155,8 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
               className={cn(
                 'flex flex-wrap gap-4 sm:justify-start md:justify-center',
                 isHighImpact
-                  ? 'gap-6 [&_button]:text-lg [&_button]:md:text-xl [&_button]:px-6 [&_button]:py-3'
-                  : '[&_button]:text-base [&_button]:md:text-lg',
+                  ? 'gap-5 [&_button]:text-base [&_button]:px-5 [&_button]:py-2.5'
+                  : '[&_button]:text-sm [&_button]:md:text-base',
               )}
             >
               {links.map(({ link }, i) => (

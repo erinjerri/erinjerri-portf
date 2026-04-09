@@ -56,7 +56,7 @@ export const VideoBackgroundTransitionBlock: React.FC<Props> = ({
       <div className="absolute inset-0 bg-black" style={{ opacity }} />
       {hasOverlay && (
         <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-center px-6 py-8 text-center">
-          <div className="max-w-3xl text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_a]:text-white">
+          <div className="max-w-2xl text-white [&_.prose]:text-base [&_.prose]:leading-relaxed [&_.prose]:text-white md:[&_.prose]:text-lg [&_.prose_*]:text-white [&_.prose_h1]:!text-[1.75rem] [&_.prose_h1]:!leading-tight md:[&_.prose_h1]:!text-[2rem] [&_.prose_h2]:!text-lg [&_.prose_h2]:md:!text-xl [&_a]:text-white">
             {Boolean(content) && <RichText data={content as any} enableGutter={false} />}
           </div>
           {Array.isArray(links) && links.length > 0 && (

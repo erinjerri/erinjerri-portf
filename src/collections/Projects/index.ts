@@ -43,6 +43,7 @@ export const Projects: CollectionConfig<'projects'> = {
     title: true,
     slug: true,
     categories: true,
+    relatedPost: true,
     meta: {
       image: true,
       description: true,
@@ -122,6 +123,15 @@ export const Projects: CollectionConfig<'projects'> = {
               },
               hasMany: true,
               relationTo: 'projects',
+            },
+            {
+              name: 'relatedPost',
+              type: 'relationship',
+              relationTo: 'posts',
+              admin: {
+                position: 'sidebar',
+                description: 'Optional blog post to highlight (e.g. deep-dive or announcement).',
+              },
             },
             {
               name: 'categories',

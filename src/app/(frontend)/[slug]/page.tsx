@@ -114,6 +114,12 @@ export default async function Page({ params: paramsPromise }: Args) {
         {draft && <LivePreviewListener />}
 
         <RenderHero {...hero} />
+        {(decodedSlug === 'timebite' || decodedSlug === 'timebite-download') && (
+          <p className="container mt-8 max-w-[48rem] text-base leading-relaxed text-muted-foreground">
+            TimeBite is an AI-powered productivity and spatial computing system designed for real-world
+            workflows.
+          </p>
+        )}
         <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
         <RenderBlocks blocks={layout} pageSlug={decodedSlug} />
       </article>
@@ -129,11 +135,19 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
   try {
     const page = await getPageBySlug(decodedSlug, draft)
-    return generateMeta({ doc: page ?? (isBuild && decodedSlug === 'home' ? homeStatic : null) })
+    const path = decodedSlug === 'home' ? '/' : `/${decodedSlug}`
+    return generateMeta({
+      doc: page ?? (isBuild && decodedSlug === 'home' ? homeStatic : null),
+      canonicalPath: path,
+    })
   } catch (err) {
     if (!isBuild) throw err
     console.warn('[slug/page] Skipping metadata because DB is unavailable:', err)
-    return generateMeta({ doc: decodedSlug === 'home' ? homeStatic : null })
+    const path = decodedSlug === 'home' ? '/' : `/${decodedSlug}`
+    return generateMeta({
+      doc: decodedSlug === 'home' ? homeStatic : null,
+      canonicalPath: path,
+    })
   }
 
   // Unreachable

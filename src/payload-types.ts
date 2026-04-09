@@ -909,6 +909,10 @@ export interface Project {
     [k: string]: unknown;
   };
   relatedProjects?: (string | Project)[] | null;
+  /**
+   * Optional blog post to highlight (e.g. deep-dive or announcement).
+   */
+  relatedPost?: (string | null) | Post;
   categories?: (string | Category)[] | null;
   meta?: {
     title?: string | null;
@@ -2354,6 +2358,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   heroImage?: T;
   content?: T;
   relatedProjects?: T;
+  relatedPost?: T;
   categories?: T;
   meta?:
     | T

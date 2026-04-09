@@ -2,10 +2,13 @@ import React from 'react'
 
 import type { Media as MediaDoc, Page } from '@/payload-types'
 
+import { cn } from '@/utilities/ui'
 import { HeaderThemeSetter } from '@/heros/HeaderThemeSetter'
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
+
+import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
 type HeroProps = Page['hero']
 
@@ -73,6 +76,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     if (isPopulated(resource)) {
       return (
         <Media
+          alt={
+            (typeof resource.alt === 'string' && resource.alt.trim()) ||
+            alt ||
+            'Erin Jerri — AI, spatial computing, and engineering work'
+          }
           fill
           htmlElement={null}
           imgClassName="object-cover"
@@ -103,6 +111,10 @@ export const HighImpactHero: React.FC<HeroProps> = ({
       {backgroundImage && (
         <div className="absolute inset-0 -z-10">
           <Media
+            alt={
+              (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
+              'Full-width hero background — Erin Jerri, AI and spatial computing'
+            }
             fill
             className="absolute inset-0 h-full w-full"
             imgClassName="object-cover object-[50%_22%] md:object-center"
@@ -117,7 +129,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
       {!backgroundImage && (
         <div className="absolute inset-0 -z-10">
           <StaticHeroImage
-            alt=""
+            alt="Decorative hero background — Erin Jerri portfolio"
             className="h-full w-full"
             src={backgroundSrc!}
             position="50% 22%"
@@ -127,10 +139,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
       {/* Keep legacy single-image high-impact heroes working while supporting the new 3-image layout. */}
       {!showGridLayout && hasPortrait ? (
-        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-16 xl:grid-cols-2 xl:gap-12 xl:px-8">
+        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
           <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
             <div className="max-w-[36.5rem]">
-              {richText && <RichText className="mb-6" data={richText} enableGutter={false} />}
+              {richText && (
+                <RichText
+                  className={cn('mb-6', heroBioRichTextClassName)}
+                  data={richText}
+                  enableGutter={false}
+                />
+              )}
               {Array.isArray(links) && links.length > 0 && (
                 <ul className="flex flex-wrap justify-center gap-4 xl:justify-start">
                   {links.map(({ link }, i) => (
@@ -144,8 +162,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
 
           <div className="order-1 flex min-h-[260px] justify-center xl:order-2 xl:min-h-0 xl:justify-end">
-            <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]">
+              <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]">
               <Media
+                alt={
+                  (typeof media.alt === 'string' && media.alt.trim()) ||
+                  'Erin Jerri Apple Vision Pro spatial computing work'
+                }
                 imgClassName="h-auto w-full object-contain object-top drop-shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
                 pictureClassName="relative block w-full"
                 priority
@@ -156,9 +178,15 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : !showGridLayout ? (
-        <div className="relative z-10 mx-auto flex max-w-[1200px] items-center px-4 py-16 xl:px-8">
+        <div className="relative z-10 mx-auto flex max-w-[1200px] items-center px-4 py-20 md:py-24 lg:py-28 xl:px-8">
           <div className="max-w-[36.5rem]">
-            {richText && <RichText className="mb-6" data={richText} enableGutter={false} />}
+            {richText && (
+              <RichText
+                className={cn('mb-6', heroBioRichTextClassName)}
+                data={richText}
+                enableGutter={false}
+              />
+            )}
             {Array.isArray(links) && links.length > 0 && (
               <ul className="flex flex-wrap gap-4">
                 {links.map(({ link }, i) => (
@@ -171,10 +199,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : (
-        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-16 xl:grid-cols-2 xl:gap-12 xl:px-8">
+        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
           <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
             <div className="max-w-[36.5rem]">
-              {richText && <RichText className="mb-6" data={richText} enableGutter={false} />}
+              {richText && (
+                <RichText
+                  className={cn('mb-6', heroBioRichTextClassName)}
+                  data={richText}
+                  enableGutter={false}
+                />
+              )}
               {Array.isArray(links) && links.length > 0 && (
                 <ul className="flex flex-wrap justify-center gap-4 xl:justify-start">
                   {links.map(({ link }, i) => (
@@ -192,7 +226,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               <div className="col-span-2 aspect-[16/9] overflow-hidden">
                 {renderHeroSlot(
                   heroImage1,
-                  'Hero top',
+                  'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
                   // Cap logical width so mobile does not pull 750w+ for a ~380px slot (PageSpeed / Slow 4G).
                   '(max-width: 1279px) min(100vw - 2rem, 24rem), min(50vw, 32rem)',
                 )}
@@ -200,7 +234,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               <div className="aspect-[3/4] overflow-hidden">
                 {renderHeroSlot(
                   heroImage2,
-                  'Hero bottom left',
+                  'Erin Jerri Apple Vision Pro spatial computing work',
                   // This card grows wider than the previous sizes hint suggested, especially on
                   // high-DPR desktop displays. Give the browser a truer width so it can request
                   // a larger source candidate and avoid soft/pixelated rendering.
@@ -211,7 +245,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               <div className="aspect-[3/4] overflow-hidden">
                 {renderHeroSlot(
                   heroImage3,
-                  'Hero bottom right',
+                  'Erin Jerri — engineering, AI systems, and spatial computing',
                   '(max-width: 1279px) min(50vw - 0.5rem, 12rem), min(25vw, 15rem)',
                 )}
               </div>

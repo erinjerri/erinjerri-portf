@@ -40,7 +40,9 @@ export const ToplineHeaderBlock: React.FC<Props> = ({ height = 'medium', media, 
       </div>
       <div className="absolute inset-0 bg-background/70" />
       <div className="relative z-10 flex h-full items-center px-6 md:px-10">
-        <h2 className="text-5xl font-extrabold tracking-tight text-foreground md:text-8xl">{title}</h2>
+        <h2 className="max-w-[90vw] truncate font-title text-base font-semibold leading-snug tracking-tight text-foreground md:text-lg">
+          {title}
+        </h2>
       </div>
     </div>
   )

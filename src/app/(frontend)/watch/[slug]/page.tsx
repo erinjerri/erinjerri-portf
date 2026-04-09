@@ -97,7 +97,7 @@ export default async function WatchPage({ params: paramsPromise }: Args) {
                 .join(', ')}
             </div>
           )}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">
+          <h1 className="mb-6 font-title text-display-h1 leading-[1.1] tracking-tight md:text-display-h1-md">
             {watchDoc.title}
           </h1>
           <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
@@ -145,7 +145,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const watchDoc = await getWatchBySlug(decodedSlug, draft)
 
-  return generateMeta({ doc: watchDoc as Project })
+  return generateMeta({ doc: watchDoc as Project, canonicalPath: `/watch/${decodedSlug}` })
 }
 
 const getWatchBySlug = async (slug: string, draft: boolean) => {

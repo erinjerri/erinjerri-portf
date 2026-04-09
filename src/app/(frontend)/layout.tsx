@@ -11,6 +11,12 @@ import { InitTheme } from '@/providers/Theme/InitTheme'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { GoogleTagManagerHead, GoogleTagManagerNoScript } from '@/components/GoogleTagManager'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import {
+  CANONICAL_SITE_ORIGIN,
+  PERSON_JSON_LD,
+  SITE_DEFAULT_DESCRIPTION,
+  SITE_DEFAULT_TITLE,
+} from '@/utilities/siteMetadata'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Header as HeaderType } from '@/payload-types'
 
@@ -45,6 +51,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <link rel="preconnect" href="https://www.googletagmanager.com" />
         ) : null}
         {gtmContainerId ? <GoogleTagManagerHead containerId={gtmContainerId} /> : null}
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_JSON_LD) }}
+        />
         {process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ? (
           <>
             <link rel="preconnect" href="https://www.clarity.ms" />
@@ -75,8 +86,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 }
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: `${CANONICAL_SITE_ORIGIN}/`,
+  },
+  description: SITE_DEFAULT_DESCRIPTION,
   metadataBase: new URL(getServerSideURL()),
   openGraph: mergeOpenGraph(),
+  title: SITE_DEFAULT_TITLE,
   twitter: {
     card: 'summary_large_image',
     creator: '@erinjerri',

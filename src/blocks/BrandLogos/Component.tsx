@@ -16,14 +16,14 @@ export const BrandLogosBlock: React.FC<BrandLogosBlockProps> = (props) => {
   const muted = style === 'muted'
 
   return (
-    <div className="container my-10 pb-8 lg:my-12 lg:pb-12">
+    <div className="container my-16 pb-8 md:my-20 lg:my-24 lg:pb-12">
       {heading ? (
-        <h2 className="mb-3 text-center font-title text-xl font-semibold tracking-tight md:text-2xl">
+        <h2 className="mb-3 text-center font-title text-display-h2 font-semibold tracking-tight md:text-display-h2-md">
           {heading}
         </h2>
       ) : null}
       {intro ? (
-        <p className="mx-auto mb-8 max-w-2xl text-center text-sm text-muted-foreground md:text-base">
+        <p className="mx-auto mb-8 max-w-2xl text-center text-base leading-relaxed text-muted-foreground">
           {intro}
         </p>
       ) : null}

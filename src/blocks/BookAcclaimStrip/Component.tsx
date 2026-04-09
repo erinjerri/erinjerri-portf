@@ -2,7 +2,7 @@ import { cn } from '@/utilities/ui'
 import type { BookAcclaimStripBlock as BookAcclaimStripBlockProps } from '@/payload-types'
 import React from 'react'
 
-/** Matches hero RichText h1 sizing from tailwind typography (`prose` / `md:prose-md`). */
+/** Large section title + metric-style leads (restored after global typography pass). */
 const heroH1Class =
   'font-title text-[2.5rem] font-extrabold leading-[1.1] tracking-tight md:text-[3.5rem]'
 
@@ -11,7 +11,7 @@ export const BookAcclaimStripBlock: React.FC<BookAcclaimStripBlockProps> = (prop
   if (!items?.length) return null
 
   return (
-    <section className="w-full border-t border-slate-200 bg-white py-12 text-slate-900 lg:py-16">
+    <section className="w-full border-t border-slate-200 bg-white py-20 text-slate-900 md:py-24 lg:py-28">
       <div className="container">
         {heading ? <h2 className={heroH1Class}>{heading}</h2> : null}
         <div
@@ -36,10 +36,10 @@ export const BookAcclaimStripBlock: React.FC<BookAcclaimStripBlockProps> = (prop
                 <div className="min-w-0 flex-1">
                   <p
                     className={cn(
-                      'font-title font-extrabold leading-[1.05] tracking-tight text-primary',
+                      'font-title font-extrabold tracking-tight text-primary',
                       item.variant === 'numbered'
-                        ? 'text-3xl tabular-nums sm:text-4xl lg:text-5xl'
-                        : 'text-xl sm:text-2xl lg:text-3xl',
+                        ? 'tabular-nums leading-[1.02] text-[2.75rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[4.5rem]'
+                        : 'leading-[1.05] text-2xl sm:text-3xl lg:text-4xl',
                     )}
                   >
                     {item.lead}

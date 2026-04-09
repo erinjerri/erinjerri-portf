@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import type { Media, Page, Post, Config } from '../payload-types'
+import type { Config, Media, Page, Post, Project, Watch } from '../payload-types'
 
 import {
   DEFAULT_OG_IMAGE_HEIGHT,
@@ -10,6 +10,13 @@ import {
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
+import {
+  CANONICAL_SITE_ORIGIN,
+  SITE_DEFAULT_DESCRIPTION,
+  SITE_DEFAULT_TITLE,
+  canonicalUrlForPath,
+  getFixedPageSeo,
+} from './siteMetadata'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL()
@@ -34,10 +41,20 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   return url
 }
 
+function normalizeCanonicalPath(path: string): string {
+  if (!path || path === '/') return '/'
+  const withSlash = path.startsWith('/') ? path : `/${path}`
+  return withSlash.replace(/\/$/, '') || '/'
+}
+
 export const generateMeta = async (args: {
-  doc: Partial<Page> | Partial<Post> | null
+  doc: Partial<Page> | Partial<Post> | Partial<Project> | Partial<Watch> | null
+  /** Public pathname e.g. `/`, `/about`, `/posts/hello` */
+  canonicalPath: string
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { doc, canonicalPath } = args
+  const path = normalizeCanonicalPath(canonicalPath)
+  const canonical = canonicalUrlForPath(path === '/' ? '/' : path)
 
   const serverUrl = getServerSideURL()
   const defaultOgAbsolute =
@@ -47,14 +64,34 @@ export const generateMeta = async (args: {
 
   const ogImage = getImageURL(doc?.meta?.image)
 
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Erin Jerri'
-    : 'Erin Jerri'
+  const fixedPageSeo = getFixedPageSeo(path)
+
+  const cmsTitle = doc?.meta?.title?.trim()
+  const cmsDescription = doc?.meta?.description?.trim()
+
+  let title: string
+  if (fixedPageSeo) {
+    title = fixedPageSeo.title
+  } else if (cmsTitle) {
+    title = `${cmsTitle} | Erin Jerri`
+  } else {
+    title = SITE_DEFAULT_TITLE
+  }
+
+  const description =
+    fixedPageSeo?.description ??
+    (cmsDescription || SITE_DEFAULT_DESCRIPTION)
+
+  const ogUrl =
+    path === '/' ? `${CANONICAL_SITE_ORIGIN}/` : `${CANONICAL_SITE_ORIGIN}${path}`
 
   return {
-    description: doc?.meta?.description,
+    alternates: {
+      canonical,
+    },
+    description,
     openGraph: mergeOpenGraph({
-      description: doc?.meta?.description || '',
+      description,
       images: ogImage
         ? [
             {
@@ -67,8 +104,14 @@ export const generateMeta = async (args: {
           ]
         : undefined,
       title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      url: ogUrl,
     }),
     title,
+    twitter: {
+      card: 'summary_large_image',
+      creator: '@erinjerri',
+      description,
+      title,
+    },
   }
 }

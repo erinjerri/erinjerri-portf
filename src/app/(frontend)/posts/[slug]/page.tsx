@@ -122,11 +122,11 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   try {
     const post = await getPostBySlug(decodedSlug, draft)
 
-    return generateMeta({ doc: post })
+    return generateMeta({ doc: post, canonicalPath: `/posts/${decodedSlug}` })
   } catch (err) {
     if (!isBuild) throw err
     console.warn('[posts/[slug]] Skipping metadata because DB is unavailable:', err)
-    return generateMeta({ doc: null })
+    return generateMeta({ doc: null, canonicalPath: `/posts/${decodedSlug}` })
   }
 
   // Unreachable

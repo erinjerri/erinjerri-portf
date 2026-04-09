@@ -111,7 +111,11 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
 
   return (
     <section className="container" id={id ? `block-${id}` : undefined}>
-      {heading ? <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2> : null}
+      {heading ? (
+        <h2 className="font-title text-display-h2 font-semibold tracking-tight md:text-display-h2-md">
+          {heading}
+        </h2>
+      ) : null}
       {showDisclosure ? (
         <p className="mt-2 text-xs text-white/70">
           {disclosureText || 'As an Amazon Associate I earn from qualifying purchases.'}

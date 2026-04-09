@@ -15,14 +15,14 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
   const aspectClass = aspectRatio === '3:4' ? 'aspect-[3/4]' : 'aspect-[2/3]'
 
   return (
-    <div className="container my-10 lg:my-14">
+    <div className="container my-16 md:my-20 lg:my-24">
       {heading ? (
-        <h2 className="mb-3 text-center font-title text-xl font-semibold tracking-tight md:text-2xl">
+        <h2 className="mb-3 text-center font-title text-display-h2 font-semibold tracking-tight md:text-display-h2-md">
           {heading}
         </h2>
       ) : null}
       {intro ? (
-        <p className="mx-auto mb-8 max-w-2xl text-center text-sm text-muted-foreground md:mb-10 md:text-base">
+        <p className="mx-auto mb-8 max-w-2xl text-center text-base leading-relaxed text-muted-foreground md:mb-10">
           {intro}
         </p>
       ) : null}
@@ -43,7 +43,7 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
           const alt =
             (typeof media.alt === 'string' && media.alt.trim()) ||
             row.caption?.trim() ||
-            'Book cover'
+            "Creating Augmented and Virtual Realities O'Reilly book cover"
 
           return (
             <figure

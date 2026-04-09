@@ -100,8 +100,9 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
     },
   },
   meta: {
-    description: 'Explore Erin Jerri’s latest writing, projects, speaking, and creative work.',
-    title: 'Erin Jerri',
+    description:
+      'Software engineer, founder, and O’Reilly author building AI and spatial computing systems. Creator of TimeBite, a LifeOS for real-world workflows.',
+    title: 'Erin Jerri — AI, Spatial Computing, TimeBite',
   },
   title: 'Home',
   layout: [...homeHireMeLayoutBlocks],

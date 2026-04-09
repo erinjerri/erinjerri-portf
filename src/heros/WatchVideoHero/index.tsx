@@ -54,7 +54,7 @@ export const WatchVideoHero: React.FC<Props> = ({
           <iframe
             className="h-full w-full"
             src={embedUrl}
-            title="Embedded video"
+            title="Erin Jerri — video: speaking, AI, and spatial computing"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           />
@@ -93,6 +93,10 @@ export const WatchVideoHero: React.FC<Props> = ({
           {hasHeroImage ? (
             <div className="absolute inset-0 opacity-20">
               <MediaComponent
+                alt={
+                  (typeof heroImage!.alt === 'string' && heroImage!.alt.trim()) ||
+                  'Erin Jerri — talk and video hero, AI and spatial computing'
+                }
                 fill
                 imgClassName="object-cover"
                 priority
@@ -103,7 +107,7 @@ export const WatchVideoHero: React.FC<Props> = ({
             <div className="absolute inset-0 bg-muted/50" aria-hidden />
           )}
           {/* Overlay text */}
-          <span className="relative z-10 text-4xl" aria-hidden>
+          <span className="relative z-10 text-2xl opacity-90" aria-hidden>
             ▶
           </span>
           <span className="relative z-10 text-lg font-medium">Watch on {hostname}</span>
@@ -159,6 +163,10 @@ export const WatchVideoHero: React.FC<Props> = ({
   return (
     <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 bg-black aspect-video">
       <MediaComponent
+        alt={
+          (typeof heroImage!.alt === 'string' && heroImage!.alt.trim()) ||
+          'Erin Jerri — talk and video hero, AI and spatial computing'
+        }
         fill
         imgClassName="object-cover"
         priority

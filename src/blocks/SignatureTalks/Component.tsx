@@ -8,8 +8,10 @@ export const SignatureTalksBlock: React.FC<SignatureTalksBlockProps> = (props) =
   if (!talks?.length) return null
 
   return (
-    <div className="container my-12 lg:my-16">
-      <h2 className="font-title text-2xl font-extrabold tracking-tight lg:text-3xl">{heading}</h2>
+    <div className="container my-16 md:my-20 lg:my-24">
+      <h2 className="font-title text-display-h2 font-semibold tracking-tight md:text-display-h2-md">
+        {heading}
+      </h2>
       {intro ? (
         <p className="mt-3 max-w-3xl text-muted-foreground lg:text-lg">{intro}</p>
       ) : null}
@@ -20,12 +22,14 @@ export const SignatureTalksBlock: React.FC<SignatureTalksBlockProps> = (props) =
             key={i}
           >
             <div className="flex gap-4">
-              <span className={`font-title text-2xl font-bold tabular-nums ${accent}`}>
+              <span className={`font-title text-xl font-semibold tabular-nums sm:text-2xl ${accent}`}>
                 {talk.number}
               </span>
               <div className="min-w-0 flex-1">
-                <h3 className="font-title text-lg font-bold leading-snug lg:text-xl">{talk.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground lg:text-base">
+                <h3 className="font-title text-base font-semibold leading-snug text-foreground/95 lg:text-lg">
+                  {talk.title}
+                </h3>
+                <p className="mt-2 text-base leading-relaxed text-muted-foreground">
                   {talk.subtitle}
                 </p>
               </div>

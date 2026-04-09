@@ -6,6 +6,7 @@ import {
   DEFAULT_OG_IMAGE_WIDTH,
 } from '@/constants/defaultOgImage'
 
+import { SITE_DEFAULT_DESCRIPTION, SITE_DEFAULT_TITLE } from './siteMetadata'
 import { getServerSideURL } from './getURL'
 
 function absoluteOgImageUrl(): string {
@@ -17,17 +18,17 @@ function absoluteOgImageUrl(): string {
 
 const defaultOpenGraph: Metadata['openGraph'] = {
   type: 'website',
-  description: 'Articles, projects, speaking, and creative work from Erin Jerri.',
+  description: SITE_DEFAULT_DESCRIPTION,
   images: [
     {
       url: absoluteOgImageUrl(),
       width: DEFAULT_OG_IMAGE_WIDTH,
       height: DEFAULT_OG_IMAGE_HEIGHT,
-      alt: 'Erin Jerri',
+      alt: "Creating Augmented and Virtual Realities O'Reilly book cover — Erin Jerri",
     },
   ],
   siteName: 'Erin Jerri',
-  title: 'Erin Jerri',
+  title: SITE_DEFAULT_TITLE,
 }
 
 export const mergeOpenGraph = (og?: Metadata['openGraph']): Metadata['openGraph'] => {

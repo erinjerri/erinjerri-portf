@@ -15,9 +15,9 @@ export const aboutPage = ({
     slug: 'about',
     _status: 'published',
     meta: {
-      title: 'About Erin Jerri',
+      title: 'About Erin Jerri Pañgilinan — AI & Spatial Computing',
       description:
-        'Learn more about Erin Jerri, explore speaking topics, and get in touch about consulting or events.',
+        'Erin Jerri Pañgilinan is a software engineer, founder, and O’Reilly author working in AI and spatial computing.',
     },
     title: 'About',
     hero: {

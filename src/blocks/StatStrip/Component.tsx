@@ -15,7 +15,7 @@ export const StatStripBlock: React.FC<StatStripBlockProps> = (props) => {
   if (!items?.length) return null
 
   return (
-    <div className="container my-10 lg:my-12">
+    <div className="container my-16 md:my-20 lg:my-24">
       {eyebrow ? (
         <p
           className={cn('mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em]', accent)}
@@ -38,7 +38,9 @@ export const StatStripBlock: React.FC<StatStripBlockProps> = (props) => {
               className={cn(
                 accent,
                 'font-title leading-none tracking-tight',
-                isBold ? 'text-3xl font-extrabold sm:text-4xl' : 'text-2xl font-bold sm:text-3xl',
+                isBold
+                  ? 'text-2xl font-bold tabular-nums sm:text-3xl'
+                  : 'text-xl font-semibold tabular-nums sm:text-2xl',
               )}
             >
               {item.value}

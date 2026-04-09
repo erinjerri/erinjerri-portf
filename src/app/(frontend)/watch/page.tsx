@@ -72,11 +72,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
   try {
     const page = await getPageBySlug(WATCH_PAGE_SLUG, draft)
-    return generateMeta({ doc: page })
+    return generateMeta({ doc: page, canonicalPath: '/watch' })
   } catch (err) {
     if (!isBuild) throw err
     console.warn('[watch/page] Skipping metadata because DB is unavailable:', err)
-    return generateMeta({ doc: null })
+    return generateMeta({ doc: null, canonicalPath: '/watch' })
   }
 }
 

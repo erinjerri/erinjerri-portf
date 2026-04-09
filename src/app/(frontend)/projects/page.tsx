@@ -8,6 +8,7 @@ import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import React from 'react'
 import PageClient from './page.client'
+import { canonicalUrlForPath, SITE_DEFAULT_DESCRIPTION } from '@/utilities/siteMetadata'
 
 const getCachedProjectsPage = unstable_cache(
   async () => {
@@ -94,6 +95,8 @@ export default async function Page() {
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Projects`,
+    alternates: { canonical: canonicalUrlForPath('/projects') },
+    description: SITE_DEFAULT_DESCRIPTION,
+    title: 'Projects',
   }
 }

@@ -2,7 +2,9 @@ import React from 'react'
 
 import type { Page } from '@/payload-types'
 
+import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 import { HeaderThemeSetter } from '@/heros/HeaderThemeSetter'
+import { cn } from '@/utilities/ui'
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
@@ -29,6 +31,10 @@ export const BackgroundCoverHero: React.FC<Page['hero']> = ({
       {backgroundImage && (
         <div className="absolute inset-0 -z-10">
           <Media
+            alt={
+              (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
+              'Full-width hero background — Erin Jerri, AI and spatial computing'
+            }
             fill
             className="absolute inset-0 h-full w-full"
             imgClassName="object-cover object-center"
@@ -44,7 +50,11 @@ export const BackgroundCoverHero: React.FC<Page['hero']> = ({
         <div className="max-w-[44rem]">
           {richText && (
             <RichText
-              className="mb-6 [&_.prose]:text-white [&_.prose_*]:text-white"
+              className={cn(
+                'mb-6',
+                heroBioRichTextClassName,
+                '[&_.prose]:text-white [&_.prose_*]:text-white',
+              )}
               data={richText}
               enableGutter={false}
             />

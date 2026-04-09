@@ -8,6 +8,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 import PageClient from './page.client'
 import { notFound } from 'next/navigation'
+import { canonicalUrlForPath, SITE_DEFAULT_DESCRIPTION } from '@/utilities/siteMetadata'
 
 export const revalidate = 600
 
@@ -102,8 +103,11 @@ export default async function Page({ params: paramsPromise }: Args) {
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { pageNumber } = await paramsPromise
+  const path = `/watch/page/${pageNumber || '1'}`
   return {
-    title: `Videos Page ${pageNumber || ''}`,
+    alternates: { canonical: canonicalUrlForPath(path) },
+    description: SITE_DEFAULT_DESCRIPTION,
+    title: `Videos — page ${pageNumber || ''}`,
   }
 }
 

@@ -98,6 +98,14 @@ const config = {
         sans: ['var(--font-copy)'],
         title: ['var(--font-title)'],
       },
+      fontSize: {
+        /** Page / document title — 48px → 56px @ md */
+        'display-h1': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display-h1-md': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        /** Section titles — 28px → 32px @ md */
+        'display-h2': ['1.75rem', { lineHeight: '1.25', letterSpacing: '-0.02em' }],
+        'display-h2-md': ['2rem', { lineHeight: '1.25', letterSpacing: '-0.02em' }],
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },
@@ -112,27 +120,54 @@ const config = {
         DEFAULT: {
           css: [
             {
-              // `--text` was never defined; body/headings fell back poorly. Links use theme primary blue.
               '--tw-prose-body': 'hsl(var(--foreground))',
               '--tw-prose-headings': 'hsl(var(--foreground))',
               '--tw-prose-links': 'hsl(var(--primary))',
               '--tw-prose-bold': 'hsl(var(--foreground))',
+              fontSize: '1rem',
+              lineHeight: '1.625',
+              maxWidth: '65ch',
               h1: {
                 fontFamily: 'var(--font-title)',
-                fontWeight: 800,
-                marginBottom: '0.25em',
+                fontSize: '3rem',
+                lineHeight: '1.1',
+                letterSpacing: '-0.02em',
+                fontWeight: '700',
+                marginBottom: '0.35em',
               },
               h2: {
                 fontFamily: 'var(--font-title)',
-                fontWeight: 700,
+                fontSize: '1.75rem',
+                lineHeight: '1.25',
+                letterSpacing: '-0.02em',
+                fontWeight: '600',
+                marginTop: '1.75em',
+                marginBottom: '0.5em',
               },
               h3: {
                 fontFamily: 'var(--font-title)',
-                fontWeight: 700,
+                fontSize: '1.25rem',
+                lineHeight: '1.35',
+                fontWeight: '600',
+              },
+              h4: {
+                fontFamily: 'var(--font-title)',
+                fontSize: '1.125rem',
+                lineHeight: '1.4',
+                fontWeight: '600',
               },
               p: {
                 fontFamily: 'var(--font-copy)',
                 fontWeight: 400,
+                marginTop: '0.75em',
+                marginBottom: '0.75em',
+              },
+              blockquote: {
+                fontFamily: 'var(--font-copy)',
+                fontSize: '1rem',
+                lineHeight: '1.6',
+                fontWeight: '400',
+                fontStyle: 'normal',
               },
               a: {
                 color: 'hsl(var(--primary))',
@@ -146,7 +181,6 @@ const config = {
             },
           ],
         },
-        // `prose-invert` (e.g. hero bio on dark) otherwise turns links into muted grey.
         invert: {
           css: {
             '--tw-prose-invert-links': 'hsl(var(--primary))',
@@ -157,29 +191,30 @@ const config = {
             'a:hover': {
               color: 'hsl(var(--primary) / 0.88)',
             },
+            blockquote: {
+              fontSize: '1rem',
+              lineHeight: '1.6',
+            },
           },
         },
         base: {
           css: [
             {
-              h1: {
-                fontSize: '2.5rem',
-              },
-              h2: {
-                fontSize: '1.25rem',
-                fontWeight: 600,
-              },
+              fontSize: '1rem',
+              lineHeight: '1.625',
             },
           ],
         },
         md: {
           css: [
             {
+              fontSize: '1.125rem',
+              lineHeight: '1.625',
               h1: {
                 fontSize: '3.5rem',
               },
               h2: {
-                fontSize: '1.5rem',
+                fontSize: '2rem',
               },
             },
           ],

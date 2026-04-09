@@ -41,7 +41,9 @@ export const PostHero: React.FC<{
           </div>
 
           <div className="">
-            <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
+            <h1 className="mb-6 font-title text-display-h1 leading-[1.1] tracking-tight md:text-display-h1-md">
+              {title}
+            </h1>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4 md:gap-16">
@@ -73,6 +75,10 @@ export const PostHero: React.FC<{
       <div className="min-h-[60vh] select-none">
         {heroImage && typeof heroImage !== 'string' && (
           <Media
+            alt={
+              (typeof heroImage.alt === 'string' && heroImage.alt.trim()) ||
+              `${title} — Erin Jerri, AI and spatial computing`
+            }
             fill
             priority
             imgClassName="-z-10 object-cover"
