@@ -89,6 +89,42 @@ function hasVideoBackgroundMedia(b: LayoutBlock | null | undefined): boolean {
   return Boolean((b as { media?: unknown }).media)
 }
 
+type LexicalNode = {
+  children?: LexicalNode[]
+  text?: string | null
+}
+
+function lexicalNodeHasContent(node: LexicalNode | null | undefined): boolean {
+  if (!node || typeof node !== 'object') return false
+  if (typeof node.text === 'string' && node.text.trim().length > 0) return true
+  return Array.isArray(node.children) && node.children.some((child) => lexicalNodeHasContent(child))
+}
+
+function richTextHasContent(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false
+
+  const root = (value as { root?: { children?: LexicalNode[] } }).root
+  if (!root || !Array.isArray(root.children)) return false
+
+  return root.children.some((child) => lexicalNodeHasContent(child))
+}
+
+function mediaBlockSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
+  const mediaBlock = asMediaBlock(b)
+  if (!mediaBlock) return false
+
+  const overlayRichText = mediaBlock.overlayRichText
+  const hasOverlayRichText = Boolean(
+    overlayRichText &&
+    typeof overlayRichText === 'object' &&
+    'root' in overlayRichText &&
+    Array.isArray((overlayRichText as { root?: { children?: unknown[] } }).root?.children) &&
+    ((overlayRichText as { root?: { children?: unknown[] } }).root?.children?.length ?? 0) > 0,
+  )
+
+  return mediaBlock.displayStyle === 'heroOverlay' || hasOverlayRichText
+}
+
 function isLeadingHeroLikeBlock(b: LayoutBlock | null | undefined): boolean {
   if (!b) return false
 
@@ -118,6 +154,16 @@ function contentHasLinks(b: LayoutBlock | null | undefined): boolean {
   return Array.isArray(c.columns) && c.columns.some((col) => col?.enableLink && col?.link)
 }
 
+function contentHasRichText(b: LayoutBlock | null | undefined): boolean {
+  if (!b) return false
+  const c = b as ContentBlockType
+  return Array.isArray(c.columns) && c.columns.some((col) => richTextHasContent(col?.richText))
+}
+
+function contentSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
+  return contentHasLinks(b) && !contentHasRichText(b)
+}
+
 /** Check if CTA block has links */
 function ctaHasLinks(b: LayoutBlock | null | undefined): boolean {
   if (!b) return false
@@ -144,7 +190,7 @@ export const RenderBlocks: React.FC<{
       const maybeLinksBlock = blocks[leadingTrimCount]
       const mergedLinksBlock =
         maybeLinksBlock &&
-        ((maybeLinksBlock.blockType === 'content' && contentHasLinks(maybeLinksBlock)) ||
+        ((maybeLinksBlock.blockType === 'content' && contentSupportsOverlayMerge(maybeLinksBlock)) ||
           (maybeLinksBlock.blockType === 'cta' && ctaHasLinks(maybeLinksBlock)))
 
       if (mergedLinksBlock) {
@@ -169,10 +215,12 @@ export const RenderBlocks: React.FC<{
             blockMedia.mediaType === 'image' &&
             (blockMedia.image || blockMedia.media)
           const nextHasLinks =
-            nextBlock?.blockType === 'content' && contentHasLinks(nextBlock)
+            nextBlock?.blockType === 'content' && contentSupportsOverlayMerge(nextBlock)
           const nextCtaHasLinks = nextBlock?.blockType === 'cta' && ctaHasLinks(nextBlock)
           const shouldMergeWithOverlay =
-            isMediaBlockWithImage && (nextHasLinks || nextCtaHasLinks)
+            isMediaBlockWithImage &&
+            mediaBlockSupportsOverlayMerge(block) &&
+            (nextHasLinks || nextCtaHasLinks)
 
           if (shouldMergeWithOverlay && nextBlock) {
             return (
@@ -204,8 +252,8 @@ export const RenderBlocks: React.FC<{
               (prevMedia.image || prevMedia.media)
             const thisHasLinks =
               (blockType === 'cta' && ctaHasLinks(block)) ||
-              (blockType === 'content' && contentHasLinks(block))
-            if (prevIsMediaBlockWithImage && thisHasLinks) {
+              (blockType === 'content' && contentSupportsOverlayMerge(block))
+            if (prevIsMediaBlockWithImage && mediaBlockSupportsOverlayMerge(prevBlock) && thisHasLinks) {
               return null
             }
           }
@@ -234,7 +282,7 @@ export const RenderBlocks: React.FC<{
                 prevBlock &&
                 (prevBlock.blockType === 'content' || prevBlock.blockType === 'cta') &&
                 ((prevBlock.blockType === 'cta' && ctaHasLinks(prevBlock)) ||
-                  (prevBlock.blockType === 'content' && contentHasLinks(prevBlock)))
+                  (prevBlock.blockType === 'content' && contentSupportsOverlayMerge(prevBlock)))
               const prevPrev = index >= 2 ? blocksToRender[index - 2] : null
               const prevPrevIsMedia =
                 prevPrev &&

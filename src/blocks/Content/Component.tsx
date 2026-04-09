@@ -11,6 +11,8 @@ import { Media as MediaComponent } from '@/components/Media'
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const { columns, contrastStyle } = props
   const isWhiteContrast = contrastStyle === 'whiteOnBlackText'
+  const whiteTextClasses =
+    '[&_.payload-richtext]:!text-black [&_.payload-richtext_*]:!text-black [&_.prose]:!text-black [&_.prose_*]:!text-black [&_.payload-richtext_a]:!text-black'
   type ColumnWithFlexibleContent = NonNullable<ContentBlockProps['columns']>[number] & {
     contentType?: 'media' | 'text' | null
     columnStyle?: 'default' | 'blackBgWhiteText' | 'whiteBgBlackText' | null
@@ -99,7 +101,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 >
                   {isFullBleedWhite ? (
                     <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 bg-white py-6">
-                      <div className="container px-8 text-black [&_.prose]:text-black [&_.prose_*]:text-black [&_a]:text-black">
+                      <div className={cn('container px-8 text-black', whiteTextClasses, '[&_a]:text-black')}>
                         {shouldRenderText && richText && <RichText data={richText} enableGutter={false} />}
                         {shouldRenderMedia && renderColumnMedia(media, size)}
                         {enableLink && (
@@ -118,10 +120,16 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                           columnStyle === 'blackBgWhiteText',
                         'bg-white px-6 py-6 text-black [&_.prose]:text-black [&_.prose_*]:text-black [&_a]:text-black':
                           columnStyle === 'whiteBgBlackText',
+                        'bg-white px-6 py-6 text-black': isWhiteContrast && columnStyle !== 'blackBgWhiteText',
                       })}
                     >
                       {shouldRenderText && richText && (
-                        <div className="flex gap-4 items-center">
+                        <div
+                          className={cn(
+                            'flex flex-row-reverse items-start gap-4',
+                            isWhiteContrast && whiteTextClasses,
+                          )}
+                        >
                           {icon && typeof icon === 'object' && icon !== null && (
                             <div className="shrink-0 flex items-center [&_img]:w-8 [&_img]:h-8 [&_img]:object-contain [&_img]:opacity-90">
                               <MediaComponent resource={icon} size="56px" />

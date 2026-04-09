@@ -126,7 +126,7 @@ const columnFields: Field[] = [
     relationTo: 'media',
     admin: {
       condition: (_, siblingData) => siblingData?.contentType === 'text',
-      description: 'Optional icon shown to the left of the title (e.g. for HIRE Me cards).',
+      description: 'Optional icon shown to the right of the title (e.g. for HIRE Me cards).',
     },
   },
   {

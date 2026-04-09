@@ -146,6 +146,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                 <RichText
                   className={cn('mb-6', heroBioRichTextClassName)}
                   data={richText}
+                  demoteExtraHeroH1
                   enableGutter={false}
                 />
               )}
@@ -184,6 +185,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               <RichText
                 className={cn('mb-6', heroBioRichTextClassName)}
                 data={richText}
+                demoteExtraHeroH1
                 enableGutter={false}
               />
             )}
@@ -206,6 +208,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                 <RichText
                   className={cn('mb-6', heroBioRichTextClassName)}
                   data={richText}
+                  demoteExtraHeroH1
                   enableGutter={false}
                 />
               )}

@@ -6,7 +6,6 @@ import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
-import { InitTheme } from '@/providers/Theme/InitTheme'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { GoogleTagManagerHead, GoogleTagManagerNoScript } from '@/components/GoogleTagManager'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
@@ -16,7 +15,7 @@ import type { Footer as FooterType, Header as HeaderType } from '@/payload-types
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
-import { defaultTheme } from '@/providers/Theme/ThemeSelector/types'
+import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/ThemeSelector/types'
 import { PersonJsonLd } from '@/components/PersonJsonLd'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -44,10 +43,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
 
+  const themeBootstrapScript = `(function(){try{function gp(){var m=window.matchMedia("(prefers-color-scheme: dark)");return typeof m.matches==="boolean"?m.matches?"dark":"light":null}function ok(t){return t==="light"||t==="dark"}var d=${JSON.stringify(defaultTheme)},p=window.localStorage.getItem(${JSON.stringify(themeLocalStorageKey)});if(ok(p)){document.documentElement.setAttribute("data-theme",p)}else{var i=gp();document.documentElement.setAttribute("data-theme",i||d)}}catch(e){document.documentElement.setAttribute("data-theme",${JSON.stringify(defaultTheme)})}})();`
+
   return (
     <html lang="en" suppressHydrationWarning data-theme={defaultTheme}>
       <head>
-        <InitTheme />
+        {/* eslint-disable-next-line react/no-danger -- sync data-theme before first paint */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {/* Preconnect to analytics origins to reduce connection latency when scripts load */}

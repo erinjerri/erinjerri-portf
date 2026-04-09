@@ -90,7 +90,7 @@ export const HeaderNav: React.FC<{
 
   return (
     <nav className="relative flex w-full items-center justify-center">
-      <div className="hidden md:flex items-center justify-center gap-8 uppercase tracking-[0.18em] text-[11px] md:text-xs font-semibold">
+      <div className="hidden md:flex items-center justify-center gap-8 uppercase tracking-[0.18em] font-semibold [font-size:var(--nav-font-size)]">
         {navLinks.map(({ id, link, href }) => {
           const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
           return (
@@ -100,7 +100,7 @@ export const HeaderNav: React.FC<{
                 prefetch={true}
                 appearance="inline"
                 className={cn(
-                  'rounded px-3 py-2 transition-colors font-semibold',
+                  'inline-flex min-h-[44px] items-center rounded px-3 py-2.5 transition-colors font-semibold',
                   lightText
                     ? isActive
                       ? 'text-white bg-white/15'
@@ -117,7 +117,7 @@ export const HeaderNav: React.FC<{
       <Link
         href="/search"
         className={cn(
-          'absolute right-12 hidden md:inline-flex transition-colors',
+          'absolute right-12 hidden h-11 w-11 items-center justify-center md:inline-flex transition-colors',
           lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
         )}
         aria-label="Search"

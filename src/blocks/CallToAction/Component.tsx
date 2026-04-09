@@ -20,7 +20,7 @@ export const CallToActionBlock: React.FC<CTABlockProps> = (props) => {
     <div className="container">
       <div
         className={cn(
-          'rounded border p-4 flex flex-col gap-8 md:flex-row md:justify-between md:items-center',
+          'rounded border p-4 flex flex-col gap-4',
           {
             'bg-card border-border': contrastStyle === 'default',
             'bg-black border-white/20 text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_.payload-richtext_a]:text-white':
@@ -30,10 +30,10 @@ export const CallToActionBlock: React.FC<CTABlockProps> = (props) => {
           },
         )}
       >
-        <div className="max-w-[48rem] flex items-center">
+        <div className="max-w-[48rem]">
           {richText && <RichText className="mb-0" data={richText} enableGutter={false} />}
         </div>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4 items-start">
           {(links || []).map(({ link }, i) => {
             return <CMSLink key={i} size="lg" {...link} appearance={link?.appearance || 'default'} />
           })}
