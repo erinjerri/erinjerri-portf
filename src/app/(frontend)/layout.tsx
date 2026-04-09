@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
 import React from 'react'
-import { Suspense } from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/Footer/Component'
@@ -18,7 +17,7 @@ import {
   SITE_DEFAULT_TITLE,
 } from '@/utilities/siteMetadata'
 import { getCachedGlobal } from '@/utilities/getGlobals'
-import type { Header as HeaderType } from '@/payload-types'
+import type { Footer as FooterType, Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -26,13 +25,22 @@ import { defaultTheme } from '@/providers/Theme/ThemeSelector/types'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData: HeaderType | null = null
+  let footerData: FooterType | null = null
   const headerStartedAt = Date.now()
-  const headerResult = await Promise.allSettled([getCachedGlobal('header', 1)()])
+  const [headerResult, footerResult] = await Promise.allSettled([
+    getCachedGlobal('header', 1)(),
+    getCachedGlobal('footer', 2)(),
+  ])
 
-  if (headerResult[0].status === 'fulfilled') {
-    headerData = headerResult[0].value as HeaderType
+  if (headerResult.status === 'fulfilled') {
+    headerData = headerResult.value as HeaderType
   } else if (process.env.NODE_ENV === 'development') {
-    console.error('[Layout] Failed to fetch header:', headerResult[0].reason)
+    console.error('[Layout] Failed to fetch header:', headerResult.reason)
+  }
+  if (footerResult.status === 'fulfilled') {
+    footerData = footerResult.value as FooterType
+  } else if (process.env.NODE_ENV === 'development') {
+    console.error('[Layout] Failed to fetch footer:', footerResult.reason)
   }
   if (process.env.NODE_ENV === 'development') {
     console.log(`[layout] header ${Date.now() - headerStartedAt}ms`)
@@ -70,11 +78,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           <Header data={headerData} />
           {children}
-          <Suspense
-            fallback={<div className="mt-auto min-h-[380px] border-t border-border bg-transparent" />}
-          >
-            <Footer />
-          </Suspense>
+          <Footer data={footerData} />
         </Providers>
         <AnalyticsScripts
           measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
