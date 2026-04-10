@@ -1,14 +1,21 @@
 'use client'
 import { useHeaderTheme } from '@/providers/HeaderTheme'
+import { usePathname } from 'next/navigation'
 import React, { useEffect } from 'react'
 
 const PageClient: React.FC = () => {
-  /* Force the header to be dark mode while we have an image behind it */
   const { setHeaderTheme } = useHeaderTheme()
+  const pathname = usePathname()
 
   useEffect(() => {
+    /* Home prismatic hero: light nav text on ink background. Other pages: prior default. */
+    if (pathname === '/') {
+      setHeaderTheme('dark')
+      return
+    }
     setHeaderTheme('light')
-  }, [setHeaderTheme])
+  }, [pathname, setHeaderTheme])
+
   return <React.Fragment />
 }
 

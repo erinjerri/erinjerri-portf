@@ -15,6 +15,7 @@ import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { cn } from '@/utilities/ui'
 
 export async function generateStaticParams() {
   try {
@@ -106,14 +107,19 @@ export default async function Page({ params: paramsPromise }: Args) {
     ? videoAsset
     : null
 
+  const isHomePrismatic = decodedSlug === 'home'
+
   return (
     <>
-      <article className="pt-16 pb-24">
+      <article
+        className={cn('pt-16 pb-24', isHomePrismatic && 'home-prismatic-scope')}
+        {...(isHomePrismatic ? { 'data-home-prismatic': '' } : {})}
+      >
         <PageClient />
 
         {draft && <LivePreviewListener />}
 
-        <RenderHero {...hero} />
+        <RenderHero {...hero} visualVariant={isHomePrismatic ? 'prismatic' : undefined} />
         {(decodedSlug === 'timebite' || decodedSlug === 'timebite-download') && (
           <p className="container mt-8 max-w-[48rem] text-base leading-relaxed text-muted-foreground">
             TimeBite is an AI-powered productivity and spatial computing system designed for real-world

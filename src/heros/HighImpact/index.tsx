@@ -10,7 +10,7 @@ import RichText from '@/components/RichText'
 
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
-type HeroProps = Page['hero']
+type HeroProps = Page['hero'] & { visualVariant?: 'prismatic' }
 
 const isPopulated = (m: unknown): m is MediaDoc =>
   Boolean(m && typeof m === 'object' && 'url' in m)
@@ -57,13 +57,17 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   heroImage1,
   heroImage2,
   heroImage3,
+  visualVariant,
 }) => {
   const hasBackground = isPopulated(backgroundMedia)
   const hasPortrait = isPopulated(media)
   const hasAnyGridFields = Boolean(heroImage1 || heroImage2 || heroImage3)
   const hasGridMedia =
     isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
-  const showGridLayout = hasAnyGridFields || hasGridMedia
+  /** Homepage experiment: prioritize editorial split + portrait over multi-image grid */
+  const forcePortraitSplit = visualVariant === 'prismatic' && hasPortrait
+  const showGridLayout = !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
+  const isPrismatic = visualVariant === 'prismatic'
   const backgroundImage = hasBackground ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
 
@@ -98,16 +102,23 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
   return (
     <div
-      className="relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] w-full overflow-hidden text-foreground"
+      className={cn(
+        'relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] w-full overflow-hidden text-foreground',
+        isPrismatic && 'hp-hero-root',
+      )}
       data-theme="dark"
     >
       <HeaderThemeSetter theme="dark" />
 
-      {/* Background: gradient fallback, then background image */}
-      <div
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-[#000815] via-[#0c1633] to-[#020712]"
-        aria-hidden
-      />
+      {/* Background: prismatic ink + mist, or legacy gradient, then optional CMS background */}
+      {isPrismatic ? (
+        <div className="hp-hero-backdrop absolute inset-0 -z-10" aria-hidden />
+      ) : (
+        <div
+          className="absolute inset-0 -z-10 bg-gradient-to-br from-[#000815] via-[#0c1633] to-[#020712]"
+          aria-hidden
+        />
+      )}
       {backgroundImage && (
         <div className="absolute inset-0 -z-10">
           <Media
@@ -139,19 +150,38 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
       {/* Keep legacy single-image high-impact heroes working while supporting the new 3-image layout. */}
       {!showGridLayout && hasPortrait ? (
-        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-start gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
+        <div
+          className={cn(
+            'relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-start gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8',
+            isPrismatic && 'xl:items-center',
+          )}
+        >
           <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
-            <div className="max-w-[36.5rem]">
+            <div
+              className={cn(
+                'max-w-[36.5rem]',
+                isPrismatic &&
+                  'hp-glass-panel w-full rounded-2xl border border-white/[0.12] bg-white/[0.05] px-6 py-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.45)] backdrop-blur-xl md:px-8 md:py-10',
+              )}
+            >
               {richText && (
                 <RichText
-                  className={cn('mb-6', heroBioRichTextClassName)}
+                  className={cn(
+                    'mb-6',
+                    isPrismatic ? 'hp-hero-prose' : heroBioRichTextClassName,
+                  )}
                   data={richText}
                   demoteExtraHeroH1
                   enableGutter={false}
                 />
               )}
               {Array.isArray(links) && links.length > 0 && (
-                <ul className="flex flex-wrap justify-center gap-4 xl:justify-start">
+                <ul
+                  className={cn(
+                    'flex flex-wrap justify-center gap-3 xl:justify-start',
+                    isPrismatic && 'hp-hero-links',
+                  )}
+                >
                   {links.map(({ link }, i) => (
                     <li key={i}>
                       <CMSLink {...link} />
@@ -163,13 +193,23 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
 
           <div className="order-1 flex min-h-[260px] justify-center self-start xl:order-2 xl:min-h-0 xl:justify-end">
-            <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]">
+            <div
+              className={cn(
+                'w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]',
+                isPrismatic && 'hp-portrait-frame',
+              )}
+            >
               <Media
                 alt={
                   (typeof media.alt === 'string' && media.alt.trim()) ||
                   'Erin Jerri Apple Vision Pro spatial computing work'
                 }
-                imgClassName="h-auto w-full object-contain object-top drop-shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
+                imgClassName={cn(
+                  'h-auto w-full object-contain object-top',
+                  isPrismatic
+                    ? 'rounded-2xl object-cover object-[50%_18%] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.55)]'
+                    : 'drop-shadow-[0_18px_45px_rgba(0,0,0,0.35)]',
+                )}
                 pictureClassName="relative block w-full"
                 priority
                 resource={media}
@@ -180,10 +220,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         </div>
       ) : !showGridLayout ? (
         <div className="relative z-10 mx-auto flex max-w-[1200px] items-center px-4 py-20 md:py-24 lg:py-28 xl:px-8">
-          <div className="max-w-[36.5rem]">
+          <div
+            className={cn(
+              'max-w-[36.5rem]',
+              isPrismatic &&
+                'hp-glass-panel rounded-2xl border border-white/[0.12] bg-white/[0.05] px-6 py-8 backdrop-blur-xl md:px-8 md:py-10',
+            )}
+          >
             {richText && (
               <RichText
-                className={cn('mb-6', heroBioRichTextClassName)}
+                className={cn('mb-6', isPrismatic ? 'hp-hero-prose' : heroBioRichTextClassName)}
                 data={richText}
                 demoteExtraHeroH1
                 enableGutter={false}
@@ -203,17 +249,28 @@ export const HighImpactHero: React.FC<HeroProps> = ({
       ) : (
         <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-start gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
           <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
-            <div className="max-w-[36.5rem]">
+            <div
+              className={cn(
+                'max-w-[36.5rem]',
+                isPrismatic &&
+                  'hp-glass-panel w-full rounded-2xl border border-white/[0.12] bg-white/[0.05] px-6 py-8 backdrop-blur-xl md:px-8 md:py-10',
+              )}
+            >
               {richText && (
                 <RichText
-                  className={cn('mb-6', heroBioRichTextClassName)}
+                  className={cn('mb-6', isPrismatic ? 'hp-hero-prose' : heroBioRichTextClassName)}
                   data={richText}
                   demoteExtraHeroH1
                   enableGutter={false}
                 />
               )}
               {Array.isArray(links) && links.length > 0 && (
-                <ul className="flex flex-wrap justify-center gap-4 xl:justify-start">
+                <ul
+                  className={cn(
+                    'flex flex-wrap justify-center gap-3 xl:justify-start',
+                    isPrismatic && 'hp-hero-links',
+                  )}
+                >
                   {links.map(({ link }, i) => (
                     <li key={i}>
                       <CMSLink {...link} />
@@ -225,7 +282,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
 
           <div className="order-1 xl:order-2">
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <div
+              className={cn(
+                'grid grid-cols-2 gap-2 sm:gap-3',
+                isPrismatic && '[&_.relative]:rounded-xl [&_.relative]:ring-1 [&_.relative]:ring-white/15',
+              )}
+            >
               <div className="col-span-2 aspect-[16/9] overflow-hidden">
                 {renderHeroSlot(
                   heroImage1,
