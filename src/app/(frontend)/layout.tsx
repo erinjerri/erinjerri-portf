@@ -9,14 +9,18 @@ import { Providers } from '@/providers'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { GoogleTagManagerHead, GoogleTagManagerNoScript } from '@/components/GoogleTagManager'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { CANONICAL_SITE_ORIGIN, SITE_DEFAULT_DESCRIPTION, SITE_DEFAULT_TITLE } from '@/utilities/siteMetadata'
+import {
+  CANONICAL_SITE_ORIGIN,
+  PERSON_JSON_LD,
+  SITE_DEFAULT_DESCRIPTION,
+  SITE_DEFAULT_TITLE,
+} from '@/utilities/siteMetadata'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Footer as FooterType, Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/ThemeSelector/types'
-import { PersonJsonLd } from '@/components/PersonJsonLd'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData: HeaderType | null = null
@@ -42,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
+  const enableThirdPartyScripts = process.env.NODE_ENV === 'production'
 
   const themeBootstrapScript = `(function(){try{function gp(){var m=window.matchMedia("(prefers-color-scheme: dark)");return typeof m.matches==="boolean"?m.matches?"dark":"light":null}function ok(t){return t==="light"||t==="dark"}var d=${JSON.stringify(defaultTheme)},p=window.localStorage.getItem(${JSON.stringify(themeLocalStorageKey)});if(ok(p)){document.documentElement.setAttribute("data-theme",p)}else{var i=gp();document.documentElement.setAttribute("data-theme",i||d)}}catch(e){document.documentElement.setAttribute("data-theme",${JSON.stringify(defaultTheme)})}})();`
 
@@ -49,15 +54,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning data-theme={defaultTheme}>
       <head>
         {/* eslint-disable-next-line react/no-danger -- sync data-theme before first paint */}
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {/* Preconnect to analytics origins to reduce connection latency when scripts load */}
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || gtmContainerId ? (
+        {enableThirdPartyScripts &&
+        (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || gtmContainerId) ? (
           <link rel="preconnect" href="https://www.googletagmanager.com" />
         ) : null}
-        {gtmContainerId ? <GoogleTagManagerHead containerId={gtmContainerId} /> : null}
-        {process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ? (
+        {enableThirdPartyScripts && gtmContainerId ? (
+          <GoogleTagManagerHead containerId={gtmContainerId} />
+        ) : null}
+        {enableThirdPartyScripts && process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ? (
           <>
             <link rel="preconnect" href="https://www.clarity.ms" />
             <link rel="dns-prefetch" href="https://scripts.clarity.ms" />
@@ -65,8 +76,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ) : null}
       </head>
       <body>
-        <PersonJsonLd />
-        {gtmContainerId ? <GoogleTagManagerNoScript containerId={gtmContainerId} /> : null}
+        <script
+          id="person-jsonld-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_JSON_LD) }}
+        />
+        {enableThirdPartyScripts && gtmContainerId ? (
+          <GoogleTagManagerNoScript containerId={gtmContainerId} />
+        ) : null}
         <Providers>
           <AdminBar />
 
@@ -74,10 +91,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
           <Footer data={footerData} />
         </Providers>
-        <AnalyticsScripts
-          measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
-          clarityProjectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}
-        />
+        {enableThirdPartyScripts ? (
+          <AnalyticsScripts
+            measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+            clarityProjectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}
+          />
+        ) : null}
       </body>
     </html>
   )

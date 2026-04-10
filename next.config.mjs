@@ -55,6 +55,9 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Keep dev and prod artifacts isolated so switching between `next dev`,
+  // `next build`, and `next start` cannot leave stale manifests/chunks behind.
+  distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
   experimental: {
     // Next 15.4 expects serverActions under `experimental`.
     // Keep this high enough for Payload admin saves (rich text, uploads).

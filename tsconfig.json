@@ -12,7 +12,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "incremental": true,
+    "incremental": false,
     "jsx": "preserve",
     "module": "esnext",
     "moduleResolution": "bundler",
