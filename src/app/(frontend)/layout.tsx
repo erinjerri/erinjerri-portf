@@ -20,7 +20,7 @@ import type { Footer as FooterType, Header as HeaderType } from '@/payload-types
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
-import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/ThemeSelector/types'
+import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/shared'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData: HeaderType | null = null

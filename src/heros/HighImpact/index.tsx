@@ -3,7 +3,6 @@ import React from 'react'
 import type { Media as MediaDoc, Page } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
-import { HeaderThemeSetter } from '@/heros/HeaderThemeSetter'
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
@@ -18,6 +17,9 @@ const isPopulated = (m: unknown): m is MediaDoc =>
 const heroFallbacks = {
   background: '/media/dimensions-background-curves.webp',
 } as const
+
+/** Full-bleed / slot heroes: cover + bias upper area so heads stay in frame (spec: top center or 40% 20%). */
+const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
 const StaticHeroImage: React.FC<{
   alt: string
@@ -71,6 +73,62 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const backgroundImage = hasBackground ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
 
+  const renderHeroCopy = (className?: string) => {
+    const hasLinks = Array.isArray(links) && links.length > 0
+    if (!richText && !hasLinks) return null
+
+    return (
+      <div className={className}>
+        {richText && (
+          <RichText
+            className={cn(
+              isPrismatic ? 'mb-5 hp-hero-prose hp-hero-prose--open' : 'mb-6',
+              !isPrismatic && heroBioRichTextClassName,
+            )}
+            data={richText}
+            demoteExtraHeroH1
+            enableGutter={false}
+          />
+        )}
+        {hasLinks && (
+          <ul
+            className={cn(
+              'm-0 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 p-0',
+              isPrismatic && 'hp-hero-links',
+            )}
+          >
+            {links.map(({ link }, i) => (
+              <li className="shrink-0" key={i}>
+                <CMSLink {...link} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    )
+  }
+
+  const renderPortrait = () => {
+    if (!hasPortrait) return null
+
+    return (
+      <Media
+        alt={
+          (typeof media.alt === 'string' && media.alt.trim()) ||
+          'Erin Jerri Apple Vision Pro spatial computing work'
+        }
+        imgClassName={cn(
+          'h-auto w-full object-cover object-[40%_20%]',
+          'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
+        )}
+        pictureClassName="relative block w-full overflow-hidden"
+        priority
+        resource={media}
+        size="(max-width: 640px) 78vw, (max-width: 1280px) 36vw, 460px"
+      />
+    )
+  }
+
   const renderHeroSlot = (
     resource: MediaDoc | string | number | null | undefined,
     alt: string,
@@ -87,7 +145,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           }
           fill
           htmlElement={null}
-          imgClassName="object-cover"
+          imgClassName={heroCoverImgClassName}
           pictureClassName="relative block h-full w-full"
           quality={100}
           {...(unoptimized ? { unoptimized: true } : {})}
@@ -103,13 +161,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   return (
     <div
       className={cn(
-        'relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] w-full overflow-hidden text-foreground',
+        'relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] md:min-h-[75vh] w-full overflow-hidden text-foreground',
         isPrismatic && 'hp-hero-root',
       )}
       data-theme="dark"
     >
-      <HeaderThemeSetter theme="dark" />
-
       {/* Background: prismatic ink + mist, or legacy gradient, then optional CMS background */}
       {isPrismatic ? (
         <div className="hp-hero-backdrop absolute inset-0 -z-10" aria-hidden />
@@ -128,7 +184,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             }
             fill
             className="absolute inset-0 h-full w-full"
-            imgClassName="object-cover object-[50%_22%] md:object-center"
+            imgClassName={heroCoverImgClassName}
             pictureClassName="relative block h-full w-full"
             priority
             quality={100}
@@ -143,180 +199,87 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             alt="Decorative hero background — Erin Jerri portfolio"
             className="h-full w-full"
             src={backgroundSrc!}
-            position="50% 22%"
+            position="40% 20%"
           />
         </div>
       )}
 
-      {/* Keep legacy single-image high-impact heroes working while supporting the new 3-image layout. */}
+      {/* Foreground visuals fill the hero; prismatic variant uses a tighter side-by-side layout so the portrait and copy read as one composition. */}
       {!showGridLayout && hasPortrait ? (
-        <div
-          className={cn(
-            'relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-start gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8',
-            isPrismatic && 'xl:items-center',
+        <>
+          {isPrismatic ? (
+            <div className="relative z-10 mx-auto flex min-h-[62vh] w-full max-w-[96rem] flex-col justify-center gap-8 px-6 py-16 md:px-10 lg:px-12 xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-center xl:gap-12 xl:py-20">
+              <div className="order-2 xl:order-1">
+                {renderHeroCopy('max-w-[min(calc(100vw-2.5rem),40rem)]')}
+              </div>
+              <div className="order-1 flex justify-center xl:order-2 xl:justify-end">
+                <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[500px]">
+                  {renderPortrait()}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center px-4 pt-20 pb-36 xl:justify-end xl:px-8 xl:pb-8 xl:pt-24">
+                <div className="pointer-events-auto w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[440px] xl:max-w-[560px]">
+                  {renderPortrait()}
+                </div>
+              </div>
+              <div className="pointer-events-none absolute bottom-6 left-6 z-20 text-left md:bottom-8 md:left-8">
+                <div className="pointer-events-auto max-w-[min(calc(100vw-2.5rem),42rem)] p-6 md:max-w-[46rem] md:p-8 pr-1">
+                  {renderHeroCopy()}
+                </div>
+              </div>
+            </>
           )}
-        >
-          <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
-            <div
-              className={cn(
-                'max-w-[36.5rem]',
-                isPrismatic &&
-                  'hp-glass-panel w-full rounded-2xl border border-white/[0.12] bg-white/[0.05] px-6 py-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.45)] backdrop-blur-xl md:px-8 md:py-10',
-              )}
-            >
-              {richText && (
-                <RichText
-                  className={cn(
-                    'mb-6',
-                    isPrismatic ? 'hp-hero-prose' : heroBioRichTextClassName,
-                  )}
-                  data={richText}
-                  demoteExtraHeroH1
-                  enableGutter={false}
-                />
-              )}
-              {Array.isArray(links) && links.length > 0 && (
-                <ul
-                  className={cn(
-                    'flex flex-wrap justify-center gap-3 xl:justify-start',
-                    isPrismatic && 'hp-hero-links',
-                  )}
-                >
-                  {links.map(({ link }, i) => (
-                    <li key={i}>
-                      <CMSLink {...link} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-
-          <div className="order-1 flex min-h-[260px] justify-center self-start xl:order-2 xl:min-h-0 xl:justify-end">
-            <div
-              className={cn(
-                'w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[520px]',
-                isPrismatic && 'hp-portrait-frame',
-              )}
-            >
-              <Media
-                alt={
-                  (typeof media.alt === 'string' && media.alt.trim()) ||
-                  'Erin Jerri Apple Vision Pro spatial computing work'
-                }
-                imgClassName={cn(
-                  'h-auto w-full object-contain object-top',
-                  isPrismatic
-                    ? 'rounded-2xl object-cover object-[50%_18%] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.55)]'
-                    : 'drop-shadow-[0_18px_45px_rgba(0,0,0,0.35)]',
-                )}
-                pictureClassName="relative block w-full"
-                priority
-                resource={media}
-                size="(max-width: 640px) 78vw, (max-width: 1280px) 42vw, 520px"
-              />
-            </div>
-          </div>
-        </div>
+        </>
       ) : !showGridLayout ? (
-        <div className="relative z-10 mx-auto flex max-w-[1200px] items-center px-4 py-20 md:py-24 lg:py-28 xl:px-8">
-          <div
-            className={cn(
-              'max-w-[36.5rem]',
-              isPrismatic &&
-                'hp-glass-panel rounded-2xl border border-white/[0.12] bg-white/[0.05] px-6 py-8 backdrop-blur-xl md:px-8 md:py-10',
-            )}
-          >
-            {richText && (
-              <RichText
-                className={cn('mb-6', isPrismatic ? 'hp-hero-prose' : heroBioRichTextClassName)}
-                data={richText}
-                demoteExtraHeroH1
-                enableGutter={false}
-              />
-            )}
-            {Array.isArray(links) && links.length > 0 && (
-              <ul className="flex flex-wrap gap-4">
-                {links.map(({ link }, i) => (
-                  <li key={i}>
-                    <CMSLink {...link} />
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="pointer-events-none absolute bottom-6 left-6 z-20 text-left md:bottom-8 md:left-8">
+          <div className="pointer-events-auto max-w-[min(calc(100vw-2.5rem),42rem)] p-6 md:max-w-[46rem] md:p-8 pr-1">
+            {renderHeroCopy()}
           </div>
         </div>
       ) : (
-        <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-start gap-8 px-4 py-20 md:py-24 lg:py-28 xl:grid-cols-2 xl:gap-12 xl:px-8">
-          <div className="order-2 flex flex-col items-center text-center xl:order-1 xl:items-start xl:text-left">
-            <div
-              className={cn(
-                'max-w-[36.5rem]',
-                isPrismatic &&
-                  'hp-glass-panel w-full rounded-2xl border border-white/[0.12] bg-white/[0.05] px-6 py-8 backdrop-blur-xl md:px-8 md:py-10',
-              )}
-            >
-              {richText && (
-                <RichText
-                  className={cn('mb-6', isPrismatic ? 'hp-hero-prose' : heroBioRichTextClassName)}
-                  data={richText}
-                  demoteExtraHeroH1
-                  enableGutter={false}
-                />
-              )}
-              {Array.isArray(links) && links.length > 0 && (
-                <ul
-                  className={cn(
-                    'flex flex-wrap justify-center gap-3 xl:justify-start',
-                    isPrismatic && 'hp-hero-links',
+        <>
+          <div className="absolute inset-0 z-0 flex items-center justify-center px-4 pt-20 pb-40 xl:justify-end xl:px-8 xl:pb-12 xl:pt-24">
+            <div className="w-full max-w-md sm:max-w-lg xl:max-w-2xl">
+              <div
+                className={cn(
+                  'grid grid-cols-2 gap-2 sm:gap-3',
+                  isPrismatic && '[&_.relative]:rounded-xl [&_.relative]:ring-1 [&_.relative]:ring-white/15',
+                )}
+              >
+                <div className="relative col-span-2 aspect-[16/9] overflow-hidden">
+                  {renderHeroSlot(
+                    heroImage1,
+                    'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
+                    '(max-width: 1279px) min(100vw - 2rem, 24rem), min(50vw, 32rem)',
                   )}
-                >
-                  {links.map(({ link }, i) => (
-                    <li key={i}>
-                      <CMSLink {...link} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-
-          <div className="order-1 xl:order-2">
-            <div
-              className={cn(
-                'grid grid-cols-2 gap-2 sm:gap-3',
-                isPrismatic && '[&_.relative]:rounded-xl [&_.relative]:ring-1 [&_.relative]:ring-white/15',
-              )}
-            >
-              <div className="col-span-2 aspect-[16/9] overflow-hidden">
-                {renderHeroSlot(
-                  heroImage1,
-                  'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                  // Cap logical width so mobile does not pull 750w+ for a ~380px slot (PageSpeed / Slow 4G).
-                  '(max-width: 1279px) min(100vw - 2rem, 24rem), min(50vw, 32rem)',
-                )}
-              </div>
-              <div className="aspect-[3/4] overflow-hidden">
-                {renderHeroSlot(
-                  heroImage2,
-                  'Erin Jerri Apple Vision Pro spatial computing work',
-                  // This card grows wider than the previous sizes hint suggested, especially on
-                  // high-DPR desktop displays. Give the browser a truer width so it can request
-                  // a larger source candidate and avoid soft/pixelated rendering.
-                  '(max-width: 767px) min(50vw - 0.5rem, 16rem), (max-width: 1279px) min(50vw - 0.5rem, 18rem), min(25vw, 22rem)',
-                  true,
-                )}
-              </div>
-              <div className="aspect-[3/4] overflow-hidden">
-                {renderHeroSlot(
-                  heroImage3,
-                  'Erin Jerri — engineering, AI systems, and spatial computing',
-                  '(max-width: 1279px) min(50vw - 0.5rem, 12rem), min(25vw, 15rem)',
-                )}
+                </div>
+                <div className="relative aspect-[3/4] overflow-hidden">
+                  {renderHeroSlot(
+                    heroImage2,
+                    'Erin Jerri Apple Vision Pro spatial computing work',
+                    '(max-width: 767px) min(50vw - 0.5rem, 16rem), (max-width: 1279px) min(50vw - 0.5rem, 18rem), min(25vw, 22rem)',
+                    true,
+                  )}
+                </div>
+                <div className="relative aspect-[3/4] overflow-hidden">
+                  {renderHeroSlot(
+                    heroImage3,
+                    'Erin Jerri — engineering, AI systems, and spatial computing',
+                    '(max-width: 1279px) min(50vw - 0.5rem, 12rem), min(25vw, 15rem)',
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+          <div className="pointer-events-none absolute bottom-6 left-6 z-20 text-left md:bottom-8 md:left-8">
+            <div className="pointer-events-auto max-w-[min(calc(100vw-2.5rem),42rem)] p-6 md:max-w-[46rem] md:p-8 pr-1">
+              {renderHeroCopy()}
+            </div>
+          </div>
+        </>
       )}
     </div>
   )

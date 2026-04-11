@@ -1,29 +1,23 @@
 'use client'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import React, { useState } from 'react'
 
-import type { Theme } from './types'
+import type { Theme } from '../types'
 
-import { useTheme } from '..'
-import { themeLocalStorageKey } from './types'
+import { defaultTheme, getImplicitPreference, themeLocalStorageKey } from '../shared'
 
 export const ThemeSelector: React.FC = () => {
-  const { setTheme } = useTheme()
   const [value, setValue] = useState('')
 
   const onThemeChange = (themeToSet: Theme & 'auto') => {
     if (themeToSet === 'auto') {
-      setTheme(null)
+      window.localStorage.removeItem(themeLocalStorageKey)
+      const implicitPreference = getImplicitPreference()
+      document.documentElement.setAttribute('data-theme', implicitPreference || defaultTheme)
       setValue('auto')
     } else {
-      setTheme(themeToSet)
+      window.localStorage.setItem(themeLocalStorageKey, themeToSet)
+      document.documentElement.setAttribute('data-theme', themeToSet)
       setValue(themeToSet)
     }
   }
@@ -34,18 +28,18 @@ export const ThemeSelector: React.FC = () => {
   }, [])
 
   return (
-    <Select onValueChange={onThemeChange} value={value}>
-      <SelectTrigger
+    <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+      <span className="sr-only">Select a theme</span>
+      <select
         aria-label="Select a theme"
-        className="w-auto bg-transparent gap-2 pl-0 md:pl-3 border-none"
+        className="h-9 rounded-md border border-border bg-transparent px-3 text-sm text-foreground outline-none transition-colors focus:border-primary"
+        onChange={(event) => onThemeChange(event.target.value as Theme & 'auto')}
+        value={value}
       >
-        <SelectValue placeholder="Theme" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="auto">Auto</SelectItem>
-        <SelectItem value="light">Light</SelectItem>
-        <SelectItem value="dark">Dark</SelectItem>
-      </SelectContent>
-    </Select>
+        <option value="auto">Theme: Auto</option>
+        <option value="light">Theme: Light</option>
+        <option value="dark">Theme: Dark</option>
+      </select>
+    </label>
   )
 }

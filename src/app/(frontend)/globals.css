@@ -31,9 +31,33 @@
   --space-16: 4rem;
   --space-24: 6rem;
 
-  /* Nav-specific */
-  --nav-font-size: 0.8125rem; /* 13px — was hardcoded 11px */
+  /* Nav-specific (md+ desktop bar only; scales down slightly on very wide viewports with many links) */
+  --nav-font-size: 0.8125rem; /* 13px */
   --nav-height: 64px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --nav-font-size: 0.75rem; /* 12px — tighter md band */
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --nav-font-size: 0.8125rem; /* 13px */
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --nav-font-size: 0.75rem; /* 12px — extra room before overlap on large monitors */
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --nav-font-size: 0.8125rem; /* 13px — ultra-wide can breathe again */
+  }
 }
 
 @tailwind base;
@@ -334,31 +358,6 @@
       linear-gradient(168deg, hsl(var(--hp-ink)) 0%, hsl(230 20% 8%) 48%, hsl(228 18% 11%) 100%);
   }
 
-  .hp-portrait-frame {
-    position: relative;
-    padding: 3px;
-    border-radius: 1.25rem;
-    background: linear-gradient(
-      135deg,
-      hsl(var(--hp-mint) / 0.5),
-      hsl(var(--hp-violet) / 0.32) 48%,
-      hsl(var(--hp-coral) / 0.22) 100%
-    );
-    box-shadow:
-      0 0 0 1px hsl(var(--hp-mist) / 0.1) inset,
-      0 28px 56px -24px rgb(0 0 0 / 0.55),
-      0 0 72px -28px hsl(var(--hp-mint) / 0.22);
-  }
-
-  .hp-portrait-frame::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: radial-gradient(circle at 28% 18%, hsl(var(--hp-cyan-glow) / 0.12), transparent 50%);
-  }
-
   .hp-hero-prose.prose,
   .hp-hero-prose .prose {
     --tw-prose-body: hsl(var(--hp-mist) / 0.84);
@@ -374,6 +373,20 @@
     letter-spacing: -0.035em;
     line-height: 1.1;
     color: hsl(var(--hp-mist));
+  }
+
+  /* Open hero (no glass card): Aura-style display type on the canvas */
+  .hp-hero-prose--open .hero-rich-demoted-h1,
+  .hp-hero-prose.hp-hero-prose--open.prose h1 {
+    font-size: clamp(2.75rem, 8vw, 4.75rem);
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+    margin-top: 0;
+    margin-bottom: 0.35em;
+    text-shadow:
+      0 2px 40px rgb(0 0 0 / 0.5),
+      0 1px 3px rgb(0 0 0 / 0.35);
   }
 
   .hp-hero-prose.prose h2 {
@@ -393,6 +406,31 @@
     font-weight: 400;
     line-height: 1.68;
     color: hsl(var(--hp-mist) / 0.82);
+  }
+
+  .hp-hero-prose.hp-hero-prose--open.prose h2 {
+    font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+    margin-top: 0.85em;
+    margin-bottom: 0.35em;
+    color: hsl(var(--hp-mist) / 0.88);
+    text-shadow: 0 1px 24px rgb(0 0 0 / 0.4);
+  }
+
+  .hp-hero-prose.hp-hero-prose--open.prose p {
+    font-size: clamp(1.0625rem, 2.1vw, 1.3125rem);
+    line-height: 1.58;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: hsl(var(--hp-mist) / 0.76);
+    max-width: 38rem;
+    text-shadow: 0 1px 28px rgb(0 0 0 / 0.42);
+  }
+
+  .hp-hero-prose.hp-hero-prose--open.prose p:first-of-type {
+    margin-top: 0.25em;
   }
 
   .hp-hero-prose.prose strong {

@@ -4,7 +4,6 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { draftMode } from 'next/headers'
 import { unstable_cache } from 'next/cache'
 import React from 'react'
-import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
@@ -51,8 +50,6 @@ export default async function Page() {
 
   return (
     <article className="pt-16 pb-24">
-      <PageClient />
-
       {draft && <LivePreviewListener />}
 
       <RenderHero {...resolvedHero} />

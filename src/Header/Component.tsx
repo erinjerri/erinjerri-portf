@@ -1,8 +1,9 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import React from 'react'
-import { HeaderClient } from './Component.client'
 
 import type { Header } from '@/payload-types'
+
+import { HeaderClient } from './Component.client'
 
 interface HeaderProps {
   data?: Header | null

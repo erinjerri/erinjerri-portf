@@ -8,7 +8,6 @@ import { existsSync } from 'fs'
 
 import type { Footer, Media as MediaType } from '@/payload-types'
 
-import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
 import { SubscribeForm } from './SubscribeForm'
@@ -183,8 +182,6 @@ export async function Footer({ data }: FooterProps = {}) {
                   ))}
               </div>
             )}
-
-            <ThemeSelector />
           </div>
 
           {/* Right column: Link groups */}

@@ -13,7 +13,6 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
-import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { cn } from '@/utilities/ui'
 
@@ -115,8 +114,6 @@ export default async function Page({ params: paramsPromise }: Args) {
         className={cn('pt-16 pb-24', isHomePrismatic && 'home-prismatic-scope')}
         {...(isHomePrismatic ? { 'data-home-prismatic': '' } : {})}
       >
-        <PageClient />
-
         {draft && <LivePreviewListener />}
 
         <RenderHero {...hero} visualVariant={isHomePrismatic ? 'prismatic' : undefined} />

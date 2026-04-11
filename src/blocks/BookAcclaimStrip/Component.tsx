@@ -2,50 +2,65 @@ import { cn } from '@/utilities/ui'
 import type { BookAcclaimStripBlock as BookAcclaimStripBlockProps } from '@/payload-types'
 import React from 'react'
 
-/** Large section title + metric-style leads (restored after global typography pass). */
-const heroH1Class =
-  'font-title text-[2.5rem] font-extrabold leading-[1.1] tracking-tight md:text-[3.5rem]'
+/** Section title: near-black, scales down on narrow viewports. */
+const sectionHeadingClass =
+  'font-title text-3xl font-extrabold leading-[1.1] tracking-tight text-slate-950 sm:text-4xl md:text-5xl lg:text-[3.25rem] xl:text-[3.5rem] 2xl:text-6xl'
+
+/**
+ * Numbered leads: stepped type (no arbitrary clamp — Tailwind v3 turns `_` inside arbitrary
+ * font-size values into spaces, which breaks valid clamp() syntax). Full-width layouts use
+ * larger type; xl+ three-column grid steps down so columns do not collide.
+ */
+const leadNumberedClass =
+  'max-w-full break-words text-balance font-title font-black tabular-nums leading-[1.05] tracking-tight text-blue-950 ' +
+  'text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-3xl 2xl:text-4xl'
+
+/** Check-variant leads: smaller scale, same wrap safety. */
+const leadCheckClass =
+  'max-w-full break-words text-balance font-title font-black leading-[1.12] tracking-tight text-blue-950 ' +
+  'text-2xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-2xl 2xl:text-3xl'
 
 export const BookAcclaimStripBlock: React.FC<BookAcclaimStripBlockProps> = (props) => {
   const { heading = 'Book acclaim', items } = props
   if (!items?.length) return null
 
+  const count = items.length
+
   return (
-    <section className="w-full border-t border-slate-200 bg-white py-20 text-slate-900 md:py-24 lg:py-28">
+    <section className="w-full border-t border-slate-200 bg-white py-16 text-slate-950 sm:py-20 md:py-24 lg:py-28">
       <div className="container">
-        {heading ? <h2 className={heroH1Class}>{heading}</h2> : null}
+        {heading ? <h2 className={sectionHeadingClass}>{heading}</h2> : null}
         <div
           className={cn(
-            'mt-10 grid gap-10 lg:mt-12 lg:gap-14',
-            items.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2',
+            'mt-8 grid grid-cols-1 gap-y-12 sm:mt-10 sm:gap-y-14 lg:mt-12',
+            /* One column until there is room; three-up only at xl+ */
+            count >= 3 && 'xl:grid-cols-3 xl:gap-x-10 xl:gap-y-14 2xl:gap-x-14',
+            count === 2 && 'lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12',
           )}
         >
           {items.map((item, i) => (
-            <div className="text-center md:text-left" key={i}>
-              <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:gap-4">
+            <div className="min-w-0 text-center sm:text-left" key={i}>
+              <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-4">
                 {item.variant === 'check' ? (
                   <span
                     className={cn(
-                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-primary text-sm font-bold text-primary md:mt-1',
+                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-blue-900 text-sm font-bold text-blue-950 sm:mt-1',
                     )}
                     aria-hidden
                   >
                     ✓
                   </span>
                 ) : null}
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 w-full max-w-full flex-1">
                   <p
                     className={cn(
-                      'font-title font-extrabold tracking-tight text-primary',
-                      item.variant === 'numbered'
-                        ? 'tabular-nums leading-[1.02] text-[2.75rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[4.5rem]'
-                        : 'leading-[1.05] text-2xl sm:text-3xl lg:text-4xl',
+                      item.variant === 'numbered' ? leadNumberedClass : leadCheckClass,
                     )}
                   >
                     {item.lead}
                   </p>
                   {item.body ? (
-                    <p className="mx-auto mt-3 max-w-prose text-base leading-relaxed text-slate-700 md:mx-0">
+                    <p className="mx-auto mt-4 max-w-prose text-base leading-relaxed text-slate-800 sm:mx-0 sm:text-lg">
                       {item.body}
                     </p>
                   ) : null}

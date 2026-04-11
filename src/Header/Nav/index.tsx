@@ -89,53 +89,64 @@ export const HeaderNav: React.FC<{
   )
 
   return (
-    <nav className="relative flex w-full items-center justify-center">
-      <div className="hidden md:flex items-center justify-center gap-8 uppercase tracking-[0.18em] font-semibold [font-size:var(--nav-font-size)]">
-        {navLinks.map(({ id, link, href }) => {
-          const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
-          return (
-            <span key={id}>
-              <CMSLink
-                {...link}
-                prefetch={true}
-                appearance="inline"
-                className={cn(
-                  'inline-flex min-h-[44px] items-center rounded px-3 py-2.5 transition-colors font-semibold',
-                  lightText
-                    ? isActive
-                      ? 'text-white bg-white/15'
-                      : 'text-white/85 hover:text-white hover:bg-white/10'
-                    : isActive
-                      ? 'text-foreground bg-black/10'
-                      : 'text-foreground/85 hover:text-foreground hover:bg-black/5',
-                )}
-              />
-            </span>
-          )
-        })}
+    <>
+      {/* Middle column must stay in the grid on mobile (nav is md+ only); display:none would drop the cell. */}
+      <div className="col-start-2 row-start-1 flex min-w-0 justify-center justify-self-stretch">
+        <nav aria-label="Primary" className="hidden w-full min-w-0 md:flex md:items-center md:justify-center">
+          <div
+            className={cn(
+              'flex max-w-full min-w-0 flex-wrap items-center justify-center gap-x-2 gap-y-2 uppercase font-semibold [font-size:var(--nav-font-size)] sm:gap-x-3 md:gap-x-3 md:gap-y-2 md:tracking-[0.14em] lg:gap-x-5 lg:tracking-[0.16em] xl:gap-x-6 xl:tracking-[0.18em] 2xl:gap-x-8',
+            )}
+          >
+            {navLinks.map(({ id, link, href }) => {
+              const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
+              return (
+                <span key={id} className="min-w-0 max-w-[min(100%,14rem)] sm:max-w-[min(100%,16rem)]">
+                  <CMSLink
+                    {...link}
+                    prefetch={true}
+                    appearance="inline"
+                    className={cn(
+                      'inline-flex min-h-[44px] w-full items-center justify-center rounded px-2 py-2 text-center leading-snug transition-colors sm:px-2.5 md:justify-center lg:px-3',
+                      lightText
+                        ? isActive
+                          ? 'text-white bg-white/15'
+                          : 'text-white/85 hover:text-white hover:bg-white/10'
+                        : isActive
+                          ? 'text-foreground bg-black/10'
+                          : 'text-foreground/85 hover:text-foreground hover:bg-black/5',
+                    )}
+                  />
+                </span>
+              )
+            })}
+          </div>
+        </nav>
       </div>
-      <Link
-        href="/search"
-        className={cn(
-          'absolute right-12 hidden h-11 w-11 items-center justify-center md:inline-flex transition-colors',
-          lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
-        )}
-        aria-label="Search"
-      >
-        <span className="sr-only">Search</span>
-        <SearchIcon className="w-5" />
-      </Link>
-      <button
-        type="button"
-        onClick={() => setMobileOpen((prev) => !prev)}
-        className={cn(
-          'absolute right-0 md:hidden p-2 rounded-md',
-          lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
-        )}
-        aria-label="Toggle navigation menu"
-      >
-        {mobileOpen ? <X size={26} /> : <Menu size={26} />}
-      </button>
+      <div className="col-start-3 row-start-1 flex shrink-0 items-center justify-end justify-self-end">
+        <Link
+          href="/search"
+          className={cn(
+            'hidden h-11 w-11 shrink-0 items-center justify-center md:inline-flex transition-colors',
+            lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
+          )}
+          aria-label="Search"
+        >
+          <span className="sr-only">Search</span>
+          <SearchIcon className="w-5" />
+        </Link>
+        <button
+          type="button"
+          onClick={() => setMobileOpen((prev) => !prev)}
+          className={cn(
+            'shrink-0 p-2 md:hidden',
+            lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
+          )}
+          aria-label="Toggle navigation menu"
+        >
+          {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+        </button>
+      </div>
 
       {mounted &&
         createPortal(
@@ -197,6 +208,6 @@ export const HeaderNav: React.FC<{
           </div>,
           document.body,
         )}
-    </nav>
+    </>
   )
 }

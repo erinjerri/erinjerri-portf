@@ -15,7 +15,6 @@ import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
-import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
@@ -72,7 +71,6 @@ export default async function WatchPage({ params: paramsPromise }: Args) {
   return (
     <article className="pt-16 pb-24">
       <ReadingProgress />
-      <PageClient />
 
       {draft && <LivePreviewListener />}
 

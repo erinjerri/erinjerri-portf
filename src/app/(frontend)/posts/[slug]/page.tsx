@@ -14,7 +14,6 @@ import { VideoEmbed } from '@/components/VideoEmbed'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient } from '@/utilities/getPayloadClient'
-import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
@@ -91,7 +90,6 @@ export default async function Post({ params: paramsPromise }: Args) {
   return (
     <article className="pt-16 pb-16">
       <ReadingProgress />
-      <PageClient />
 
       {draft && <LivePreviewListener />}
 
