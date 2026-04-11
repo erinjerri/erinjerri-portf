@@ -44,15 +44,16 @@ const DIMENSIONS_STRIP_SRC =
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
-  const keepCurvesWhileSticky = pathname === '/'
-  const stripVisible = keepCurvesWhileSticky ? true : !scrolled
+  /** Keep the dimensions strip on every “dark header” route (same set as `themeForPathname`), not only `/`. */
+  const stripPinned = theme === 'dark'
+  const stripVisible = stripPinned ? true : !scrolled
 
   return (
     <header
       className={cn(
         'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300',
         scrolled
-          ? keepCurvesWhileSticky
+          ? stripPinned
             ? 'bg-transparent backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
             : 'bg-[#0a0b10] backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
           : 'bg-transparent border-white/10 text-white',
@@ -106,8 +107,8 @@ function normalizePathnameInput(value: string | undefined): string {
  * One stable subtree for SSR and hydration: same `HeaderBody` markup on server and client.
  *
  * Do not read `usePathname()` for rendered output until after mount. On the first client pass it can
- * disagree with `initialPathname` from `headers()` (rewrites, timing, Flight), which flips
- * `stripVisible` on `/` vs other routes and removes the curves layer — classic hydration mismatch.
+ * disagree with `initialPathname` from `headers()` (rewrites, timing, Flight), which flips pathname
+ * and toggles the curves strip — classic hydration mismatch.
  * Same gate applies to scroll-driven classes so SSR (scrollY === 0) matches hydration.
  */
 export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathname }) => {
