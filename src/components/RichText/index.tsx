@@ -93,12 +93,12 @@ function createJsxConverters(demoteExtraHeroH1: boolean): JSXConvertersFunction<
           <div className="container">
             <div
               className={cn(
-                'rounded border p-4 flex flex-col gap-4',
+                'rounded-none border p-4 flex flex-col gap-4',
                 {
                   'bg-card border-border': contrastStyle === 'default',
                   'bg-black border-white/20 text-white [&_.prose]:text-white [&_.prose_*]:text-white [&_.payload-richtext_a]:text-white':
                     isDark,
-                  'bg-white border-black/15 text-black [&_.prose]:text-black [&_.prose_*]:text-black [&_.payload-richtext_a]:text-black':
+                  'border border-white/20 bg-white/5 text-foreground backdrop-blur-sm [&_.prose]:text-foreground [&_.prose_*]:text-foreground/90 [&_.payload-richtext_a]:text-primary':
                     isLight,
                 },
               )}
@@ -159,7 +159,7 @@ export default function RichText(props: Props) {
         {
           container: enableGutter,
           'max-w-none': !enableGutter,
-          'mx-auto prose text-base prose-a:text-primary md:text-[1.125rem] md:prose-md dark:prose-invert dark:prose-a:text-primary':
+          'mx-auto prose prose-invert text-base prose-a:text-primary md:text-[1.125rem] md:prose-md':
             enableProse,
         },
         className,

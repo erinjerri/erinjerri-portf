@@ -4,7 +4,7 @@ import { type VariantProps, cva } from 'class-variance-authority'
 import * as React from 'react'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-[8px] text-base font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:bg-[#C6C6C6] disabled:text-primary/30 disabled:opacity-100',
+  'inline-flex items-center justify-center whitespace-nowrap text-base font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100',
   {
     defaultVariants: {
       size: 'default',
@@ -13,27 +13,17 @@ const buttonVariants = cva(
     variants: {
       size: {
         clear: '',
-        default: 'h-10 px-4 py-2',
-        icon: 'h-10 w-10',
-        lg: 'h-11 rounded px-8',
-        sm: 'h-9 rounded px-3',
+        default: '',
+        icon: 'h-10 w-10 rounded-none p-0',
+        lg: 'rounded-none px-8 py-3.5 text-lg',
+        sm: 'rounded-none px-4 py-2 text-sm',
       },
       variant: {
         default:
-          'bg-[#1C8FDA] text-white hover:bg-[#95D5F6] hover:text-[#1C8FDA] focus-visible:bg-[#95D5F6] focus-visible:text-[#1C8FDA] active:bg-[#95D5F6] active:text-[#1C8FDA]',
-        accent:
-          'bg-[#37EDFF] text-[#0F172A] hover:bg-[#95D5F6] hover:text-[#0F172A] focus-visible:bg-[#95D5F6] focus-visible:text-[#0F172A] active:bg-[#95D5F6] active:text-[#0F172A]',
-        light:
-          'bg-white text-[#1C8FDA] hover:bg-[#EAF6FF] hover:text-[#1C8FDA] focus-visible:bg-[#EAF6FF] focus-visible:text-[#1C8FDA] active:bg-[#EAF6FF] active:text-[#1C8FDA]',
-        inactive: 'bg-[#C6C6C6] text-primary/60 hover:bg-[#C6C6C6] hover:text-primary/60',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        filter:
-          'border border-border bg-transparent text-muted-foreground hover:border-primary hover:text-primary',
-        ghost: 'hover:bg-card hover:text-foreground',
-        link: 'text-primary items-start justify-start underline-offset-4 hover:underline',
+          'rounded-none bg-primary px-6 py-3 text-white hover:bg-primary/90 hover:text-white focus-visible:bg-muted focus-visible:text-foreground active:bg-muted active:text-foreground',
         outline:
-          'border border-[#1C8FDA] bg-transparent text-[#1C8FDA] hover:bg-[#1C8FDA] hover:text-white',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          'rounded-none border border-white/20 bg-white/5 px-6 py-3 text-foreground backdrop-blur-sm hover:bg-white/10 hover:text-foreground',
+        link: 'h-auto min-h-0 rounded-none bg-transparent p-0 font-semibold text-primary underline-offset-4 hover:underline',
       },
     },
   },
@@ -55,7 +45,7 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const Comp = asChild ? Slot : 'button'
-  return <Comp className={cn(buttonVariants({ className, size, variant }))} ref={ref} {...props} />
+  return <Comp className={cn(buttonVariants({ size, variant }), className)} ref={ref} {...props} />
 }
 
 export { Button, buttonVariants }

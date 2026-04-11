@@ -135,8 +135,8 @@ export const Card: React.FC<{
 
   const surfaceClass =
     variant === 'prismatic'
-      ? 'group rounded-2xl overflow-hidden border border-white/[0.12] bg-[linear-gradient(165deg,hsla(210,25%,98%,0.08),hsla(220,20%,12%,0.35))] backdrop-blur-xl shadow-[0_12px_40px_-12px_rgba(0,0,0,0.5)] transition-[border-color,box-shadow,transform] duration-300 hover:cursor-pointer hover:-translate-y-0.5 hover:border-[hsl(var(--hp-mint)/0.35)] hover:shadow-[0_20px_50px_-12px_hsl(var(--hp-mint)/0.2)]'
-      : 'group rounded-lg overflow-hidden border border-white/30 bg-[linear-gradient(180deg,rgba(186,230,253,0.24),rgba(56,189,248,0.12))] backdrop-blur-lg shadow-[0_10px_30px_rgba(8,47,73,0.28)] transition-colors hover:cursor-pointer hover:border-cyan-200/70'
+      ? 'group overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-sm transition-[border-color,box-shadow,transform] duration-300 hover:cursor-pointer hover:-translate-y-0.5 hover:border-[hsl(var(--hp-mint)/0.35)] hover:shadow-[0_24px_60px_-20px_hsl(var(--hp-mint)/0.18)]'
+      : 'group overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-sm transition-[border-color,box-shadow,transform] duration-300 hover:cursor-pointer hover:-translate-y-0.5 hover:border-white/20 hover:shadow-2xl'
 
   return (
     <article className={cn(surfaceClass, className)} ref={card.ref}>
@@ -221,14 +221,24 @@ export const Card: React.FC<{
               </Button>
             )}
             {qaLink && (
-              <Button asChild size="sm" variant="light">
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="border-white/70 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
                 <a href={qaLink.url} target="_blank" rel="noopener noreferrer">
                   {qaLink.label}
                 </a>
               </Button>
             )}
             {slidesPdfUrl && (
-              <Button asChild size="sm" variant="light">
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="border-white/70 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
                 <a
                   href={slidesPdfUrl}
                   target="_blank"

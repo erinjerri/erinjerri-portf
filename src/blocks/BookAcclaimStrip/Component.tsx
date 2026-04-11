@@ -6,19 +6,19 @@ import React from 'react'
  * Section title: near-black. `!` beats `[data-home-prismatic] h2` in globals (which forces light mist).
  */
 const sectionHeadingClass =
-  'font-title text-3xl font-extrabold leading-[1.1] tracking-tight !text-neutral-950 sm:text-4xl md:text-5xl lg:text-[3.25rem] xl:text-[3.5rem] 2xl:text-6xl'
+  'font-title text-4xl font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl'
 
 /**
  * Numbered leads: stepped type (no arbitrary clamp — Tailwind v3 turns `_` inside arbitrary
  * font-size values into spaces, which breaks valid clamp() syntax).
  */
 const leadNumberedClass =
-  'max-w-full break-words text-balance font-title font-black tabular-nums leading-[1.05] tracking-tight !text-neutral-950 ' +
+  'max-w-full break-words text-balance font-title font-semibold tabular-nums leading-[1.08] tracking-tight text-white/90 ' +
   'text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-5xl 2xl:text-6xl'
 
 /** Check-variant leads: smaller scale, same wrap safety. */
 const leadCheckClass =
-  'max-w-full break-words text-balance font-title font-black leading-[1.12] tracking-tight !text-neutral-950 ' +
+  'max-w-full break-words text-balance font-title font-semibold leading-[1.15] tracking-tight text-white/90 ' +
   'text-2xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-4xl 2xl:text-5xl'
 
 export const BookAcclaimStripBlock: React.FC<BookAcclaimStripBlockProps> = (props) => {
@@ -28,7 +28,7 @@ export const BookAcclaimStripBlock: React.FC<BookAcclaimStripBlockProps> = (prop
   const count = items.length
 
   return (
-    <section className="book-acclaim-strip w-full border-t border-slate-200 bg-white py-16 !text-neutral-950 sm:py-20 md:py-24 lg:py-28">
+    <section className="book-acclaim-strip w-full py-24 text-foreground md:py-32">
       <div className="container">
         {heading ? <h2 className={sectionHeadingClass}>{heading}</h2> : null}
         <div
@@ -45,7 +45,7 @@ export const BookAcclaimStripBlock: React.FC<BookAcclaimStripBlockProps> = (prop
                 {item.variant === 'check' ? (
                   <span
                     className={cn(
-                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-neutral-800 text-sm font-bold !text-neutral-950 sm:mt-1',
+                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border-2 border-white/20 text-sm font-bold text-white sm:mt-1',
                     )}
                     aria-hidden
                   >
@@ -61,7 +61,7 @@ export const BookAcclaimStripBlock: React.FC<BookAcclaimStripBlockProps> = (prop
                     {item.lead}
                   </p>
                   {item.body ? (
-                    <p className="mx-auto mt-4 max-w-prose text-base leading-relaxed !text-neutral-800 sm:mx-0 sm:text-lg">
+                    <p className="mx-auto mt-4 max-w-prose text-base leading-relaxed text-white/70 sm:mx-0 md:text-lg">
                       {item.body}
                     </p>
                   ) : null}

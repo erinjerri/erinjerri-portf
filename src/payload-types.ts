@@ -235,15 +235,15 @@ export interface Page {
      */
     backgroundMedia?: (string | null) | Media;
     /**
-     * Optional top image (wide) for the home hero.
+     * Home: wide top slot in the image collage (row above the two portrait slots). Use with Hero 2 & 3 for a balanced bento layout.
      */
     heroImage1?: (string | null) | Media;
     /**
-     * Optional bottom-left image for the home hero.
+     * Home: bottom-left portrait in the collage (e.g. book / headshot). Pairs with Hero 1 & 3.
      */
     heroImage2?: (string | null) | Media;
     /**
-     * Optional bottom-right image for the home hero.
+     * Home: bottom-right portrait in the collage (e.g. AVP / secondary). Pairs with Hero 1 & 2.
      */
     heroImage3?: (string | null) | Media;
     /**
@@ -754,7 +754,7 @@ export interface ContentBlock {
          */
         media?: (string | null) | Media;
         /**
-         * Optional icon shown to the left of the title (e.g. for HIRE Me cards).
+         * Optional icon shown to the right of the title (e.g. for HIRE Me cards).
          */
         icon?: (string | null) | Media;
         enableLink?: boolean | null;
@@ -1503,7 +1503,7 @@ export interface BookCoverRowBlock {
    */
   intro?: string | null;
   /**
-   * Frame shape for each cover. Images use object-contain inside the frame.
+   * Reserved for future use. Covers render at natural aspect ratio (no dark letterbox frame).
    */
   aspectRatio?: ('2:3' | '3:4') | null;
   covers?:
@@ -1516,6 +1516,14 @@ export interface BookCoverRowBlock {
          * e.g. English · 中文 · 한국어
          */
         caption?: string | null;
+        /**
+         * Optional CTA under the cover (e.g. Buy on Amazon).
+         */
+        buttonLabel?: string | null;
+        /**
+         * URL for the button when label is set.
+         */
+        buttonUrl?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -2253,6 +2261,8 @@ export interface BookCoverRowBlockSelect<T extends boolean = true> {
     | {
         image?: T;
         caption?: T;
+        buttonLabel?: T;
+        buttonUrl?: T;
         id?: T;
       };
   id?: T;

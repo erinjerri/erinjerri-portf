@@ -46,7 +46,7 @@ export const CollectionArchive: React.FC<Props> = (props) => {
         {viewAllHref && viewAllLabel ? (
           <div className="mt-12 flex justify-center md:mt-14">
             <Link
-              className="hp-view-all-link inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-6 py-3 text-sm font-medium tracking-wide text-[hsl(var(--hp-mist))] backdrop-blur-md transition-[border-color,box-shadow,background-color,color] duration-300 hover:border-[hsl(var(--hp-mint)/0.45)] hover:bg-white/[0.1] hover:text-white hover:shadow-[0_0_32px_-8px_hsl(var(--hp-mint)/0.35)]"
+              className="hp-view-all-link inline-flex items-center gap-2 rounded-none border border-white/15 bg-white/[0.06] px-6 py-3 text-sm font-medium tracking-wide text-[hsl(var(--hp-mist))] backdrop-blur-md transition-[border-color,box-shadow,background-color,color] duration-300 hover:border-[hsl(var(--hp-mint)/0.45)] hover:bg-white/[0.1] hover:text-white hover:shadow-[0_0_32px_-8px_hsl(var(--hp-mint)/0.35)]"
               href={viewAllHref}
             >
               {viewAllLabel}

@@ -8,7 +8,6 @@ import type { Header as HeaderType } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import Link from 'next/link'
 import { Menu, SearchIcon, X } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/ui'
 
 type HeaderLink = NonNullable<HeaderType['navItems']>[number]['link']
@@ -42,20 +41,19 @@ const useLightText = (scrolled: boolean, theme: string | null) =>
 
 export const HeaderNav: React.FC<{
   data: HeaderType | null
-  /** Hydration-safe path from parent (middleware `x-pathname`, then synced from `usePathname`). */
+  /** Path from parent only — matches SSR (`x-pathname`) then client updates in one place (HeaderClient). */
   pathname: string
   scrolled?: boolean
   theme?: string | null
 }> = ({ data, pathname, scrolled = false, theme = null }) => {
   const navItems = data?.navItems || []
-  const pathnameFromHook = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
   useEffect(() => {
     setMobileOpen(false)
-  }, [pathnameFromHook])
+  }, [pathname])
 
   useEffect(() => {
     if (!mounted) return

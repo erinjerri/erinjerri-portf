@@ -81,6 +81,7 @@
   :root {
     --background: 222 35% 5%;
     --foreground: 0 0% 74.9%;
+    --text: hsl(var(--foreground));
 
     --card: 210 28.8% 28.6%;
     --card-foreground: 0 0% 74.9%;
@@ -117,6 +118,7 @@
   [data-theme='dark'] {
     --background: 222 35% 5%;
     --foreground: 0 0% 74.9%;
+    --text: hsl(var(--foreground));
 
     --card: 210 28.8% 28.6%;
     --card-foreground: 0 0% 74.9%;
@@ -147,6 +149,7 @@
     --warning: 44 90% 62%;
     --error: 354 70% 55%;
   }
+
 }
 
 @layer base {
@@ -434,7 +437,7 @@
   .hp-hero-links a {
     display: inline-flex;
     align-items: center;
-    border-radius: 8px;
+    border-radius: 0;
     border: 1px solid hsl(var(--hp-mint) / 0.35);
     background: hsl(var(--hp-mint) / 0.1);
     padding: 0.55rem 1.15rem;
@@ -442,16 +445,11 @@
     font-weight: 500;
     color: hsl(var(--hp-mist)) !important;
     text-decoration: none !important;
-    transition:
-      border-color 0.25s ease,
-      background-color 0.25s ease,
-      box-shadow 0.25s ease;
   }
 
   .hp-hero-links a:hover {
     border-color: hsl(var(--hp-mint) / 0.55);
     background: hsl(var(--hp-mint) / 0.16);
-    box-shadow: 0 0 20px -10px hsl(var(--hp-mint) / 0.28);
   }
 
   .hp-archive-section {
@@ -478,5 +476,11 @@
 
   [data-home-prismatic] .prose h3 a:hover {
     color: hsl(var(--hp-mint));
+  }
+
+  /* Vertical rhythm for main content — scales with viewport (horizontal padding stays from Tailwind theme.container). */
+  .container {
+    padding-top: clamp(1rem, 3vw, 2rem);
+    padding-bottom: clamp(1rem, 3vw, 2rem);
   }
 }

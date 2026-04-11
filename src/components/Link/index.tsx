@@ -5,9 +5,12 @@ import React from 'react'
 
 import type { Page, Post } from '@/payload-types'
 
+/** Payload `link` field appearances in DB / generated types; runtime maps unknown → default. */
+type LegacyLinkAppearance = 'accent' | 'light' | 'inactive' | 'filter'
+
 type CMSLinkType = {
   archive?: 'posts' | 'projects' | 'watch' | null
-  appearance?: 'inline' | ButtonProps['variant']
+  appearance?: 'inline' | ButtonProps['variant'] | LegacyLinkAppearance | null
   children?: React.ReactNode
   className?: string
   label?: string | null
@@ -59,11 +62,19 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
   if (!href) return null
 
-  const size = appearance === 'link' ? 'clear' : sizeFromProps
+  /** CMS only ships default | outline; map legacy Payload values to supported Button variants. */
+  const resolvedVariant: 'default' | 'outline' | 'link' | 'inline' =
+    appearance === 'inline'
+      ? 'inline'
+      : appearance === 'outline' || appearance === 'link'
+        ? appearance
+        : 'default'
+
+  const size = resolvedVariant === 'link' ? 'clear' : sizeFromProps
   const newTabProps = newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
 
   /* Ensure we don't break any styles set by richText */
-  if (appearance === 'inline') {
+  if (resolvedVariant === 'inline') {
     return (
       <Link className={cn(className)} href={href || url || ''} prefetch={prefetch} {...newTabProps}>
         {label && label}
@@ -72,8 +83,10 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     )
   }
 
+  const buttonVariant: ButtonProps['variant'] = resolvedVariant
+
   return (
-    <Button asChild className={className} size={size} variant={appearance}>
+    <Button asChild className={className} size={size} variant={buttonVariant}>
       <Link className={cn(className)} href={href || url || ''} prefetch={prefetch} {...newTabProps}>
         {label && label}
         {children && children}

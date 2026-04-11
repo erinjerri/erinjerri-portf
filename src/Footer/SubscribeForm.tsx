@@ -80,7 +80,7 @@ export function SubscribeForm({ action, useApiForm = true }: SubscribeFormProps)
               name="email"
               className="flex-1 rounded-lg border-border bg-muted/50 text-foreground placeholder:text-muted-foreground"
             />
-            <Button type="submit" size="default" className="rounded-lg shrink-0">
+            <Button type="submit" size="default" className="shrink-0">
               Subscribe
             </Button>
           </form>
@@ -104,7 +104,7 @@ export function SubscribeForm({ action, useApiForm = true }: SubscribeFormProps)
             disabled={status === 'loading'}
             className="flex-1 rounded-lg border-border bg-muted/50 text-foreground placeholder:text-muted-foreground"
           />
-          <Button type="submit" size="default" className="rounded-lg shrink-0" disabled={status === 'loading'}>
+          <Button type="submit" size="default" className="shrink-0" disabled={status === 'loading'}>
             {status === 'loading' ? 'Subscribing…' : 'Subscribe'}
           </Button>
         </form>

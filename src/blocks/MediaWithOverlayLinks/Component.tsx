@@ -111,13 +111,15 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
     <div
       className={cn(
         'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden',
-        isHighImpact ? 'min-h-[60vh] md:min-h-[70vh]' : 'min-h-[40vh] md:min-h-[50vh]',
+        isHighImpact
+          ? 'h-[60vh] max-h-[70vh] md:h-[min(70vh,720px)]'
+          : 'h-[40vh] max-h-[55vh] md:h-[min(50vh,640px)]',
       )}
     >
       <div className="absolute inset-0">
         <MediaComponent
           fill
-          imgClassName="h-full w-full object-cover"
+          imgClassName="h-full w-full object-cover object-center"
           pictureClassName="absolute inset-0"
           priority
           resource={selectedMedia}
@@ -163,7 +165,7 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
                 <li key={i}>
                   <CMSLink
                     {...link}
-                    appearance={(link?.appearance as 'light' | 'default' | 'outline') || 'light'}
+                    appearance={(link?.appearance as 'default' | 'outline' | 'link') || 'default'}
                   />
                 </li>
               ))}

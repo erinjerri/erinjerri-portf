@@ -21,7 +21,6 @@ import type { Footer as FooterType, Header as HeaderType } from '@/payload-types
 import './globals.css'
 import { frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
-import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/shared'
 import { cn } from '@/utilities/ui'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -50,14 +49,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
   const enableThirdPartyScripts = process.env.NODE_ENV === 'production'
 
-  const themeBootstrapScript = `(function(){try{function gp(){var m=window.matchMedia("(prefers-color-scheme: dark)");return typeof m.matches==="boolean"?m.matches?"dark":"light":null}function ok(t){return t==="light"||t==="dark"}var d=${JSON.stringify(defaultTheme)},p=window.localStorage.getItem(${JSON.stringify(themeLocalStorageKey)});if(ok(p)){document.documentElement.setAttribute("data-theme",p)}else{var i=gp();document.documentElement.setAttribute("data-theme",i||d)}}catch(e){document.documentElement.setAttribute("data-theme",${JSON.stringify(defaultTheme)})}})();`
+  /** Site is dark-only — no OS / localStorage theme branching (avoids flash and keeps editorial palette). */
+  const themeBootstrapScript =
+    '(function(){try{document.documentElement.setAttribute("data-theme","dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();'
 
   return (
     <html
       className={cn(frontendFontVariables)}
       lang="en"
       suppressHydrationWarning
-      data-theme={defaultTheme}
+      data-theme="dark"
     >
       <head>
         {/* eslint-disable-next-line react/no-danger -- sync data-theme before first paint */}

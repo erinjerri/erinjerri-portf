@@ -15,7 +15,7 @@ export const TagPillsBlock: React.FC<TagPillsBlockProps> = (props) => {
       <div className="flex flex-wrap justify-center gap-2 lg:justify-start lg:gap-3">
         {tags.map((t, i) => (
           <span
-            className={`inline-flex items-center rounded-full border px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-wider ${accent}`}
+            className={`inline-flex items-center rounded-[8px] border px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-wider ${accent}`}
             key={i}
           >
             {t.label}

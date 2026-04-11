@@ -61,6 +61,22 @@ export const BookCoverRow: Block = {
             description: 'e.g. English · 中文 · 한국어',
           },
         },
+        {
+          name: 'buttonLabel',
+          type: 'text',
+          label: 'Button label',
+          admin: {
+            description: 'Optional CTA under the cover (e.g. Buy on Amazon).',
+          },
+        },
+        {
+          name: 'buttonUrl',
+          type: 'text',
+          label: 'Button URL',
+          admin: {
+            description: 'URL for the button when label is set.',
+          },
+        },
       ],
     },
   ],

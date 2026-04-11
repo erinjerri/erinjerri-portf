@@ -3,7 +3,6 @@ import { headers } from 'next/headers'
 import React from 'react'
 
 import type { Header } from '@/payload-types'
-
 import { HeaderClient } from './Component.client'
 
 interface HeaderProps {

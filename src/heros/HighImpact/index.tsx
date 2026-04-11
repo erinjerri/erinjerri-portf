@@ -119,6 +119,28 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const renderPortrait = () => {
     if (!hasPortrait) return null
 
+    /* Prismatic home: fixed banner height so AVP portrait cannot run arbitrarily tall (premium editorial pacing). */
+    if (isPrismatic) {
+      return (
+        <div className="relative mx-auto w-full max-w-[min(100%,440px)] overflow-hidden rounded-2xl shadow-[0_24px_70px_-28px_rgba(0,0,0,0.55)] h-[60vh] max-h-[70vh] md:h-[70vh] md:max-h-[min(70vh,720px)]">
+          <Media
+            alt={
+              (typeof media.alt === 'string' && media.alt.trim()) ||
+              'Erin Jerri Apple Vision Pro spatial computing work'
+            }
+            fill
+            className="absolute inset-0"
+            imgClassName="object-cover object-[50%_32%]"
+            pictureClassName="absolute inset-0 block h-full w-full"
+            priority
+            quality={70}
+            resource={media}
+            size="(max-width: 640px) 85vw, (max-width: 1024px) 40vw, 440px"
+          />
+        </div>
+      )
+    }
+
     return (
       <Media
         alt={
@@ -126,10 +148,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           'Erin Jerri Apple Vision Pro spatial computing work'
         }
         imgClassName={cn(
-          'h-auto w-full object-cover',
-          /* Softer top bias so the portrait does not visually crowd the sticky header */
-          isPrismatic ? 'object-[50%_32%]' : 'object-[40%_20%]',
-          !isPrismatic && 'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
+          'h-auto w-full object-cover object-center object-[40%_20%]',
+          'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
         )}
         pictureClassName="relative block w-full overflow-hidden"
         priority
@@ -174,7 +194,10 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   return (
     <div
       className={cn(
-        'relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] md:min-h-[75vh] w-full overflow-hidden text-foreground',
+        /* No negative margin: sticky header (z-50) must sit above hero; content clears nav via padding below. */
+        'relative mt-0 flex w-full flex-col overflow-hidden text-foreground',
+        /* Prismatic home: ~one viewport, vertically centered content, capped so zoom-out does not leave a huge void */
+        isPrismatic ? 'min-h-[clamp(480px,58vh,760px)]' : 'min-h-[60vh]',
         isPrismatic && 'hp-hero-root',
       )}
       data-theme="dark"
@@ -224,16 +247,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           {isPrismatic ? (
             <div
               className={cn(
-                'relative z-10 mx-auto flex min-h-[62vh] w-full max-w-[96rem] flex-col justify-center gap-8 px-6 md:px-10 lg:px-12',
-                /* Clear sticky header (h-16): hero uses negative margin so extra top padding keeps portrait off the nav */
-                'pt-[calc(var(--nav-height)+2.25rem)] pb-16 md:pt-[calc(var(--nav-height)+3.25rem)]',
-                'xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-center xl:gap-12 xl:py-20 xl:pt-[calc(var(--nav-height)+2.75rem)]',
+                'relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-6 px-6 md:px-10',
+                /* Tighter vertical rhythm into first homepage section */
+                'pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:pt-[calc(var(--nav-height)+3rem)]',
+                'xl:grid xl:min-h-0 xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-center xl:gap-10 xl:pb-14 xl:pt-[calc(var(--nav-height)+2.5rem)]',
               )}
             >
               <div className="order-2 xl:order-1">
                 {renderHeroCopy('max-w-[min(calc(100vw-2.5rem),40rem)]')}
               </div>
-              <div className="order-1 flex justify-center xl:order-2 xl:justify-end">
+              <div className="order-1 flex justify-center xl:order-2 xl:items-center xl:justify-end">
                 <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[500px]">
                   {renderPortrait()}
                 </div>
@@ -241,7 +264,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             </div>
           ) : (
             <>
-              <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center px-4 pt-20 pb-36 xl:justify-end xl:px-8 xl:pb-8 xl:pt-24">
+              <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center px-4 pt-20 pb-20 xl:justify-end xl:px-8 xl:pb-8 xl:pt-24">
                 <div className="pointer-events-auto w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[440px] xl:max-w-[560px]">
                   {renderPortrait()}
                 </div>
@@ -261,7 +284,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : isPrismatic ? (
-        <div className="relative z-10 mx-auto flex w-full max-w-[96rem] flex-col items-stretch gap-12 px-6 pb-16 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-12 lg:pb-20 lg:pt-[calc(var(--nav-height)+3.25rem)] xl:gap-16">
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-8 px-6 pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-14 lg:pt-[calc(var(--nav-height)+3rem)] xl:gap-12">
           <div className="min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
             {renderHeroCopy()}
           </div>
@@ -301,7 +324,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         </div>
       ) : (
         <>
-          <div className="absolute inset-0 z-0 flex items-center justify-center px-4 pt-20 pb-40 xl:justify-end xl:px-8 xl:pb-12 xl:pt-24">
+          <div className="absolute inset-0 z-0 flex items-center justify-center px-4 pt-20 pb-24 xl:justify-end xl:px-8 xl:pb-10 xl:pt-24">
             <div className="w-full max-w-md sm:max-w-lg xl:max-w-2xl">
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <div className="relative col-span-2 aspect-[16/9] overflow-hidden">

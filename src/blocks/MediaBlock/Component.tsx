@@ -122,14 +122,16 @@ export const MediaBlock: React.FC<Props> = (props) => {
       <div
         className={cn(
           'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden',
-          isHighImpact ? 'min-h-[60vh] md:min-h-[70vh]' : 'min-h-[40vh] md:min-h-[50vh]',
+          isHighImpact
+            ? 'h-[60vh] max-h-[70vh] md:h-[min(70vh,720px)]'
+            : 'h-[40vh] max-h-[55vh] md:h-[min(50vh,640px)]',
           className,
         )}
       >
         <div className="absolute inset-0">
           <MediaComponent
             fill
-            imgClassName="h-full w-full object-cover"
+            imgClassName="h-full w-full object-cover object-center"
             pictureClassName="absolute inset-0"
             priority
             resource={selectedMedia}
@@ -149,7 +151,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
             >
               {links.map(({ link }, i) => (
                 <li key={i}>
-                  <CMSLink {...(link as any)} appearance={link?.appearance || 'light'} />
+                  <CMSLink {...(link as any)} appearance={link?.appearance || 'default'} />
                 </li>
               ))}
             </ul>
@@ -245,7 +247,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
           className={cn(
             'relative w-full overflow-hidden',
             isFullWidthTransition
-              ? 'aspect-[16/9]'
+              ? 'h-[60vh] max-h-[70vh] md:h-[min(70vh,720px)]'
               : 'aspect-[4/3] sm:aspect-[16/10] lg:aspect-[3/2]',
             !isFullWidthTransition && 'rounded-[1rem]',
           )}
@@ -253,7 +255,11 @@ export const MediaBlock: React.FC<Props> = (props) => {
           <MediaComponent
             className="absolute inset-0"
             fill
-            imgClassName={cn('h-full w-full object-cover object-center', imgClassName)}
+            imgClassName={
+              isFullWidthTransition
+                ? cn('absolute inset-0 h-full w-full object-cover object-center', imgClassName)
+                : cn('h-full w-full object-cover object-center', imgClassName)
+            }
             pictureClassName="absolute inset-0"
             resource={selectedMedia}
             size={

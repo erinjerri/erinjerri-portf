@@ -120,10 +120,10 @@ const config = {
         DEFAULT: {
           css: [
             {
-              '--tw-prose-body': 'hsl(var(--foreground))',
-              '--tw-prose-headings': 'hsl(var(--foreground))',
+              '--tw-prose-body': 'var(--text)',
+              '--tw-prose-headings': 'var(--text)',
               '--tw-prose-links': 'hsl(var(--primary))',
-              '--tw-prose-bold': 'hsl(var(--foreground))',
+              '--tw-prose-bold': 'var(--text)',
               fontSize: '1rem',
               lineHeight: '1.625',
               maxWidth: '65ch',

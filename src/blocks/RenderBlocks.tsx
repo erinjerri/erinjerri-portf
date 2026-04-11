@@ -1,5 +1,7 @@
 import React, { Fragment } from 'react'
 
+import { cn } from '@/utilities/ui'
+
 import type {
   CallToActionBlock as CtaBlockType,
   ContentBlock as ContentBlockType,
@@ -223,21 +225,41 @@ export const RenderBlocks: React.FC<{
             (nextHasLinks || nextCtaHasLinks)
 
           if (shouldMergeWithOverlay && nextBlock) {
+            const isHomePage = pageSlug === 'home'
             return (
               <div
-                className={
-                  index === 0 ? 'mb-20 md:mb-24 lg:mb-28' : 'my-20 md:my-24 lg:my-28'
-                }
+                className={cn(
+                  isHomePage
+                    ? index === 0
+                      ? 'pt-8 pb-16 md:pt-10 md:pb-20'
+                      : 'py-16 md:py-24'
+                    : index === 0
+                      ? 'mb-20 md:mb-24 lg:mb-28'
+                      : 'my-20 md:my-24 lg:my-28',
+                )}
                 key={index}
               >
-                <MediaWithOverlayLinksBlock
-                  mediaBlock={block as MediaBlockType}
-                  linksBlock={
-                    nextBlock as React.ComponentProps<
-                      typeof MediaWithOverlayLinksBlock
-                    >['linksBlock']
-                  }
-                />
+                {isHomePage ? (
+                  <div className="mx-auto max-w-7xl px-6 md:px-10">
+                    <MediaWithOverlayLinksBlock
+                      mediaBlock={block as MediaBlockType}
+                      linksBlock={
+                        nextBlock as React.ComponentProps<
+                          typeof MediaWithOverlayLinksBlock
+                        >['linksBlock']
+                      }
+                    />
+                  </div>
+                ) : (
+                  <MediaWithOverlayLinksBlock
+                    mediaBlock={block as MediaBlockType}
+                    linksBlock={
+                      nextBlock as React.ComponentProps<
+                        typeof MediaWithOverlayLinksBlock
+                      >['linksBlock']
+                    }
+                  />
+                )}
               </div>
             )
           }
@@ -309,15 +331,50 @@ export const RenderBlocks: React.FC<{
               const homepagePostsCap =
                 blockType === 'archive' && pageSlug === 'home' ? 3 : undefined
 
+              const isHomePage = pageSlug === 'home'
+              const isBookCoverRow = blockType === 'bookCoverRow'
+              const prevIsBookCoverRow = prevBlock?.blockType === 'bookCoverRow'
+              const nextIsStandaloneLinksBlock =
+                nextBlock &&
+                ((nextBlock.blockType === 'cta' && ctaHasLinks(nextBlock)) ||
+                  (nextBlock.blockType === 'content' && contentHasLinks(nextBlock)))
+              const isStandaloneLinksBlock =
+                (blockType === 'cta' && ctaHasLinks(block)) ||
+                (blockType === 'content' && contentHasLinks(block))
+              const sectionClassName = cn(
+                isHomePage
+                  ? index === 0
+                    ? 'pt-8 pb-16 md:pt-10 md:pb-20'
+                    : isBookCoverRow && nextIsStandaloneLinksBlock
+                      ? 'pt-16 pb-4 md:pt-20 md:pb-6'
+                      : prevIsBookCoverRow && isStandaloneLinksBlock
+                        ? 'pt-4 pb-16 md:pt-6 md:pb-20'
+                        : 'py-16 md:py-24'
+                  : marginClass,
+              )
+
               return (
-                <div className={marginClass} key={index}>
-                  {/* Block component expects its specific block type; block is a layout union */}
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  <Block
-                    {...(block as any)}
-                    {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
-                    disableInnerContainer
-                  />
+                <div className={sectionClassName} key={index}>
+                  {isHomePage ? (
+                    <div className="mx-auto max-w-7xl px-6 md:px-10">
+                      {/* Block component expects its specific block type; block is a layout union */}
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      <Block
+                        {...(block as any)}
+                        {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
+                        disableInnerContainer
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      <Block
+                        {...(block as any)}
+                        {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
+                        disableInnerContainer
+                      />
+                    </>
+                  )}
                 </div>
               )
             }

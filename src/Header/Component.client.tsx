@@ -52,7 +52,6 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
           : 'bg-transparent border-transparent',
         !scrolled && (useLightText ? 'text-white' : 'text-foreground'),
       )}
-      data-theme={theme}
     >
       <div className="container">
         <div className={HEADER_ROW_CLASS}>
@@ -66,10 +65,15 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   )
 }
 
-function HeaderBodyInteractive({ data, initialPathname }: HeaderClientProps) {
-  const [scrolled, setScrolled] = useState(false)
+/**
+ * One stable subtree for SSR and hydration: same `HeaderBody` markup on server and client.
+ * Pathname starts as `initialPathname` (from `x-pathname` header) then syncs from `usePathname`.
+ * Scroll only toggles cosmetic classes on `<header>` — never swap layout components.
+ */
+export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathname }) => {
   const pathnameFromHook = usePathname()
   const [pathname, setPathname] = useState(initialPathname)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     setPathname(pathnameFromHook ?? initialPathname)
@@ -89,23 +93,4 @@ function HeaderBodyInteractive({ data, initialPathname }: HeaderClientProps) {
   }, [])
 
   return <HeaderBody data={data} pathname={pathname} scrolled={scrolled} />
-}
-
-/**
- * First paint uses only `initialPathname` + no scroll hooks so SSR HTML matches the client.
- * After mount, swap to the interactive subtree — it mounts fresh and is not re-hydrated against
- * a different legacy bundle / `usePathname` timing mismatch.
- */
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathname }) => {
-  const [hasMounted, setHasMounted] = useState(false)
-
-  useEffect(() => {
-    setHasMounted(true)
-  }, [])
-
-  if (!hasMounted) {
-    return <HeaderBody data={data} pathname={initialPathname} scrolled={false} />
-  }
-
-  return <HeaderBodyInteractive data={data} initialPathname={initialPathname} />
 }

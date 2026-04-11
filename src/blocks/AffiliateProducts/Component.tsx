@@ -137,11 +137,8 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
           const openInNewTab = product.openInNewTab ?? true
 
           return (
-            <article
-              className="overflow-hidden rounded-lg bg-[linear-gradient(180deg,rgba(186,230,253,0.24),rgba(56,189,248,0.12))] backdrop-blur-lg shadow-[0_10px_30px_rgba(8,47,73,0.28)]"
-              key={String(product.id)}
-            >
-              <div className="w-full overflow-hidden rounded-t-lg">
+            <article className="flex flex-col overflow-hidden rounded-none" key={String(product.id)}>
+              <div className="w-full shrink-0 overflow-hidden rounded-none">
                 {product.image && typeof product.image !== 'string' ? (
                   <Media
                     alt={
@@ -150,7 +147,7 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
                       'Product image'
                     }
                     className="block w-full max-w-full"
-                    imgClassName="h-auto w-full max-w-full rounded-t-lg"
+                    imgClassName="h-auto w-full max-w-full rounded-none"
                     pictureClassName="block w-full"
                     quality={100}
                     resource={product.image}
@@ -163,29 +160,29 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
                 )}
               </div>
 
-              <div className="p-4">
+              {href ? (
+                <div className="flex w-full shrink-0 px-3 pt-2">
+                  <AffiliateLink
+                    url={href}
+                    product={product.title ?? product.brand ?? 'Unknown'}
+                    target={openInNewTab ? '_blank' : '_self'}
+                    rel={openInNewTab ? 'sponsored noopener noreferrer' : 'sponsored'}
+                    className="inline-flex w-full items-center justify-center rounded-none bg-cyan-300/90 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-200 sm:w-auto"
+                  >
+                    {product.ctaLabel || 'View on Amazon'}
+                  </AffiliateLink>
+                </div>
+              ) : null}
+
+              <div className="flex flex-col px-3 pb-3 pt-2">
                 {product.brand ? (
                   <div className="text-xs uppercase tracking-wide text-white/70">{product.brand}</div>
                 ) : null}
 
-                <h3 className="mt-1 text-lg font-semibold leading-snug">{product.title}</h3>
+                <h3 className="mt-0.5 text-lg font-semibold leading-snug">{product.title}</h3>
 
                 {product.description ? (
-                  <p className="mt-2 text-sm leading-relaxed text-white/80">{product.description}</p>
-                ) : null}
-
-                {href ? (
-                  <div className="mt-4">
-                    <AffiliateLink
-                      url={href}
-                      product={product.title ?? product.brand ?? 'Unknown'}
-                      target={openInNewTab ? '_blank' : '_self'}
-                      rel={openInNewTab ? 'sponsored noopener noreferrer' : 'sponsored'}
-                      className="inline-flex items-center justify-center rounded-md bg-cyan-300/90 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-200"
-                    >
-                      {product.ctaLabel || 'View on Amazon'}
-                    </AffiliateLink>
-                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/80">{product.description}</p>
                 ) : null}
               </div>
             </article>
