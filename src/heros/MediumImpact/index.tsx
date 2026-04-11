@@ -8,28 +8,33 @@ import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
-export const MediumImpactHero: React.FC<Page['hero']> = ({
+export const MediumImpactHero: React.FC<Page['hero'] & { pageSlug?: string }> = ({
   links,
   media,
+  pageSlug,
   richText,
 }) => {
   const heroMedia = media && typeof media === 'object' ? media : null
 
   const hasLinks = Array.isArray(links) && links.length > 0
 
+  const isTimebite = pageSlug === 'timebite' || pageSlug === 'timebite-download'
+
   return (
     <div className="container">
-      <div className="flex flex-col items-center">
+      <div className={cn('flex flex-col', isTimebite ? 'items-start' : 'items-center')}>
         {/* Image */}
         {heroMedia && (
-          <div className="mb-6 w-full max-w-[420px]">
+          <div className={cn('mb-6 w-full max-w-[420px]', isTimebite && 'bg-transparent')}>
             <Media
               alt={
                 (typeof heroMedia.alt === 'string' && heroMedia.alt.trim()) ||
                 'Erin Jerri — about and profile, AI and spatial computing'
               }
               className="w-full"
-              imgClassName="object-contain"
+              imagePlaceholder={isTimebite ? 'empty' : undefined}
+              imgClassName="h-auto w-full max-w-full"
+              pictureClassName={cn('block w-full', isTimebite && 'bg-transparent')}
               priority
               resource={heroMedia}
               size="(max-width: 640px) 100vw, (max-width: 1024px) 360px, (max-width: 1280px) 420px, 520px"

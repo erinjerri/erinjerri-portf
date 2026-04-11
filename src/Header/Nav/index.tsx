@@ -42,18 +42,20 @@ const useLightText = (scrolled: boolean, theme: string | null) =>
 
 export const HeaderNav: React.FC<{
   data: HeaderType | null
+  /** Hydration-safe path from parent (middleware `x-pathname`, then synced from `usePathname`). */
+  pathname: string
   scrolled?: boolean
   theme?: string | null
-}> = ({ data, scrolled = false, theme = null }) => {
+}> = ({ data, pathname, scrolled = false, theme = null }) => {
   const navItems = data?.navItems || []
-  const pathname = usePathname()
+  const pathnameFromHook = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
   useEffect(() => {
     setMobileOpen(false)
-  }, [pathname])
+  }, [pathnameFromHook])
 
   useEffect(() => {
     if (!mounted) return
@@ -99,7 +101,7 @@ export const HeaderNav: React.FC<{
             )}
           >
             {navLinks.map(({ id, link, href }) => {
-              const isActive = href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
+              const isActive = href ? normalizePath(pathname) === normalizePath(href) : false
               return (
                 <span key={id} className="min-w-0 max-w-[min(100%,14rem)] sm:max-w-[min(100%,16rem)]">
                   <CMSLink
@@ -177,7 +179,7 @@ export const HeaderNav: React.FC<{
               <div className="flex flex-col gap-3">
                 {navLinks.map(({ id, link, href }) => {
                   const isActive =
-                    href ? normalizePath(pathname ?? '/') === normalizePath(href) : false
+                    href ? normalizePath(pathname) === normalizePath(href) : false
 
                   return (
                     <div key={id} onClick={() => setMobileOpen(false)}>

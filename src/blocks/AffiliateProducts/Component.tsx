@@ -141,7 +141,7 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
               className="overflow-hidden rounded-lg bg-[linear-gradient(180deg,rgba(186,230,253,0.24),rgba(56,189,248,0.12))] backdrop-blur-lg shadow-[0_10px_30px_rgba(8,47,73,0.28)]"
               key={String(product.id)}
             >
-              <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/10">
+              <div className="w-full overflow-hidden rounded-t-lg">
                 {product.image && typeof product.image !== 'string' ? (
                   <Media
                     alt={
@@ -149,16 +149,15 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
                       product.title ||
                       'Product image'
                     }
-                    className="absolute inset-0 h-full w-full"
-                    fill
-                    imgClassName="object-contain object-center"
-                    pictureClassName="relative block h-full w-full"
+                    className="block w-full max-w-full"
+                    imgClassName="h-auto w-full max-w-full rounded-t-lg"
+                    pictureClassName="block w-full"
                     quality={100}
                     resource={product.image}
                     size="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-white/70">
+                  <div className="flex min-h-[8rem] w-full items-center justify-center text-sm text-white/70">
                     No image
                   </div>
                 )}

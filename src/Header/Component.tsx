@@ -1,4 +1,5 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { headers } from 'next/headers'
 import React from 'react'
 
 import type { Header } from '@/payload-types'
@@ -22,5 +23,8 @@ export async function Header({ data }: HeaderProps = {}) {
     }
   }
 
-  return <HeaderClient data={headerData} />
+  const headerList = await headers()
+  const initialPathname = headerList.get('x-pathname') ?? '/'
+
+  return <HeaderClient data={headerData} initialPathname={initialPathname} />
 }

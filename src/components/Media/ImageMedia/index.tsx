@@ -59,6 +59,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     src: srcFromProps,
     loading: loadingFromProps,
     unoptimized: unoptimizedFromProps,
+    imagePlaceholder = 'blur',
   } = props
 
   let width: number | undefined
@@ -130,8 +131,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         fill={fill}
         height={!fill ? height : undefined}
         onError={() => setImageError(true)}
-        placeholder="blur"
-        blurDataURL={placeholderBlur}
+        placeholder={imagePlaceholder === 'empty' ? 'empty' : 'blur'}
+        {...(imagePlaceholder === 'empty' ? {} : { blurDataURL: placeholderBlur })}
         priority={priority}
         fetchPriority={priority ? 'high' : undefined}
         quality={quality}

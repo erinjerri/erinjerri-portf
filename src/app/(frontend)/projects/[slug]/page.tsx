@@ -12,23 +12,24 @@ import type { Project } from '@/payload-types'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
-import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayloadClient()
-    const projects = await payload.find({
-      collection: 'projects',
-      draft: false,
-      limit: 1000,
-      overrideAccess: false,
-      pagination: false,
-      select: {
-        slug: true,
-      },
-    })
+    const projects = await withPayloadClientRetry((payload) =>
+      payload.find({
+        collection: 'projects',
+        draft: false,
+        limit: 1000,
+        overrideAccess: false,
+        pagination: false,
+        select: {
+          slug: true,
+        },
+      }),
+    )
 
     return projects.docs.map(({ slug }) => ({ slug }))
   } catch (err) {
@@ -108,33 +109,34 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
 const getProjectBySlug = async (slug: string, draft: boolean) => {
   if (draft) {
-    const payload = await getPayloadClient()
-    const result = await payload.find({
-      collection: 'projects',
-      draft: true,
-      depth: 2,
-      limit: 1,
-      pagination: false,
-      overrideAccess: true,
-      where: { slug: { equals: slug } },
-    })
+    const result = await withPayloadClientRetry((payload) =>
+      payload.find({
+        collection: 'projects',
+        draft: true,
+        depth: 2,
+        limit: 1,
+        pagination: false,
+        overrideAccess: true,
+        where: { slug: { equals: slug } },
+      }),
+    )
     return (result.docs?.[0] as Project | null) ?? null
   }
 
   const getCached = unstable_cache(
-    async () => {
-      const payload = await getPayloadClient()
-      const result = await payload.find({
-        collection: 'projects',
-        draft: false,
-        depth: 2,
-        limit: 1,
-        pagination: false,
-        overrideAccess: false,
-        where: { slug: { equals: slug } },
-      })
-      return (result.docs?.[0] as Project | null) ?? null
-    },
+    async () =>
+      withPayloadClientRetry(async (payload) => {
+        const result = await payload.find({
+          collection: 'projects',
+          draft: false,
+          depth: 2,
+          limit: 1,
+          pagination: false,
+          overrideAccess: false,
+          where: { slug: { equals: slug } },
+        })
+        return (result.docs?.[0] as Project | null) ?? null
+      }),
     ['project', slug],
     { revalidate: 60, tags: [`project_${slug}`] },
   )

@@ -66,8 +66,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasAnyGridFields = Boolean(heroImage1 || heroImage2 || heroImage3)
   const hasGridMedia =
     isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
-  /** Homepage experiment: prioritize editorial split + portrait over multi-image grid */
-  const forcePortraitSplit = visualVariant === 'prismatic' && hasPortrait
+  /** Prefer Hero Image 1–3 grid over prismatic portrait when any grid slot has media (Payload uploads). */
+  const forcePortraitSplit =
+    visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
   const showGridLayout = !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
   const isPrismatic = visualVariant === 'prismatic'
   const backgroundImage = hasBackground ? backgroundMedia : null
@@ -119,7 +120,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         }
         imgClassName={cn(
           'h-auto w-full object-cover object-[40%_20%]',
-          'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
+          !isPrismatic && 'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
         )}
         pictureClassName="relative block w-full overflow-hidden"
         priority
@@ -193,7 +194,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           />
         </div>
       )}
-      {!backgroundImage && (
+      {/* Curves asset lives in the nav on home (prismatic); hero uses ink + mist only. */}
+      {!backgroundImage && !isPrismatic && (
         <div className="absolute inset-0 -z-10">
           <StaticHeroImage
             alt="Decorative hero background — Erin Jerri portfolio"
@@ -239,16 +241,48 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             {renderHeroCopy()}
           </div>
         </div>
+      ) : isPrismatic ? (
+        <div className="relative z-10 mx-auto flex w-full max-w-[96rem] flex-col items-stretch gap-12 px-6 pb-16 pt-20 md:px-10 lg:flex-row lg:items-center lg:gap-12 lg:pb-20 lg:pt-24 xl:gap-16">
+          <div className="min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
+            {renderHeroCopy()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div
+              className={cn(
+                'grid w-full grid-cols-2 gap-3 sm:gap-4 lg:max-w-[min(100%,40rem)] lg:justify-self-end xl:max-w-[44rem]',
+                '[&_.relative]:overflow-hidden',
+              )}
+            >
+              <div className="relative col-span-2 aspect-[16/9] min-h-[10.5rem] sm:min-h-[12.5rem]">
+                {renderHeroSlot(
+                  heroImage1,
+                  'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
+                  '(max-width: 1279px) min(100vw - 2rem, 28rem), min(50vw, 36rem)',
+                )}
+              </div>
+              <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
+                {renderHeroSlot(
+                  heroImage2,
+                  'Erin Jerri — book and profile',
+                  '(max-width: 767px) min(50vw - 0.5rem, 18rem), (max-width: 1279px) min(50vw - 0.5rem, 20rem), min(25vw, 22rem)',
+                  true,
+                )}
+              </div>
+              <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
+                {renderHeroSlot(
+                  heroImage3,
+                  'Erin Jerri — engineering, AI systems, and spatial computing',
+                  '(max-width: 1279px) min(50vw - 0.5rem, 14rem), min(25vw, 18rem)',
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div className="absolute inset-0 z-0 flex items-center justify-center px-4 pt-20 pb-40 xl:justify-end xl:px-8 xl:pb-12 xl:pt-24">
             <div className="w-full max-w-md sm:max-w-lg xl:max-w-2xl">
-              <div
-                className={cn(
-                  'grid grid-cols-2 gap-2 sm:gap-3',
-                  isPrismatic && '[&_.relative]:rounded-xl [&_.relative]:ring-1 [&_.relative]:ring-white/15',
-                )}
-              >
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <div className="relative col-span-2 aspect-[16/9] overflow-hidden">
                   {renderHeroSlot(
                     heroImage1,

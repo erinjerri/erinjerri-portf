@@ -194,7 +194,9 @@ export const seed = async ({
       path.join(process.cwd(), 'public', 'media', 'CYR-CreatingARVR-X-cover-updated@1x.png'),
     ),
     fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'dimensions-background-curves.webp')),
-    fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'Erin-Book-Headshot.webp')),
+    fetchFileByPath(
+      path.join(process.cwd(), 'public', 'media', 'erinjerri-book-headshot-green-no-glare-2400x2654.webp'),
+    ),
     fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'erin-AVP-headshot-95op.png')),
   ])
 
@@ -263,7 +265,7 @@ export const seed = async ({
     payload.create({
       collection: 'media',
       data: {
-        alt: 'Erin holding a book',
+        alt: 'Erin Jerri — author portrait, green backdrop (no glare)',
         mediaType: 'image',
       },
       file: homeHeroBottomLeftBuffer,

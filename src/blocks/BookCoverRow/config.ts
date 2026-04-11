@@ -31,7 +31,8 @@ export const BookCoverRow: Block = {
         { label: '3:4 (taller)', value: '3:4' },
       ],
       admin: {
-        description: 'Frame shape for each cover. Images use object-contain inside the frame.',
+        description:
+          'Reserved for future use. Covers render at natural aspect ratio (no dark letterbox frame).',
       },
     },
     {
