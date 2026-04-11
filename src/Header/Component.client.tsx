@@ -38,27 +38,51 @@ type HeaderBodyProps = {
   scrolled: boolean
 }
 
+const DIMENSIONS_STRIP_SRC =
+  '/media/hero-top-banner-experience-dimensions-background-curves-cut-1400x155.png'
+
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
-  const useLightText = scrolled || theme !== 'light'
+  const stripVisible = !scrolled
 
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300',
+        'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300',
         scrolled
           ? 'bg-[#0a0b10] backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
-          : 'bg-transparent border-transparent',
-        !scrolled && (useLightText ? 'text-white' : 'text-foreground'),
+          : 'bg-transparent border-white/10 text-white',
       )}
+      data-theme={theme}
     >
-      <div className="container">
+      {stripVisible ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: [
+              'linear-gradient(180deg, rgba(5, 10, 22, 0.9) 0%, rgba(9, 17, 32, 0.82) 100%)',
+              `url(${DIMENSIONS_STRIP_SRC})`,
+            ].join(', '),
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+          }}
+        />
+      ) : null}
+      <div className="container relative z-10">
         <div className={HEADER_ROW_CLASS}>
           <Link href="/" className={LOGO_LINK_CLASS}>
             <Logo loading="eager" priority="high" />
           </Link>
-          <HeaderNav data={data} pathname={pathname} scrolled={scrolled} theme={theme} />
+          <HeaderNav
+            data={data}
+            pathname={pathname}
+            scrolled={scrolled}
+            theme={theme}
+            stripVisible={stripVisible}
+          />
         </div>
       </div>
     </header>

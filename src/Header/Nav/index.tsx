@@ -35,9 +35,9 @@ const resolveHref = (link: HeaderLink): string | null => {
   return link.url || null
 }
 
-/** When true, use white text (header has dark bg). When false and theme is light, use dark text for contrast on light pages. */
-const useLightText = (scrolled: boolean, theme: string | null) =>
-  scrolled || theme !== 'light'
+/** When true, use white text (header has dark bg/strip). When false and theme is light, use dark text for contrast on light pages. */
+const useLightText = (scrolled: boolean, theme: string | null, stripVisible: boolean) =>
+  scrolled || stripVisible || theme !== 'light'
 
 export const HeaderNav: React.FC<{
   data: HeaderType | null
@@ -45,7 +45,8 @@ export const HeaderNav: React.FC<{
   pathname: string
   scrolled?: boolean
   theme?: string | null
-}> = ({ data, pathname, scrolled = false, theme = null }) => {
+  stripVisible?: boolean
+}> = ({ data, pathname, scrolled = false, theme = null, stripVisible = false }) => {
   const navItems = data?.navItems || []
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -67,7 +68,7 @@ export const HeaderNav: React.FC<{
     }
   }, [mounted, mobileOpen])
 
-  const lightText = useLightText(scrolled, theme ?? null)
+  const lightText = useLightText(scrolled, theme ?? null, stripVisible)
   const navLinks = useMemo(
     () => {
       const seen = new Set<string>()
