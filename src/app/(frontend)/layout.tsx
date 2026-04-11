@@ -8,10 +8,10 @@ import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { GoogleTagManagerHead, GoogleTagManagerNoScript } from '@/components/GoogleTagManager'
-import { PersonJsonLd } from '@/components/PersonJsonLd'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import {
   CANONICAL_SITE_ORIGIN,
+  PERSON_JSON_LD,
   SITE_DEFAULT_DESCRIPTION,
   SITE_DEFAULT_TITLE,
 } from '@/utilities/siteMetadata'
@@ -94,8 +94,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
           <Footer data={footerData} />
         </Providers>
-        {/* Inject after mount to avoid false hydration mismatches from extensions mutating <script> tags. */}
-        <PersonJsonLd />
+        <script
+          id="person-jsonld-schema"
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_JSON_LD) }}
+        />
         {enableThirdPartyScripts ? (
           <AnalyticsScripts
             measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}

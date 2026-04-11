@@ -23,7 +23,8 @@ export async function Header({ data }: HeaderProps = {}) {
   }
 
   const headerList = await headers()
-  const initialPathname = headerList.get('x-pathname') ?? '/'
+  const rawPath = headerList.get('x-pathname')?.trim() || '/'
+  const initialPathname = rawPath.startsWith('/') ? rawPath.split('?')[0]!.split('#')[0]! : `/${rawPath}`
 
-  return <HeaderClient data={headerData} initialPathname={initialPathname} />
+  return <HeaderClient data={headerData} initialPathname={initialPathname || '/'} />
 }

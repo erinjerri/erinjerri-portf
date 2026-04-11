@@ -94,19 +94,30 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   )
 }
 
+function normalizePathnameInput(value: string | undefined): string {
+  if (value == null) return '/'
+  const trimmed = String(value).trim()
+  if (!trimmed) return '/'
+  const pathOnly = trimmed.split('?')[0]?.split('#')[0] ?? '/'
+  return pathOnly.startsWith('/') ? pathOnly : `/${pathOnly}`
+}
+
 /**
  * One stable subtree for SSR and hydration: same `HeaderBody` markup on server and client.
- * Pathname starts as `initialPathname` (from `x-pathname` header) then syncs from `usePathname`.
- * Scroll only toggles cosmetic classes on `<header>` — never swap layout components.
+ *
+ * Do not read `usePathname()` for rendered output until after mount. On the first client pass it can
+ * disagree with `initialPathname` from `headers()` (rewrites, timing, Flight), which flips
+ * `stripVisible` on `/` vs other routes and removes the curves layer — classic hydration mismatch.
+ * Same gate applies to scroll-driven classes so SSR (scrollY === 0) matches hydration.
  */
 export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathname }) => {
   const pathnameFromHook = usePathname()
-  const [pathname, setPathname] = useState(initialPathname)
+  const [clientReady, setClientReady] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  useEffect(() => {
-    setPathname(pathnameFromHook ?? initialPathname)
-  }, [pathnameFromHook, initialPathname])
+  const pathname = normalizePathnameInput(
+    clientReady ? (pathnameFromHook ?? initialPathname) : initialPathname,
+  )
 
   useEffect(() => {
     const handleScroll = () => {
@@ -115,11 +126,14 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathnam
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
+    setClientReady(true)
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
-  return <HeaderBody data={data} pathname={pathname} scrolled={scrolled} />
+  const scrolledForShell = clientReady ? scrolled : false
+
+  return <HeaderBody data={data} pathname={pathname} scrolled={scrolledForShell} />
 }
