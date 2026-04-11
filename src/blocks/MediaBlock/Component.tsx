@@ -239,24 +239,31 @@ export const MediaBlock: React.FC<Props> = (props) => {
             />
             Your browser does not support the video tag.
           </video>
-        )}
+      )}
       {!isAudio && !isVideo && !shouldRenderVideoURL && (selectedMedia || staticImage) && (
-        <MediaComponent
-          imgClassName={cn(
-            {
-              'border border-border rounded-[0.8rem]': !isFullWidthTransition,
-              'w-full object-cover': isFullWidthTransition,
-            },
-            imgClassName,
-          )}
-          resource={selectedMedia}
-          size={
+        <div
+          className={cn(
+            'relative w-full overflow-hidden',
             isFullWidthTransition
-              ? '100vw'
-              : '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px'
-          }
-          src={staticImage}
-        />
+              ? 'aspect-[16/9]'
+              : 'aspect-[4/3] sm:aspect-[16/10] lg:aspect-[3/2]',
+            !isFullWidthTransition && 'rounded-[1rem]',
+          )}
+        >
+          <MediaComponent
+            className="absolute inset-0"
+            fill
+            imgClassName={cn('h-full w-full object-cover object-center', imgClassName)}
+            pictureClassName="absolute inset-0"
+            resource={selectedMedia}
+            size={
+              isFullWidthTransition
+                ? '100vw'
+                : '(max-width: 640px) 100vw, (max-width: 1024px) 92vw, 1200px'
+            }
+            src={staticImage}
+          />
+        </div>
       )}
       {caption && (
         <div

@@ -19,14 +19,27 @@ type ArchiveFetchedDocs = {
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string
+    homepagePostsCap?: number
   }
 > = async (props) => {
-  const { categories, id, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
+  const {
+    categories,
+    id,
+    introContent,
+    limit: limitFromProps,
+    populateBy,
+    selectedDocs,
+    homepagePostsCap,
+  } = props
   const { isEnabled: isDraftMode } = await draftMode()
 
   const relationTo = (props.relationTo || 'posts') as CardRelationTo
-  const limit =
-    relationTo === 'watch'
+  const isHomePostsTeaser =
+    typeof homepagePostsCap === 'number' && homepagePostsCap > 0 && relationTo === 'posts'
+
+  const limit = isHomePostsTeaser
+    ? homepagePostsCap
+    : relationTo === 'watch'
       ? Math.max(limitFromProps ?? 100, 100)
       : relationTo === 'posts'
         ? Math.max(limitFromProps ?? 100, 100)
@@ -90,6 +103,10 @@ export const ArchiveBlock: React.FC<
     return dateB - dateA
   })
 
+  if (isHomePostsTeaser && typeof homepagePostsCap === 'number') {
+    docs = docs.slice(0, homepagePostsCap)
+  }
+
   const categoryMap = new Map<string, { id: string; slug?: string | null; title: string }>()
 
   for (const doc of docs) {
@@ -112,13 +129,38 @@ export const ArchiveBlock: React.FC<
   const filterCategories = Array.from(categoryMap.values())
 
   return (
-    <div className="my-20 md:my-24 lg:my-28" id={`block-${id}`}>
+    <div
+      className={
+        isHomePostsTeaser
+          ? 'my-24 md:my-32 lg:my-40 hp-archive-section'
+          : 'my-20 md:my-24 lg:my-28'
+      }
+      id={`block-${id}`}
+    >
       {introContent && (
         <div className="container mb-16">
-          <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
+          <RichText
+            className={
+              isHomePostsTeaser
+                ? 'ms-0 max-w-[48rem] hp-archive-intro'
+                : 'ms-0 max-w-[48rem]'
+            }
+            data={introContent}
+            enableGutter={false}
+          />
         </div>
       )}
-      {filterCategories.length > 0 ? (
+      {isHomePostsTeaser ? (
+        <>
+          <CollectionArchive
+            docs={docs}
+            prismaticCards
+            relationTo={relationTo}
+            viewAllHref="/posts"
+            viewAllLabel="View all posts"
+          />
+        </>
+      ) : filterCategories.length > 0 ? (
         <CategoryFilter categories={filterCategories} docs={docs} relationTo={relationTo} />
       ) : (
         <CollectionArchive docs={docs} relationTo={relationTo} />

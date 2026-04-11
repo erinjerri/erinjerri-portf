@@ -16,8 +16,9 @@ const heroes = {
   topline: ToplineHero,
 }
 
-export const RenderHero: React.FC<Page['hero']> = (props) => {
-  const { type } = props || {}
+export const RenderHero: React.FC<Page['hero'] & { visualVariant?: 'prismatic' }> = (props) => {
+  const { visualVariant, ...heroProps } = props
+  const { type } = heroProps || {}
   const heroType = type as string | undefined
 
   if (!heroType || heroType === 'none') return null
@@ -26,5 +27,10 @@ export const RenderHero: React.FC<Page['hero']> = (props) => {
 
   if (!HeroToRender) return null
 
-  return <HeroToRender {...props} />
+  return (
+    <HeroToRender
+      {...heroProps}
+      {...(heroType === 'highImpact' ? { visualVariant } : {})}
+    />
+  )
 }

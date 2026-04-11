@@ -3,11 +3,12 @@ import React from 'react'
 import type { Page } from '@/payload-types'
 
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
-import { HeaderThemeSetter } from '@/heros/HeaderThemeSetter'
 import { cn } from '@/utilities/ui'
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
+
+const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
 export const BackgroundCoverHero: React.FC<Page['hero']> = ({
   backgroundMedia,
@@ -18,11 +19,9 @@ export const BackgroundCoverHero: React.FC<Page['hero']> = ({
 
   return (
     <div
-      className="relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[58vh] w-full overflow-hidden text-white"
+      className="relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] md:min-h-[72vh] w-full overflow-hidden text-white"
       data-theme="dark"
     >
-      <HeaderThemeSetter theme="dark" />
-
       <div
         className="absolute inset-0 -z-10 bg-gradient-to-br from-[#000815] via-[#0c1633] to-[#020712]"
         aria-hidden
@@ -37,7 +36,7 @@ export const BackgroundCoverHero: React.FC<Page['hero']> = ({
             }
             fill
             className="absolute inset-0 h-full w-full"
-            imgClassName="object-cover object-center"
+            imgClassName={heroCoverImgClassName}
             pictureClassName="relative block h-full w-full"
             priority
             resource={backgroundImage}
@@ -46,30 +45,32 @@ export const BackgroundCoverHero: React.FC<Page['hero']> = ({
         </div>
       )}
 
-      <div className="relative z-10 mx-auto flex min-h-[58vh] max-w-[1200px] items-end px-4 py-16 md:py-20 xl:px-8">
-        <div className="max-w-[44rem]">
-          {richText && (
-            <RichText
-              className={cn(
-                'mb-6',
-                heroBioRichTextClassName,
-                '[&_.prose]:text-white [&_.prose_*]:text-white',
-              )}
-              data={richText}
-              enableGutter={false}
-            />
-          )}
-          {Array.isArray(links) && links.length > 0 && (
-            <ul className="flex flex-wrap gap-4">
-              {links.map(({ link }, i) => (
-                <li key={i}>
-                  <CMSLink {...link} />
-                </li>
-              ))}
-            </ul>
-          )}
+      {(richText || (Array.isArray(links) && links.length > 0)) && (
+        <div className="pointer-events-none absolute bottom-6 left-6 z-10 max-w-[400px] text-left md:bottom-8 md:left-8">
+          <div className="pointer-events-auto p-6 md:p-8">
+            {richText && (
+              <RichText
+                className={cn(
+                  'mb-6',
+                  heroBioRichTextClassName,
+                  '[&_.prose]:text-white [&_.prose_*]:text-white',
+                )}
+                data={richText}
+                enableGutter={false}
+              />
+            )}
+            {Array.isArray(links) && links.length > 0 && (
+              <ul className="m-0 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 p-0">
+                {links.map(({ link }, i) => (
+                  <li className="shrink-0" key={i}>
+                    <CMSLink {...link} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -24,11 +24,11 @@ export const ToplineHero: React.FC<Props> = ({ media, overlayTitle }) => {
             `${title} — Erin Jerri, AI and spatial computing`
           }
           fill={!isVideo}
-          imgClassName="h-full w-full object-cover"
+          imgClassName="h-full w-full object-cover object-[40%_20%]"
           pictureClassName="absolute inset-0"
           priority
           resource={media}
-          videoClassName="h-full w-full object-cover"
+          videoClassName="h-full w-full object-cover object-[40%_20%]"
         />
       </div>
       <div className="absolute inset-0 bg-background/70" />

@@ -30,9 +30,9 @@ export const LowImpactHero: React.FC<LowImpactHeroType> = ({ children, links, ri
             />
           ))}
         {Array.isArray(links) && links.length > 0 && (
-          <ul className="flex flex-wrap gap-4 mt-4">
+          <ul className="m-0 mt-4 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 p-0">
             {links.map(({ link }, i) => (
-              <li key={i}>
+              <li className="shrink-0" key={i}>
                 <CMSLink {...link} />
               </li>
             ))}

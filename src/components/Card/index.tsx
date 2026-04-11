@@ -60,9 +60,17 @@ export const Card: React.FC<{
   relationTo?: CardRelationTo
   showCategories?: boolean
   title?: string
+  variant?: 'default' | 'prismatic'
 }> = (props) => {
   const { card, link } = useClickableCard({})
-  const { className, doc, relationTo = 'posts', showCategories, title: titleFromProps } = props
+  const {
+    className,
+    doc,
+    relationTo = 'posts',
+    showCategories,
+    title: titleFromProps,
+    variant = 'default',
+  } = props
 
   const { slug, categories, meta, title, slides, videoUrl, videoSource, cardVideoLink, cardQALink } =
     doc || {}
@@ -125,14 +133,13 @@ export const Card: React.FC<{
         }
       : null
 
+  const surfaceClass =
+    variant === 'prismatic'
+      ? 'group rounded-2xl overflow-hidden border border-white/[0.12] bg-[linear-gradient(165deg,hsla(210,25%,98%,0.08),hsla(220,20%,12%,0.35))] backdrop-blur-xl shadow-[0_12px_40px_-12px_rgba(0,0,0,0.5)] transition-[border-color,box-shadow,transform] duration-300 hover:cursor-pointer hover:-translate-y-0.5 hover:border-[hsl(var(--hp-mint)/0.35)] hover:shadow-[0_20px_50px_-12px_hsl(var(--hp-mint)/0.2)]'
+      : 'group rounded-lg overflow-hidden border border-white/30 bg-[linear-gradient(180deg,rgba(186,230,253,0.24),rgba(56,189,248,0.12))] backdrop-blur-lg shadow-[0_10px_30px_rgba(8,47,73,0.28)] transition-colors hover:cursor-pointer hover:border-cyan-200/70'
+
   return (
-    <article
-      className={cn(
-        'group rounded-lg overflow-hidden border border-white/30 bg-[linear-gradient(180deg,rgba(186,230,253,0.24),rgba(56,189,248,0.12))] backdrop-blur-lg shadow-[0_10px_30px_rgba(8,47,73,0.28)] transition-colors hover:cursor-pointer hover:border-cyan-200/70',
-        className,
-      )}
-      ref={card.ref}
-    >
+    <article className={cn(surfaceClass, className)} ref={card.ref}>
       <div className="relative w-full">
         {!metaImage && <div className="">No image</div>}
         {metaImage && typeof metaImage !== 'string' && (

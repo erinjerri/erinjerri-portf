@@ -98,7 +98,7 @@ export const WatchVideoHero: React.FC<Props> = ({
                   'Erin Jerri — talk and video hero, AI and spatial computing'
                 }
                 fill
-                imgClassName="object-cover"
+                imgClassName="object-cover object-[40%_20%]"
                 priority
                 resource={heroImage!}
               />
@@ -168,7 +168,7 @@ export const WatchVideoHero: React.FC<Props> = ({
           'Erin Jerri — talk and video hero, AI and spatial computing'
         }
         fill
-        imgClassName="object-cover"
+        imgClassName="object-cover object-[40%_20%]"
         priority
         resource={heroImage!}
       />

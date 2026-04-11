@@ -43,9 +43,14 @@ export const MediumImpactHero: React.FC<Page['hero']> = ({
         )}
         {/* Links (Subscribe button) directly below image */}
         {hasLinks && (
-          <ul className={cn('flex flex-wrap justify-center gap-4', heroMedia ? 'mt-4 mb-6' : 'mb-6')}>
-            {links!.map(({ link }, i) => (
-              <li key={i}>
+          <ul
+            className={cn(
+              'm-0 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 self-start p-0',
+              heroMedia ? 'mt-4 mb-6' : 'mb-6',
+            )}
+          >
+            {links.map(({ link }, i) => (
+              <li className="shrink-0" key={i}>
                 <CMSLink {...link} />
               </li>
             ))}

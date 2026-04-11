@@ -55,9 +55,6 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Keep dev and prod artifacts isolated so switching between `next dev`,
-  // `next build`, and `next start` cannot leave stale manifests/chunks behind.
-  distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
   experimental: {
     // Next 15.4 expects serverActions under `experimental`.
     // Keep this high enough for Payload admin saves (rich text, uploads).
@@ -115,20 +112,6 @@ const nextConfig = {
       { hostname: 'substackcdn.com', protocol: 'https' },
       { hostname: 'bucketeer-*.amazonaws.com', protocol: 'https' },
     ],
-  },
-  webpack: (webpackConfig, { dev }) => {
-    // Memory cache in dev avoids ENOENT on manifests (Next.js 15 bug) and pack cache races in synced folders
-    if (dev) {
-      webpackConfig.cache = { type: 'memory' }
-    }
-    // Replace Next.js polyfills with empty module for modern browsers (saves ~11KB, improves Lighthouse)
-    webpackConfig.resolve.alias = {
-      ...webpackConfig.resolve.alias,
-      '../build/polyfills/polyfill-module': false,
-      'next/dist/build/polyfills/polyfill-module': false,
-    }
-
-    return webpackConfig
   },
   reactStrictMode: true,
   redirects,

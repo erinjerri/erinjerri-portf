@@ -7,7 +7,6 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import React from 'react'
-import PageClient from './page.client'
 import { canonicalUrlForPath, SITE_DEFAULT_DESCRIPTION } from '@/utilities/siteMetadata'
 
 const getCachedProjectsPage = unstable_cache(
@@ -62,7 +61,6 @@ export default async function Page() {
 
   return (
     <div className="pt-24 pb-24">
-      <PageClient />
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none">
           <h1>Projects</h1>

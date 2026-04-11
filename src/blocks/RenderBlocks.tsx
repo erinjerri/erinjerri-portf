@@ -306,11 +306,18 @@ export const RenderBlocks: React.FC<{
                 marginClass = sectionY
               }
 
+              const homepagePostsCap =
+                blockType === 'archive' && pageSlug === 'home' ? 3 : undefined
+
               return (
                 <div className={marginClass} key={index}>
                   {/* Block component expects its specific block type; block is a layout union */}
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  <Block {...(block as any)} disableInnerContainer />
+                  <Block
+                    {...(block as any)}
+                    {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
+                    disableInnerContainer
+                  />
                 </div>
               )
             }

@@ -1,5 +1,4 @@
 'use client'
-import { useHeaderTheme } from '@/providers/HeaderTheme'
 import { cn } from '@/utilities/ui'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -18,18 +17,20 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   /* Storing the value in a useState to avoid hydration errors */
   const [theme, setTheme] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
-  const { headerTheme, setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
 
   useEffect(() => {
-    setHeaderTheme(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname])
+    if (!pathname) return
 
-  useEffect(() => {
-    if (headerTheme && headerTheme !== theme) setTheme(headerTheme)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [headerTheme])
+    const isDarkHeaderPath =
+      pathname === '/' ||
+      pathname === '/watch' ||
+      /^\/posts\/[^/]+$/.test(pathname) ||
+      /^\/projects\/[^/]+$/.test(pathname) ||
+      /^\/watch\/[^/]+$/.test(pathname)
+
+    setTheme(isDarkHeaderPath ? 'dark' : 'light')
+  }, [pathname])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,8 +60,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
       {...(theme ? { 'data-theme': theme } : {})}
     >
       <div className="container">
-        <div className="relative flex h-16 items-center justify-center">
-          <Link href="/" className="absolute left-0 top-1/2 -translate-y-1/2 z-30">
+        <div className="relative grid h-16 grid-cols-[auto,minmax(0,1fr),auto] items-center gap-x-2 sm:gap-x-3 md:gap-x-4 lg:gap-x-6">
+          <Link href="/" className="relative z-30 col-start-1 shrink-0 justify-self-start">
             <Logo loading="eager" priority="high" />
           </Link>
           <HeaderNav data={data} scrolled={scrolled} theme={theme} />
