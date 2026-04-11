@@ -51,6 +51,13 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   />
 )
 
+type HeroSlotOpts = {
+  unoptimized?: boolean
+  /** First visible hero tile — LCP candidate (preload + eager decode). */
+  priority?: boolean
+  quality?: number
+}
+
 export const HighImpactHero: React.FC<HeroProps> = ({
   links,
   media,
@@ -119,13 +126,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           'Erin Jerri Apple Vision Pro spatial computing work'
         }
         imgClassName={cn(
-          'h-auto w-full object-cover object-[40%_20%]',
+          'h-auto w-full object-cover',
+          /* Softer top bias so the portrait does not visually crowd the sticky header */
+          isPrismatic ? 'object-[50%_32%]' : 'object-[40%_20%]',
           !isPrismatic && 'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
         )}
         pictureClassName="relative block w-full overflow-hidden"
         priority
+        quality={70}
         resource={media}
-        size="(max-width: 640px) 78vw, (max-width: 1280px) 36vw, 460px"
+        size="(max-width: 640px) 85vw, (max-width: 1024px) 40vw, 460px"
       />
     )
   }
@@ -134,9 +144,10 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     resource: MediaDoc | string | number | null | undefined,
     alt: string,
     size?: string,
-    unoptimized?: boolean,
+    opts?: HeroSlotOpts,
   ) => {
     if (isPopulated(resource)) {
+      const { unoptimized, priority: slotPriority, quality: slotQuality } = opts ?? {}
       return (
         <Media
           alt={
@@ -148,7 +159,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           htmlElement={null}
           imgClassName={heroCoverImgClassName}
           pictureClassName="relative block h-full w-full"
-          quality={100}
+          priority={slotPriority}
+          quality={slotQuality}
           {...(unoptimized ? { unoptimized: true } : {})}
           resource={resource}
           size={size}
@@ -188,9 +200,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             imgClassName={heroCoverImgClassName}
             pictureClassName="relative block h-full w-full"
             priority
-            quality={100}
+            quality={65}
             resource={backgroundImage}
-            size="(max-width: 768px) 100vw, (max-width: 1440px) 100vw, 1920px"
+            size="(max-width: 768px) 100vw, 1200px"
           />
         </div>
       )}
@@ -210,7 +222,14 @@ export const HighImpactHero: React.FC<HeroProps> = ({
       {!showGridLayout && hasPortrait ? (
         <>
           {isPrismatic ? (
-            <div className="relative z-10 mx-auto flex min-h-[62vh] w-full max-w-[96rem] flex-col justify-center gap-8 px-6 py-16 md:px-10 lg:px-12 xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-center xl:gap-12 xl:py-20">
+            <div
+              className={cn(
+                'relative z-10 mx-auto flex min-h-[62vh] w-full max-w-[96rem] flex-col justify-center gap-8 px-6 md:px-10 lg:px-12',
+                /* Clear sticky header (h-16): hero uses negative margin so extra top padding keeps portrait off the nav */
+                'pt-[calc(var(--nav-height)+2.25rem)] pb-16 md:pt-[calc(var(--nav-height)+3.25rem)]',
+                'xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-center xl:gap-12 xl:py-20 xl:pt-[calc(var(--nav-height)+2.75rem)]',
+              )}
+            >
               <div className="order-2 xl:order-1">
                 {renderHeroCopy('max-w-[min(calc(100vw-2.5rem),40rem)]')}
               </div>
@@ -242,7 +261,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : isPrismatic ? (
-        <div className="relative z-10 mx-auto flex w-full max-w-[96rem] flex-col items-stretch gap-12 px-6 pb-16 pt-20 md:px-10 lg:flex-row lg:items-center lg:gap-12 lg:pb-20 lg:pt-24 xl:gap-16">
+        <div className="relative z-10 mx-auto flex w-full max-w-[96rem] flex-col items-stretch gap-12 px-6 pb-16 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-12 lg:pb-20 lg:pt-[calc(var(--nav-height)+3.25rem)] xl:gap-16">
           <div className="min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
             {renderHeroCopy()}
           </div>
@@ -257,22 +276,24 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                 {renderHeroSlot(
                   heroImage1,
                   'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                  '(max-width: 1279px) min(100vw - 2rem, 28rem), min(50vw, 36rem)',
+                  '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px',
+                  { priority: true, quality: 65 },
                 )}
               </div>
               <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
                 {renderHeroSlot(
                   heroImage2,
                   'Erin Jerri — book and profile',
-                  '(max-width: 767px) min(50vw - 0.5rem, 18rem), (max-width: 1279px) min(50vw - 0.5rem, 20rem), min(25vw, 22rem)',
-                  true,
+                  '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
+                  { unoptimized: true, quality: 72 },
                 )}
               </div>
               <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
                 {renderHeroSlot(
                   heroImage3,
                   'Erin Jerri — engineering, AI systems, and spatial computing',
-                  '(max-width: 1279px) min(50vw - 0.5rem, 14rem), min(25vw, 18rem)',
+                  '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
+                  { quality: 72 },
                 )}
               </div>
             </div>
@@ -287,22 +308,24 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   {renderHeroSlot(
                     heroImage1,
                     'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                    '(max-width: 1279px) min(100vw - 2rem, 24rem), min(50vw, 32rem)',
+                    '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px',
+                    { priority: true, quality: 65 },
                   )}
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   {renderHeroSlot(
                     heroImage2,
                     'Erin Jerri Apple Vision Pro spatial computing work',
-                    '(max-width: 767px) min(50vw - 0.5rem, 16rem), (max-width: 1279px) min(50vw - 0.5rem, 18rem), min(25vw, 22rem)',
-                    true,
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
+                    { unoptimized: true, quality: 72 },
                   )}
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   {renderHeroSlot(
                     heroImage3,
                     'Erin Jerri — engineering, AI systems, and spatial computing',
-                    '(max-width: 1279px) min(50vw - 0.5rem, 12rem), min(25vw, 15rem)',
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
+                    { quality: 72 },
                   )}
                 </div>
               </div>

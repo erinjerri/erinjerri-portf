@@ -55,6 +55,14 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '../build/polyfills/polyfill-module': false,
+      'next/dist/build/polyfills/polyfill-module': false,
+    }
+    return config
+  },
   experimental: {
     // Next 15.4 expects serverActions under `experimental`.
     // Keep this high enough for Payload admin saves (rich text, uploads).

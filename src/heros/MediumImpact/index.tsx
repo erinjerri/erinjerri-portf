@@ -36,8 +36,9 @@ export const MediumImpactHero: React.FC<Page['hero'] & { pageSlug?: string }> = 
               imgClassName="h-auto w-full max-w-full"
               pictureClassName={cn('block w-full', isTimebite && 'bg-transparent')}
               priority
+              quality={70}
               resource={heroMedia}
-              size="(max-width: 640px) 100vw, (max-width: 1024px) 360px, (max-width: 1280px) 420px, 520px"
+              size="(max-width: 768px) min(92vw, 420px), (max-width: 1024px) 360px, 420px"
             />
             {heroMedia?.caption && (
               <div className="mt-3">

@@ -148,20 +148,20 @@ export async function Footer({ data }: FooterProps = {}) {
   const copyright = footerData?.copyright
 
   return (
-    <footer className="mt-auto border-t border-border bg-transparent text-foreground">
+    <footer className="mt-auto border-t border-border bg-transparent text-foreground [contain:layout]">
       <div className="container py-10">
         {/* Main footer content - two columns */}
-        <div className="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16">
+        <div className="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16 lg:items-start">
           {/* Left column: Logo, Subscribe, Slogan, Social */}
-          <div className="flex flex-col gap-6 lg:max-w-sm">
+          <div className="flex min-h-0 flex-col gap-6 lg:max-w-sm">
             <Link className="flex items-center" href="/">
               <Logo />
             </Link>
 
             {subscribeSection?.showSubscribe !== false && (
-              <SubscribeForm
-                action={substackEmbedSrc}
-              />
+              <div className="min-h-[3.25rem] w-full max-w-full">
+                <SubscribeForm action={substackEmbedSrc} />
+              </div>
             )}
 
             {subscribeSection?.slogan && (
@@ -188,9 +188,11 @@ export async function Footer({ data }: FooterProps = {}) {
           {linkGroups.length > 0 && (
             <nav className="flex flex-wrap gap-x-12 gap-y-8">
               {linkGroups.map((group, groupIndex) => (
-                <div key={group.id || groupIndex} className="flex flex-col gap-3">
+                <div key={group.id || groupIndex} className="flex min-h-0 flex-col gap-3">
                   {group.header && (
-                    <span className="font-semibold text-foreground">{group.header}</span>
+                    <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">
+                      {group.header}
+                    </span>
                   )}
                   <ul className="flex flex-col gap-2">
                     {group.links?.map((item, linkIndex) => {

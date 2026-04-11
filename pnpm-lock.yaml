@@ -18,12 +18,6 @@ importers:
       '@aws-sdk/client-s3':
         specifier: 3.717.0
         version: 3.717.0
-      '@fontsource/jost':
-        specifier: ^5.2.8
-        version: 5.2.8
-      '@fontsource/league-spartan':
-        specifier: ^5.2.8
-        version: 5.2.8
       '@netlify/functions':
         specifier: ^3.0.0
         version: 3.1.10(rollup@4.59.0)
@@ -1083,12 +1077,6 @@ packages:
 
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
-
-  '@fontsource/jost@5.2.8':
-    resolution: {integrity: sha512-PEK7oGJL8r+YZm6BriWhmCql9DhVYTMt0iEQbZHo8mqfIPIZo67Tm68xEIaRA0yB3wsHA7Tm66yMQDIxq3Bjqw==}
-
-  '@fontsource/league-spartan@5.2.8':
-    resolution: {integrity: sha512-83zacDd4BcvLwQ5JLjMg9s81MybTGKLsQJTihXSy4iQZEhMOofIvfhpe6udE7xk4l29NaQCK59DAzv1HfdIbLw==}
 
   '@formatjs/ecma402-abstract@2.3.6':
     resolution: {integrity: sha512-HJnTFeRM2kVFVr5gr5kH1XP6K0JcJtE7Lzvtr3FS/so5f1kpsqqqxy5JF+FRaO6H2qmcMfAUIox7AJteieRtVw==}
@@ -8237,10 +8225,6 @@ snapshots:
       tabbable: 6.4.0
 
   '@floating-ui/utils@0.2.11': {}
-
-  '@fontsource/jost@5.2.8': {}
-
-  '@fontsource/league-spartan@5.2.8': {}
 
   '@formatjs/ecma402-abstract@2.3.6':
     dependencies:

@@ -45,8 +45,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.717.0",
-    "@fontsource/jost": "^5.2.8",
-    "@fontsource/league-spartan": "^5.2.8",
     "@netlify/functions": "^3.0.0",
     "@payloadcms/admin-bar": "3.78.0",
     "@payloadcms/db-mongodb": "3.78.0",
