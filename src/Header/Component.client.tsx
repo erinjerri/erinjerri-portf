@@ -44,14 +44,17 @@ const DIMENSIONS_STRIP_SRC =
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
-  const stripVisible = !scrolled
+  const keepCurvesWhileSticky = pathname === '/'
+  const stripVisible = keepCurvesWhileSticky ? true : !scrolled
 
   return (
     <header
       className={cn(
         'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300',
         scrolled
-          ? 'bg-[#0a0b10] backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
+          ? keepCurvesWhileSticky
+            ? 'bg-transparent backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
+            : 'bg-[#0a0b10] backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
           : 'bg-transparent border-white/10 text-white',
       )}
       data-theme={theme}
@@ -62,7 +65,9 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
           className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage: [
-              'linear-gradient(180deg, rgba(5, 10, 22, 0.9) 0%, rgba(9, 17, 32, 0.82) 100%)',
+              scrolled
+                ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
+                : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
               `url(${DIMENSIONS_STRIP_SRC})`,
             ].join(', '),
             backgroundPosition: 'center',

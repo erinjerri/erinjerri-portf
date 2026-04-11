@@ -15,7 +15,7 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
   if (!covers?.length) return null
 
   return (
-    <div className="container my-16 md:my-20 lg:my-24">
+    <div className="container mt-12 mb-3 md:mt-16 md:mb-4 lg:mt-20 lg:mb-6">
       {heading ? (
         <h2 className="mb-3 text-center font-title text-display-h2 font-semibold tracking-tight md:text-display-h2-md">
           {heading}
@@ -50,10 +50,10 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
 
           return (
             <figure
-              className="mx-auto flex w-full max-w-[min(100%,22rem)] flex-col sm:max-w-none"
+              className="mx-auto flex w-full max-w-[min(100%,22rem)] flex-col gap-y-2 sm:max-w-none"
               key={i}
             >
-              <div className="w-full overflow-hidden rounded-none">
+              <div className="w-full min-h-0 overflow-hidden rounded-none">
                 <Media
                   alt={alt}
                   className="block w-full max-w-full"
@@ -65,14 +65,14 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
                 />
               </div>
               {showButton ? (
-                <div className="mt-1.5 w-full shrink-0">
+                <div className="flex w-full shrink-0 justify-center sm:justify-start">
                   <Button asChild variant="outline" className="w-full rounded-none sm:w-auto">
                     <Link href={btnUrl}>{btnLabel}</Link>
                   </Button>
                 </div>
               ) : null}
               {row.caption ? (
-                <figcaption className="mt-2 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground md:text-sm">
+                <figcaption className="text-center text-xs font-medium uppercase tracking-wider text-muted-foreground md:text-sm">
                   {row.caption}
                 </figcaption>
               ) : null}

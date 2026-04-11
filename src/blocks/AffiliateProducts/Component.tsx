@@ -137,8 +137,11 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
           const openInNewTab = product.openInNewTab ?? true
 
           return (
-            <article className="flex flex-col overflow-hidden rounded-none" key={String(product.id)}>
-              <div className="w-full shrink-0 overflow-hidden rounded-none">
+            <article
+              className="flex min-h-0 flex-col gap-y-2 overflow-hidden rounded-none"
+              key={String(product.id)}
+            >
+              <div className="w-full min-h-0 shrink-0 overflow-hidden rounded-none">
                 {product.image && typeof product.image !== 'string' ? (
                   <Media
                     alt={
@@ -161,7 +164,7 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
               </div>
 
               {href ? (
-                <div className="flex w-full shrink-0 px-3 pt-2">
+                <div className="flex w-full shrink-0 px-3">
                   <AffiliateLink
                     url={href}
                     product={product.title ?? product.brand ?? 'Unknown'}
@@ -174,15 +177,15 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
                 </div>
               ) : null}
 
-              <div className="flex flex-col px-3 pb-3 pt-2">
+              <div className="flex min-h-0 flex-col gap-y-1.5 px-3 pb-3">
                 {product.brand ? (
                   <div className="text-xs uppercase tracking-wide text-white/70">{product.brand}</div>
                 ) : null}
 
-                <h3 className="mt-0.5 text-lg font-semibold leading-snug">{product.title}</h3>
+                <h3 className="text-lg font-semibold leading-snug">{product.title}</h3>
 
                 {product.description ? (
-                  <p className="mt-1.5 text-sm leading-relaxed text-white/80">{product.description}</p>
+                  <p className="text-sm leading-relaxed text-white/80">{product.description}</p>
                 ) : null}
               </div>
             </article>

@@ -117,11 +117,22 @@ export const MediaBlock: React.FC<Props> = (props) => {
   if (isHeroOverlay && (selectedMedia || staticImage) && !isAudio && !isVideo) {
     const opacity = Math.max(0, Math.min(100, overlayOpacity ?? 60)) / 100
     const hasLinks = Array.isArray(links) && links.length > 0
+    const mediaAspect =
+      selectedMedia && typeof selectedMedia === 'object'
+        ? (() => {
+            const w = Number((selectedMedia as any).width)
+            const h = Number((selectedMedia as any).height)
+            return Number.isFinite(w) && Number.isFinite(h) && h > 0 ? w / h : null
+          })()
+        : null
+    // Portrait-ish media in a wide hero strip should be contained, otherwise it crops into a thin band.
+    const preferContain = typeof mediaAspect === 'number' ? mediaAspect < 1.25 : false
 
     return (
       <div
         className={cn(
           'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden',
+          preferContain && 'bg-black/20',
           isHighImpact
             ? 'h-[60vh] max-h-[70vh] md:h-[min(70vh,720px)]'
             : 'h-[40vh] max-h-[55vh] md:h-[min(50vh,640px)]',
@@ -131,7 +142,10 @@ export const MediaBlock: React.FC<Props> = (props) => {
         <div className="absolute inset-0">
           <MediaComponent
             fill
-            imgClassName="h-full w-full object-cover object-center"
+            imgClassName={cn(
+              'h-full w-full',
+              preferContain ? 'object-contain object-[50%_0%]' : 'object-cover object-center',
+            )}
             pictureClassName="absolute inset-0"
             priority
             resource={selectedMedia}

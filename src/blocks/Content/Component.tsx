@@ -65,11 +65,35 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     )
   }
 
+  const isLinkOnlyBlock =
+    Array.isArray(columns) &&
+    columns.length > 0 &&
+    columns.every((col) => {
+      const typedCol = col as ColumnWithFlexibleContent
+      const shouldRenderText = !typedCol.contentType || typedCol.contentType === 'text'
+      const shouldRenderMedia = typedCol.contentType === 'media' && Boolean(typedCol.media)
+      const hasRich = Boolean(
+        shouldRenderText && typedCol.richText && richTextHasContent(typedCol.richText),
+      )
+      const hasMed = Boolean(shouldRenderMedia && typedCol.media && typeof typedCol.media === 'object')
+      const hasLink =
+        Boolean(typedCol.enableLink && typedCol.link) &&
+        Boolean(
+          (typeof typedCol.link?.url === 'string' && typedCol.link.url.trim()) ||
+            (typeof typedCol.link?.label === 'string' && typedCol.link.label.trim()),
+        )
+      return hasLink && !hasRich && !hasMed
+    })
+
   return (
     <div
       className={cn(
         /* Tight top on contrast band avoids a “dead” strip of body background between hero and first section. */
-        isWhiteContrast ? 'mb-16 mt-0 md:mb-20' : 'my-16',
+        isWhiteContrast
+          ? 'mb-16 mt-0 md:mb-20'
+          : isLinkOnlyBlock
+            ? 'mt-0 mb-12 md:-mt-12 md:mb-14'
+            : 'my-16',
         {
           /* No border-y: twin horizontal rules read as an accidental “strip” on full-bleed bands. */
           'relative left-1/2 right-1/2 w-screen -translate-x-1/2 bg-gradient-to-b from-background via-background to-slate-950 py-10 text-foreground':
@@ -78,12 +102,19 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
       )}
     >
       <div
-        className={cn({
-          container: true,
-          'px-8 [&_a]:text-primary': isWhiteContrast,
-        })}
+        className={cn(
+          'container',
+          isWhiteContrast && 'px-8 [&_a]:text-primary',
+          // Link-only button rows should tuck up to adjacent media blocks.
+          isLinkOnlyBlock && 'py-0',
+        )}
       >
-        <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-16">
+        <div
+          className={cn(
+            'grid grid-cols-4 gap-x-16 lg:grid-cols-12',
+            isLinkOnlyBlock ? 'gap-y-4' : 'gap-y-8',
+          )}
+        >
           {columns &&
             columns.length > 0 &&
             columns.map((col, index) => {
@@ -100,6 +131,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                   (typeof link?.url === 'string' && link.url.trim()) ||
                     (typeof link?.label === 'string' && link.label.trim()),
                 )
+              const linkSpacingClass = !hasRich && !hasMed ? 'mt-0' : hasMed && !hasRich ? 'mt-3' : 'mt-6'
               const isFullBleedWhite =
                 columnStyle === 'whiteBgBlackText' &&
                 whiteStyleMode === 'fullBleed' &&
@@ -132,7 +164,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                           <CMSLink
                             {...link}
                             appearance={link?.appearance || 'default'}
-                            className="mt-6 inline-flex"
+                            className={cn('inline-flex', linkSpacingClass)}
                           />
                         )}
                       </div>
@@ -171,7 +203,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                         <CMSLink
                           {...link}
                           appearance={link?.appearance || 'default'}
-                          className="mt-6 inline-flex"
+                          className={cn('inline-flex', linkSpacingClass)}
                         />
                       )}
                     </div>

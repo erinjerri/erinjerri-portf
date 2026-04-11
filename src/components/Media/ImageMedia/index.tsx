@@ -116,6 +116,9 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     resource && typeof resource === 'object' && (resource.focalX != null || resource.focalY != null)
       ? `${resource.focalX ?? 50}% ${resource.focalY ?? 50}%`
       : undefined
+  // If callers explicitly request object-contain, let their CSS control object-position.
+  const containsObjectContain =
+    typeof imgClassName === 'string' && imgClassName.includes('object-contain')
 
   // `sizes` drives srcset width — keep mobile tight to avoid downloading desktop-sized assets.
   const sizes = sizeFromProps
@@ -143,7 +146,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         loading={loading}
         sizes={sizes}
         src={src}
-        style={fill && focalPoint ? { objectPosition: focalPoint } : undefined}
+        style={fill && focalPoint && !containsObjectContain ? { objectPosition: focalPoint } : undefined}
         width={!fill ? width : undefined}
       />
     </picture>

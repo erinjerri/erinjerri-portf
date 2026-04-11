@@ -97,6 +97,12 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
   const opacity = Math.max(0, Math.min(100, mediaBlock.overlayOpacity ?? 60)) / 100
   const overlayRichText = mediaBlock.overlayRichText
   const isHighImpact = mediaBlock.overlayVariant === 'highImpact'
+  const mediaAspect = (() => {
+    const w = Number((selectedMedia as any).width)
+    const h = Number((selectedMedia as any).height)
+    return Number.isFinite(w) && Number.isFinite(h) && h > 0 ? w / h : null
+  })()
+  const preferContain = typeof mediaAspect === 'number' ? mediaAspect < 1.25 : false
   const rootChildren = getLexicalRootChildren(overlayRichText)
   const hasOverlayRichText = rootChildren !== null && rootChildren.length > 0
 
@@ -111,6 +117,7 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
     <div
       className={cn(
         'relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden',
+        preferContain && 'bg-black/20',
         isHighImpact
           ? 'h-[60vh] max-h-[70vh] md:h-[min(70vh,720px)]'
           : 'h-[40vh] max-h-[55vh] md:h-[min(50vh,640px)]',
@@ -119,7 +126,10 @@ export const MediaWithOverlayLinksBlock: React.FC<Props> = ({ mediaBlock, linksB
       <div className="absolute inset-0">
         <MediaComponent
           fill
-          imgClassName="h-full w-full object-cover object-center"
+          imgClassName={cn(
+            'h-full w-full',
+            preferContain ? 'object-contain object-[50%_0%]' : 'object-cover object-center',
+          )}
           pictureClassName="absolute inset-0"
           priority
           resource={selectedMedia}

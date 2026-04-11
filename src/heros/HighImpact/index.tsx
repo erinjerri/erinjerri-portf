@@ -119,10 +119,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const renderPortrait = () => {
     if (!hasPortrait) return null
 
-    /* Prismatic home: fixed banner height so AVP portrait cannot run arbitrarily tall (premium editorial pacing). */
+    /* Prismatic home: bounded frame + object-contain so AVP art is not cropped on short 13" viewports (object-cover + fixed vh clipped heads/gear). */
     if (isPrismatic) {
       return (
-        <div className="relative mx-auto w-full max-w-[min(100%,440px)] overflow-hidden rounded-2xl shadow-[0_24px_70px_-28px_rgba(0,0,0,0.55)] h-[60vh] max-h-[70vh] md:h-[70vh] md:max-h-[min(70vh,720px)]">
+        <div
+          className={cn(
+            'relative mx-auto w-full max-w-[min(100%,440px)] overflow-hidden rounded-2xl bg-black/25 shadow-[0_24px_70px_-28px_rgba(0,0,0,0.55)]',
+            /* Explicit frame height + object-contain: avoids object-cover crop inside a vh-tall box on short 13" viewports */
+            'min-h-[200px] h-[min(64svh,680px)]',
+          )}
+        >
           <Media
             alt={
               (typeof media.alt === 'string' && media.alt.trim()) ||
@@ -130,7 +136,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             }
             fill
             className="absolute inset-0"
-            imgClassName="object-cover object-[50%_32%]"
+            imgClassName="object-contain object-center"
             pictureClassName="absolute inset-0 block h-full w-full"
             priority
             quality={70}

@@ -87,7 +87,8 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
   return (
     <Button asChild className={className} size={size} variant={buttonVariant}>
-      <Link className={cn(className)} href={href || url || ''} prefetch={prefetch} {...newTabProps}>
+      {/* Avoid duplicating className on both Button + Link (Radix Slot already applies it). */}
+      <Link href={href || url || ''} prefetch={prefetch} {...newTabProps}>
         {label && label}
         {children && children}
       </Link>
