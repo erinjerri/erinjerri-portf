@@ -9,10 +9,8 @@ const COVER_SIZES =
   '(max-width: 640px) min(88vw, 380px), (max-width: 1024px) min(42vw, 340px), min(30vw, 360px)'
 
 export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
-  const { heading, intro, covers, aspectRatio = '2:3' } = props
+  const { heading, intro, covers } = props
   if (!covers?.length) return null
-
-  const aspectClass = aspectRatio === '3:4' ? 'aspect-[3/4]' : 'aspect-[2/3]'
 
   return (
     <div className="container my-16 md:my-20 lg:my-24">
@@ -50,18 +48,15 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
               className="mx-auto flex w-full max-w-[min(100%,22rem)] flex-col sm:max-w-none"
               key={i}
             >
-              <div
-                className={cn('relative w-full overflow-hidden rounded-md bg-muted/15', aspectClass)}
-              >
+              <div className="w-full overflow-hidden rounded-md">
                 <Media
                   alt={alt}
-                  className="absolute inset-0 h-full w-full"
-                  imgClassName="object-contain object-center"
-                  pictureClassName="relative block h-full w-full"
+                  className="block w-full max-w-full"
+                  imgClassName="h-auto w-full max-w-full rounded-md"
+                  pictureClassName="block w-full"
                   quality={100}
                   resource={media}
                   size={COVER_SIZES}
-                  fill
                 />
               </div>
               {row.caption ? (

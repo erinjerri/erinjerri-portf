@@ -1,17 +1,17 @@
 import { unstable_cache } from 'next/cache'
-import { getPayloadClient } from './getPayloadClient'
+import { withPayloadClientRetry } from './getPayloadClient'
 
 export async function getRedirects(depth = 1) {
-  const payload = await getPayloadClient()
+  return withPayloadClientRetry(async (payload) => {
+    const { docs: redirects } = await payload.find({
+      collection: 'redirects',
+      depth,
+      limit: 0,
+      pagination: false,
+    })
 
-  const { docs: redirects } = await payload.find({
-    collection: 'redirects',
-    depth,
-    limit: 0,
-    pagination: false,
+    return redirects
   })
-
-  return redirects
 }
 
 /**

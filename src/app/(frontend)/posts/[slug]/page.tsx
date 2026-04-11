@@ -13,7 +13,7 @@ import type { Post } from '@/payload-types'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
-import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
@@ -25,17 +25,18 @@ export async function generateStaticParams() {
   }
 
   try {
-    const payload = await getPayloadClient()
-    const posts = await payload.find({
-      collection: 'posts',
-      draft: false,
-      limit: 1000,
-      overrideAccess: false,
-      pagination: false,
-      select: {
-        slug: true,
-      },
-    })
+    const posts = await withPayloadClientRetry((payload) =>
+      payload.find({
+        collection: 'posts',
+        draft: false,
+        limit: 1000,
+        overrideAccess: false,
+        pagination: false,
+        select: {
+          slug: true,
+        },
+      }),
+    )
 
     return posts.docs.map(({ slug }) => ({ slug }))
   } catch (err) {
@@ -144,57 +145,58 @@ const getPostBySlug = async (slug: string, draft: boolean) => {
   }
 
   if (draft) {
-    const payload = await getPayloadClient()
-    const result = await payload.find({
-      collection: 'posts',
-      draft: true,
-      depth: 2,
-      limit: 1,
-      pagination: false,
-      overrideAccess: true,
-      where: { slug: { equals: slug } },
-    })
-    if (result.docs?.[0]) return result.docs[0]
-
-    const fallback = await payload.find({
-      collection: 'posts',
-      draft: true,
-      depth: 2,
-      limit: 2,
-      pagination: false,
-      overrideAccess: true,
-      where: fallbackWhere,
-    })
-
-    return fallback.docs.length === 1 ? fallback.docs[0] : null
-  }
-
-  const getCached = unstable_cache(
-    async () => {
-      const payload = await getPayloadClient()
+    return withPayloadClientRetry(async (payload) => {
       const result = await payload.find({
         collection: 'posts',
-        draft: false,
+        draft: true,
         depth: 2,
         limit: 1,
         pagination: false,
-        overrideAccess: false,
+        overrideAccess: true,
         where: { slug: { equals: slug } },
       })
       if (result.docs?.[0]) return result.docs[0]
 
       const fallback = await payload.find({
         collection: 'posts',
-        draft: false,
+        draft: true,
         depth: 2,
         limit: 2,
         pagination: false,
-        overrideAccess: false,
+        overrideAccess: true,
         where: fallbackWhere,
       })
 
       return fallback.docs.length === 1 ? fallback.docs[0] : null
-    },
+    })
+  }
+
+  const getCached = unstable_cache(
+    async () =>
+      withPayloadClientRetry(async (payload) => {
+        const result = await payload.find({
+          collection: 'posts',
+          draft: false,
+          depth: 2,
+          limit: 1,
+          pagination: false,
+          overrideAccess: false,
+          where: { slug: { equals: slug } },
+        })
+        if (result.docs?.[0]) return result.docs[0]
+
+        const fallback = await payload.find({
+          collection: 'posts',
+          draft: false,
+          depth: 2,
+          limit: 2,
+          pagination: false,
+          overrideAccess: false,
+          where: fallbackWhere,
+        })
+
+        return fallback.docs.length === 1 ? fallback.docs[0] : null
+      }),
     ['post', slug],
     { revalidate: 60, tags: [`post_${slug}`] },
   )

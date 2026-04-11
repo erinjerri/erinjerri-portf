@@ -43,20 +43,19 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     }
   }
 
-  /** Without `fill`, next/image uses Payload width/height — wrong metadata makes covers postage-stamp sized. */
+  /** Natural aspect — no fixed-ratio box or tinted fill behind the image (avoids letterboxing). */
   const renderColumnMedia = (media: ColumnWithFlexibleContent['media'], columnSize: string | null | undefined) => {
     if (!media || typeof media !== 'object') return null
     const m = media as Media
     const alt = (typeof m.alt === 'string' && m.alt.trim()) || 'Image'
 
     return (
-      <div className="relative aspect-[2/3] w-full overflow-hidden rounded-md bg-black/10">
+      <div className="w-full overflow-hidden rounded-md">
         <MediaComponent
           alt={alt}
-          className="absolute inset-0 h-full w-full"
-          fill
-          imgClassName="object-contain object-center"
-          pictureClassName="relative block h-full w-full"
+          className="block w-full max-w-full"
+          imgClassName="h-auto w-full max-w-full rounded-md"
+          pictureClassName="block w-full"
           quality={100}
           resource={m}
           size={mediaSizesForColumn(columnSize)}

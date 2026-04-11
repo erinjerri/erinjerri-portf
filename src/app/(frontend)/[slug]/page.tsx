@@ -10,7 +10,7 @@ import { RenderHero } from '@/heros/RenderHero'
 import { resolveHeroMedia } from '@/heros/resolveHeroMedia'
 import { enhancePageForRoute } from '@/utilities/enhancePageForRoute'
 import { generateMeta } from '@/utilities/generateMeta'
-import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
@@ -18,17 +18,18 @@ import { cn } from '@/utilities/ui'
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayloadClient()
-    const pages = await payload.find({
-      collection: 'pages',
-      draft: false,
-      limit: 1000,
-      overrideAccess: false,
-      pagination: false,
-      select: {
-        slug: true,
-      },
-    })
+    const pages = await withPayloadClientRetry((payload) =>
+      payload.find({
+        collection: 'pages',
+        draft: false,
+        limit: 1000,
+        overrideAccess: false,
+        pagination: false,
+        select: {
+          slug: true,
+        },
+      }),
+    )
 
     return (
       pages.docs
@@ -116,7 +117,11 @@ export default async function Page({ params: paramsPromise }: Args) {
       >
         {draft && <LivePreviewListener />}
 
-        <RenderHero {...hero} visualVariant={isHomePrismatic ? 'prismatic' : undefined} />
+        <RenderHero
+          {...hero}
+          pageSlug={decodedSlug}
+          visualVariant={isHomePrismatic ? 'prismatic' : undefined}
+        />
         {(decodedSlug === 'timebite' || decodedSlug === 'timebite-download') && (
           <p className="container mt-8 max-w-[48rem] text-base leading-relaxed text-muted-foreground">
             TimeBite is an AI-powered productivity and spatial computing system designed for real-world
@@ -158,16 +163,17 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
 const getPageBySlug = async (slug: string, draft: boolean) => {
   if (draft) {
-    const payload = await getPayloadClient()
-    const result = await payload.find({
-      collection: 'pages',
-      depth: 3,
-      draft: true,
-      limit: 1,
-      pagination: false,
-      overrideAccess: true,
-      where: { slug: { equals: slug } },
-    })
+    const result = await withPayloadClientRetry((payload) =>
+      payload.find({
+        collection: 'pages',
+        depth: 3,
+        draft: true,
+        limit: 1,
+        pagination: false,
+        overrideAccess: true,
+        where: { slug: { equals: slug } },
+      }),
+    )
     return result.docs?.[0] ?? null
   }
 

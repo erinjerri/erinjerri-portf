@@ -111,7 +111,8 @@ export const hero: Field = {
       type: 'upload',
       admin: {
         condition: (_, { type } = {}) => type === 'highImpact',
-        description: 'Optional top image (wide) for the home hero.',
+        description:
+          'Home: wide top slot in the image collage (row above the two portrait slots). Use with Hero 2 & 3 for a balanced bento layout.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
       relationTo: 'media',
@@ -122,7 +123,7 @@ export const hero: Field = {
       type: 'upload',
       admin: {
         condition: (_, { type } = {}) => type === 'highImpact',
-        description: 'Optional bottom-left image for the home hero.',
+        description: 'Home: bottom-left portrait in the collage (e.g. book / headshot). Pairs with Hero 1 & 3.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
       relationTo: 'media',
@@ -133,7 +134,7 @@ export const hero: Field = {
       type: 'upload',
       admin: {
         condition: (_, { type } = {}) => type === 'highImpact',
-        description: 'Optional bottom-right image for the home hero.',
+        description: 'Home: bottom-right portrait in the collage (e.g. AVP / secondary). Pairs with Hero 1 & 2.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
       relationTo: 'media',

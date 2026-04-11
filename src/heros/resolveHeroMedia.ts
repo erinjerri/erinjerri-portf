@@ -1,6 +1,6 @@
 import type { Media, Page } from '@/payload-types'
 
-import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 
 type Hero = Page['hero']
 type HeroMediaField = Hero['backgroundMedia'] | Hero['heroImage1'] | Hero['heroImage2'] | Hero['heroImage3'] | Hero['media']
@@ -14,13 +14,14 @@ const resolveMedia = async (value: HeroMediaField): Promise<ResolvedHeroMediaFie
   if (typeof value !== 'string' && typeof value !== 'number') return value as ResolvedHeroMediaField
 
   try {
-    const payload = await getPayloadClient()
-    return await payload.findByID({
-      collection: 'media',
-      depth: 0,
-      id: String(value),
-      overrideAccess: false,
-    })
+    return await withPayloadClientRetry((payload) =>
+      payload.findByID({
+        collection: 'media',
+        depth: 0,
+        id: String(value),
+        overrideAccess: false,
+      }),
+    )
   } catch {
     return String(value)
   }
