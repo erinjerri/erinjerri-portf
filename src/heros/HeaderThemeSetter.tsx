@@ -1,16 +1,16 @@
 'use client'
 
-import { useHeaderTheme } from '@/providers/HeaderTheme'
+import { useTheme } from '@/providers/Theme'
 import { useEffect } from 'react'
 
 import type { Theme } from '@/providers/Theme/types'
 
 export function HeaderThemeSetter({ theme }: { theme: Theme | null }) {
-  const { setHeaderTheme } = useHeaderTheme()
+  const { setTheme } = useTheme()
 
   useEffect(() => {
-    setHeaderTheme(theme)
-  }, [setHeaderTheme, theme])
+    setTheme(theme)
+  }, [setTheme, theme])
 
   return null
 }
