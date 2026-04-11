@@ -82,7 +82,7 @@ export const PostHero: React.FC<{
             fill
             priority
             imgClassName="-z-10 object-cover object-[40%_20%]"
-            quality={100}
+            quality={72}
             resource={heroImage}
             size="(max-width: 768px) 100vw, (max-width: 1440px) 100vw, 1920px"
           />

@@ -99,14 +99,16 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const isPngSource = typeof src === 'string' && /\.png($|\?)/i.test(src)
   const disableOptimization = Boolean(unoptimizedFromProps) || isPngSource
 
-  const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
-  // Quality: must match next.config images.qualities [60,65,70,75,80,85,90,100]
+  const loading =
+    loadingFromProps ?? (priority ? 'eager' : 'lazy')
+  // Quality: must match next.config images.qualities — bias lower on mobile for bytes.
   const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90, 100] as const
   const rawQuality =
-    qualityFromProps ?? (fill && priority ? 100 : priority ? 100 : 85)
+    qualityFromProps ??
+    (fill && priority ? 65 : priority ? 70 : fill ? 70 : 75)
   const quality = ALLOWED_QUALITIES.includes(rawQuality as (typeof ALLOWED_QUALITIES)[number])
     ? rawQuality
-    : 85
+    : 70
 
   // Use Payload focal point for object-position when using fill (hero images).
   // Set focalX/focalY in Payload admin (Media → edit image → focal point) to keep faces visible on mobile.
@@ -115,13 +117,14 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
       ? `${resource.focalX ?? 50}% ${resource.focalY ?? 50}%`
       : undefined
 
-  // NOTE: sizes tells the browser display width so it picks the right srcset. Larger values = sharper on retina.
-  // Grid (3-col): 640px ensures ~2x for 33vw on 1440px. Full-width hero: 100vw.
+  // `sizes` drives srcset width — keep mobile tight to avoid downloading desktop-sized assets.
   const sizes = sizeFromProps
     ? sizeFromProps
-    : fill
-      ? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px'
-      : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px'
+    : fill && priority
+      ? '(max-width: 768px) 100vw, 1200px'
+      : fill
+        ? '(max-width: 768px) 92vw, (max-width: 1280px) 50vw, 720px'
+        : '(max-width: 640px) 92vw, (max-width: 1024px) 48vw, 560px'
 
   return (
     <picture className={cn(pictureClassName)}>

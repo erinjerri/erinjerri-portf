@@ -19,8 +19,10 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Footer as FooterType, Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
+import { frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
 import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/shared'
+import { cn } from '@/utilities/ui'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData: HeaderType | null = null
@@ -51,7 +53,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const themeBootstrapScript = `(function(){try{function gp(){var m=window.matchMedia("(prefers-color-scheme: dark)");return typeof m.matches==="boolean"?m.matches?"dark":"light":null}function ok(t){return t==="light"||t==="dark"}var d=${JSON.stringify(defaultTheme)},p=window.localStorage.getItem(${JSON.stringify(themeLocalStorageKey)});if(ok(p)){document.documentElement.setAttribute("data-theme",p)}else{var i=gp();document.documentElement.setAttribute("data-theme",i||d)}}catch(e){document.documentElement.setAttribute("data-theme",${JSON.stringify(defaultTheme)})}})();`
 
   return (
-    <html lang="en" suppressHydrationWarning data-theme={defaultTheme}>
+    <html
+      className={cn(frontendFontVariables)}
+      lang="en"
+      suppressHydrationWarning
+      data-theme={defaultTheme}
+    >
       <head>
         {/* eslint-disable-next-line react/no-danger -- sync data-theme before first paint */}
         <script
