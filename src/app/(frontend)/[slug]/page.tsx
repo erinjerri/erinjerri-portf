@@ -13,8 +13,24 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
+import { homeHireMeLayoutBlocks } from '@/endpoints/seed/home-hire-me-layout'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { cn } from '@/utilities/ui'
+import type { Page } from '@/payload-types'
+
+function withMissingHomeSignatureBlocks(layout: Page['layout'] | null | undefined): Page['layout'] {
+  const current = Array.isArray(layout) ? [...layout] : []
+  const requiredBlockTypes = new Set(['ribbonBlock', 'statsBlock', 'bioBlock'])
+  const existing = new Set(current.map((block) => block?.blockType).filter(Boolean))
+
+  for (const seededBlock of homeHireMeLayoutBlocks) {
+    if (requiredBlockTypes.has(seededBlock.blockType) && !existing.has(seededBlock.blockType)) {
+      current.push(seededBlock)
+    }
+  }
+
+  return current as Page['layout']
+}
 
 export async function generateStaticParams() {
   try {
@@ -108,6 +124,7 @@ export default async function Page({ params: paramsPromise }: Args) {
     : null
 
   const isHomePrismatic = decodedSlug === 'home'
+  const layoutToRender = isHomePrismatic ? withMissingHomeSignatureBlocks(layout) : layout
 
   return (
     <>
@@ -131,7 +148,7 @@ export default async function Page({ params: paramsPromise }: Args) {
           </p>
         )}
         <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
-        <RenderBlocks blocks={layout} pageSlug={decodedSlug} />
+        <RenderBlocks blocks={layoutToRender} pageSlug={decodedSlug} />
       </article>
     </>
   )

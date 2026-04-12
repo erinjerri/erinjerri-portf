@@ -27,6 +27,9 @@ import { BookCoverRowBlock } from '@/blocks/BookCoverRow/Component'
 import { HeroCredentialStripBlock } from '@/blocks/HeroCredentialStrip/Component'
 import { SignatureTalksBlock } from '@/blocks/SignatureTalks/Component'
 import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
+import { RibbonBlockBlock } from '@/blocks/RibbonBlock/Component'
+import { StatsBlockBlock } from '@/blocks/StatsBlock/Component'
+import { BioBlockBlock } from '@/blocks/BioBlock/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -46,6 +49,9 @@ const blockComponents = {
   heroCredentialStrip: HeroCredentialStripBlock,
   signatureTalks: SignatureTalksBlock,
   bookAcclaimStrip: BookAcclaimStripBlock,
+  ribbonBlock: RibbonBlockBlock,
+  statsBlock: StatsBlockBlock,
+  bioBlock: BioBlockBlock,
 }
 
 /** Layout block - element of page layout array */
@@ -281,7 +287,9 @@ export const RenderBlocks: React.FC<{
           }
 
           if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType as keyof typeof blockComponents]
+            const Block = blockComponents[
+              blockType as keyof typeof blockComponents
+            ] as React.ComponentType<Record<string, unknown>>
 
             if (typeof Block === 'function') {
               const prevBlock = blocksToRender[index - 1]
@@ -352,24 +360,22 @@ export const RenderBlocks: React.FC<{
                         : 'py-16 md:py-24'
                   : marginClass,
               )
+              const blockProps = block as Record<string, unknown>
 
               return (
                 <div className={sectionClassName} key={index}>
                   {isHomePage ? (
                     <div className="mx-auto max-w-7xl px-6 md:px-10">
-                      {/* Block component expects its specific block type; block is a layout union */}
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       <Block
-                        {...(block as any)}
+                        {...blockProps}
                         {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
                         disableInnerContainer
                       />
                     </div>
                   ) : (
                     <>
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       <Block
-                        {...(block as any)}
+                        {...blockProps}
                         {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
                         disableInnerContainer
                       />

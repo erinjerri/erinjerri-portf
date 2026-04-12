@@ -19,6 +19,9 @@ import { BookCoverRow } from '../../blocks/BookCoverRow/config'
 import { HeroCredentialStrip } from '../../blocks/HeroCredentialStrip/config'
 import { SignatureTalks } from '../../blocks/SignatureTalks/config'
 import { BookAcclaimStrip } from '../../blocks/BookAcclaimStrip/config'
+import { RibbonBlock } from '../../blocks/RibbonBlock/config'
+import { StatsBlock } from '../../blocks/StatsBlock/config'
+import { BioBlock } from '../../blocks/BioBlock/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -105,6 +108,9 @@ export const Pages: CollectionConfig<'pages'> = {
                 HeroCredentialStrip,
                 SignatureTalks,
                 BookAcclaimStrip,
+                RibbonBlock,
+                StatsBlock,
+                BioBlock,
               ],
               required: true,
               admin: {

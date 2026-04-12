@@ -360,6 +360,9 @@ export interface Page {
     | HeroCredentialStripBlock
     | SignatureTalksBlock
     | BookAcclaimStripBlock
+    | RibbonBlockBlock
+    | StatsBlockBlock
+    | BioBlockBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1600,6 +1603,83 @@ export interface BookAcclaimStripBlock {
   blockType: 'bookAcclaimStrip';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RibbonBlockBlock".
+ */
+export interface RibbonBlockBlock {
+  tagline?: string | null;
+  headline: string;
+  /**
+   * Optional exact phrase inside the headline to highlight in mint italic.
+   */
+  highlight?: string | null;
+  supportingText?: string | null;
+  columns?:
+    | {
+        number: string;
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ribbonBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlockBlock".
+ */
+export interface StatsBlockBlock {
+  eyebrow?: string | null;
+  items?:
+    | {
+        value: string;
+        label: string;
+        color?: ('mint' | 'teal' | 'pink' | 'white') | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statsBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BioBlockBlock".
+ */
+export interface BioBlockBlock {
+  eyebrow?: string | null;
+  headline: string;
+  paragraphs?:
+    | {
+        text: string;
+        /**
+         * Optional phrases to highlight inside the paragraph text.
+         */
+        highlights?:
+          | {
+              phrase: string;
+              color?: ('mint' | 'teal' | 'pink' | 'white') | null;
+              underline?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  pills?:
+    | {
+        label: string;
+        color?: ('mint' | 'teal' | 'pink' | 'white') | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'bioBlock';
+}
+/**
  * Normalized analytics metrics for dashboard widgets and conversion reporting.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1986,6 +2066,9 @@ export interface PagesSelect<T extends boolean = true> {
         heroCredentialStrip?: T | HeroCredentialStripBlockSelect<T>;
         signatureTalks?: T | SignatureTalksBlockSelect<T>;
         bookAcclaimStrip?: T | BookAcclaimStripBlockSelect<T>;
+        ribbonBlock?: T | RibbonBlockBlockSelect<T>;
+        statsBlock?: T | StatsBlockBlockSelect<T>;
+        bioBlock?: T | BioBlockBlockSelect<T>;
       };
   meta?:
     | T
@@ -2313,6 +2396,74 @@ export interface BookAcclaimStripBlockSelect<T extends boolean = true> {
         variant?: T;
         lead?: T;
         body?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RibbonBlockBlock_select".
+ */
+export interface RibbonBlockBlockSelect<T extends boolean = true> {
+  tagline?: T;
+  headline?: T;
+  highlight?: T;
+  supportingText?: T;
+  columns?:
+    | T
+    | {
+        number?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlockBlock_select".
+ */
+export interface StatsBlockBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  items?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        color?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BioBlockBlock_select".
+ */
+export interface BioBlockBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  headline?: T;
+  paragraphs?:
+    | T
+    | {
+        text?: T;
+        highlights?:
+          | T
+          | {
+              phrase?: T;
+              color?: T;
+              underline?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  pills?:
+    | T
+    | {
+        label?: T;
+        color?: T;
         id?: T;
       };
   id?: T;
