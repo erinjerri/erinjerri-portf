@@ -16,6 +16,15 @@ type CurveLayer = {
 
 type CurvePoint = { x: number; y: number }
 
+type GeometryLike = {
+  setAttribute: (name: string, attribute: unknown) => void
+}
+
+type PositionAttributeLike = {
+  array: Float32Array
+  needsUpdate: boolean
+}
+
 const LAYERS: CurveLayer[] = [
   {
     baseY: -0.18,
@@ -224,7 +233,7 @@ export function RibbonCurves() {
 
       const updateCurveGeometry = (
         points: CurvePoint[],
-        geometry: import('three').BufferGeometry,
+        geometry: GeometryLike,
         offsetY: number,
       ) => {
         const positions = new Float32Array(points.length * 3)
@@ -298,7 +307,7 @@ export function RibbonCurves() {
           )
         })
 
-        const positions = stars.geometry.getAttribute('position') as import('three').BufferAttribute
+        const positions = stars.geometry.getAttribute('position') as PositionAttributeLike
         if (leadCurvePoints.length > 0) {
           for (let index = 0; index < STAR_COUNT; index += 1) {
             const sampleIndex = Math.min(
