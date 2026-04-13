@@ -115,9 +115,9 @@ export default async function Page({ params: paramsPromise }: Args) {
     <>
       <article
         className={cn(
-          isHomePrismatic ? 'home-prismatic-scope pt-0 pb-0' : 'pt-16 pb-24',
+          isHomePrismatic ? 'theme-prismatic home-prismatic-scope pt-0 pb-0' : 'pt-16 pb-24',
+          decodedSlug === 'about' && 'about-prose-scope',
         )}
-        {...(isHomePrismatic ? { 'data-home-prismatic': '' } : {})}
       >
         {draft && <LivePreviewListener />}
 

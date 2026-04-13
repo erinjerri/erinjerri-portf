@@ -3,7 +3,7 @@ import type { BookAcclaimStripBlock as BookAcclaimStripBlockProps } from '@/payl
 import React from 'react'
 
 /**
- * Section title: near-black. `!` beats `[data-home-prismatic] h2` in globals (which forces light mist).
+ * Section title: near-black. `!` beats `.theme-prismatic h2` in globals (which forces light mist).
  */
 const sectionHeadingClass =
   'font-title text-4xl font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl'

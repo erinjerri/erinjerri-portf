@@ -89,14 +89,14 @@ export const BioBlockBlock: React.FC<BioBlockBlockProps> = ({
       ) : null}
 
       {headline?.trim() ? (
-        <h2 className="max-w-4xl font-title text-[2.35rem] font-semibold leading-[1.18] text-white md:text-[3.1rem]">
+        <h2 className="max-w-4xl font-title text-[2.35rem] font-normal leading-[1.18] text-white md:text-[3.1rem]">
           {headline.trim()}
         </h2>
       ) : null}
 
       <div className="mt-8 space-y-6 md:mt-9">
         {bioParagraphs.map((paragraph, index) => (
-          <p className="max-w-4xl text-[1.05rem] leading-8 text-white/50 md:text-[1.16rem] md:leading-9" key={paragraph.id ?? index}>
+          <p className="max-w-4xl text-[1.05rem] leading-8 text-white/75 md:text-[1.16rem] md:leading-9" key={paragraph.id ?? index}>
             {renderParagraph(paragraph.text?.trim() ?? '', paragraph.highlights)}
           </p>
         ))}

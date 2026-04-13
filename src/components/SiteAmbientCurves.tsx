@@ -1,13 +1,12 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import React, { useLayoutEffect, useState } from 'react'
+import type { ComponentType } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 
-/** Canvas chunk loads only when mounted; keeps initial JS + main thread free on mobile. */
-const RibbonCurvesLazy = dynamic(
-  () => import('@/blocks/RibbonBlock/Curves').then((mod) => mod.RibbonCurves),
-  { ssr: false },
-)
+type RibbonCurvesProps = { variant?: 'ambient' | 'full' }
+
+/** Loaded only after mount so the canvas chunk is not in the initial RSC client module graph. */
+type RibbonCurvesComponent = ComponentType<RibbonCurvesProps>
 
 /** Match Tailwind `md` and hero mobile CSS (viewport width). */
 const MOBILE_DEFER_CURVES_PX = 768
@@ -15,9 +14,13 @@ const MOBILE_DEFER_CURVES_PX = 768
 /**
  * Fixed canvas ribbon + stars behind the whole frontend.
  * Desktop: start immediately. Mobile: defer until idle (with timeout) or first scroll/touch/pointer.
+ *
+ * `RibbonCurves` is loaded via `import()` after the shell mounts so Flight/webpack do not need its
+ * factory during the first `react-server-dom-webpack` client module init (avoids `options.factory` / `.call` errors).
  */
 export function SiteAmbientCurves() {
   const [show, setShow] = useState(false)
+  const [RibbonCurves, setRibbonCurves] = useState<RibbonCurvesComponent | null>(null)
 
   useLayoutEffect(() => {
     let cancelled = false
@@ -73,12 +76,28 @@ export function SiteAmbientCurves() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!show) {
+      setRibbonCurves(null)
+      return
+    }
+
+    let cancelled = false
+    void import('@/blocks/RibbonBlock/Curves').then((mod) => {
+      if (!cancelled) setRibbonCurves(() => mod.RibbonCurves)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [show])
+
   return (
     <div
       className="site-ambient-curves pointer-events-none fixed inset-0 z-0 min-h-[100dvh] w-full"
       aria-hidden
     >
-      {show ? <RibbonCurvesLazy variant="ambient" /> : null}
+      {RibbonCurves ? <RibbonCurves variant="ambient" /> : null}
     </div>
   )
 }

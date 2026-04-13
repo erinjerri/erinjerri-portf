@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { SiteAmbientCurvesLoader } from '@/components/SiteAmbientCurvesLoader'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
@@ -19,10 +20,8 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Footer as FooterType, Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
-import { frontendFontVariables } from './fonts'
+import { fontJost, frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
-import { cn } from '@/utilities/ui'
-import { SiteAmbientCurves } from '@/components/SiteAmbientCurves'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData: HeaderType | null = null
@@ -68,7 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html
-      className={cn(frontendFontVariables)}
+      className={frontendFontVariables}
       lang="en"
       suppressHydrationWarning
       data-theme="dark"
@@ -96,12 +95,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </>
         ) : null}
       </head>
-      <body>
+      <body className={fontJost.className}>
         {enableThirdPartyScripts && gtmContainerId ? (
           <GoogleTagManagerNoScript containerId={gtmContainerId} />
         ) : null}
         <Providers>
-          <SiteAmbientCurves />
+          <SiteAmbientCurvesLoader />
           <AdminBar />
 
           <Header data={headerFailed ? undefined : headerData} />

@@ -15,6 +15,7 @@
     "dev:turbo": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbo",
     "dev:fast": "cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next dev",
     "dev:clean": "pnpm clean:next",
+    "dev:hard": "pnpm clean:next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:reset": "lsof -ti :3000 | xargs kill 2>/dev/null || true; pnpm dev",
     "dev:fresh": "pnpm clean:next && pnpm build && pnpm dev",
     "dev:prod": "pnpm clean:next && pnpm build && pnpm start",

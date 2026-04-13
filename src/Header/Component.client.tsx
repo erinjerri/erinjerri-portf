@@ -2,7 +2,7 @@
 import { cn } from '@/utilities/ui'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useLayoutEffect, useMemo, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
@@ -50,6 +50,7 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
 
   return (
     <header
+      suppressHydrationWarning
       className={cn(
         'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300',
         scrolled
@@ -106,35 +107,34 @@ function normalizePathnameInput(value: string | undefined): string {
 /**
  * One stable subtree for SSR and hydration: same `HeaderBody` markup on server and client.
  *
- * Do not read `usePathname()` for rendered output until after mount. On the first client pass it can
- * disagree with `initialPathname` from `headers()` (rewrites, timing, Flight), which flips pathname
- * and toggles the curves strip — classic hydration mismatch.
- * Same gate applies to scroll-driven classes so SSR (scrollY === 0) matches hydration.
+ * Do not read `usePathname()` for rendered output until `useLayoutEffect` sets `shellReady`.
+ * Same gate keeps scroll-driven classes off until after the first paint so SSR matches hydration.
  */
 export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathname }) => {
   const pathnameFromHook = usePathname()
-  const [clientReady, setClientReady] = useState(false)
+  /** Until true, match SSR: `usePathname()` / scroll can differ on the first client pass vs `headers()`. */
+  const [shellReady, setShellReady] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   const pathname = normalizePathnameInput(
-    clientReady ? (pathnameFromHook ?? initialPathname) : initialPathname,
+    shellReady ? (pathnameFromHook ?? initialPathname) : initialPathname,
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 80)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
-    setClientReady(true)
+    setShellReady(true)
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
-  const scrolledForShell = clientReady ? scrolled : false
+  const scrolledForShell = shellReady ? scrolled : false
 
   return <HeaderBody data={data} pathname={pathname} scrolled={scrolledForShell} />
 }
