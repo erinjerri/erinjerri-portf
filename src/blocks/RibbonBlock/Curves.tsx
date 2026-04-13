@@ -1,3 +1,7 @@
+/**
+ * Mobile perf: site “3D feel” is Canvas2D (not three.js). Throttled RAF, pauses when tab hidden /
+ * off-screen, lower DPR + point counts on small viewports for TBT. Full `variant` keeps richer motion.
+ */
 'use client'
 
 import React, { useEffect, useRef } from 'react'
@@ -81,7 +85,9 @@ const LAYERS: CurveLayer[] = [
 ]
 
 const CURVE_POINT_COUNT = 180
+const CURVE_POINT_COUNT_AMBIENT_MOBILE = 110
 const STAR_COUNT = 42
+const STAR_COUNT_AMBIENT_MOBILE = 22
 
 function buildCurvePoints(
   config: CurveLayer,
@@ -90,11 +96,13 @@ function buildCurvePoints(
   height: number,
   pointerX: number,
   pointerY: number,
+  pointCount: number = CURVE_POINT_COUNT,
 ): CurvePoint[] {
   const points: CurvePoint[] = []
+  const count = Math.max(32, Math.min(pointCount, 256))
 
-  for (let index = 0; index < CURVE_POINT_COUNT; index += 1) {
-    const t = index / (CURVE_POINT_COUNT - 1)
+  for (let index = 0; index < count; index += 1) {
+    const t = index / (count - 1)
     const x = t * width
     const diagonal = (t - 0.5) * config.slope
     const waveA = Math.sin(t * Math.PI * config.tensionA + time * config.speed + config.phase)
@@ -302,18 +310,22 @@ const MOBILE_TIME_SCALE = 0.8
 
 export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const wrapRef = useRef<HTMLDivElement | null>(null)
   const scrollYRef = useRef(0)
   const motionPrefsRef = useRef<MotionPrefs>({
     mobile: false,
     reduceMotion: false,
   })
+  const pageVisibleRef = useRef(true)
+  const inViewRef = useRef(true)
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    const maybeCtx = canvas.getContext('2d')
+    if (!maybeCtx) return
+    const ctx = maybeCtx
 
     let frame = 0
     let width = 0
@@ -329,34 +341,6 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
 
     const mMobile = window.matchMedia(MOBILE_MAX_WIDTH_MQ)
     const mReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const syncMotion = () => {
-      motionPrefsRef.current = {
-        mobile: mMobile.matches,
-        reduceMotion: mReduce.matches,
-      }
-    }
-    syncMotion()
-    mMobile.addEventListener('change', syncMotion)
-    mReduce.addEventListener('change', syncMotion)
-
-    const resize = () => {
-      const parent = canvas.parentElement
-      const nextWidth = parent?.clientWidth ?? window.innerWidth
-      const nextHeight = parent?.clientHeight ?? 520
-      const isMobileViewport = window.matchMedia(MOBILE_MAX_WIDTH_MQ).matches
-      const dpr = Math.min(window.devicePixelRatio || 1, isMobileViewport ? 1.5 : 2)
-
-      width = nextWidth
-      height = nextHeight
-
-      canvas.width = Math.round(nextWidth * dpr)
-      canvas.height = Math.round(nextHeight * dpr)
-      canvas.style.width = `${nextWidth}px`
-      canvas.style.height = `${nextHeight}px`
-
-      ctx.setTransform(1, 0, 0, 1, 0, 0)
-      ctx.scale(dpr, dpr)
-    }
 
     const handlePointerMove = (event: PointerEvent) => {
       const bounds = canvas.getBoundingClientRect()
@@ -371,23 +355,62 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       pointerTarget.y = 0
     }
 
-    resize()
-
-    /** Cap ~30fps on narrow viewports to reduce main-thread work (Lighthouse TBT). */
+    /** Site-wide ambient: 30fps cap always. Mobile `full` variant: 30fps; desktop `full`: ~60fps. */
     let lastFrameTimeMs = 0
-    const MOBILE_FRAME_INTERVAL_MS = 1000 / 30
+    const FRAME_MS_30 = 1000 / 30
+    const FRAME_MS_60 = 1000 / 60
 
-    const render = (now?: number) => {
+    function render(now?: number) {
       const ts = typeof now === 'number' ? now : performance.now()
       const { mobile, reduceMotion } = motionPrefsRef.current
-      if (mobile && !reduceMotion && ts - lastFrameTimeMs < MOBILE_FRAME_INTERVAL_MS * 0.92) {
+
+      if (!pageVisibleRef.current || !inViewRef.current) {
+        return
+      }
+
+      if (reduceMotion) {
+        lastFrameTimeMs = ts
+        const time = 0
+        pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
+        pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
+        const heroBlend =
+          variant === 'ambient'
+            ? Math.max(0, Math.min(1, 1 - scrollYRef.current / AMBIENT_SCROLL_BLEND_RANGE_PX))
+            : 1
+        const curveIntensity = variant === 'ambient' ? 0.18 + 0.82 * heroBlend : 1
+        drawBackground(ctx, width, height, time, pointerCurrent.x, pointerCurrent.y, variant, heroBlend)
+        const pointCap =
+          variant === 'ambient' && mobile ? CURVE_POINT_COUNT_AMBIENT_MOBILE : CURVE_POINT_COUNT
+        for (const [index, layer] of LAYERS.entries()) {
+          const points = buildCurvePoints(
+            layer,
+            time,
+            width,
+            height,
+            pointerCurrent.x,
+            pointerCurrent.y,
+            pointCap,
+          )
+          const drifted = points.map((point) => ({
+            x: point.x,
+            y: point.y + Math.sin(time * (0.38 + index * 0.06) + index) * (6 + index * 1.4),
+          }))
+          drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width, curveIntensity)
+        }
+        frame = 0
+        return
+      }
+
+      const frameCapMs =
+        variant === 'ambient' ? FRAME_MS_30 : mobile ? FRAME_MS_30 : FRAME_MS_60
+      if (ts - lastFrameTimeMs < frameCapMs * 0.92) {
         frame = window.requestAnimationFrame(render)
         return
       }
       lastFrameTimeMs = ts
 
       const rawT = ts / 1000
-      const time = reduceMotion ? 0 : mobile ? rawT * MOBILE_TIME_SCALE : rawT
+      const time = mobile ? rawT * MOBILE_TIME_SCALE : rawT
 
       pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
       pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
@@ -412,6 +435,9 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       )
 
       const leadCurves: CurvePoint[][] = []
+      const pointCap =
+        variant === 'ambient' && mobile ? CURVE_POINT_COUNT_AMBIENT_MOBILE : CURVE_POINT_COUNT
+      const starCap = variant === 'ambient' && mobile ? STAR_COUNT_AMBIENT_MOBILE : STAR_COUNT
 
       for (const [index, layer] of LAYERS.entries()) {
         const points = buildCurvePoints(
@@ -421,6 +447,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
           height,
           pointerCurrent.x,
           pointerCurrent.y,
+          pointCap,
         )
 
         const drifted = points.map((point) => ({
@@ -444,8 +471,8 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
 
       const guide = leadCurves[0] ?? []
       if (guide.length && starMul > 0.02) {
-        for (let index = 0; index < STAR_COUNT; index += 1) {
-          const t = (index + 1) / (STAR_COUNT + 1)
+        for (let index = 0; index < starCap; index += 1) {
+          const t = (index + 1) / (starCap + 1)
           const sampleIndex = Math.min(
             guide.length - 1,
             Math.max(0, Math.round(t * (guide.length - 1))),
@@ -467,6 +494,99 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       frame = window.requestAnimationFrame(render)
     }
 
+    const resize = () => {
+      const parent = canvas.parentElement
+      const nextWidth = parent?.clientWidth ?? window.innerWidth
+      const nextHeight = parent?.clientHeight ?? 520
+      const isMobileViewport = window.matchMedia(MOBILE_MAX_WIDTH_MQ).matches
+      const dprMax =
+        variant === 'ambient' && isMobileViewport ? 1 : isMobileViewport ? 1.5 : 2
+      const dpr = Math.min(window.devicePixelRatio || 1, dprMax)
+
+      width = nextWidth
+      height = nextHeight
+
+      canvas.width = Math.round(nextWidth * dpr)
+      canvas.height = Math.round(nextHeight * dpr)
+      canvas.style.width = `${nextWidth}px`
+      canvas.style.height = `${nextHeight}px`
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.scale(dpr, dpr)
+
+      if (motionPrefsRef.current.reduceMotion) {
+        window.requestAnimationFrame(() => render(performance.now()))
+      }
+    }
+
+    resize()
+
+    const syncMotion = () => {
+      motionPrefsRef.current = {
+        mobile: mMobile.matches,
+        reduceMotion: mReduce.matches,
+      }
+      const { reduceMotion } = motionPrefsRef.current
+      if (reduceMotion) {
+        if (frame) {
+          window.cancelAnimationFrame(frame)
+          frame = 0
+        }
+        window.requestAnimationFrame(() => {
+          render(performance.now())
+        })
+        return
+      }
+      if (pageVisibleRef.current && inViewRef.current && !frame) {
+        frame = window.requestAnimationFrame(render)
+      }
+    }
+    syncMotion()
+    mMobile.addEventListener('change', syncMotion)
+    mReduce.addEventListener('change', syncMotion)
+
+    const onVisibility = () => {
+      pageVisibleRef.current = document.visibilityState === 'visible'
+      if (!pageVisibleRef.current && frame) {
+        window.cancelAnimationFrame(frame)
+        frame = 0
+      } else if (
+        pageVisibleRef.current &&
+        inViewRef.current &&
+        !frame &&
+        !motionPrefsRef.current.reduceMotion
+      ) {
+        frame = window.requestAnimationFrame(render)
+      } else if (pageVisibleRef.current && motionPrefsRef.current.reduceMotion) {
+        window.requestAnimationFrame(() => render(performance.now()))
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    onVisibility()
+
+    let intersectionObserver: IntersectionObserver | undefined
+    const wrap = wrapRef.current
+    if (wrap && typeof IntersectionObserver !== 'undefined') {
+      intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          const hit = entries.some((e) => e.isIntersecting)
+          inViewRef.current = hit
+          if (!hit && frame) {
+            window.cancelAnimationFrame(frame)
+            frame = 0
+          } else if (hit && pageVisibleRef.current && !frame) {
+            if (motionPrefsRef.current.reduceMotion) {
+              window.requestAnimationFrame(() => render(performance.now()))
+            } else {
+              frame = window.requestAnimationFrame(render)
+            }
+          }
+        },
+        { threshold: 0, rootMargin: '0px' },
+      )
+      intersectionObserver.observe(wrap)
+    }
+
     const resizeObserver = new ResizeObserver(() => resize())
     const parent = canvas.parentElement
     if (parent) resizeObserver.observe(parent)
@@ -474,10 +594,10 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     canvas.addEventListener('pointermove', handlePointerMove)
     canvas.addEventListener('pointerleave', handlePointerLeave)
 
-    frame = window.requestAnimationFrame(render)
-
     return () => {
       window.cancelAnimationFrame(frame)
+      intersectionObserver?.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
       resizeObserver.disconnect()
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', syncScroll)
@@ -489,7 +609,10 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
   }, [variant])
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+    <div
+      ref={wrapRef}
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+    >
       <canvas
         className={
           variant === 'ambient'

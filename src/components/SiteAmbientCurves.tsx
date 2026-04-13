@@ -1,14 +1,14 @@
 'use client'
 
 import type { ComponentType } from 'react'
-import React, { useEffect, useLayoutEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 type RibbonCurvesProps = { variant?: 'ambient' | 'full' }
 
 /** Loaded only after mount so the canvas chunk is not in the initial RSC client module graph. */
 type RibbonCurvesComponent = ComponentType<RibbonCurvesProps>
 
-/** Match Tailwind `md` and hero mobile CSS (viewport width). */
+/** Viewport width: defer canvas until idle below this (aligns with `max-width: 768px` / `md`). */
 const MOBILE_DEFER_CURVES_PX = 768
 
 /**
@@ -22,7 +22,7 @@ export function SiteAmbientCurves() {
   const [show, setShow] = useState(false)
   const [RibbonCurves, setRibbonCurves] = useState<RibbonCurvesComponent | null>(null)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     let cancelled = false
     const start = () => {
       if (!cancelled) setShow(true)
@@ -30,7 +30,7 @@ export function SiteAmbientCurves() {
 
     if (typeof window === 'undefined') return
 
-    if (window.innerWidth > MOBILE_DEFER_CURVES_PX) {
+    if (window.innerWidth >= MOBILE_DEFER_CURVES_PX) {
       start()
       return () => {
         cancelled = true
@@ -50,9 +50,9 @@ export function SiteAmbientCurves() {
 
     const scheduleIdle = () => {
       if (typeof window.requestIdleCallback === 'function') {
-        idleHandle = window.requestIdleCallback(() => start(), { timeout: 2800 })
+        idleHandle = window.requestIdleCallback(() => start(), { timeout: 2000 })
       } else {
-        idleHandle = setTimeout(start, 1200)
+        idleHandle = setTimeout(() => start(), 2000)
       }
     }
 

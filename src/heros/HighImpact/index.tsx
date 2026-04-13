@@ -207,8 +207,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
       className={cn(
         /* No negative margin: sticky header (z-50) must sit above hero; content clears nav via padding below. */
         'relative mt-0 flex w-full flex-col overflow-hidden text-foreground',
-        /* Prismatic home: ~one viewport, vertically centered content, capped so zoom-out does not leave a huge void */
-        isPrismatic ? 'min-h-[clamp(480px,58vh,760px)]' : 'min-h-[60vh]',
+        /* CLS: reserve at least one viewport height before paint (Lighthouse); prismatic keeps flex centering inside. */
+        'min-h-[100dvh]',
         isPrismatic && 'hp-hero-root',
       )}
       data-high-impact-hero
