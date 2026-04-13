@@ -1,4 +1,5 @@
 import type { StatsBlockBlock as StatsBlockBlockProps } from '@/payload-types'
+import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 import React from 'react'
 
 const colorMap = {
@@ -39,12 +40,8 @@ export const StatsBlockBlock: React.FC<StatsBlockBlockProps> = ({ eyebrow, items
       </div>
 
       {/* Divider into next section — soft teal line + glow */}
-      <div
-        aria-hidden
-        className="relative mx-auto mt-12 max-w-4xl md:mt-14"
-      >
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-[#4fd4c4]/55 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 h-3 -translate-y-1/2 bg-[radial-gradient(ellipse_at_center,rgba(79,212,196,0.22)_0%,transparent_70%)] blur-sm" />
+      <div aria-hidden className="relative mx-auto mt-12 max-w-4xl md:mt-14">
+        <HomeTealSectionDivider />
       </div>
     </section>
   )

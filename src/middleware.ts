@@ -19,8 +19,9 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all pathnames except static assets and Next internals.
+     * Frontend-only matcher: skip Payload admin/API routes so auth/session
+     * request context is untouched for admin actions and Local API calls.
      */
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+    '/((?!api|admin|_next/static|_next/image|favicon.ico|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }

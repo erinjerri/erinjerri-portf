@@ -3,7 +3,7 @@
 import type { PayloadAdminBarProps } from '@payloadcms/admin-bar'
 import React from 'react'
 
-import './index.scss'
+// Avoid `@payloadcms/ui/scss` on the public site — it broke webpack client chunks (RSC).
 
 export const AdminBar: React.FC<{
   adminBarProps?: PayloadAdminBarProps

@@ -30,6 +30,7 @@ import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
 import { RibbonBlockBlock } from '@/blocks/RibbonBlock/Component'
 import { StatsBlockBlock } from '@/blocks/StatsBlock/Component'
 import { BioBlockBlock } from '@/blocks/BioBlock/Component'
+import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -115,6 +116,16 @@ function richTextHasContent(value: unknown): boolean {
   if (!root || !Array.isArray(root.children)) return false
 
   return root.children.some((child) => lexicalNodeHasContent(child))
+}
+
+/** Home layout: teal line between signature bands (same language as StatsBlock footer). */
+function showHomeTealDividerBetween(prevType: string | undefined, currentType: string | undefined) {
+  if (!prevType || !currentType) return false
+  return (
+    (prevType === 'bioBlock' && currentType === 'content') ||
+    (prevType === 'content' && currentType === 'brandLogos') ||
+    (prevType === 'brandLogos' && currentType === 'bookCoverRow')
+  )
 }
 
 function mediaBlockSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
@@ -363,10 +374,18 @@ export const RenderBlocks: React.FC<{
               )
               const blockProps = block as Record<string, unknown>
 
+              const showTealDivider =
+                isHomePage && showHomeTealDividerBetween(prevBlock?.blockType, blockType)
+
               return (
                 <div className={sectionClassName} key={index}>
                   {isHomePage ? (
                     <div className="mx-auto max-w-7xl px-6 md:px-10">
+                      {showTealDivider ? (
+                        <div className="mx-auto max-w-4xl pb-10 md:pb-12">
+                          <HomeTealSectionDivider />
+                        </div>
+                      ) : null}
                       <Block
                         {...blockProps}
                         {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}

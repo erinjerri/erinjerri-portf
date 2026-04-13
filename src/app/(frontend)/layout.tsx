@@ -22,10 +22,13 @@ import './globals.css'
 import { frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
 import { cn } from '@/utilities/ui'
+import { SiteAmbientCurves } from '@/components/SiteAmbientCurves'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData: HeaderType | null = null
   let footerData: FooterType | null = null
+  let headerFailed = false
+  let footerFailed = false
   const headerStartedAt = Date.now()
   const [headerResult, footerResult] = await Promise.allSettled([
     getCachedGlobal('header', 1)(),
@@ -35,12 +38,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   if (headerResult.status === 'fulfilled') {
     headerData = headerResult.value as HeaderType
   } else if (process.env.NODE_ENV === 'development') {
-    console.error('[Layout] Failed to fetch header:', headerResult.reason)
+    headerFailed = true
+    const reason =
+      headerResult.reason instanceof Error
+        ? `${headerResult.reason.name}: ${headerResult.reason.message}`
+        : String(headerResult.reason ?? 'unknown error')
+    console.warn('[Layout] Failed to fetch header:', reason)
   }
   if (footerResult.status === 'fulfilled') {
     footerData = footerResult.value as FooterType
   } else if (process.env.NODE_ENV === 'development') {
-    console.error('[Layout] Failed to fetch footer:', footerResult.reason)
+    footerFailed = true
+    const reason =
+      footerResult.reason instanceof Error
+        ? `${footerResult.reason.name}: ${footerResult.reason.message}`
+        : String(footerResult.reason ?? 'unknown error')
+    console.warn('[Layout] Failed to fetch footer:', reason)
   }
   if (process.env.NODE_ENV === 'development') {
     console.log(`[layout] header ${Date.now() - headerStartedAt}ms`)
@@ -88,11 +101,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <GoogleTagManagerNoScript containerId={gtmContainerId} />
         ) : null}
         <Providers>
+          <SiteAmbientCurves />
           <AdminBar />
 
-          <Header data={headerData} />
+          <Header data={headerFailed ? undefined : headerData} />
           {children}
-          <Footer data={footerData} />
+          <Footer data={footerFailed ? undefined : footerData} />
         </Providers>
         <script
           id="person-jsonld-schema"

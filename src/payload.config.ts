@@ -50,6 +50,24 @@ const allowedOrigins = Array.from(
             'http://localhost:3000',
             'http://127.0.0.1:3000',
             'http://[::1]:3000',
+            'http://localhost:3001',
+            'http://127.0.0.1:3001',
+            'http://[::1]:3001',
+            'http://localhost:3002',
+            'http://127.0.0.1:3002',
+            'http://[::1]:3002',
+            'http://localhost:3003',
+            'http://127.0.0.1:3003',
+            'http://[::1]:3003',
+            'http://localhost:3004',
+            'http://127.0.0.1:3004',
+            'http://[::1]:3004',
+            'http://localhost:3005',
+            'http://127.0.0.1:3005',
+            'http://[::1]:3005',
+            'http://localhost:3006',
+            'http://127.0.0.1:3006',
+            'http://[::1]:3006',
             ...(process.env.NEXT_PUBLIC_DEV_EXTRA_ORIGINS
               ? process.env.NEXT_PUBLIC_DEV_EXTRA_ORIGINS.split(',')
                   .map((o) => o.trim())
@@ -168,13 +186,19 @@ export default buildConfig({
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
-      beforeLogin: ['@/components/BeforeLogin'],
+      beforeLogin: ['@/components/BeforeLogin#default'],
       // The `BeforeDashboard` component renders the 'welcome' block and seed action.
-      beforeDashboard: ['@/components/BeforeDashboard', '@/components/LoadLexicalList'],
-      afterNavLinks: ['@/components/dashboard/AnalyticsNavLink#default'],
+      beforeDashboard: [
+        '@/components/BeforeDashboard#default',
+        '@/components/LoadLexicalList#default',
+      ],
+      afterNavLinks: [
+        '@/components/dashboard/AnalyticsNavLink#default',
+        '@/components/AdminLogoutNavLink#default',
+      ],
       graphics: {
-        Icon: '@/components/AdminGraphics/Icon',
-        Logo: '@/components/AdminGraphics/Logo',
+        Icon: '@/components/AdminGraphics/Icon#default',
+        Logo: '@/components/AdminGraphics/Logo#default',
       },
       views: {
         analyticsDashboard: {

@@ -28,7 +28,7 @@ const LAYERS: CurveLayer[] = [
     tensionB: 3.15,
     phase: 0.35,
     slope: 0.54,
-    width: 1.35,
+    width: 1.8,
   },
   {
     baseY: 0.48,
@@ -40,7 +40,7 @@ const LAYERS: CurveLayer[] = [
     tensionB: 2.72,
     phase: 1.55,
     slope: 0.46,
-    width: 1.15,
+    width: 1.5,
   },
   {
     baseY: 0.23,
@@ -52,7 +52,7 @@ const LAYERS: CurveLayer[] = [
     tensionB: 2.32,
     phase: 2.08,
     slope: 0.22,
-    width: 1,
+    width: 1.28,
   },
   {
     baseY: 0.62,
@@ -64,7 +64,7 @@ const LAYERS: CurveLayer[] = [
     tensionB: 2.44,
     phase: 0.88,
     slope: 0.17,
-    width: 0.9,
+    width: 1.1,
   },
   {
     baseY: 0.1,
@@ -76,12 +76,12 @@ const LAYERS: CurveLayer[] = [
     tensionB: 2.08,
     phase: 2.72,
     slope: 0.1,
-    width: 0.78,
+    width: 0.95,
   },
 ]
 
 const CURVE_POINT_COUNT = 180
-const STAR_COUNT = 30
+const STAR_COUNT = 42
 
 function buildCurvePoints(
   config: CurveLayer,
@@ -215,15 +215,20 @@ function drawBackground(
   time: number,
   pointerX: number,
   pointerY: number,
+  variant: 'full' | 'ambient',
 ) {
   ctx.clearRect(0, 0, width, height)
 
-  const baseGradient = ctx.createLinearGradient(0, 0, 0, height)
-  baseGradient.addColorStop(0, '#07101d')
-  baseGradient.addColorStop(0.42, '#060b13')
-  baseGradient.addColorStop(1, '#070910')
-  ctx.fillStyle = baseGradient
-  ctx.fillRect(0, 0, width, height)
+  if (variant === 'full') {
+    const baseGradient = ctx.createLinearGradient(0, 0, 0, height)
+    baseGradient.addColorStop(0, '#07101d')
+    baseGradient.addColorStop(0.42, '#060b13')
+    baseGradient.addColorStop(1, '#070910')
+    ctx.fillStyle = baseGradient
+    ctx.fillRect(0, 0, width, height)
+  }
+
+  const glowMul = variant === 'ambient' ? 1 : 1
 
   const leftGlow = ctx.createRadialGradient(
     width * (0.1 + pointerX * 0.02),
@@ -233,8 +238,8 @@ function drawBackground(
     height * 0.08,
     width * 0.46,
   )
-  leftGlow.addColorStop(0, 'rgba(110, 188, 255, 0.26)')
-  leftGlow.addColorStop(0.42, 'rgba(60, 120, 210, 0.14)')
+  leftGlow.addColorStop(0, `rgba(110, 188, 255, ${0.26 * glowMul})`)
+  leftGlow.addColorStop(0.42, `rgba(60, 120, 210, ${0.14 * glowMul})`)
   leftGlow.addColorStop(1, 'rgba(0,0,0,0)')
   ctx.fillStyle = leftGlow
   ctx.fillRect(0, 0, width, height)
@@ -247,8 +252,8 @@ function drawBackground(
     height * 0.92,
     width * 0.42,
   )
-  rightGlow.addColorStop(0, 'rgba(142, 116, 255, 0.18)')
-  rightGlow.addColorStop(0.4, 'rgba(94, 76, 180, 0.11)')
+  rightGlow.addColorStop(0, `rgba(142, 116, 255, ${0.18 * glowMul})`)
+  rightGlow.addColorStop(0.4, `rgba(94, 76, 180, ${0.11 * glowMul})`)
   rightGlow.addColorStop(1, 'rgba(0,0,0,0)')
   ctx.fillStyle = rightGlow
   ctx.fillRect(0, 0, width, height)
@@ -260,17 +265,23 @@ function drawBackground(
       Math.sin(time * 0.26) * 0.026 +
       pointerX * 0.012 +
       pointerY * 0.01)
+  const bandMul = variant === 'ambient' ? 1 : 1
   const ribbonGradient = ctx.createLinearGradient(0, ribbonY - 90, width, ribbonY + 90)
   ribbonGradient.addColorStop(0, 'rgba(120, 214, 255, 0)')
-  ribbonGradient.addColorStop(0.34, 'rgba(116, 215, 255, 0.14)')
-  ribbonGradient.addColorStop(0.55, 'rgba(218, 247, 255, 0.18)')
-  ribbonGradient.addColorStop(0.76, 'rgba(168, 154, 255, 0.12)')
+  ribbonGradient.addColorStop(0.34, `rgba(116, 215, 255, ${0.14 * bandMul})`)
+  ribbonGradient.addColorStop(0.55, `rgba(218, 247, 255, ${0.18 * bandMul})`)
+  ribbonGradient.addColorStop(0.76, `rgba(168, 154, 255, ${0.12 * bandMul})`)
   ribbonGradient.addColorStop(1, 'rgba(162, 132, 255, 0)')
   ctx.fillStyle = ribbonGradient
   ctx.fillRect(0, ribbonY - 120, width, 240)
 }
 
-export function RibbonCurves() {
+type RibbonCurvesProps = {
+  /** `ambient`: transparent base — for fixed site-wide layer over existing page bg. */
+  variant?: 'full' | 'ambient'
+}
+
+export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   useEffect(() => {
@@ -325,7 +336,7 @@ export function RibbonCurves() {
       pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
       pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
 
-      drawBackground(ctx, width, height, time, pointerCurrent.x, pointerCurrent.y)
+      drawBackground(ctx, width, height, time, pointerCurrent.x, pointerCurrent.y, variant)
 
       const leadCurves: CurvePoint[][] = []
 
@@ -344,7 +355,7 @@ export function RibbonCurves() {
           y: point.y + Math.sin(time * (0.38 + index * 0.06) + index) * (6 + index * 1.4),
         }))
 
-        if (index < 2) leadCurves.push(drifted)
+        if (index < 3) leadCurves.push(drifted)
         drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width)
       }
 
@@ -357,15 +368,15 @@ export function RibbonCurves() {
             Math.max(0, Math.round(t * (guide.length - 1))),
           )
           const point = guide[sampleIndex]!
-          const orbit = Math.sin(time * 0.8 + index * 0.6) * 8
+          const orbit = Math.sin(time * 0.8 + index * 0.6) * 10
           const color = index % 4 === 0 ? '#bfa7ff' : '#88e7ff'
           drawStar(
             ctx,
-            point.x + Math.sin(time * 0.4 + index) * 9,
-            point.y + orbit + (index % 2 === 0 ? 8 : -4),
-            index % 5 === 0 ? 1.9 : 1.4,
+            point.x + Math.sin(time * 0.4 + index) * 11,
+            point.y + orbit + (index % 2 === 0 ? 9 : -5),
+            index % 5 === 0 ? 2.4 : 1.8,
             color,
-            0.85,
+            0.95,
           )
         }
       }
@@ -389,12 +400,21 @@ export function RibbonCurves() {
       canvas.removeEventListener('pointermove', handlePointerMove)
       canvas.removeEventListener('pointerleave', handlePointerLeave)
     }
-  }, [])
+  }, [variant])
 
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-      <canvas className="pointer-events-auto block h-full w-full opacity-100" ref={canvasRef} />
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[#070910]/20 to-[#070910]" />
+      <canvas
+        className={
+          variant === 'ambient'
+            ? 'pointer-events-none block h-full w-full opacity-100'
+            : 'pointer-events-auto block h-full w-full opacity-100'
+        }
+        ref={canvasRef}
+      />
+      {variant === 'full' ? (
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[#070910]/20 to-[#070910]" />
+      ) : null}
     </div>
   )
 }

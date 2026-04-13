@@ -1,8 +1,6 @@
 import type { RibbonBlockBlock as RibbonBlockBlockProps } from '@/payload-types'
 import React from 'react'
 
-import { RibbonCurves } from './Curves'
-
 const defaultColumns = [
   {
     number: '01',
@@ -55,10 +53,9 @@ export const RibbonBlockBlock: React.FC<RibbonBlockBlockProps> = ({
     headline?.trim() || 'I focus on what happens after the model - when AI has to operate inside products, workflows, and environments.'
 
   return (
-    <section className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden bg-[#070910] text-white">
-      <RibbonCurves />
-
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(109,188,255,0.16),transparent_36%),radial-gradient(circle_at_82%_72%,rgba(150,126,255,0.12),transparent_30%),linear-gradient(180deg,rgba(8,10,16,0.62)_0%,rgba(7,9,14,0.9)_100%)]" />
+    <section className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden bg-transparent text-white">
+      {/* Curves + stars: `SiteAmbientCurves` in frontend layout (site-wide). */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(109,188,255,0.16),transparent_36%),radial-gradient(circle_at_82%_72%,rgba(150,126,255,0.12),transparent_30%),linear-gradient(180deg,rgba(8,10,16,0.72)_0%,rgba(7,9,14,0.94)_100%)]" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-7 pb-0 pt-14 md:px-12 md:pt-20">
         {tagline?.trim() ? (
