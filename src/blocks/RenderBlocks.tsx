@@ -349,6 +349,7 @@ export const RenderBlocks: React.FC<{
               const isStandaloneLinksBlock =
                 (blockType === 'cta' && ctaHasLinks(block)) ||
                 (blockType === 'content' && contentHasLinks(block))
+
               const sectionClassName = cn(
                 isHomePage
                   ? index === 0

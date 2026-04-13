@@ -392,7 +392,7 @@ export function RibbonCurves() {
   }, [])
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
       <canvas className="pointer-events-auto block h-full w-full opacity-100" ref={canvasRef} />
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[#070910]/20 to-[#070910]" />
     </div>
