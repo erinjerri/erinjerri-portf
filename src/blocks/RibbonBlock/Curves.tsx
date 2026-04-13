@@ -142,6 +142,8 @@ function drawGlowLine(
   color: string,
   opacity: number,
   width: number,
+  /** Scroll / readability: 0–1, scales all passes (ambient site-wide layer). */
+  intensityMul = 1,
 ) {
   ctx.save()
   ctx.globalCompositeOperation = 'lighter'
@@ -149,20 +151,21 @@ function drawGlowLine(
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
 
-  ctx.globalAlpha = opacity * 0.12
+  const m = intensityMul
+  ctx.globalAlpha = opacity * 0.12 * m
   ctx.lineWidth = width * 18
   ctx.shadowBlur = width * 34
   ctx.shadowColor = color
   traceCurve(ctx, points)
   ctx.stroke()
 
-  ctx.globalAlpha = opacity * 0.24
+  ctx.globalAlpha = opacity * 0.24 * m
   ctx.lineWidth = width * 8
   ctx.shadowBlur = width * 18
   traceCurve(ctx, points)
   ctx.stroke()
 
-  ctx.globalAlpha = opacity
+  ctx.globalAlpha = opacity * m
   ctx.lineWidth = width * 2.2
   ctx.shadowBlur = width * 8
   traceCurve(ctx, points)
@@ -208,6 +211,9 @@ function drawStar(
   ctx.restore()
 }
 
+/** After this many px scroll, ambient hero blend hits 0 (stars gone; curves/radials at floor). */
+const AMBIENT_SCROLL_BLEND_RANGE_PX = 400
+
 function drawBackground(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -216,6 +222,8 @@ function drawBackground(
   pointerX: number,
   pointerY: number,
   variant: 'full' | 'ambient',
+  /** 1 = top of page, 0 = scrolled — dims radials for `ambient` only. */
+  heroBlend: number,
 ) {
   ctx.clearRect(0, 0, width, height)
 
@@ -228,7 +236,8 @@ function drawBackground(
     ctx.fillRect(0, 0, width, height)
   }
 
-  const glowMul = variant === 'ambient' ? 1 : 1
+  const radialMul =
+    variant === 'ambient' ? (0.72 * heroBlend + 0.28) * 0.85 : 1
 
   const leftGlow = ctx.createRadialGradient(
     width * (0.1 + pointerX * 0.02),
@@ -238,8 +247,8 @@ function drawBackground(
     height * 0.08,
     width * 0.46,
   )
-  leftGlow.addColorStop(0, `rgba(110, 188, 255, ${0.26 * glowMul})`)
-  leftGlow.addColorStop(0.42, `rgba(60, 120, 210, ${0.14 * glowMul})`)
+  leftGlow.addColorStop(0, `rgba(110, 188, 255, ${0.26 * radialMul})`)
+  leftGlow.addColorStop(0.42, `rgba(60, 120, 210, ${0.14 * radialMul})`)
   leftGlow.addColorStop(1, 'rgba(0,0,0,0)')
   ctx.fillStyle = leftGlow
   ctx.fillRect(0, 0, width, height)
@@ -252,28 +261,31 @@ function drawBackground(
     height * 0.92,
     width * 0.42,
   )
-  rightGlow.addColorStop(0, `rgba(142, 116, 255, ${0.18 * glowMul})`)
-  rightGlow.addColorStop(0.4, `rgba(94, 76, 180, ${0.11 * glowMul})`)
+  rightGlow.addColorStop(0, `rgba(142, 116, 255, ${0.18 * radialMul})`)
+  rightGlow.addColorStop(0.4, `rgba(94, 76, 180, ${0.11 * radialMul})`)
   rightGlow.addColorStop(1, 'rgba(0,0,0,0)')
   ctx.fillStyle = rightGlow
   ctx.fillRect(0, 0, width, height)
 
-  const ribbonY =
-    height *
-    (0.22 +
-      0.26 * 0.5 +
-      Math.sin(time * 0.26) * 0.026 +
-      pointerX * 0.012 +
-      pointerY * 0.01)
-  const bandMul = variant === 'ambient' ? 1 : 1
-  const ribbonGradient = ctx.createLinearGradient(0, ribbonY - 90, width, ribbonY + 90)
-  ribbonGradient.addColorStop(0, 'rgba(120, 214, 255, 0)')
-  ribbonGradient.addColorStop(0.34, `rgba(116, 215, 255, ${0.14 * bandMul})`)
-  ribbonGradient.addColorStop(0.55, `rgba(218, 247, 255, ${0.18 * bandMul})`)
-  ribbonGradient.addColorStop(0.76, `rgba(168, 154, 255, ${0.12 * bandMul})`)
-  ribbonGradient.addColorStop(1, 'rgba(162, 132, 255, 0)')
-  ctx.fillStyle = ribbonGradient
-  ctx.fillRect(0, ribbonY - 120, width, 240)
+  // Traveling horizontal “band” — kept for `full` hero only; removed for site-wide `ambient`
+  // so it doesn’t read as a bright slab over body text while scrolling.
+  if (variant === 'full') {
+    const ribbonY =
+      height *
+      (0.22 +
+        0.26 * 0.5 +
+        Math.sin(time * 0.26) * 0.026 +
+        pointerX * 0.012 +
+        pointerY * 0.01)
+    const ribbonGradient = ctx.createLinearGradient(0, ribbonY - 90, width, ribbonY + 90)
+    ribbonGradient.addColorStop(0, 'rgba(120, 214, 255, 0)')
+    ribbonGradient.addColorStop(0.34, 'rgba(116, 215, 255, 0.14)')
+    ribbonGradient.addColorStop(0.55, 'rgba(218, 247, 255, 0.18)')
+    ribbonGradient.addColorStop(0.76, 'rgba(168, 154, 255, 0.12)')
+    ribbonGradient.addColorStop(1, 'rgba(162, 132, 255, 0)')
+    ctx.fillStyle = ribbonGradient
+    ctx.fillRect(0, ribbonY - 120, width, 240)
+  }
 }
 
 type RibbonCurvesProps = {
@@ -283,6 +295,7 @@ type RibbonCurvesProps = {
 
 export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const scrollYRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -296,6 +309,12 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     let height = 0
     const pointerTarget = { x: 0, y: 0 }
     const pointerCurrent = { x: 0, y: 0 }
+
+    const syncScroll = () => {
+      scrollYRef.current = window.scrollY
+    }
+    syncScroll()
+    window.addEventListener('scroll', syncScroll, { passive: true })
 
     const resize = () => {
       const parent = canvas.parentElement
@@ -336,7 +355,24 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
       pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
 
-      drawBackground(ctx, width, height, time, pointerCurrent.x, pointerCurrent.y, variant)
+      const heroBlend =
+        variant === 'ambient'
+          ? Math.max(0, Math.min(1, 1 - scrollYRef.current / AMBIENT_SCROLL_BLEND_RANGE_PX))
+          : 1
+
+      const curveIntensity =
+        variant === 'ambient' ? 0.18 + 0.82 * heroBlend : 1
+
+      drawBackground(
+        ctx,
+        width,
+        height,
+        time,
+        pointerCurrent.x,
+        pointerCurrent.y,
+        variant,
+        heroBlend,
+      )
 
       const leadCurves: CurvePoint[][] = []
 
@@ -356,11 +392,21 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
         }))
 
         if (index < 3) leadCurves.push(drifted)
-        drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width)
+        drawGlowLine(
+          ctx,
+          drifted,
+          layer.color,
+          layer.opacity,
+          layer.width,
+          curveIntensity,
+        )
       }
 
+      const starMul =
+        variant === 'ambient' ? Math.pow(heroBlend, 1.45) : 1
+
       const guide = leadCurves[0] ?? []
-      if (guide.length) {
+      if (guide.length && starMul > 0.02) {
         for (let index = 0; index < STAR_COUNT; index += 1) {
           const t = (index + 1) / (STAR_COUNT + 1)
           const sampleIndex = Math.min(
@@ -376,7 +422,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
             point.y + orbit + (index % 2 === 0 ? 9 : -5),
             index % 5 === 0 ? 2.4 : 1.8,
             color,
-            0.95,
+            0.95 * starMul,
           )
         }
       }
@@ -397,6 +443,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       window.cancelAnimationFrame(frame)
       resizeObserver.disconnect()
       window.removeEventListener('resize', resize)
+      window.removeEventListener('scroll', syncScroll)
       canvas.removeEventListener('pointermove', handlePointerMove)
       canvas.removeEventListener('pointerleave', handlePointerLeave)
     }
