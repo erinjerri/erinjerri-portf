@@ -78,7 +78,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockProps> = ({
   if (!headline?.trim() && !bioParagraphs.length && !bioPills.length) return null
 
   return (
-    <section className="rounded-[8px] border border-white/10 bg-[#0b0d11] px-8 py-10 text-white shadow-[0_28px_80px_-48px_rgba(0,0,0,0.8)] md:px-12 md:py-12">
+    <section className="bg-transparent px-8 py-10 text-white md:px-12 md:py-12">
       {eyebrow?.trim() ? (
         <div className="mb-10 flex items-center gap-4">
           <span className="text-[0.82rem] font-semibold uppercase tracking-[0.18em] text-white/28">
@@ -109,13 +109,9 @@ export const BioBlockBlock: React.FC<BioBlockBlockProps> = ({
 
             return (
               <span
-                className="inline-flex items-center rounded-[8px] border px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
+                className="inline-flex items-center rounded-full bg-white/[0.06] px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
                 key={pill.id ?? index}
-                style={{
-                  borderColor: color,
-                  color,
-                  backgroundColor: 'rgba(255,255,255,0.01)',
-                }}
+                style={{ color }}
               >
                 {pill.label?.trim()}
               </span>

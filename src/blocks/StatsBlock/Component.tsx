@@ -14,7 +14,7 @@ export const StatsBlockBlock: React.FC<StatsBlockBlockProps> = ({ eyebrow, items
   if (!statItems.length) return null
 
   return (
-    <section className="rounded-[8px] border border-white/10 bg-[#0b0d11] px-8 py-10 text-white shadow-[0_28px_80px_-48px_rgba(0,0,0,0.8)] md:px-12 md:py-12">
+    <section className="bg-transparent px-8 py-10 text-white md:px-12 md:py-12">
       {eyebrow?.trim() ? (
         <p className="mb-8 text-center text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-white/28">
           {eyebrow.trim()}
@@ -26,10 +26,7 @@ export const StatsBlockBlock: React.FC<StatsBlockBlockProps> = ({ eyebrow, items
           const color = colorMap[item.color ?? 'mint'] ?? colorMap.mint
 
           return (
-            <div
-              className="rounded-[8px] border border-white/10 bg-white/[0.02] px-6 py-7 text-center"
-              key={item.id ?? index}
-            >
+            <div className="px-6 py-7 text-center" key={item.id ?? index}>
               <div className={`font-title text-[3.25rem] font-semibold leading-none ${color} md:text-[3.9rem]`}>
                 {item.value?.trim()}
               </div>
@@ -39,6 +36,15 @@ export const StatsBlockBlock: React.FC<StatsBlockBlockProps> = ({ eyebrow, items
             </div>
           )
         })}
+      </div>
+
+      {/* Divider into next section — soft teal line + glow */}
+      <div
+        aria-hidden
+        className="relative mx-auto mt-12 max-w-4xl md:mt-14"
+      >
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-[#4fd4c4]/55 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 h-3 -translate-y-1/2 bg-[radial-gradient(ellipse_at_center,rgba(79,212,196,0.22)_0%,transparent_70%)] blur-sm" />
       </div>
     </section>
   )
