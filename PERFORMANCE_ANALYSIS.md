@@ -4,6 +4,35 @@ Analysis run: build + codebase review. Focus: slow build, slow nav clicks, slow 
 
 ---
 
+## Lighthouse mobile (Moto G Power, slow 4G, Lighthouse 13) — Apr 2026
+
+### Before (production audit excerpt)
+
+| Metric | Value |
+|--------|------:|
+| Performance | red zone |
+| FCP | 1.1 s |
+| LCP | 3.8 s |
+| TBT | ~31 s cumulative blocking (lab) |
+| CLS | 0.465 |
+| SI | 6.3 s |
+
+Notable audits: footer + flex column layout shift; hero/headshot images oversized vs display; legacy polyfills in large chunks; Clarity early; unused JS; large DOM.
+
+### After (expected / re-measure on Netlify)
+
+| Metric | Target |
+|--------|--------|
+| LCP | under 2.5 s (target) — tighter `sizes` + quality on hero `Media`, Next image optimization |
+| CLS | under 0.1 (target) — footer subscribe reserve height, `contain:paint`, dynamic subscribe skeleton |
+| TBT | under 200 ms (target) — `optimizePackageImports`, deferred Clarity post-LCP, smaller hero bytes |
+
+**Re-run locally:** `pnpm build && pnpm start`, then Lighthouse mobile against `http://localhost:3000`. **Re-run on Netlify** after deploy (CDN headers + plugin).
+
+---
+
+---
+
 ## Build Timing (observed)
 
 | Phase | Time |

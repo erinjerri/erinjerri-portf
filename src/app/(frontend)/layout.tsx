@@ -1,3 +1,7 @@
+/**
+ * Performance: avoid early preconnect to Clarity (loads after LCP via AnalyticsScripts) so DNS/TCP
+ * does not compete with hero assets on slow 4G.
+ */
 import type { Metadata } from 'next'
 
 import React from 'react'
@@ -87,12 +91,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ) : null}
         {enableThirdPartyScripts && gtmContainerId ? (
           <GoogleTagManagerHead containerId={gtmContainerId} />
-        ) : null}
-        {enableThirdPartyScripts && process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ? (
-          <>
-            <link rel="preconnect" href="https://www.clarity.ms" />
-            <link rel="dns-prefetch" href="https://scripts.clarity.ms" />
-          </>
         ) : null}
       </head>
       <body className={fontJost.className}>

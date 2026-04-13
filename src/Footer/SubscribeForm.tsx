@@ -1,3 +1,7 @@
+/**
+ * Performance: stable vertical space for the API form path reduces CLS when success/error
+ * messages replace or extend the email row (mobile Lighthouse).
+ */
 'use client'
 
 import { Button } from '@/components/ui/button'
@@ -64,7 +68,7 @@ export function SubscribeForm({ action, useApiForm = true }: SubscribeFormProps)
 
   if (!useApiForm) {
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex min-h-[148px] flex-col gap-3">
         <iframe
           src={action}
           title="Substack subscribe"
@@ -90,7 +94,7 @@ export function SubscribeForm({ action, useApiForm = true }: SubscribeFormProps)
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-h-[5.75rem] flex-col gap-3">
       {status === 'success' ? (
         <p className="text-sm text-muted-foreground">Thanks for subscribing!</p>
       ) : (

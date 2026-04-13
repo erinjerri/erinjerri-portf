@@ -1,3 +1,8 @@
+/**
+ * Performance: defer Substack subscribe client bundle (dynamic import) + reserve vertical space
+ * so the footer does not jump when the form mounts (CLS on mobile Lighthouse).
+ */
+import dynamic from 'next/dynamic'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { Facebook, Github, Linkedin, Mail, Youtube } from 'lucide-react'
@@ -10,8 +15,21 @@ import type { Footer, Media as MediaType } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
-import { SubscribeForm } from './SubscribeForm'
 import { SocialIconImage } from './SocialIconImage'
+
+const SubscribeFormClient = dynamic(
+  () => import('./SubscribeForm').then((m) => ({ default: m.SubscribeForm })),
+  {
+    loading: () => (
+      <div
+        className="flex min-h-[7rem] w-full max-w-xl flex-col justify-center gap-2"
+        aria-hidden
+      >
+        <div className="h-10 w-full rounded-md bg-muted/20" />
+      </div>
+    ),
+  },
+)
 
 const resolveFallbackSocialIcon = (
   label: string,
@@ -149,19 +167,19 @@ export async function Footer({ data }: FooterProps = {}) {
   const copyright = footerData?.copyright
 
   return (
-    <footer className="mt-auto border-t border-border bg-transparent text-foreground [contain:layout]">
+    <footer className="mt-auto border-t border-border bg-transparent text-foreground [contain:paint]">
       <div className="container py-10">
         {/* Main footer content - two columns */}
         <div className="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16 lg:items-start">
           {/* Left column: Logo, Subscribe, Slogan, Social */}
-          <div className="flex min-h-0 flex-col gap-6 lg:max-w-sm">
+          <div className="flex min-h-0 flex-col gap-6 lg:max-w-sm [contain:layout]">
             <Link className="flex items-center" href="/" prefetch={false}>
               <Logo />
             </Link>
 
             {subscribeSection?.showSubscribe !== false && (
-              <div className="min-h-[3.25rem] w-full max-w-full">
-                <SubscribeForm action={substackEmbedSrc} />
+              <div className="min-h-[7rem] w-full max-w-full">
+                <SubscribeFormClient action={substackEmbedSrc} />
               </div>
             )}
 
@@ -189,7 +207,10 @@ export async function Footer({ data }: FooterProps = {}) {
           {linkGroups.length > 0 && (
             <nav className="flex flex-wrap gap-x-12 gap-y-8">
               {linkGroups.map((group, groupIndex) => (
-                <div key={group.id || groupIndex} className="flex min-h-0 flex-col gap-3">
+                <div
+                  key={group.id || groupIndex}
+                  className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]"
+                >
                   {group.header && (
                     <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">
                       {group.header}

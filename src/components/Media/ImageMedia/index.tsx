@@ -1,3 +1,7 @@
+/**
+ * Performance: `sizes` caps mobile srcset width (LCP bytes); quality defaults favor mobile
+ * when `fill` + `priority` (hero / above-the-fold).
+ */
 'use client'
 
 import type { StaticImageData } from 'next/image'
@@ -8,10 +12,7 @@ import React, { useEffect, useState } from 'react'
 
 import type { Props as MediaProps } from '../types'
 
-import { cssVariables } from '@/cssVariables'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-
-const { breakpoints } = cssVariables
 
 // A base64 encoded image to use as a placeholder while the image is loading
 const placeholderBlur =
@@ -105,7 +106,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90, 100] as const
   const rawQuality =
     qualityFromProps ??
-    (fill && priority ? 65 : priority ? 70 : fill ? 70 : 75)
+    (fill && priority ? 60 : priority ? 70 : fill ? 70 : 75)
   const quality = ALLOWED_QUALITIES.includes(rawQuality as (typeof ALLOWED_QUALITIES)[number])
     ? rawQuality
     : 70
@@ -124,10 +125,10 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const sizes = sizeFromProps
     ? sizeFromProps
     : fill && priority
-      ? '(max-width: 768px) 100vw, 1200px'
+      ? '(max-width: 768px) min(100vw, 420px), (max-width: 1280px) 50vw, 960px'
       : fill
-        ? '(max-width: 768px) 92vw, (max-width: 1280px) 50vw, 720px'
-        : '(max-width: 640px) 92vw, (max-width: 1024px) 48vw, 560px'
+        ? '(max-width: 768px) min(100vw, 420px), (max-width: 1280px) 50vw, 720px'
+        : '(max-width: 640px) min(100vw, 400px), (max-width: 1024px) 48vw, 560px'
 
   return (
     <picture className={cn(pictureClassName)}>

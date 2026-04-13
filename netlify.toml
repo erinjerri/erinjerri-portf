@@ -1,3 +1,4 @@
+# Netlify: long-cache immutable assets + SWR for /media to cut repeat bytes (mobile Lighthouse).
 [build]
   command = "pnpm run build:netlify"
 
@@ -17,6 +18,18 @@
 
 [[headers]]
   for = "/_next/image/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Public media (when served from the site origin) — long cache, SWR for updates.
+[[headers]]
+  for = "/media/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+
+# Next font / static media chunks (defensive; often covered by /_next/static/*).
+[[headers]]
+  for = "/_next/static/media/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 

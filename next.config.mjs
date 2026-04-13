@@ -1,3 +1,9 @@
+/**
+ * Performance (mobile Lighthouse / Netlify):
+ * - `optimizePackageImports` tree-shakes heavy icon/UI packages.
+ * - `removeConsole` trims prod client bundles.
+ * - Image `qualities` + `deviceSizes` keep LCP payloads small on narrow viewports.
+ */
 import { withPayload } from '@payloadcms/next/withPayload'
 import bundleAnalyzer from '@next/bundle-analyzer'
 
@@ -55,6 +61,9 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   experimental: {
     // Next 15.4 expects serverActions under `experimental`.
     // Keep this high enough for Payload admin saves (rich text, uploads).
@@ -63,6 +72,14 @@ const nextConfig = {
     },
     // Inline critical CSS in prod only; skip in dev to speed up compilation.
     inlineCss: process.env.NODE_ENV !== 'development',
+    // Smaller client chunks for barrel-heavy packages (TBT / main-thread).
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-select',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-label',
+      'recharts',
+    ],
   },
   images: {
     // Make sure image optimization stays enabled (some wrappers/platform presets toggle this).

@@ -1,3 +1,7 @@
+/**
+ * Performance: `display: "swap"` + `adjustFontFallback` limit FOIT/CLS; subset + weight list
+ * trims bytes vs loading full variable axes.
+ */
 import { Jost, League_Spartan } from 'next/font/google'
 
 /**

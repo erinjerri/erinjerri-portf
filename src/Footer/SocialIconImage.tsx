@@ -1,3 +1,6 @@
+/**
+ * Performance: fixed width/height + explicit `sizes` avoids layout recalc when icons decode.
+ */
 'use client'
 
 import Image from 'next/image'
@@ -31,6 +34,7 @@ export function SocialIconImage({
       className={className}
       width={20}
       height={20}
+      sizes="20px"
       onError={() => setError(true)}
       unoptimized
     />

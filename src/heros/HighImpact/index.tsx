@@ -1,3 +1,6 @@
+/**
+ * Performance: hero `Media` `size` + quality props cap LCP decode/transfer on mobile viewports.
+ */
 import React from 'react'
 
 import type { Media as MediaDoc, Page } from '@/payload-types'
@@ -143,7 +146,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             priority
             quality={60}
             resource={media}
-            size="(max-width: 768px) min(100vw, 440px), (max-width: 1024px) 40vw, 440px"
+            size="(max-width: 768px) min(100vw, 400px), (max-width: 1024px) 38vw, 420px"
           />
         </div>
       )
@@ -163,7 +166,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         priority
         quality={60}
         resource={media}
-        size="(max-width: 768px) min(100vw, 460px), (max-width: 1024px) 40vw, 460px"
+        size="(max-width: 768px) min(100vw, 400px), (max-width: 1024px) 38vw, 440px"
       />
     )
   }
@@ -232,9 +235,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             imgClassName={heroCoverImgClassName}
             pictureClassName="relative block h-full w-full"
             priority
-            quality={65}
+            quality={60}
             resource={backgroundImage}
-            size="(max-width: 768px) 100vw, 1200px"
+            size="(max-width: 768px) min(100vw, 768px), (max-width: 1536px) 90vw, 1200px"
           />
         </div>
       )}

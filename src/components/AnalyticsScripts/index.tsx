@@ -1,3 +1,7 @@
+/**
+ * Performance: Clarity defers until after first LCP paint (or 12s safety) so it does not compete
+ * with hero assets on slow 4G (Lighthouse TBT / network). GA stays lazyOnload.
+ */
 'use client'
 
 import Script from 'next/script'
@@ -8,19 +12,21 @@ type Props = {
   clarityProjectId?: string | null
 }
 
-/**
- * GA stays on lazyOnload. Clarity is deferred until idle (or 6s cap) so it does not compete
- * with LCP / main-thread during the critical window.
- */
 export const AnalyticsScripts: React.FC<Props> = ({ measurementId, clarityProjectId }) => {
   const clarityInjected = useRef(false)
 
   useEffect(() => {
     if (!clarityProjectId || clarityInjected.current) return
-    if (typeof document === 'undefined') return
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
+
+    let cancelled = false
+    let fallbackTimer: ReturnType<typeof globalThis.setTimeout> | undefined
+    let lcpInjectTimer: ReturnType<typeof globalThis.setTimeout> | undefined
+    let lcpObserver: PerformanceObserver | undefined
 
     const inject = () => {
-      if (clarityInjected.current || document.getElementById('microsoft-clarity')) return
+      if (cancelled || clarityInjected.current || document.getElementById('microsoft-clarity'))
+        return
       clarityInjected.current = true
       const s = document.createElement('script')
       s.id = 'microsoft-clarity'
@@ -33,20 +39,42 @@ export const AnalyticsScripts: React.FC<Props> = ({ measurementId, clarityProjec
       document.head.appendChild(s)
     }
 
-    let idleId: number | undefined
-    let timeoutId: ReturnType<typeof setTimeout> | undefined
+    const arm = () => {
+      fallbackTimer = globalThis.setTimeout(() => {
+        lcpObserver?.disconnect()
+        if (lcpInjectTimer) clearTimeout(lcpInjectTimer)
+        if ('requestIdleCallback' in globalThis) {
+          globalThis.requestIdleCallback(() => inject(), { timeout: 4000 })
+        } else {
+          globalThis.setTimeout(inject, 0)
+        }
+      }, 12000)
 
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      idleId = window.requestIdleCallback(() => inject(), { timeout: 6000 })
-    } else {
-      timeoutId = setTimeout(inject, 4500)
+      try {
+        lcpObserver = new PerformanceObserver((list) => {
+          if (list.getEntries().length === 0) return
+          lcpObserver?.disconnect()
+          if (fallbackTimer) clearTimeout(fallbackTimer)
+          lcpInjectTimer = globalThis.setTimeout(inject, 900)
+        })
+        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true })
+      } catch {
+        if (fallbackTimer) clearTimeout(fallbackTimer)
+        if ('requestIdleCallback' in globalThis) {
+          globalThis.requestIdleCallback(() => inject(), { timeout: 14000 })
+        } else {
+          globalThis.setTimeout(inject, 8000)
+        }
+      }
     }
 
+    arm()
+
     return () => {
-      if (idleId !== undefined && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
-        window.cancelIdleCallback(idleId)
-      }
-      if (timeoutId !== undefined) clearTimeout(timeoutId)
+      cancelled = true
+      lcpObserver?.disconnect()
+      if (fallbackTimer) clearTimeout(fallbackTimer)
+      if (lcpInjectTimer) clearTimeout(lcpInjectTimer)
     }
   }, [clarityProjectId])
 
