@@ -3,6 +3,11 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import type { GetObjectCommandOutput } from '@aws-sdk/client-s3'
 import path from 'path'
 import { readFile } from 'fs/promises'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const runtime = 'nodejs'
+
 async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Uint8Array> {
   const chunks: Buffer[] = []
   const readable = stream as AsyncIterable<Buffer | Uint8Array>
@@ -44,7 +49,7 @@ const publicMediaDir = path.join(process.cwd(), 'public', 'media')
 const readFromLocalPublicMedia = async (filename: string): Promise<Response | null> => {
   try {
     const buf = await readFile(path.join(publicMediaDir, filename))
-    return new Response(buf, {
+    return new NextResponse(Buffer.from(buf), {
       status: 200,
       headers: {
         'Content-Type': getContentType(filename),
@@ -153,7 +158,6 @@ export async function GET(
     const headers: Record<string, string> = {}
     // Next/image requires a valid content-type to treat this as an image.
     headers['Content-Type'] = res.ContentType || getContentType(cleanFilename)
-    if (res.ContentLength) headers['Content-Length'] = String(res.ContentLength)
     if (res.ETag) headers['ETag'] = String(res.ETag)
     headers['Cache-Control'] = res.CacheControl || 'public, max-age=31536000, immutable'
 
@@ -164,7 +168,7 @@ export async function GET(
       typeof body?.transformToByteArray === 'function'
         ? await body.transformToByteArray()
         : await streamToBuffer(body as NodeJS.ReadableStream)
-    return new Response(bytes, { status: 200, headers })
+    return new NextResponse(Buffer.from(bytes), { status: 200, headers })
   } catch (err: unknown) {
     const local = await readFromLocalPublicMedia(cleanFilename)
     if (local) return local

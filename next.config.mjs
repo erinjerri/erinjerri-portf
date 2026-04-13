@@ -55,7 +55,11 @@ const r2Hosts = Array.from(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.cache = false
+    }
+
     config.resolve.alias = {
       ...config.resolve.alias,
       '../build/polyfills/polyfill-module': false,

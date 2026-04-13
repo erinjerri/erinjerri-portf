@@ -12,369 +12,389 @@ type CurveLayer = {
   tensionB: number
   phase: number
   slope: number
+  width: number
 }
 
 type CurvePoint = { x: number; y: number }
 
-type GeometryLike = {
-  setAttribute: (name: string, attribute: unknown) => void
-}
-
-type PositionAttributeLike = {
-  array: Float32Array
-  needsUpdate: boolean
-}
-
 const LAYERS: CurveLayer[] = [
   {
-    baseY: -0.18,
-    amplitude: 0.055,
+    baseY: 0.34,
+    amplitude: 0.085,
+    speed: 0.34,
+    color: '#e7fbff',
+    opacity: 0.95,
+    tensionA: 1.5,
+    tensionB: 3.15,
+    phase: 0.35,
+    slope: 0.54,
+    width: 1.35,
+  },
+  {
+    baseY: 0.48,
+    amplitude: 0.1,
     speed: 0.26,
-    color: '#b8efff',
-    opacity: 1,
-    tensionA: 1.45,
-    tensionB: 2.8,
-    phase: 0.4,
-    slope: 0.58,
-  },
-  {
-    baseY: -0.24,
-    amplitude: 0.07,
-    speed: 0.22,
-    color: '#b6a9ff',
-    opacity: 0.6,
-    tensionA: 1.2,
-    tensionB: 2.4,
+    color: '#9de9ff',
+    opacity: 0.84,
+    tensionA: 1.22,
+    tensionB: 2.72,
     phase: 1.55,
-    slope: 0.62,
+    slope: 0.46,
+    width: 1.15,
   },
   {
-    baseY: -0.08,
-    amplitude: 0.09,
-    speed: 0.18,
-    color: '#8bdcff',
-    opacity: 0.38,
-    tensionA: 1.1,
-    tensionB: 2.2,
-    phase: 2.1,
-    slope: 0.36,
+    baseY: 0.23,
+    amplitude: 0.11,
+    speed: 0.21,
+    color: '#beaaff',
+    opacity: 0.62,
+    tensionA: 1.08,
+    tensionB: 2.32,
+    phase: 2.08,
+    slope: 0.22,
+    width: 1,
   },
   {
-    baseY: -0.38,
-    amplitude: 0.06,
-    speed: 0.14,
-    color: '#79bcff',
+    baseY: 0.62,
+    amplitude: 0.074,
+    speed: 0.16,
+    color: '#7dd9ff',
+    opacity: 0.42,
+    tensionA: 0.94,
+    tensionB: 2.44,
+    phase: 0.88,
+    slope: 0.17,
+    width: 0.9,
+  },
+  {
+    baseY: 0.1,
+    amplitude: 0.058,
+    speed: 0.12,
+    color: '#d2ebff',
     opacity: 0.28,
     tensionA: 0.9,
-    tensionB: 2.4,
-    phase: 0.9,
-    slope: 0.22,
+    tensionB: 2.08,
+    phase: 2.72,
+    slope: 0.1,
+    width: 0.78,
   },
 ]
 
-const CURVE_POINT_COUNT = 90
-const STAR_COUNT = 14
+const CURVE_POINT_COUNT = 180
+const STAR_COUNT = 30
 
-function buildCurvePoints(config: CurveLayer, time: number): CurvePoint[] {
+function buildCurvePoints(
+  config: CurveLayer,
+  time: number,
+  width: number,
+  height: number,
+  pointerX: number,
+  pointerY: number,
+): CurvePoint[] {
   const points: CurvePoint[] = []
 
   for (let index = 0; index < CURVE_POINT_COUNT; index += 1) {
     const t = index / (CURVE_POINT_COUNT - 1)
-    const x = -1.25 + t * 2.5
+    const x = t * width
     const diagonal = (t - 0.5) * config.slope
     const waveA = Math.sin(t * Math.PI * config.tensionA + time * config.speed + config.phase)
     const waveB = Math.sin(
       t * Math.PI * config.tensionB - time * config.speed * 0.75 + config.phase,
     )
-    const y =
-      config.baseY + diagonal + waveA * config.amplitude + waveB * config.amplitude * 0.35
-    points.push({ x, y })
+    const normalizedY =
+      config.baseY +
+      diagonal +
+      waveA * config.amplitude +
+      waveB * config.amplitude * 0.35 +
+      pointerX * 0.014 +
+      pointerY * 0.01
+
+    points.push({
+      x,
+      y: normalizedY * height,
+    })
   }
 
   return points
+}
+
+function traceCurve(ctx: CanvasRenderingContext2D, points: CurvePoint[]) {
+  if (!points.length) return
+
+  ctx.beginPath()
+  ctx.moveTo(points[0]!.x, points[0]!.y)
+
+  for (let index = 1; index < points.length - 1; index += 1) {
+    const point = points[index]!
+    const next = points[index + 1]!
+    const controlX = (point.x + next.x) / 2
+    const controlY = (point.y + next.y) / 2
+    ctx.quadraticCurveTo(point.x, point.y, controlX, controlY)
+  }
+
+  const last = points[points.length - 1]!
+  ctx.lineTo(last.x, last.y)
+}
+
+function drawGlowLine(
+  ctx: CanvasRenderingContext2D,
+  points: CurvePoint[],
+  color: string,
+  opacity: number,
+  width: number,
+) {
+  ctx.save()
+  ctx.globalCompositeOperation = 'lighter'
+  ctx.strokeStyle = color
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+
+  ctx.globalAlpha = opacity * 0.12
+  ctx.lineWidth = width * 18
+  ctx.shadowBlur = width * 34
+  ctx.shadowColor = color
+  traceCurve(ctx, points)
+  ctx.stroke()
+
+  ctx.globalAlpha = opacity * 0.24
+  ctx.lineWidth = width * 8
+  ctx.shadowBlur = width * 18
+  traceCurve(ctx, points)
+  ctx.stroke()
+
+  ctx.globalAlpha = opacity
+  ctx.lineWidth = width * 2.2
+  ctx.shadowBlur = width * 8
+  traceCurve(ctx, points)
+  ctx.stroke()
+
+  ctx.restore()
+}
+
+function drawStar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  color: string,
+  alpha: number,
+) {
+  ctx.save()
+  ctx.globalCompositeOperation = 'lighter'
+  ctx.globalAlpha = alpha
+
+  const glow = ctx.createRadialGradient(x, y, 0, x, y, radius * 4)
+  glow.addColorStop(0, color)
+  glow.addColorStop(0.25, color)
+  glow.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = glow
+  ctx.beginPath()
+  ctx.arc(x, y, radius * 4, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.arc(x, y, radius, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.strokeStyle = color
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(x - radius * 3.3, y)
+  ctx.lineTo(x + radius * 3.3, y)
+  ctx.moveTo(x, y - radius * 3.3)
+  ctx.lineTo(x, y + radius * 3.3)
+  ctx.stroke()
+  ctx.restore()
+}
+
+function drawBackground(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  time: number,
+  pointerX: number,
+  pointerY: number,
+) {
+  ctx.clearRect(0, 0, width, height)
+
+  const baseGradient = ctx.createLinearGradient(0, 0, 0, height)
+  baseGradient.addColorStop(0, '#07101d')
+  baseGradient.addColorStop(0.42, '#060b13')
+  baseGradient.addColorStop(1, '#070910')
+  ctx.fillStyle = baseGradient
+  ctx.fillRect(0, 0, width, height)
+
+  const leftGlow = ctx.createRadialGradient(
+    width * (0.1 + pointerX * 0.02),
+    height * (0.08 - pointerY * 0.02),
+    0,
+    width * 0.1,
+    height * 0.08,
+    width * 0.46,
+  )
+  leftGlow.addColorStop(0, 'rgba(110, 188, 255, 0.26)')
+  leftGlow.addColorStop(0.42, 'rgba(60, 120, 210, 0.14)')
+  leftGlow.addColorStop(1, 'rgba(0,0,0,0)')
+  ctx.fillStyle = leftGlow
+  ctx.fillRect(0, 0, width, height)
+
+  const rightGlow = ctx.createRadialGradient(
+    width * 0.88,
+    height * 0.92,
+    0,
+    width * 0.88,
+    height * 0.92,
+    width * 0.42,
+  )
+  rightGlow.addColorStop(0, 'rgba(142, 116, 255, 0.18)')
+  rightGlow.addColorStop(0.4, 'rgba(94, 76, 180, 0.11)')
+  rightGlow.addColorStop(1, 'rgba(0,0,0,0)')
+  ctx.fillStyle = rightGlow
+  ctx.fillRect(0, 0, width, height)
+
+  const ribbonY =
+    height *
+    (0.22 +
+      0.26 * 0.5 +
+      Math.sin(time * 0.26) * 0.026 +
+      pointerX * 0.012 +
+      pointerY * 0.01)
+  const ribbonGradient = ctx.createLinearGradient(0, ribbonY - 90, width, ribbonY + 90)
+  ribbonGradient.addColorStop(0, 'rgba(120, 214, 255, 0)')
+  ribbonGradient.addColorStop(0.34, 'rgba(116, 215, 255, 0.14)')
+  ribbonGradient.addColorStop(0.55, 'rgba(218, 247, 255, 0.18)')
+  ribbonGradient.addColorStop(0.76, 'rgba(168, 154, 255, 0.12)')
+  ribbonGradient.addColorStop(1, 'rgba(162, 132, 255, 0)')
+  ctx.fillStyle = ribbonGradient
+  ctx.fillRect(0, ribbonY - 120, width, 240)
 }
 
 export function RibbonCurves() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   useEffect(() => {
-    let mounted = true
-    let cleanup: (() => void) | undefined
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-    const run = async () => {
-      const canvas = canvasRef.current
-      if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
-      const THREE = await import('three')
-      if (!mounted) return
+    let frame = 0
+    let width = 0
+    let height = 0
+    const pointerTarget = { x: 0, y: 0 }
+    const pointerCurrent = { x: 0, y: 0 }
 
-      const renderer = new THREE.WebGLRenderer({
-        canvas,
-        alpha: true,
-        antialias: true,
-        powerPreference: 'high-performance',
-      })
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8))
-
-      const scene = new THREE.Scene()
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10)
-      camera.position.z = 3
-
-      const interactiveGroup = new THREE.Group()
-      scene.add(interactiveGroup)
-
-      const layers = LAYERS.map((config) => {
-        const lineGeometry = new THREE.BufferGeometry()
-        const glowGeometry = new THREE.BufferGeometry()
-
-        const lineMaterial = new THREE.LineBasicMaterial({
-          color: config.color,
-          transparent: true,
-          opacity: config.opacity,
-          blending: THREE.AdditiveBlending,
-        })
-
-        const glowMaterial = new THREE.LineBasicMaterial({
-          color: config.color,
-          transparent: true,
-          opacity: config.opacity * 0.34,
-          blending: THREE.AdditiveBlending,
-        })
-
-        const line = new THREE.Line(lineGeometry, lineMaterial)
-        const glow = new THREE.Line(glowGeometry, glowMaterial)
-        glow.scale.set(1.01, 1.42, 1)
-
-        interactiveGroup.add(glow)
-        interactiveGroup.add(line)
-
-        return { config, line, glow }
-      })
-
-      const starPositions = new Float32Array(STAR_COUNT * 3)
-      const starColors = new Float32Array(STAR_COUNT * 3)
-
-      for (let index = 0; index < STAR_COUNT; index += 1) {
-        const color = new THREE.Color(index % 4 === 0 ? '#9d88ff' : '#86ddff')
-        starColors[index * 3] = color.r
-        starColors[index * 3 + 1] = color.g
-        starColors[index * 3 + 2] = color.b
-      }
-
-      const starsGeometry = new THREE.BufferGeometry()
-      starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3))
-      starsGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3))
-
-      const starsMaterial = new THREE.PointsMaterial({
-        size: 0.03,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.85,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-
-      const stars = new THREE.Points(starsGeometry, starsMaterial)
-      interactiveGroup.add(stars)
-
-      const backgroundMaterial = new THREE.ShaderMaterial({
-        transparent: true,
-        depthWrite: false,
-        uniforms: {
-          uTime: { value: 0 },
-          uPointerX: { value: 0 },
-          uPointerY: { value: 0 },
-        },
-        vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          varying vec2 vUv;
-          uniform float uTime;
-          uniform float uPointerX;
-          uniform float uPointerY;
-          void main() {
-            vec2 uv = vUv;
-            float glowLeft = smoothstep(0.55, -0.1, distance(uv, vec2(0.05, 0.08)));
-            float glowRight = smoothstep(0.62, -0.1, distance(uv, vec2(0.92, 0.92)));
-            float pulse = 0.5 + 0.5 * sin(uTime * 0.22);
-            float pointerInfluence = uPointerX * 0.03 + uPointerY * 0.02;
-            float ribbonCenter = 0.16 + uv.x * 0.34 + sin(uv.x * 5.8 + uTime * 0.24) * 0.035 + sin(uv.x * 12.0 - uTime * 0.4) * 0.012 + pointerInfluence;
-            float ribbon = exp(-pow((uv.y - ribbonCenter) * 18.0, 2.0));
-            float ribbonCore = exp(-pow((uv.y - ribbonCenter) * 34.0, 2.0));
-            float ribbonAccent = exp(-pow((uv.y - (ribbonCenter + 0.012)) * 26.0, 2.0));
-            vec3 color = vec3(0.02, 0.04, 0.07);
-            color += vec3(0.12, 0.22, 0.36) * glowLeft * 1.1;
-            color += vec3(0.1, 0.09, 0.24) * glowRight * (0.58 + pulse * 0.24);
-            color += vec3(0.14, 0.4, 0.62) * ribbon * 1.18;
-            color += vec3(0.84, 0.96, 1.0) * ribbonCore * 0.62;
-            color += vec3(0.64, 0.52, 0.96) * ribbonAccent * 0.42;
-            float vignette = smoothstep(1.25, 0.3, distance(uv, vec2(0.5, 0.5)));
-            color *= 0.72 + vignette * 0.28;
-            gl_FragColor = vec4(color, 0.95);
-          }
-        `,
-      })
-
-      const backgroundPlane = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.8, 2.2),
-        backgroundMaterial,
-      )
-      backgroundPlane.position.z = -0.5
-      scene.add(backgroundPlane)
-
-      let frame = 0
-      const targetPointer = { x: 0, y: 0 }
-      const currentPointer = { x: 0, y: 0 }
-
-      const updateCurveGeometry = (
-        points: CurvePoint[],
-        geometry: GeometryLike,
-        offsetY: number,
-      ) => {
-        const positions = new Float32Array(points.length * 3)
-
-        points.forEach((point, index) => {
-          positions[index * 3] = point.x
-          positions[index * 3 + 1] = point.y + offsetY
-          positions[index * 3 + 2] = 0
-        })
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-      }
-
-      const resize = () => {
-        const parent = canvas.parentElement
-        const width = parent?.clientWidth ?? window.innerWidth
-        const height = parent?.clientHeight ?? 520
-        renderer.setSize(width, height, false)
-
-        const aspect = width / Math.max(height, 1)
-        camera.left = -aspect
-        camera.right = aspect
-        camera.top = 1
-        camera.bottom = -1
-        camera.updateProjectionMatrix()
-
-        backgroundPlane.scale.set(aspect, 1, 1)
-      }
-
-      const handlePointerMove = (event: PointerEvent) => {
-        const bounds = canvas.getBoundingClientRect()
-        const x = (event.clientX - bounds.left) / Math.max(bounds.width, 1)
-        const y = (event.clientY - bounds.top) / Math.max(bounds.height, 1)
-        targetPointer.x = (x - 0.5) * 2
-        targetPointer.y = (y - 0.5) * -2
-      }
-
-      const handlePointerLeave = () => {
-        targetPointer.x = 0
-        targetPointer.y = 0
-      }
-
-      resize()
-
-      const clock = new THREE.Clock()
-
-      const animate = () => {
-        const time = clock.getElapsedTime()
-        backgroundMaterial.uniforms.uTime.value = time
-
-        currentPointer.x += (targetPointer.x - currentPointer.x) * 0.06
-        currentPointer.y += (targetPointer.y - currentPointer.y) * 0.06
-        backgroundMaterial.uniforms.uPointerX.value = currentPointer.x
-        backgroundMaterial.uniforms.uPointerY.value = currentPointer.y
-        interactiveGroup.position.x = currentPointer.x * 0.05
-        interactiveGroup.position.y = currentPointer.y * 0.035
-        interactiveGroup.rotation.z = currentPointer.x * 0.035
-
-        const leadCurvePoints: CurvePoint[] = []
-
-        layers.forEach((layer, layerIndex) => {
-          const points = buildCurvePoints(layer.config, time)
-          if (layerIndex === 0) {
-            leadCurvePoints.push(...points)
-          }
-          updateCurveGeometry(points, layer.line.geometry, 0)
-          updateCurveGeometry(
-            points,
-            layer.glow.geometry,
-            Math.sin(time * 0.4 + layerIndex) * 0.004,
-          )
-        })
-
-        const positions = stars.geometry.getAttribute('position') as PositionAttributeLike
-        if (leadCurvePoints.length > 0) {
-          for (let index = 0; index < STAR_COUNT; index += 1) {
-            const sampleIndex = Math.min(
-              leadCurvePoints.length - 1,
-              Math.max(
-                0,
-                Math.round(((index + 1) / (STAR_COUNT + 1)) * (leadCurvePoints.length - 1)),
-              ),
-            )
-            const point = leadCurvePoints[sampleIndex]
-            positions.array[index * 3] = point.x + Math.sin(time * 0.3 + index) * 0.02
-            positions.array[index * 3 + 1] =
-              point.y +
-              Math.cos(time * 0.7 + index * 0.8) * 0.03 +
-              (index % 2 === 0 ? 0.02 : -0.01)
-          }
-        }
-        positions.needsUpdate = true
-
-        renderer.render(scene, camera)
-        frame = window.requestAnimationFrame(animate)
-      }
-
-      const resizeObserver = new ResizeObserver(() => resize())
+    const resize = () => {
       const parent = canvas.parentElement
-      if (parent) resizeObserver.observe(parent)
-      canvas.addEventListener('pointermove', handlePointerMove)
-      canvas.addEventListener('pointerleave', handlePointerLeave)
-      window.addEventListener('resize', resize)
+      const nextWidth = parent?.clientWidth ?? window.innerWidth
+      const nextHeight = parent?.clientHeight ?? 520
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
 
-      animate()
+      width = nextWidth
+      height = nextHeight
 
-      cleanup = () => {
-        window.cancelAnimationFrame(frame)
-        resizeObserver.disconnect()
-        window.removeEventListener('resize', resize)
-        canvas.removeEventListener('pointermove', handlePointerMove)
-        canvas.removeEventListener('pointerleave', handlePointerLeave)
-        renderer.dispose()
+      canvas.width = Math.round(nextWidth * dpr)
+      canvas.height = Math.round(nextHeight * dpr)
+      canvas.style.width = `${nextWidth}px`
+      canvas.style.height = `${nextHeight}px`
 
-        layers.forEach((layer) => {
-          layer.line.geometry.dispose()
-          layer.glow.geometry.dispose()
-          layer.line.material.dispose()
-          layer.glow.material.dispose()
-        })
-
-        stars.geometry.dispose()
-        stars.material.dispose()
-        backgroundPlane.geometry.dispose()
-        backgroundMaterial.dispose()
-        scene.clear()
-      }
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.scale(dpr, dpr)
     }
 
-    void run()
+    const handlePointerMove = (event: PointerEvent) => {
+      const bounds = canvas.getBoundingClientRect()
+      const x = (event.clientX - bounds.left) / Math.max(bounds.width, 1)
+      const y = (event.clientY - bounds.top) / Math.max(bounds.height, 1)
+      pointerTarget.x = (x - 0.5) * 2
+      pointerTarget.y = (y - 0.5) * -2
+    }
+
+    const handlePointerLeave = () => {
+      pointerTarget.x = 0
+      pointerTarget.y = 0
+    }
+
+    resize()
+
+    const render = () => {
+      const time = performance.now() / 1000
+
+      pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
+      pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
+
+      drawBackground(ctx, width, height, time, pointerCurrent.x, pointerCurrent.y)
+
+      const leadCurves: CurvePoint[][] = []
+
+      for (const [index, layer] of LAYERS.entries()) {
+        const points = buildCurvePoints(
+          layer,
+          time,
+          width,
+          height,
+          pointerCurrent.x,
+          pointerCurrent.y,
+        )
+
+        const drifted = points.map((point) => ({
+          x: point.x,
+          y: point.y + Math.sin(time * (0.38 + index * 0.06) + index) * (6 + index * 1.4),
+        }))
+
+        if (index < 2) leadCurves.push(drifted)
+        drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width)
+      }
+
+      const guide = leadCurves[0] ?? []
+      if (guide.length) {
+        for (let index = 0; index < STAR_COUNT; index += 1) {
+          const t = (index + 1) / (STAR_COUNT + 1)
+          const sampleIndex = Math.min(
+            guide.length - 1,
+            Math.max(0, Math.round(t * (guide.length - 1))),
+          )
+          const point = guide[sampleIndex]!
+          const orbit = Math.sin(time * 0.8 + index * 0.6) * 8
+          const color = index % 4 === 0 ? '#bfa7ff' : '#88e7ff'
+          drawStar(
+            ctx,
+            point.x + Math.sin(time * 0.4 + index) * 9,
+            point.y + orbit + (index % 2 === 0 ? 8 : -4),
+            index % 5 === 0 ? 1.9 : 1.4,
+            color,
+            0.85,
+          )
+        }
+      }
+
+      frame = window.requestAnimationFrame(render)
+    }
+
+    const resizeObserver = new ResizeObserver(() => resize())
+    const parent = canvas.parentElement
+    if (parent) resizeObserver.observe(parent)
+    window.addEventListener('resize', resize)
+    canvas.addEventListener('pointermove', handlePointerMove)
+    canvas.addEventListener('pointerleave', handlePointerLeave)
+
+    render()
 
     return () => {
-      mounted = false
-      cleanup?.()
+      window.cancelAnimationFrame(frame)
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', resize)
+      canvas.removeEventListener('pointermove', handlePointerMove)
+      canvas.removeEventListener('pointerleave', handlePointerLeave)
     }
   }, [])
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <canvas className="pointer-events-auto block h-full w-full opacity-95" ref={canvasRef} />
-      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-[#070910]/45 to-[#090b11]" />
+      <canvas className="pointer-events-auto block h-full w-full opacity-100" ref={canvasRef} />
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[#070910]/20 to-[#070910]" />
     </div>
   )
 }

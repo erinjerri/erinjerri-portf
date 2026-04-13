@@ -58,7 +58,7 @@ export const RibbonBlockBlock: React.FC<RibbonBlockBlockProps> = ({
     <section className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden bg-[#070910] text-white">
       <RibbonCurves />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,155,255,0.14),transparent_36%),radial-gradient(circle_at_82%_72%,rgba(126,104,255,0.1),transparent_30%),linear-gradient(180deg,rgba(8,10,16,0.78)_0%,rgba(7,9,14,0.96)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(109,188,255,0.16),transparent_36%),radial-gradient(circle_at_82%_72%,rgba(150,126,255,0.12),transparent_30%),linear-gradient(180deg,rgba(8,10,16,0.62)_0%,rgba(7,9,14,0.9)_100%)]" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-7 pb-0 pt-14 md:px-12 md:pt-20">
         {tagline?.trim() ? (
@@ -80,7 +80,7 @@ export const RibbonBlockBlock: React.FC<RibbonBlockBlockProps> = ({
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto mt-[13rem] max-w-6xl border-t border-white/10 px-7 pb-8 md:mt-[15rem] md:px-12 md:pb-12">
+      <div className="relative z-10 mx-auto mt-[11rem] max-w-6xl border-t border-white/10 px-7 pb-8 md:mt-[13rem] md:px-12 md:pb-12">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {columnItems.map((item, index) => (
             <div
