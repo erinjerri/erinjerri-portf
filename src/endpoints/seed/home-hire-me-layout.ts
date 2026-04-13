@@ -1,5 +1,7 @@
 import type { Page } from '@/payload-types'
 
+const HOME_SIGNATURE_BLOCK_TYPES = ['ribbonBlock', 'statsBlock', 'bioBlock'] as const
+
 /**
  * Default “Hire Me” section for the home page.
  * Seeded so the block is visible on fresh installs, but the content remains editable in Payload.
@@ -85,3 +87,31 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
     ],
   },
 ]
+
+export function mergeHomeHireMeLayoutBlocks(
+  layout: Page['layout'] | null | undefined,
+): NonNullable<Page['layout']> {
+  const current = Array.isArray(layout) ? [...layout] : []
+  const signatureTypeSet = new Set<string>(HOME_SIGNATURE_BLOCK_TYPES)
+  const existingSignatureBlocks = new Map<string, NonNullable<Page['layout']>[number]>()
+  const otherBlocks: NonNullable<Page['layout']> = []
+
+  for (const block of current) {
+    const blockType = block?.blockType
+
+    if (blockType && signatureTypeSet.has(blockType)) {
+      if (!existingSignatureBlocks.has(blockType)) {
+        existingSignatureBlocks.set(blockType, block)
+      }
+      continue
+    }
+
+    otherBlocks.push(block)
+  }
+
+  const signatureBlocks = homeHireMeLayoutBlocks.map(
+    (seededBlock) => existingSignatureBlocks.get(seededBlock.blockType) ?? seededBlock,
+  )
+
+  return [...signatureBlocks, ...otherBlocks]
+}

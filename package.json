@@ -28,6 +28,7 @@
     "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/restore.ts",
     "upsert:speaking-form": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/upsert-speaking-request-form.ts",
     "ensure:store": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-store-page.ts",
+    "ensure:home-signature-blocks": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-home-signature-blocks.ts",
     "repair:crossposts": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/repair-crosspost-publish-state.ts",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "start": "pnpm build && cross-env NODE_OPTIONS=--no-deprecation next start",
