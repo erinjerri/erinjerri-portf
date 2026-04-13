@@ -39,7 +39,7 @@ type HeaderBodyProps = {
 }
 
 const DIMENSIONS_STRIP_SRC =
-  '/media/hero-top-banner-experience-dimensions-background-curves-cut-1400x155.png'
+  '/media/hero-top-banner-experience-dimensions-background-curves-cut-1400x155.webp'
 
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
@@ -79,7 +79,7 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
       ) : null}
       <div className="container relative z-10">
         <div className={HEADER_ROW_CLASS}>
-          <Link href="/" className={LOGO_LINK_CLASS}>
+          <Link href="/" prefetch={false} className={LOGO_LINK_CLASS}>
             <Logo loading="eager" priority="high" />
           </Link>
           <HeaderNav

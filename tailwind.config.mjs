@@ -129,18 +129,16 @@ const config = {
               maxWidth: '65ch',
               h1: {
                 fontFamily: 'var(--font-title)',
-                fontSize: 'clamp(2rem, 5vw, 3rem)',
+                fontWeight: '800',
                 lineHeight: '1.1',
-                letterSpacing: '-0.02em',
-                fontWeight: '700',
+                letterSpacing: '-0.01em',
                 marginBottom: '0.25em',
               },
               h2: {
                 fontFamily: 'var(--font-title)',
-                fontSize: 'clamp(1.35rem, 3vw, 1.75rem)',
-                lineHeight: '1.25',
-                letterSpacing: '-0.02em',
                 fontWeight: '700',
+                lineHeight: '1.25',
+                letterSpacing: '0em',
                 marginTop: '1.75em',
                 marginBottom: '0.5em',
               },
@@ -149,6 +147,7 @@ const config = {
                 fontSize: '1.25rem',
                 lineHeight: '1.35',
                 fontWeight: '600',
+                letterSpacing: '0.01em',
               },
               h4: {
                 fontFamily: 'var(--font-copy)',
@@ -202,19 +201,12 @@ const config = {
             {
               fontSize: '1rem',
               lineHeight: '1.7',
-            },
-          ],
-        },
-        md: {
-          css: [
-            {
-              fontSize: '1.125rem',
-              lineHeight: '1.625',
               h1: {
-                fontSize: '3.5rem',
+                fontSize: '2.5rem',
               },
               h2: {
-                fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
+                fontSize: '1.5rem',
+                fontWeight: '700',
               },
             },
           ],

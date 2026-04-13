@@ -101,8 +101,9 @@ function SocialIcon({
   const FallbackIcon = fallbackIcon
 
   return (
-    <Link
+       <Link
       href={href}
+      prefetch={false}
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener noreferrer' : undefined}
       className="text-foreground hover:text-foreground/80 transition-colors"
@@ -154,7 +155,7 @@ export async function Footer({ data }: FooterProps = {}) {
         <div className="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16 lg:items-start">
           {/* Left column: Logo, Subscribe, Slogan, Social */}
           <div className="flex min-h-0 flex-col gap-6 lg:max-w-sm">
-            <Link className="flex items-center" href="/">
+            <Link className="flex items-center" href="/" prefetch={false}>
               <Logo />
             </Link>
 

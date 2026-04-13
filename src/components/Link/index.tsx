@@ -34,7 +34,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     className,
     label,
     newTab,
-    prefetch,
+    prefetch = false,
     reference,
     size: sizeFromProps,
     url,

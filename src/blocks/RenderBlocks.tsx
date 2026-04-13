@@ -347,8 +347,18 @@ export const RenderBlocks: React.FC<{
                 marginClass = sectionY
               }
 
+              const archiveRelationTo =
+                blockType === 'archive'
+                  ? (block as { relationTo?: string | null }).relationTo
+                  : null
               const homepagePostsCap =
-                blockType === 'archive' && pageSlug === 'home' ? 3 : undefined
+                blockType === 'archive' && pageSlug === 'home' && archiveRelationTo === 'posts'
+                  ? 3
+                  : undefined
+              const homepageWatchCap =
+                blockType === 'archive' && pageSlug === 'home' && archiveRelationTo === 'watch'
+                  ? 8
+                  : undefined
 
               const isHomePage = pageSlug === 'home'
               const isBookCoverRow = blockType === 'bookCoverRow'
@@ -389,6 +399,8 @@ export const RenderBlocks: React.FC<{
                       <Block
                         {...blockProps}
                         {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
+                        {...(homepageWatchCap !== undefined ? { homepageWatchCap } : {})}
+                        {...(blockType === 'watchBlock' && isHomePage ? { limit: 8 } : {})}
                         disableInnerContainer
                       />
                     </div>
@@ -397,6 +409,8 @@ export const RenderBlocks: React.FC<{
                       <Block
                         {...blockProps}
                         {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
+                        {...(homepageWatchCap !== undefined ? { homepageWatchCap } : {})}
+                        {...(blockType === 'watchBlock' && isHomePage ? { limit: 8 } : {})}
                         disableInnerContainer
                       />
                     </>

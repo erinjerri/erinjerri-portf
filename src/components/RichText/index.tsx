@@ -159,7 +159,7 @@ export default function RichText(props: Props) {
         {
           container: enableGutter,
           'max-w-none': !enableGutter,
-          'mx-auto prose prose-invert text-base prose-a:text-primary md:text-[1.125rem] md:prose-md':
+          'mx-auto prose prose-base text-base prose-a:text-primary md:text-[1.125rem]':
             enableProse,
         },
         className,

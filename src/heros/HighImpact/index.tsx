@@ -86,32 +86,34 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     if (!richText && !hasLinks) return null
 
     return (
-      <div className={className}>
-        {richText && (
-          <RichText
-            className={cn(
-              isPrismatic ? 'mb-5 hp-hero-prose hp-hero-prose--open' : 'mb-6',
-              !isPrismatic && heroBioRichTextClassName,
-            )}
-            data={richText}
-            demoteExtraHeroH1
-            enableGutter={false}
-          />
-        )}
-        {hasLinks && (
-          <ul
-            className={cn(
-              'm-0 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 p-0',
-              isPrismatic && 'hp-hero-links',
-            )}
-          >
-            {links.map(({ link }, i) => (
-              <li className="shrink-0" key={i}>
-                <CMSLink {...link} />
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className={cn('hp-hero-content relative z-[2]', className)}>
+        <div className="hp-hero-content-inner">
+          {richText && (
+            <RichText
+              className={cn(
+                isPrismatic ? 'mb-5 hp-hero-prose hp-hero-prose--open' : 'mb-6',
+                !isPrismatic && heroBioRichTextClassName,
+              )}
+              data={richText}
+              demoteExtraHeroH1
+              enableGutter={false}
+            />
+          )}
+          {hasLinks && (
+            <ul
+              className={cn(
+                'hp-hero-cta-row m-0 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 p-0',
+                isPrismatic && 'hp-hero-links',
+              )}
+            >
+              {links.map(({ link }, i) => (
+                <li className="shrink-0" key={i}>
+                  <CMSLink {...link} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     )
   }
@@ -139,9 +141,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             imgClassName="object-contain object-center"
             pictureClassName="absolute inset-0 block h-full w-full"
             priority
-            quality={70}
+            quality={60}
             resource={media}
-            size="(max-width: 640px) 85vw, (max-width: 1024px) 40vw, 440px"
+            size="(max-width: 768px) min(100vw, 440px), (max-width: 1024px) 40vw, 440px"
           />
         </div>
       )
@@ -159,9 +161,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         )}
         pictureClassName="relative block w-full overflow-hidden"
         priority
-        quality={70}
+        quality={60}
         resource={media}
-        size="(max-width: 640px) 85vw, (max-width: 1024px) 40vw, 460px"
+        size="(max-width: 768px) min(100vw, 460px), (max-width: 1024px) 40vw, 460px"
       />
     )
   }
@@ -206,6 +208,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         isPrismatic ? 'min-h-[clamp(480px,58vh,760px)]' : 'min-h-[60vh]',
         isPrismatic && 'hp-hero-root',
       )}
+      data-high-impact-hero
       data-theme="dark"
     >
       {/* Background: prismatic ink + mist, or legacy gradient, then optional CMS background */}
@@ -246,6 +249,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           />
         </div>
       )}
+
+      {/* Mobile-only: gradient + vignette above background, below copy (canvas lives in fixed ambient layer). */}
+      <div
+        aria-hidden
+        className="hp-hero-mobile-overlay pointer-events-none absolute inset-0 z-[1] hidden max-[768px]:block"
+      />
 
       {/* Foreground visuals fill the hero; prismatic variant uses a tighter side-by-side layout so the portrait and copy read as one composition. */}
       {!showGridLayout && hasPortrait ? (

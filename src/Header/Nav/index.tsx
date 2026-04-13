@@ -105,7 +105,7 @@ export const HeaderNav: React.FC<{
                 <span key={id} className="min-w-0 max-w-[min(100%,14rem)] sm:max-w-[min(100%,16rem)]">
                   <CMSLink
                     {...link}
-                    prefetch={true}
+                    prefetch={false}
                     appearance="inline"
                     className={cn(
                       'inline-flex min-h-[44px] w-full items-center justify-center rounded px-2 py-2 text-center leading-snug transition-colors sm:px-2.5 md:justify-center lg:px-3',
@@ -127,6 +127,7 @@ export const HeaderNav: React.FC<{
       <div className="col-start-3 row-start-1 flex shrink-0 items-center justify-end justify-self-end">
         <Link
           href="/search"
+          prefetch={false}
           className={cn(
             'hidden h-11 w-11 shrink-0 items-center justify-center md:inline-flex transition-colors',
             lightText ? 'text-white/85 hover:text-white' : 'text-foreground/85 hover:text-foreground',
@@ -184,7 +185,7 @@ export const HeaderNav: React.FC<{
                     <div key={id} onClick={() => setMobileOpen(false)}>
                       <CMSLink
                         {...link}
-                        prefetch={true}
+                        prefetch={false}
                         appearance="inline"
                         className={cn(
                           'block rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold transition-colors',
@@ -199,6 +200,7 @@ export const HeaderNav: React.FC<{
 
                 <Link
                   href="/search"
+                  prefetch={false}
                   className="mt-4 block rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold text-white hover:bg-white/10 transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >

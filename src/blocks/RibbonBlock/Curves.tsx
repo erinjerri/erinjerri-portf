@@ -214,6 +214,11 @@ function drawStar(
 /** After this many px scroll, ambient hero blend hits 0 (stars gone; curves/radials at floor). */
 const AMBIENT_SCROLL_BLEND_RANGE_PX = 400
 
+/** Match CSS mobile hero / readability breakpoints. */
+const MOBILE_MAX_WIDTH_MQ = '(max-width: 768px)'
+
+type MotionPrefs = { mobile: boolean; reduceMotion: boolean }
+
 function drawBackground(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -293,9 +298,15 @@ type RibbonCurvesProps = {
   variant?: 'full' | 'ambient'
 }
 
+const MOBILE_TIME_SCALE = 0.8
+
 export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const scrollYRef = useRef(0)
+  const motionPrefsRef = useRef<MotionPrefs>({
+    mobile: false,
+    reduceMotion: false,
+  })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -316,11 +327,24 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     syncScroll()
     window.addEventListener('scroll', syncScroll, { passive: true })
 
+    const mMobile = window.matchMedia(MOBILE_MAX_WIDTH_MQ)
+    const mReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const syncMotion = () => {
+      motionPrefsRef.current = {
+        mobile: mMobile.matches,
+        reduceMotion: mReduce.matches,
+      }
+    }
+    syncMotion()
+    mMobile.addEventListener('change', syncMotion)
+    mReduce.addEventListener('change', syncMotion)
+
     const resize = () => {
       const parent = canvas.parentElement
       const nextWidth = parent?.clientWidth ?? window.innerWidth
       const nextHeight = parent?.clientHeight ?? 520
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const isMobileViewport = window.matchMedia(MOBILE_MAX_WIDTH_MQ).matches
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobileViewport ? 1.5 : 2)
 
       width = nextWidth
       height = nextHeight
@@ -349,8 +373,21 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
 
     resize()
 
-    const render = () => {
-      const time = performance.now() / 1000
+    /** Cap ~30fps on narrow viewports to reduce main-thread work (Lighthouse TBT). */
+    let lastFrameTimeMs = 0
+    const MOBILE_FRAME_INTERVAL_MS = 1000 / 30
+
+    const render = (now?: number) => {
+      const ts = typeof now === 'number' ? now : performance.now()
+      const { mobile, reduceMotion } = motionPrefsRef.current
+      if (mobile && !reduceMotion && ts - lastFrameTimeMs < MOBILE_FRAME_INTERVAL_MS * 0.92) {
+        frame = window.requestAnimationFrame(render)
+        return
+      }
+      lastFrameTimeMs = ts
+
+      const rawT = ts / 1000
+      const time = reduceMotion ? 0 : mobile ? rawT * MOBILE_TIME_SCALE : rawT
 
       pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
       pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
@@ -437,13 +474,15 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     canvas.addEventListener('pointermove', handlePointerMove)
     canvas.addEventListener('pointerleave', handlePointerLeave)
 
-    render()
+    frame = window.requestAnimationFrame(render)
 
     return () => {
       window.cancelAnimationFrame(frame)
       resizeObserver.disconnect()
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', syncScroll)
+      mMobile.removeEventListener('change', syncMotion)
+      mReduce.removeEventListener('change', syncMotion)
       canvas.removeEventListener('pointermove', handlePointerMove)
       canvas.removeEventListener('pointerleave', handlePointerLeave)
     }

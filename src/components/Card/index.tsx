@@ -155,6 +155,7 @@ export const Card: React.FC<{
               aria-label={`Play video${titleToUse ? `: ${titleToUse}` : ''}`}
               className="absolute inset-0 flex items-center justify-center"
               href={href}
+              prefetch={false}
             >
               <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/90 ring-1 ring-white/60 backdrop-blur-sm transition-transform duration-200 group-hover:scale-105">
                 <svg
@@ -200,7 +201,7 @@ export const Card: React.FC<{
         {titleToUse && (
           <div className="prose">
             <h3>
-              <Link className="not-prose" href={href} ref={link.ref}>
+              <Link className="not-prose" href={href} prefetch={false} ref={link.ref}>
                 {titleToUse}
               </Link>
             </h3>
@@ -214,7 +215,7 @@ export const Card: React.FC<{
                 <Link
                   href={videoLink.url}
                   {...(videoLink.newTab && { target: '_blank', rel: 'noopener noreferrer' })}
-                  prefetch={!videoLink.newTab}
+                  prefetch={false}
                 >
                   {videoLink.label}
                 </Link>

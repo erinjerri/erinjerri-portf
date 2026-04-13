@@ -20,6 +20,7 @@ export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string
     homepagePostsCap?: number
+    homepageWatchCap?: number
   }
 > = async (props) => {
   const {
@@ -30,20 +31,25 @@ export const ArchiveBlock: React.FC<
     populateBy,
     selectedDocs,
     homepagePostsCap,
+    homepageWatchCap,
   } = props
   const { isEnabled: isDraftMode } = await draftMode()
 
   const relationTo = (props.relationTo || 'posts') as CardRelationTo
   const isHomePostsTeaser =
     typeof homepagePostsCap === 'number' && homepagePostsCap > 0 && relationTo === 'posts'
+  const isHomeWatchTeaser =
+    typeof homepageWatchCap === 'number' && homepageWatchCap > 0 && relationTo === 'watch'
 
   const limit = isHomePostsTeaser
     ? homepagePostsCap
-    : relationTo === 'watch'
-      ? Math.max(limitFromProps ?? 100, 100)
-      : relationTo === 'posts'
+    : isHomeWatchTeaser
+      ? homepageWatchCap
+      : relationTo === 'watch'
         ? Math.max(limitFromProps ?? 100, 100)
-        : limitFromProps ?? 24
+        : relationTo === 'posts'
+          ? Math.max(limitFromProps ?? 100, 100)
+          : limitFromProps ?? 24
 
   let docs: (Post | Project)[] = []
 
