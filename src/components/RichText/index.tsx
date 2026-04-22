@@ -31,11 +31,21 @@ type NodeTypes =
 const BLOCK_NODE_TYPES = new Set(['heading', 'paragraph', 'list', 'quote', 'code', 'block'])
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
-  const { value, relationTo } = linkNode.fields.doc!
-  if (typeof value !== 'object') {
-    throw new Error('Expected value to be an object')
+  const docField = linkNode.fields.doc
+  const relationTo = docField?.relationTo
+  const value = docField?.value
+
+  if (!relationTo) return '#'
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return '#'
   }
-  const slug = value.slug
+
+  if (!value || typeof value !== 'object') return '#'
+
+  const slug = (value as { slug?: string | null }).slug
+  if (typeof slug !== 'string' || !slug.trim()) return '#'
+
   return relationTo === 'pages' ? `/${slug}` : `/${relationTo}/${slug}`
 }
 
