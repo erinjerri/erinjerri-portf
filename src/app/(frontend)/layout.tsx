@@ -61,6 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
+  const enableClarity = process.env.NEXT_PUBLIC_ENABLE_CLARITY === 'true'
   const enableThirdPartyScripts = process.env.NODE_ENV === 'production'
 
   return (
@@ -91,13 +92,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {enableThirdPartyScripts ? (
           <AnalyticsScripts
             measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
-            clarityProjectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}
+            clarityProjectId={
+              enableClarity ? process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID : undefined
+            }
           />
         ) : null}
       </body>
     </html>
   )
 }
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   alternates: {
