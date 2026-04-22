@@ -7,7 +7,7 @@
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS=--no-deprecation next build",
     "clean:next": "rm -rf .next .next-dev",
     "build": "pnpm clean:next && cross-env NODE_OPTIONS=--no-deprecation next build",
-    "build:netlify": "node -e \"console.log('node', process.version)\" && node -e \"console.log('next', require('next/package.json').version)\" && node -e \"console.log('react', require('react/package.json').version)\" && cross-env NODE_ENV=production NODE_OPTIONS=--no-deprecation next build",
+    "build:netlify": "node -e \"console.log('node', process.version)\" && node -e \"console.log('next', require('next/package.json').version)\" && node -e \"console.log('react', require('react/package.json').version)\" && NODE_OPTIONS=--no-deprecation next build",
     "build:fast": "pnpm clean:next && cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next build",
     "build:turbo": "pnpm clean:next && cross-env NODE_OPTIONS=--no-deprecation next build --turbo",
     "postbuild": "node -e \"console.log('Skipping next-sitemap postbuild; custom App Router sitemap routes handle sitemap generation.')\"",
