@@ -30,6 +30,9 @@ type NodeTypes =
 
 const BLOCK_NODE_TYPES = new Set(['heading', 'paragraph', 'list', 'quote', 'code', 'block'])
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   const docField = linkNode.fields.doc
   const relationTo = docField?.relationTo
@@ -49,12 +52,79 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   return relationTo === 'pages' ? `/${slug}` : `/${relationTo}/${slug}`
 }
 
+const renderUploadNode = ({ node }: { node: { value?: unknown; fields?: { alt?: string } | null } }) => {
+  if (!isRecord(node.value)) return null
+
+  const uploadDoc = node.value as {
+    alt?: string | null
+    filename?: string | null
+    height?: number | null
+    mimeType?: string | null
+    sizes?: Record<
+      string,
+      | {
+          filename?: string | null
+          height?: number | null
+          mimeType?: string | null
+          url?: string | null
+          width?: number | null
+        }
+      | undefined
+    >
+    url?: string | null
+    width?: number | null
+  }
+
+  const alt = node.fields?.alt || uploadDoc.alt || ''
+  const url = typeof uploadDoc.url === 'string' ? uploadDoc.url : ''
+  const mimeType = typeof uploadDoc.mimeType === 'string' ? uploadDoc.mimeType : ''
+
+  if (!url) return null
+  if (!mimeType || !mimeType.startsWith('image')) {
+    return (
+      <a href={url} rel="noopener noreferrer">
+        {uploadDoc.filename || alt || url}
+      </a>
+    )
+  }
+
+  if (!uploadDoc.sizes || !Object.keys(uploadDoc.sizes).length) {
+    return <img alt={alt} height={uploadDoc.height || undefined} src={url} width={uploadDoc.width || undefined} />
+  }
+
+  const pictureJSX: React.ReactNode[] = []
+  for (const size in uploadDoc.sizes) {
+    const imageSize = uploadDoc.sizes[size]
+    if (
+      !imageSize ||
+      !imageSize.width ||
+      !imageSize.height ||
+      !imageSize.mimeType ||
+      !imageSize.filename ||
+      !imageSize.url
+    ) {
+      continue
+    }
+
+    pictureJSX.push(
+      <source key={size} media={`(max-width: ${imageSize.width}px)`} srcSet={imageSize.url} type={imageSize.mimeType} />,
+    )
+  }
+
+  pictureJSX.push(
+    <img key="image" alt={alt} height={uploadDoc.height || undefined} src={url} width={uploadDoc.width || undefined} />,
+  )
+
+  return <picture>{pictureJSX}</picture>
+}
+
 function createJsxConverters(demoteExtraHeroH1: boolean): JSXConvertersFunction<NodeTypes> {
   let heroH1Count = 0
 
   return ({ defaultConverters }) => ({
     ...defaultConverters,
     ...LinkJSXConverter({ internalDocToHref }),
+    upload: renderUploadNode,
     heading: ({ node, nodesToJSX }) => {
       const requested = (node.tag as keyof React.JSX.IntrinsicElements) || 'h2'
       let Tag: keyof React.JSX.IntrinsicElements = requested

@@ -11,6 +11,7 @@ import { resolveHeroMedia } from '@/heros/resolveHeroMedia'
 import { enhancePageForRoute } from '@/utilities/enhancePageForRoute'
 import { generateMeta } from '@/utilities/generateMeta'
 import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import { safeDecodeURIComponent } from '@/utilities/safeDecodeURIComponent'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
 import { mergeHomeHireMeLayoutBlocks } from '@/endpoints/seed/home-hire-me-layout'
@@ -53,7 +54,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
   // Decode to support slugs with special characters
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const url = '/' + decodedSlug
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
@@ -142,7 +143,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
   try {
