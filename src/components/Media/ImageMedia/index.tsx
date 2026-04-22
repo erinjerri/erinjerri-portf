@@ -131,7 +131,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         : '(max-width: 640px) min(100vw, 400px), (max-width: 1024px) 48vw, 560px'
 
   return (
-    <picture className={cn(pictureClassName)}>
+    <picture className={cn(fill && 'relative', pictureClassName)}>
       <NextImage
         alt={alt || ''}
         className={cn(imgClassName)}

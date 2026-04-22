@@ -1,8 +1,7 @@
 /**
- * Performance: defer Substack subscribe client bundle (dynamic import) + reserve vertical space
- * so the footer does not jump when the form mounts (CLS on mobile Lighthouse).
+ * Performance: keep the footer subscribe form isolated in its own client component + reserve
+ * vertical space so the footer does not jump when the form mounts (CLS on mobile Lighthouse).
  */
-import dynamic from 'next/dynamic'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { Facebook, Github, Linkedin, Mail, Youtube } from 'lucide-react'
@@ -16,20 +15,7 @@ import type { Footer, Media as MediaType } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
 import { SocialIconImage } from './SocialIconImage'
-
-const SubscribeFormClient = dynamic(
-  () => import('./SubscribeForm').then((m) => ({ default: m.SubscribeForm })),
-  {
-    loading: () => (
-      <div
-        className="flex min-h-[7rem] w-full max-w-xl flex-col justify-center gap-2"
-        aria-hidden
-      >
-        <div className="h-10 w-full rounded-md bg-muted/20" />
-      </div>
-    ),
-  },
-)
+import { SubscribeForm } from './SubscribeForm'
 
 const resolveFallbackSocialIcon = (
   label: string,
@@ -179,7 +165,7 @@ export async function Footer({ data }: FooterProps = {}) {
 
             {subscribeSection?.showSubscribe !== false && (
               <div className="min-h-[7rem] w-full max-w-full">
-                <SubscribeFormClient action={substackEmbedSrc} />
+                <SubscribeForm action={substackEmbedSrc} />
               </div>
             )}
 

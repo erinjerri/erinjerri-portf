@@ -7,16 +7,14 @@ import type { Metadata } from 'next'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
-import { SiteAmbientCurvesLoader } from '@/components/SiteAmbientCurvesLoader'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
+import { SiteAmbientCurvesLoader } from '@/components/SiteAmbientCurvesLoader'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
-import { GoogleTagManagerHead, GoogleTagManagerNoScript } from '@/components/GoogleTagManager'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import {
   CANONICAL_SITE_ORIGIN,
-  PERSON_JSON_LD,
   SITE_DEFAULT_DESCRIPTION,
   SITE_DEFAULT_TITLE,
 } from '@/utilities/siteMetadata'
@@ -65,10 +63,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
   const enableThirdPartyScripts = process.env.NODE_ENV === 'production'
 
-  /** Site is dark-only — no OS / localStorage theme branching (avoids flash and keeps editorial palette). */
-  const themeBootstrapScript =
-    '(function(){try{document.documentElement.setAttribute("data-theme","dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();'
-
   return (
     <html
       className={frontendFontVariables}
@@ -77,11 +71,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-theme="dark"
     >
       <head>
-        {/* eslint-disable-next-line react/no-danger -- sync data-theme before first paint */}
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
-        />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {/* Preconnect to analytics origins to reduce connection latency when scripts load */}
@@ -89,14 +78,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || gtmContainerId) ? (
           <link rel="preconnect" href="https://www.googletagmanager.com" />
         ) : null}
-        {enableThirdPartyScripts && gtmContainerId ? (
-          <GoogleTagManagerHead containerId={gtmContainerId} />
-        ) : null}
       </head>
       <body className={fontJost.className}>
-        {enableThirdPartyScripts && gtmContainerId ? (
-          <GoogleTagManagerNoScript containerId={gtmContainerId} />
-        ) : null}
         <Providers>
           <SiteAmbientCurvesLoader />
           <AdminBar />
@@ -105,12 +88,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
           <Footer data={footerFailed ? undefined : footerData} />
         </Providers>
-        <script
-          id="person-jsonld-schema"
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_JSON_LD) }}
-        />
         {enableThirdPartyScripts ? (
           <AnalyticsScripts
             measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
