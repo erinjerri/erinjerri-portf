@@ -223,3 +223,4 @@ dist/
 
 # OS noise
 .DS_Store
+.gstack/

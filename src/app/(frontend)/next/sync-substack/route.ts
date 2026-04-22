@@ -9,6 +9,20 @@ const RSS_URL = process.env.SUBSTACK_RSS_URL || 'https://erinjerri.substack.com/
 const MODE: 'auto_publish' | 'review' =
   process.env.SUBSTACK_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 
+function parseBoolean(input: string | null | undefined): boolean | undefined {
+  if (!input) return undefined
+  const normalized = input.trim().toLowerCase()
+  if (normalized === 'true') return true
+  if (normalized === 'false') return false
+  return undefined
+}
+
+function parsePositiveInt(input: string | null | undefined): number | undefined {
+  if (!input) return undefined
+  const parsed = Number(input)
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : undefined
+}
+
 function resolveSyncMode(requestHeaders: Headers): 'auto_publish' | 'review' {
   const requested = requestHeaders.get('x-substack-sync-mode')
   if (requested === 'auto_publish' || requested === 'review') return requested
@@ -48,6 +62,22 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const req = user ? await createLocalReq({ user }, payload) : undefined
     const mode = resolveSyncMode(requestHeaders)
+    const syncProfileHeader = requestHeaders.get('x-substack-sync-profile')
+    const syncProfile: 'fast' | 'full' =
+      syncProfileHeader === 'full' || syncProfileHeader === 'fast'
+        ? syncProfileHeader
+        : allowCron
+          ? 'fast'
+          : 'full'
+    const alwaysFetchFullArticle =
+      parseBoolean(process.env.SUBSTACK_SYNC_ALWAYS_FETCH_FULL_ARTICLE) ??
+      (syncProfile === 'full')
+    const discoverFromArchive =
+      parseBoolean(process.env.SUBSTACK_SYNC_DISCOVER_FROM_ARCHIVE) ?? (syncProfile === 'full')
+    const maxItems =
+      parsePositiveInt(process.env.SUBSTACK_SYNC_MAX_ITEMS) ??
+      (syncProfile === 'fast' ? 5 : undefined)
+    const maxImagesPerPost = parsePositiveInt(process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST)
     const body = request.headers.get('content-type')?.includes('application/json')
       ? ((await request.json()) as
           | {
@@ -71,20 +101,20 @@ export async function POST(request: Request): Promise<Response> {
         notifyEmail: process.env.SUBSTACK_SYNC_NOTIFY_EMAIL,
         defaultAuthorID: process.env.SUBSTACK_DEFAULT_AUTHOR_ID,
         defaultAuthorEmail: process.env.SUBSTACK_DEFAULT_AUTHOR_EMAIL,
-        maxItems: process.env.SUBSTACK_SYNC_MAX_ITEMS ? Number(process.env.SUBSTACK_SYNC_MAX_ITEMS) : undefined,
+        maxItems,
         forceUpdate: process.env.SUBSTACK_SYNC_FORCE_UPDATE === 'true',
         downloadImages: process.env.SUBSTACK_SYNC_DOWNLOAD_IMAGES === 'true',
         includeImageSourceLinks: process.env.SUBSTACK_SYNC_INCLUDE_IMAGE_SOURCE_LINKS
           ? process.env.SUBSTACK_SYNC_INCLUDE_IMAGE_SOURCE_LINKS === 'true'
           : undefined,
         sourceURLs,
-        maxImagesPerPost: process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST
-          ? Number(process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST)
-          : undefined,
+        maxImagesPerPost,
+        alwaysFetchFullArticle,
+        discoverFromArchive,
       },
     })
 
-    return Response.json({ success: true, mode, ...result })
+    return Response.json({ success: true, mode, syncProfile, ...result })
   } catch (e) {
     payload.logger.error({ err: e, message: 'Error syncing Substack posts' })
     return new Response('Error syncing Substack posts.', { status: 500 })

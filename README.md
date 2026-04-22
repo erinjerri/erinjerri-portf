@@ -60,6 +60,8 @@ Optional env vars:
    - `SUBSTACK_SYNC_NOTIFY_EMAIL` (optional)
    - `SUBSTACK_SYNC_DOWNLOAD_IMAGES` (optional)
    - `SUBSTACK_SYNC_FORCE_UPDATE` (optional)
+   - `SUBSTACK_SYNC_ALWAYS_FETCH_FULL_ARTICLE` (optional; `false` is recommended for cron speed)
+   - `SUBSTACK_SYNC_DISCOVER_FROM_ARCHIVE` (optional; `false` is recommended for cron speed)
    - `SUBSTACK_SYNC_CRON` (optional; default `0 0 * * * *`) — used by Payload’s job **schedule** in config; on Netlify you still need a runner (below).
    - `SUBSTACK_SYNC_QUEUE` (optional; default `substack`)
    - `CRON_SECRET` (required for any automated trigger: Netlify scheduler or external cron)
@@ -69,6 +71,7 @@ Optional env vars:
 3. **Other hosts / extra triggers:** use an external cron (cron-job.org, UptimeRobot, etc.) calling:
    - `POST https://your-site/next/sync-substack`
    - header: `Authorization: Bearer $CRON_SECRET`
+   - optional header: `x-substack-sync-profile: fast` (defaults to `fast` for cron-secret requests)
 
 ## Medium cross-post sync
 

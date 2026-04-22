@@ -91,6 +91,7 @@ export const handler = schedule('0 * * * *', async () => {
       headers: {
         Authorization: `Bearer ${secret}`,
         'x-substack-sync-mode': syncMode,
+        'x-substack-sync-profile': 'fast',
       },
     })
 
