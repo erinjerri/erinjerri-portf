@@ -1,5 +1,5 @@
 /**
- * Performance: avoid early preconnect to Clarity (loads after LCP via AnalyticsScripts) so DNS/TCP
+ * Performance: avoid early preconnect to Clarity (loads after LCP via Analytics) so DNS/TCP
  * does not compete with hero assets on slow 4G.
  */
 import type { Metadata } from 'next'
@@ -7,11 +7,11 @@ import type { Metadata } from 'next'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { Analytics } from '@/components/Analytics'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
 import { SiteAmbientCurvesLoader } from '@/components/SiteAmbientCurvesLoader'
-import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import {
   CANONICAL_SITE_ORIGIN,
@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const headerStartedAt = Date.now()
   const [headerResult, footerResult] = await Promise.allSettled([
     getCachedGlobal('header', 1)(),
-    getCachedGlobal('footer', 2)(),
+    getCachedGlobal('footer', 1)(),
   ])
 
   if (headerResult.status === 'fulfilled') {
@@ -60,7 +60,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     console.log(`[layout] header ${Date.now() - headerStartedAt}ms`)
   }
 
-  const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
   const enableClarity = process.env.NEXT_PUBLIC_ENABLE_CLARITY === 'true'
   const enableThirdPartyScripts = process.env.NODE_ENV === 'production'
 
@@ -75,8 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {/* Preconnect to analytics origins to reduce connection latency when scripts load */}
-        {enableThirdPartyScripts &&
-        (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || gtmContainerId) ? (
+        {enableThirdPartyScripts && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
           <link rel="preconnect" href="https://www.googletagmanager.com" />
         ) : null}
       </head>
@@ -90,7 +88,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Footer data={footerFailed ? undefined : footerData} />
         </Providers>
         {enableThirdPartyScripts ? (
-          <AnalyticsScripts
+          <Analytics
             measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
             clarityProjectId={
               enableClarity ? process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID : undefined

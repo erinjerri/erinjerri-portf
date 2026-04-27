@@ -1,7 +1,5 @@
 import type { TaskConfig } from 'payload'
 
-import { syncMediumToPosts } from '../utilities/medium/syncMediumToPosts'
-
 type MediumSyncTaskIO = {
   input: Record<string, never>
   output: {
@@ -22,6 +20,7 @@ export const mediumSyncTask: TaskConfig<MediumSyncTaskIO> = {
   slug: 'mediumSync',
   label: 'Sync Medium posts',
   handler: async ({ req }) => {
+    const { syncMediumToPosts } = await import('../utilities/medium/syncMediumToPosts')
     const maxItemsRaw = process.env.MEDIUM_SYNC_MAX_ITEMS
     const maxItems =
       typeof maxItemsRaw === 'string' && maxItemsRaw.trim().length > 0
