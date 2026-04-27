@@ -5,6 +5,7 @@ declare global {
       DATABASE_URL: string
       NEXT_PUBLIC_SERVER_URL: string
       NEXT_PUBLIC_GA_MEASUREMENT_ID?: string
+      NEXT_PUBLIC_ENABLE_CLARITY?: 'true' | 'false'
       NEXT_PUBLIC_CLARITY_PROJECT_ID?: string
       GOOGLE_ANALYTICS_PROPERTY_ID?: string
       GOOGLE_ANALYTICS_CLIENT_EMAIL?: string

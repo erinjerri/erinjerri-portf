@@ -90,7 +90,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
     return (
       <div className={cn('hp-hero-content relative z-[2]', className)}>
-        <div className="hp-hero-content-inner">
+        <div
+          className={cn(
+            'hp-hero-content-inner',
+            richText && 'hp-hero-content-inner--with-prose',
+          )}
+        >
           {richText && (
             <RichText
               className={cn(

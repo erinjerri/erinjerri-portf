@@ -1,6 +1,7 @@
 /**
- * Mobile perf: site “3D feel” is Canvas2D (not three.js). Throttled RAF, pauses when tab hidden /
- * off-screen, lower DPR + point counts on small viewports for TBT. Full `variant` keeps richer motion.
+ * Mobile perf: site "3D feel" is Canvas2D (not three.js). Throttled RAF, pauses when tab hidden /
+ * off-screen, lower DPR + point counts on small viewports for TBT. Ambient mode also sleeps once
+ * the hero blend has faded, so it does not keep a site-wide RAF alive during normal reading.
  */
 'use client'
 
@@ -249,8 +250,7 @@ function drawBackground(
     ctx.fillRect(0, 0, width, height)
   }
 
-  const radialMul =
-    variant === 'ambient' ? (0.72 * heroBlend + 0.28) * 0.85 : 1
+  const radialMul = variant === 'ambient' ? (0.72 * heroBlend + 0.28) * 0.85 : 1
 
   const leftGlow = ctx.createRadialGradient(
     width * (0.1 + pointerX * 0.02),
@@ -285,11 +285,7 @@ function drawBackground(
   if (variant === 'full') {
     const ribbonY =
       height *
-      (0.22 +
-        0.26 * 0.5 +
-        Math.sin(time * 0.26) * 0.026 +
-        pointerX * 0.012 +
-        pointerY * 0.01)
+      (0.22 + 0.26 * 0.5 + Math.sin(time * 0.26) * 0.026 + pointerX * 0.012 + pointerY * 0.01)
     const ribbonGradient = ctx.createLinearGradient(0, ribbonY - 90, width, ribbonY + 90)
     ribbonGradient.addColorStop(0, 'rgba(120, 214, 255, 0)')
     ribbonGradient.addColorStop(0.34, 'rgba(116, 215, 255, 0.14)')
@@ -333,12 +329,6 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     const pointerTarget = { x: 0, y: 0 }
     const pointerCurrent = { x: 0, y: 0 }
 
-    const syncScroll = () => {
-      scrollYRef.current = window.scrollY
-    }
-    syncScroll()
-    window.addEventListener('scroll', syncScroll, { passive: true })
-
     const mMobile = window.matchMedia(MOBILE_MAX_WIDTH_MQ)
     const mReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
 
@@ -348,23 +338,58 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       const y = (event.clientY - bounds.top) / Math.max(bounds.height, 1)
       pointerTarget.x = (x - 0.5) * 2
       pointerTarget.y = (y - 0.5) * -2
+      requestRender()
     }
 
     const handlePointerLeave = () => {
       pointerTarget.x = 0
       pointerTarget.y = 0
+      requestRender()
     }
 
     /** Site-wide ambient: 30fps cap always. Mobile `full` variant: 30fps; desktop `full`: ~60fps. */
     let lastFrameTimeMs = 0
     const FRAME_MS_30 = 1000 / 30
     const FRAME_MS_60 = 1000 / 60
+    let needsUpdate = true
+
+    const getHeroBlend = () =>
+      variant === 'ambient'
+        ? Math.max(0, Math.min(1, 1 - scrollYRef.current / AMBIENT_SCROLL_BLEND_RANGE_PX))
+        : 1
+
+    const pointerIsSettling = () =>
+      Math.abs(pointerTarget.x - pointerCurrent.x) > 0.002 ||
+      Math.abs(pointerTarget.y - pointerCurrent.y) > 0.002
+
+    function requestRender() {
+      needsUpdate = true
+      if (pageVisibleRef.current && inViewRef.current && !frame) {
+        frame = window.requestAnimationFrame(render)
+      }
+    }
+
+    const syncScroll = () => {
+      scrollYRef.current = window.scrollY
+      if (variant === 'ambient') requestRender()
+    }
+    syncScroll()
+    window.addEventListener('scroll', syncScroll, { passive: true })
 
     function render(now?: number) {
       const ts = typeof now === 'number' ? now : performance.now()
       const { mobile, reduceMotion } = motionPrefsRef.current
+      frame = 0
 
       if (!pageVisibleRef.current || !inViewRef.current) {
+        return
+      }
+
+      const heroBlend = getHeroBlend()
+      const shouldAnimate =
+        !reduceMotion && (variant === 'full' || heroBlend > 0.02 || pointerIsSettling())
+
+      if (!needsUpdate && !shouldAnimate) {
         return
       }
 
@@ -373,12 +398,17 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
         const time = 0
         pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
         pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
-        const heroBlend =
-          variant === 'ambient'
-            ? Math.max(0, Math.min(1, 1 - scrollYRef.current / AMBIENT_SCROLL_BLEND_RANGE_PX))
-            : 1
         const curveIntensity = variant === 'ambient' ? 0.18 + 0.82 * heroBlend : 1
-        drawBackground(ctx, width, height, time, pointerCurrent.x, pointerCurrent.y, variant, heroBlend)
+        drawBackground(
+          ctx,
+          width,
+          height,
+          time,
+          pointerCurrent.x,
+          pointerCurrent.y,
+          variant,
+          heroBlend,
+        )
         const pointCap =
           variant === 'ambient' && mobile ? CURVE_POINT_COUNT_AMBIENT_MOBILE : CURVE_POINT_COUNT
         for (const [index, layer] of LAYERS.entries()) {
@@ -397,12 +427,11 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
           }))
           drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width, curveIntensity)
         }
-        frame = 0
+        needsUpdate = false
         return
       }
 
-      const frameCapMs =
-        variant === 'ambient' ? FRAME_MS_30 : mobile ? FRAME_MS_30 : FRAME_MS_60
+      const frameCapMs = variant === 'ambient' ? FRAME_MS_30 : mobile ? FRAME_MS_30 : FRAME_MS_60
       if (ts - lastFrameTimeMs < frameCapMs * 0.92) {
         frame = window.requestAnimationFrame(render)
         return
@@ -415,13 +444,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
       pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
 
-      const heroBlend =
-        variant === 'ambient'
-          ? Math.max(0, Math.min(1, 1 - scrollYRef.current / AMBIENT_SCROLL_BLEND_RANGE_PX))
-          : 1
-
-      const curveIntensity =
-        variant === 'ambient' ? 0.18 + 0.82 * heroBlend : 1
+      const curveIntensity = variant === 'ambient' ? 0.18 + 0.82 * heroBlend : 1
 
       drawBackground(
         ctx,
@@ -456,18 +479,10 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
         }))
 
         if (index < 3) leadCurves.push(drifted)
-        drawGlowLine(
-          ctx,
-          drifted,
-          layer.color,
-          layer.opacity,
-          layer.width,
-          curveIntensity,
-        )
+        drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width, curveIntensity)
       }
 
-      const starMul =
-        variant === 'ambient' ? Math.pow(heroBlend, 1.45) : 1
+      const starMul = variant === 'ambient' ? Math.pow(heroBlend, 1.45) : 1
 
       const guide = leadCurves[0] ?? []
       if (guide.length && starMul > 0.02) {
@@ -491,7 +506,10 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
         }
       }
 
-      frame = window.requestAnimationFrame(render)
+      needsUpdate = false
+      if (shouldAnimate) {
+        frame = window.requestAnimationFrame(render)
+      }
     }
 
     const resize = () => {
@@ -499,8 +517,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       const nextWidth = parent?.clientWidth ?? window.innerWidth
       const nextHeight = parent?.clientHeight ?? 520
       const isMobileViewport = window.matchMedia(MOBILE_MAX_WIDTH_MQ).matches
-      const dprMax =
-        variant === 'ambient' && isMobileViewport ? 1 : isMobileViewport ? 1.5 : 2
+      const dprMax = variant === 'ambient' && isMobileViewport ? 1 : isMobileViewport ? 1.5 : 2
       const dpr = Math.min(window.devicePixelRatio || 1, dprMax)
 
       width = nextWidth
@@ -514,9 +531,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.scale(dpr, dpr)
 
-      if (motionPrefsRef.current.reduceMotion) {
-        window.requestAnimationFrame(() => render(performance.now()))
-      }
+      requestRender()
     }
 
     resize()
@@ -532,13 +547,11 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
           window.cancelAnimationFrame(frame)
           frame = 0
         }
-        window.requestAnimationFrame(() => {
-          render(performance.now())
-        })
+        requestRender()
         return
       }
       if (pageVisibleRef.current && inViewRef.current && !frame) {
-        frame = window.requestAnimationFrame(render)
+        requestRender()
       }
     }
     syncMotion()
@@ -556,9 +569,9 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
         !frame &&
         !motionPrefsRef.current.reduceMotion
       ) {
-        frame = window.requestAnimationFrame(render)
+        requestRender()
       } else if (pageVisibleRef.current && motionPrefsRef.current.reduceMotion) {
-        window.requestAnimationFrame(() => render(performance.now()))
+        requestRender()
       }
     }
     document.addEventListener('visibilitychange', onVisibility)
@@ -575,11 +588,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
             window.cancelAnimationFrame(frame)
             frame = 0
           } else if (hit && pageVisibleRef.current && !frame) {
-            if (motionPrefsRef.current.reduceMotion) {
-              window.requestAnimationFrame(() => render(performance.now()))
-            } else {
-              frame = window.requestAnimationFrame(render)
-            }
+            requestRender()
           }
         },
         { threshold: 0, rootMargin: '0px' },
@@ -609,10 +618,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
   }, [variant])
 
   return (
-    <div
-      ref={wrapRef}
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-    >
+    <div ref={wrapRef} className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
       <canvas
         className={
           variant === 'ambient'
