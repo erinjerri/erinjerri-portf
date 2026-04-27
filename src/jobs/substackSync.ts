@@ -1,7 +1,5 @@
 import type { TaskConfig } from 'payload'
 
-import { syncSubstackToPosts } from '../utilities/substack/syncSubstackToPosts'
-
 type SubstackSyncTaskIO = {
   input: Record<string, never>
   output: {
@@ -35,6 +33,7 @@ export const substackSyncTask: TaskConfig<SubstackSyncTaskIO> = {
   slug: 'substackSync',
   label: 'Sync Substack posts',
   handler: async ({ req }) => {
+    const { syncSubstackToPosts } = await import('../utilities/substack/syncSubstackToPosts')
     const maxItemsRaw = process.env.SUBSTACK_SYNC_MAX_ITEMS
     const maxItems =
       typeof maxItemsRaw === 'string' && maxItemsRaw.trim().length > 0 ? Number(maxItemsRaw) : undefined

@@ -55,9 +55,12 @@ const useR2DirectURLs =
 const hasR2S3Config = Boolean(
   useR2Storage && r2Bucket && r2Endpoint && r2AccessKeyID && r2SecretAccessKey,
 )
+const useLightweightLocalPlugins =
+  process.env.NODE_ENV === 'development' &&
+  process.env.PAYLOAD_ENABLE_FULL_LOCAL_PLUGINS !== 'true'
 
 export const plugins: Plugin[] = [
-  ...(hasR2S3Config
+  ...(!useLightweightLocalPlugins && hasR2S3Config
     ? [
         s3Storage({
           collections: {
@@ -168,13 +171,17 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  searchPlugin({
-    collections: ['posts'],
-    beforeSync: beforeSyncWithSearch,
-    searchOverrides: {
-      fields: ({ defaultFields }) => {
-        return [...defaultFields, ...searchFields]
-      },
-    },
-  }),
+  ...(!useLightweightLocalPlugins
+    ? [
+        searchPlugin({
+          collections: ['posts'],
+          beforeSync: beforeSyncWithSearch,
+          searchOverrides: {
+            fields: ({ defaultFields }) => {
+              return [...defaultFields, ...searchFields]
+            },
+          },
+        }),
+      ]
+    : []),
 ]

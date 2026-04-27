@@ -31,18 +31,7 @@ import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloa
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
-import { default as default_730b936cb44e7ca811301604904ddf96 } from '@/components/AdminGraphics/Icon'
-import { default as default_f804a2f22915f9d0cc2e74cde7c6072f } from '@/components/AdminGraphics/Logo'
-import { default as default_aaa7ca8e68147c2c7193d1c8e5029c2e } from '@/components/dashboard/AnalyticsNavLink'
-import { default as default_4db2d3e84499f6bf7ea77862f576109a } from '@/components/AdminLogoutNavLink'
-import { default as default_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
-import { default as default_841bf41b8d9d87b643fb67b28cc549b1 } from '@/components/LoadLexicalList'
-import { default as default_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
-import { default as default_d2a05cc0963d064af3e35c8fd6f1ba5a } from '@/components/dashboard/AnalyticsView'
-import { default as default_3c2387709bf741a13edb9818b1640481 } from '@/components/dashboard/widgets/ConversionOverviewWidget'
-import { default as default_75595b03c1bb1dd4e2ac2ff5bb5e0df5 } from '@/components/dashboard/widgets/SourcePerformanceWidget'
-import { default as default_e36d9368e4dd6917630aa97539b1bf1e } from '@/components/dashboard/widgets/SyncHealthWidget'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -79,17 +68,6 @@ export const importMap = {
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
-  "@/components/AdminGraphics/Icon#default": default_730b936cb44e7ca811301604904ddf96,
-  "@/components/AdminGraphics/Logo#default": default_f804a2f22915f9d0cc2e74cde7c6072f,
-  "@/components/dashboard/AnalyticsNavLink#default": default_aaa7ca8e68147c2c7193d1c8e5029c2e,
-  "@/components/AdminLogoutNavLink#default": default_4db2d3e84499f6bf7ea77862f576109a,
-  "@/components/BeforeDashboard#default": default_1a7510af427896d367a49dbf838d2de6,
-  "@/components/LoadLexicalList#default": default_841bf41b8d9d87b643fb67b28cc549b1,
-  "@/components/BeforeLogin#default": default_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
-  "@/components/dashboard/AnalyticsView#default": default_d2a05cc0963d064af3e35c8fd6f1ba5a,
-  "@/components/dashboard/widgets/ConversionOverviewWidget#default": default_3c2387709bf741a13edb9818b1640481,
-  "@/components/dashboard/widgets/SourcePerformanceWidget#default": default_75595b03c1bb1dd4e2ac2ff5bb5e0df5,
-  "@/components/dashboard/widgets/SyncHealthWidget#default": default_e36d9368e4dd6917630aa97539b1bf1e,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
