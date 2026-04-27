@@ -138,7 +138,7 @@ export async function Footer({ data }: FooterProps = {}) {
 
   if (data === undefined) {
     try {
-      footerData = (await getCachedGlobal('footer', 2)()) as Footer
+      footerData = (await getCachedGlobal('footer', 1)()) as Footer
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[Footer] Failed to fetch footer:', err)
