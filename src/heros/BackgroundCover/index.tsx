@@ -5,27 +5,30 @@ import type { Page } from '@/payload-types'
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 import { cn } from '@/utilities/ui'
 import { CMSLink } from '@/components/Link'
+import { ContainedHeroAnimation } from '@/components/ContainedHeroAnimation'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
-export const BackgroundCoverHero: React.FC<Page['hero']> = ({
+export const BackgroundCoverHero: React.FC<Page['hero'] & { showHeroAnimation?: boolean }> = ({
   backgroundMedia,
   links,
   richText,
+  showHeroAnimation = false,
 }) => {
   const backgroundImage = backgroundMedia && typeof backgroundMedia === 'object' ? backgroundMedia : null
 
   return (
     <div
-      className="relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] md:min-h-[72vh] w-full overflow-hidden text-white"
+      className="relative isolate -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] md:min-h-[72vh] w-full overflow-hidden text-white"
       data-theme="dark"
     >
       <div
         className="absolute inset-0 -z-10 bg-gradient-to-br from-[#000815] via-[#0c1633] to-[#020712]"
         aria-hidden
       />
+      {showHeroAnimation && <ContainedHeroAnimation />}
 
       {backgroundImage && (
         <div className="absolute inset-0 -z-10">

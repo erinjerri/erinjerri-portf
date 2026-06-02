@@ -5,6 +5,9 @@ import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 type Hero = Page['hero']
 type HeroMediaField = Hero['backgroundMedia'] | Hero['heroImage1'] | Hero['heroImage2'] | Hero['heroImage3'] | Hero['media']
 type ResolvedHeroMediaField = string | Media | null | undefined
+type ResolveHeroMediaOptions = {
+  includeGridMedia?: boolean
+}
 
 const isMediaDoc = (value: HeroMediaField): value is Media =>
   Boolean(value && typeof value === 'object' && 'url' in value)
@@ -27,14 +30,18 @@ const resolveMedia = async (value: HeroMediaField): Promise<ResolvedHeroMediaFie
   }
 }
 
-export const resolveHeroMedia = async (hero: Hero): Promise<Hero> => {
+export const resolveHeroMedia = async (
+  hero: Hero,
+  options: ResolveHeroMediaOptions = {},
+): Promise<Hero> => {
   if (!hero) return hero
+  const { includeGridMedia = true } = options
 
   const [backgroundMedia, heroImage1, heroImage2, heroImage3, media] = await Promise.all([
     resolveMedia(hero.backgroundMedia),
-    resolveMedia(hero.heroImage1),
-    resolveMedia(hero.heroImage2),
-    resolveMedia(hero.heroImage3),
+    includeGridMedia ? resolveMedia(hero.heroImage1) : Promise.resolve(hero.heroImage1),
+    includeGridMedia ? resolveMedia(hero.heroImage2) : Promise.resolve(hero.heroImage2),
+    includeGridMedia ? resolveMedia(hero.heroImage3) : Promise.resolve(hero.heroImage3),
     resolveMedia(hero.media),
   ])
 

@@ -16,10 +16,14 @@ const heroes = {
   topline: ToplineHero,
 }
 
-export const RenderHero: React.FC<Page['hero'] & { visualVariant?: 'prismatic'; pageSlug?: string }> = (
-  props,
-) => {
-  const { visualVariant, pageSlug, ...heroProps } = props
+export const RenderHero: React.FC<
+  Page['hero'] & {
+    visualVariant?: 'prismatic'
+    pageSlug?: string
+    showHeroAnimation?: boolean
+  }
+> = (props) => {
+  const { visualVariant, pageSlug, showHeroAnimation = false, ...heroProps } = props
   const { type } = heroProps || {}
   const heroType = type as string | undefined
 
@@ -32,8 +36,9 @@ export const RenderHero: React.FC<Page['hero'] & { visualVariant?: 'prismatic'; 
   return (
     <HeroToRender
       {...heroProps}
-      {...(heroType === 'highImpact' ? { visualVariant } : {})}
-      {...(heroType === 'mediumImpact' && pageSlug ? { pageSlug } : {})}
+      {...(heroType === 'backgroundCover' ? { showHeroAnimation } : {})}
+      {...(heroType === 'highImpact' ? { showHeroAnimation, visualVariant } : {})}
+      {...(heroType === 'mediumImpact' ? { pageSlug, showHeroAnimation } : {})}
     />
   )
 }

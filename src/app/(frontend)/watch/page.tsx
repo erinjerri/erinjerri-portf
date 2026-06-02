@@ -52,7 +52,7 @@ export default async function Page() {
     <article className="pt-16 pb-24">
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...resolvedHero} />
+      <RenderHero {...resolvedHero} pageSlug="watch" showHeroAnimation />
       {selectedVideo && (
         <div className="container mt-8">
           <MediaComponent resource={selectedVideo} />

@@ -11,7 +11,6 @@ import { Analytics } from '@/components/Analytics'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
-import { SiteAmbientCurvesLoader } from '@/components/SiteAmbientCurvesLoader'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import {
   CANONICAL_SITE_ORIGIN,
@@ -80,7 +79,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={fontJost.className}>
         <Providers>
-          <SiteAmbientCurvesLoader />
           <AdminBar />
 
           <Header data={headerFailed ? undefined : headerData} />

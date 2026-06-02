@@ -50,6 +50,16 @@ type Args = {
   }>
 }
 
+const MAIN_PAGE_HERO_ANIMATION_SLUGS = new Set([
+  'home',
+  'about',
+  'speaking',
+  'advisory',
+  'services',
+  'watch',
+  'media',
+])
+
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
@@ -86,7 +96,9 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const enhancedPage = enhancePageForRoute(renderedPage, decodedSlug)
 
-  const resolvedHero = await resolveHeroMedia(enhancedPage.hero)
+  const resolvedHero = await resolveHeroMedia(enhancedPage.hero, {
+    includeGridMedia: decodedSlug === 'home',
+  })
 
   const hasHomeGridMedia =
     decodedSlug === 'home' &&
@@ -125,6 +137,7 @@ export default async function Page({ params: paramsPromise }: Args) {
         <RenderHero
           {...hero}
           pageSlug={decodedSlug}
+          showHeroAnimation={MAIN_PAGE_HERO_ANIMATION_SLUGS.has(decodedSlug)}
           visualVariant={isHomePrismatic ? 'prismatic' : undefined}
         />
         {(decodedSlug === 'timebite' || decodedSlug === 'timebite-download') && (

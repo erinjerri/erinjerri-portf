@@ -7,12 +7,16 @@ import type { Media as MediaDoc, Page } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
 import { CMSLink } from '@/components/Link'
+import { ContainedHeroAnimation } from '@/components/ContainedHeroAnimation'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
-type HeroProps = Page['hero'] & { visualVariant?: 'prismatic' }
+type HeroProps = Page['hero'] & {
+  showHeroAnimation?: boolean
+  visualVariant?: 'prismatic'
+}
 
 const isPopulated = (m: unknown): m is MediaDoc =>
   Boolean(m && typeof m === 'object' && 'url' in m)
@@ -69,6 +73,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   heroImage1,
   heroImage2,
   heroImage3,
+  showHeroAnimation = false,
   visualVariant,
 }) => {
   const hasBackground = isPopulated(backgroundMedia)
@@ -211,7 +216,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     <div
       className={cn(
         /* No negative margin: sticky header (z-50) must sit above hero; content clears nav via padding below. */
-        'relative mt-0 flex w-full flex-col overflow-hidden text-foreground',
+        'relative isolate mt-0 flex w-full flex-col overflow-hidden text-foreground',
         /* CLS: reserve at least one viewport height before paint (Lighthouse); prismatic keeps flex centering inside. */
         'min-h-[100dvh]',
         isPrismatic && 'hp-hero-root',
@@ -257,8 +262,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           />
         </div>
       )}
+      {showHeroAnimation && <ContainedHeroAnimation />}
 
-      {/* Mobile-only: gradient + vignette above background, below copy (canvas lives in fixed ambient layer). */}
+      {/* Mobile-only: gradient + vignette above background, below copy. */}
       <div
         aria-hidden
         className="hp-hero-mobile-overlay pointer-events-none absolute inset-0 z-[1] hidden max-[768px]:block"
@@ -270,16 +276,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           {isPrismatic ? (
             <div
               className={cn(
-                'relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-6 px-6 md:px-10',
+                'relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-6 overflow-hidden px-6 md:px-10',
                 /* Tighter vertical rhythm into first homepage section */
                 'pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:pt-[calc(var(--nav-height)+3rem)]',
                 'xl:grid xl:min-h-0 xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-center xl:gap-10 xl:pb-14 xl:pt-[calc(var(--nav-height)+2.5rem)]',
               )}
             >
-              <div className="order-2 xl:order-1">
+              <div className="relative z-10 order-2 xl:order-1">
                 {renderHeroCopy('max-w-[min(calc(100vw-2.5rem),40rem)]')}
               </div>
-              <div className="order-1 flex justify-center xl:order-2 xl:items-center xl:justify-end">
+              <div className="relative z-10 order-1 flex justify-center xl:order-2 xl:items-center xl:justify-end">
                 <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[500px]">
                   {renderPortrait()}
                 </div>
@@ -307,11 +313,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : isPrismatic ? (
-        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-8 px-6 pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-14 lg:pt-[calc(var(--nav-height)+3rem)] xl:gap-12">
-          <div className="min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
+        <div className="relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-8 overflow-hidden px-6 pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-14 lg:pt-[calc(var(--nav-height)+3rem)] xl:gap-12">
+          <div className="relative z-10 min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
             {renderHeroCopy()}
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="relative z-10 min-w-0 flex-1">
             <div
               className={cn(
                 'grid w-full grid-cols-2 gap-3 sm:gap-4 lg:max-w-[min(100%,40rem)] lg:justify-self-end xl:max-w-[44rem]',
