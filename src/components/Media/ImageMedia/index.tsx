@@ -106,7 +106,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90, 100] as const
   const rawQuality =
     qualityFromProps ??
-    (fill && priority ? 60 : priority ? 70 : fill ? 70 : 75)
+    (fill && priority ? 50 : priority ? 65 : fill ? 65 : 75)
   const quality = ALLOWED_QUALITIES.includes(rawQuality as (typeof ALLOWED_QUALITIES)[number])
     ? rawQuality
     : 70
@@ -125,9 +125,9 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   const sizes = sizeFromProps
     ? sizeFromProps
     : fill && priority
-      ? '(max-width: 768px) min(100vw, 420px), (max-width: 1280px) 50vw, 960px'
+      ? '(max-width: 768px) min(100vw, 360px), (max-width: 1280px) 42vw, 720px'
       : fill
-        ? '(max-width: 768px) min(100vw, 420px), (max-width: 1280px) 50vw, 720px'
+        ? '(max-width: 768px) min(100vw, 360px), (max-width: 1280px) 42vw, 640px'
         : '(max-width: 640px) min(100vw, 400px), (max-width: 1024px) 48vw, 560px'
 
   return (

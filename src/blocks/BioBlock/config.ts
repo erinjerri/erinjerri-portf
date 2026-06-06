@@ -1,30 +1,6 @@
 import type { Block } from 'payload'
 
-const defaultParagraphs = [
-  {
-    text: "I've been building in AI, spatial computing, and web3 since 2015.",
-    highlights: [
-      { phrase: 'AI', color: 'mint', underline: false },
-      { phrase: 'spatial computing', color: 'teal', underline: false },
-      { phrase: 'web3', color: 'pink', underline: false },
-    ],
-  },
-  {
-    text: "I'm the lead author of one of the first comprehensive AR/VR books published by O'Reilly Media in over five years - helping define how engineering, design, and business come together in real systems.",
-    highlights: [{ phrase: "O'Reilly Media", color: 'mint', underline: false }],
-  },
-  {
-    text: "I'm a software engineer, startup founder, and former CTO. Right now I'm building TimeBite - along with new books, apps, and film projects.",
-    highlights: [{ phrase: 'TimeBite', color: 'teal', underline: false }],
-  },
-]
-
-const defaultPills = [
-  { label: 'UC Berkeley Alumna', color: 'mint' },
-  { label: 'fast.ai Fellow', color: 'teal' },
-  { label: 'AWS CTO Fellowship', color: 'pink' },
-  { label: 'FASTER President', color: 'white' },
-]
+import { defaultBioParagraphs, defaultBioPills } from './defaults'
 
 export const BioBlock: Block = {
   slug: 'bioBlock',
@@ -37,20 +13,33 @@ export const BioBlock: Block = {
     {
       name: 'eyebrow',
       type: 'text',
-      defaultValue: "Hi, I'm Erin",
+      defaultValue: 'Hi, I’m Erin! 👋🏼',
     },
     {
       name: 'headline',
       type: 'textarea',
-      required: true,
-      defaultValue:
-        'Software engineer, startup founder, and writer - born and raised in Silicon Valley.',
+      defaultValue: '',
+      admin: {
+        description:
+          'Optional larger headline above the paragraph copy. Leave blank when the bio should be paragraph-driven.',
+      },
+    },
+    {
+      name: 'headshot',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: {
+        mediaType: { equals: 'image' },
+      },
+      admin: {
+        description: 'Optional headshot shown beside the bio copy.',
+      },
     },
     {
       name: 'paragraphs',
       type: 'array',
       minRows: 1,
-      defaultValue: [...defaultParagraphs],
+      defaultValue: [...defaultBioParagraphs],
       fields: [
         {
           name: 'text',
@@ -92,7 +81,7 @@ export const BioBlock: Block = {
     {
       name: 'pills',
       type: 'array',
-      defaultValue: [...defaultPills],
+      defaultValue: [...defaultBioPills],
       fields: [
         {
           name: 'label',

@@ -600,20 +600,19 @@
       radial-gradient(circle, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
   }
 
-  [data-high-impact-hero] .hp-hero-content-inner {
-    background: rgba(0, 0, 0, 0.35);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-    border-radius: 12px;
-    padding: 16px;
+  [data-high-impact-hero] .hp-hero-content-inner--with-prose {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    padding: 0;
   }
 
-  [data-high-impact-hero] .hp-hero-content-inner .prose,
-  [data-high-impact-hero] .hp-hero-content-inner .prose h1,
-  [data-high-impact-hero] .hp-hero-content-inner .prose h2,
-  [data-high-impact-hero] .hp-hero-content-inner .prose h3,
-  [data-high-impact-hero] .hp-hero-content-inner .prose p,
-  [data-high-impact-hero] .hp-hero-content-inner .prose li {
+  [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose,
+  [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose h1,
+  [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose h2,
+  [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose h3,
+  [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose p,
+  [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose li {
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
   }
 
@@ -633,8 +632,8 @@
 
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   @media (max-width: 768px) {
-    [data-high-impact-hero] .hp-hero-content-inner .prose,
-    [data-high-impact-hero] .hp-hero-content-inner .prose h1 {
+    [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose,
+    [data-high-impact-hero] .hp-hero-content-inner--with-prose .prose h1 {
       text-shadow:
         0 1px 2px rgba(0, 0, 0, 0.85),
         0 2px 12px rgba(0, 0, 0, 0.75);

@@ -1,4 +1,5 @@
 import type { Form } from '@/payload-types'
+import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 import { RequiredDataFromCollectionSlug } from 'payload'
 
 type AboutArgs = {
@@ -24,6 +25,7 @@ export const aboutPage = ({
       type: 'none',
     },
     layout: [
+      defaultBioBlock(),
       {
         blockType: 'formBlock',
         enableIntro: true,
