@@ -2,6 +2,12 @@ import type { Page } from '@/payload-types'
 import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 
 const HOME_SIGNATURE_BLOCK_TYPES = ['ribbonBlock', 'statsBlock', 'bioBlock'] as const
+const HOME_EXCLUDED_SPEAKER_BLOCK_TYPES = new Set([
+  'speakerKit',
+  'speakerBio',
+  'speakerBioKit',
+  'speakerKitHeadshots',
+])
 
 /**
  * Default “Hire Me” section for the home page.
@@ -80,6 +86,10 @@ export function mergeHomeHireMeLayoutBlocks(
       if (!existingSignatureBlocks.has(blockType)) {
         existingSignatureBlocks.set(blockType, block)
       }
+      continue
+    }
+
+    if (blockType && HOME_EXCLUDED_SPEAKER_BLOCK_TYPES.has(blockType)) {
       continue
     }
 

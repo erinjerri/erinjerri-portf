@@ -33,11 +33,7 @@ export async function generateStaticParams() {
       }),
     )
 
-    return (
-      pages.docs
-        ?.filter((doc) => doc.slug !== 'home')
-        .map(({ slug }) => ({ slug })) ?? []
-    )
+    return pages.docs?.filter((doc) => doc.slug !== 'home').map(({ slug }) => ({ slug })) ?? []
   } catch (err) {
     console.warn('[generateStaticParams] Skipping pages prebuild:', err)
     return []
@@ -50,15 +46,7 @@ type Args = {
   }>
 }
 
-const MAIN_PAGE_HERO_ANIMATION_SLUGS = new Set([
-  'home',
-  'about',
-  'speaking',
-  'advisory',
-  'services',
-  'watch',
-  'media',
-])
+const MAIN_PAGE_HERO_ANIMATION_SLUGS = new Set(['home'])
 
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
@@ -117,9 +105,8 @@ export default async function Page({ params: paramsPromise }: Args) {
     : resolvedHero
 
   const { layout, videoAsset, videoSource, videoUrl } = enhancedPage
-  const selectedVideo = typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video')
-    ? videoAsset
-    : null
+  const selectedVideo =
+    typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video') ? videoAsset : null
 
   const isHomePrismatic = decodedSlug === 'home'
   const layoutToRender = isHomePrismatic ? mergeHomeHireMeLayoutBlocks(layout) : layout
@@ -142,11 +129,16 @@ export default async function Page({ params: paramsPromise }: Args) {
         />
         {(decodedSlug === 'timebite' || decodedSlug === 'timebite-download') && (
           <p className="container mt-8 max-w-[48rem] text-base leading-relaxed text-muted-foreground">
-            TimeBite is an AI-powered productivity and spatial computing system designed for real-world
-            workflows.
+            TimeBite is an AI-powered productivity and spatial computing system designed for
+            real-world workflows.
           </p>
         )}
-        <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
+        <VideoEmbed
+          className="container mt-8"
+          video={selectedVideo}
+          videoSource={videoSource}
+          videoUrl={videoUrl}
+        />
         <RenderBlocks blocks={layoutToRender} pageSlug={decodedSlug} />
       </article>
     </>

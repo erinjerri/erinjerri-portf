@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     pages: Page;
+    poetry: Poetry;
     posts: Post;
     projects: Project;
     watch: Watch;
@@ -96,6 +97,7 @@ export interface Config {
   };
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
+    poetry: PoetrySelect<false> | PoetrySelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     watch: WatchSelect<false> | WatchSelect<true>;
@@ -135,18 +137,12 @@ export interface Config {
   };
   locale: null;
   widgets: {
-    'conversion-overview': ConversionOverviewWidget;
-    'source-performance': SourcePerformanceWidget;
-    'sync-health': SyncHealthWidget;
     collections: CollectionsWidget;
   };
   user: User;
   jobs: {
     tasks: {
       analyticsSync: TaskAnalyticsSync;
-      substackSync: TaskSubstackSync;
-      mediumSync: TaskMediumSync;
-      paragraphSync: TaskParagraphSync;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -363,6 +359,9 @@ export interface Page {
     | RibbonBlockBlock
     | StatsBlockBlock
     | BioBlockBlock
+    | SpeakerBioBlock
+    | SpeakerKitHeadshotsBlock
+    | SpeakerKitBlock
   )[];
   meta?: {
     title?: string | null;
@@ -556,6 +555,14 @@ export interface Media {
       filename?: string | null;
     };
     large?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    collage?: {
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -1650,7 +1657,14 @@ export interface StatsBlockBlock {
  */
 export interface BioBlockBlock {
   eyebrow?: string | null;
-  headline: string;
+  /**
+   * Optional larger headline above the paragraph copy. Leave blank when the bio should be paragraph-driven.
+   */
+  headline?: string | null;
+  /**
+   * Optional headshot shown beside the bio copy.
+   */
+  headshot?: (string | null) | Media;
   paragraphs?:
     | {
         text: string;
@@ -1678,6 +1692,102 @@ export interface BioBlockBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'bioBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpeakerBioBlock".
+ */
+export interface SpeakerBioBlock {
+  shortBio: string;
+  mediumBio: string;
+  longBio: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'speakerBio';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpeakerKitHeadshotsBlock".
+ */
+export interface SpeakerKitHeadshotsBlock {
+  heading: string;
+  photos?:
+    | {
+        photo: string | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  downloadable?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'speakerKitHeadshots';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpeakerKitBlock".
+ */
+export interface SpeakerKitBlock {
+  /**
+   * Displayed as the section heading
+   */
+  sectionTitle?: string | null;
+  shortBio: string;
+  mediumBio: string;
+  longBio: string;
+  photoHeading?: string | null;
+  photos?:
+    | {
+        photo: string | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  downloadable?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'speakerKit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "poetry".
+ */
+export interface Poetry {
+  id: string;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  featuredImage?: (string | null) | Media;
+  publishedDate?: string | null;
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * Normalized analytics metrics for dashboard widgets and conversion reporting.
@@ -1886,7 +1996,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'analyticsSync' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish';
+        taskSlug: 'inline' | 'analyticsSync' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1919,7 +2029,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'analyticsSync' | 'substackSync' | 'mediumSync' | 'paragraphSync' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'analyticsSync' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -2069,6 +2179,9 @@ export interface PagesSelect<T extends boolean = true> {
         ribbonBlock?: T | RibbonBlockBlockSelect<T>;
         statsBlock?: T | StatsBlockBlockSelect<T>;
         bioBlock?: T | BioBlockBlockSelect<T>;
+        speakerBio?: T | SpeakerBioBlockSelect<T>;
+        speakerKitHeadshots?: T | SpeakerKitHeadshotsBlockSelect<T>;
+        speakerKit?: T | SpeakerKitBlockSelect<T>;
       };
   meta?:
     | T
@@ -2445,6 +2558,7 @@ export interface StatsBlockBlockSelect<T extends boolean = true> {
 export interface BioBlockBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   headline?: T;
+  headshot?: T;
   paragraphs?:
     | T
     | {
@@ -2468,6 +2582,78 @@ export interface BioBlockBlockSelect<T extends boolean = true> {
       };
   id?: T;
   blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpeakerBioBlock_select".
+ */
+export interface SpeakerBioBlockSelect<T extends boolean = true> {
+  shortBio?: T;
+  mediumBio?: T;
+  longBio?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpeakerKitHeadshotsBlock_select".
+ */
+export interface SpeakerKitHeadshotsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  photos?:
+    | T
+    | {
+        photo?: T;
+        caption?: T;
+        id?: T;
+      };
+  downloadable?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpeakerKitBlock_select".
+ */
+export interface SpeakerKitBlockSelect<T extends boolean = true> {
+  sectionTitle?: T;
+  shortBio?: T;
+  mediumBio?: T;
+  longBio?: T;
+  photoHeading?: T;
+  photos?:
+    | T
+    | {
+        photo?: T;
+        caption?: T;
+        id?: T;
+      };
+  downloadable?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "poetry_select".
+ */
+export interface PoetrySelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  excerpt?: T;
+  content?: T;
+  featuredImage?: T;
+  publishedDate?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2695,6 +2881,16 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
         large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        collage?:
           | T
           | {
               url?: T;
@@ -3411,45 +3607,6 @@ export interface PayloadJobsStatsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "conversion-overview_widget".
- */
-export interface ConversionOverviewWidget {
-  data?: {
-    title?: string | null;
-    timeframe?: ('7d' | '30d' | '90d') | null;
-    platform?: ('all' | 'linkedin' | 'substack' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'site') | null;
-    goal?:
-      | ('newsletter_signup' | 'affiliate_click' | 'contact_submit' | 'tool_click' | 'book_call' | 'resume_download')
-      | null;
-  };
-  width: 'medium' | 'large' | 'x-large' | 'full';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "source-performance_widget".
- */
-export interface SourcePerformanceWidget {
-  data?: {
-    title?: string | null;
-    timeframe?: ('7d' | '30d' | '90d') | null;
-    goal?:
-      | ('newsletter_signup' | 'affiliate_click' | 'contact_submit' | 'tool_click' | 'book_call' | 'resume_download')
-      | null;
-  };
-  width: 'large' | 'x-large' | 'full';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sync-health_widget".
- */
-export interface SyncHealthWidget {
-  data?: {
-    title?: string | null;
-  };
-  width: 'large' | 'x-large' | 'full';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -3468,30 +3625,6 @@ export interface TaskAnalyticsSync {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TaskSubstackSync".
- */
-export interface TaskSubstackSync {
-  input?: unknown;
-  output?: unknown;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TaskMediumSync".
- */
-export interface TaskMediumSync {
-  input?: unknown;
-  output?: unknown;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TaskParagraphSync".
- */
-export interface TaskParagraphSync {
-  input?: unknown;
-  output?: unknown;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TaskSchedulePublish".
  */
 export interface TaskSchedulePublish {
@@ -3502,6 +3635,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'pages';
           value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'poetry';
+          value: string | Poetry;
         } | null)
       | ({
           relationTo: 'posts';

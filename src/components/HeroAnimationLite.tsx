@@ -16,7 +16,7 @@ import {
 import { disposeScene, resizeRendererToDisplaySize } from '@/utilities/three/performance'
 
 const TARGET_FPS = 30
-const MAX_PIXEL_RATIO = 1.5
+const MAX_PIXEL_RATIO = 2
 
 export default function HeroAnimationLite() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -33,17 +33,18 @@ export default function HeroAnimationLite() {
 
     const renderer = new WebGLRenderer({
       alpha: true,
-      antialias: false,
+      antialias: true,
       canvas,
       powerPreference: 'low-power',
     })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO))
     renderer.setClearColor(new Color(0x000000), 0)
 
     const scene = new Scene()
     const camera = new PerspectiveCamera(32, 1, 0.1, 100)
     camera.position.set(0, 0.06, 6.4)
 
-    const geometry = new TorusKnotGeometry(0.34, 0.042, 40, 5)
+    const geometry = new TorusKnotGeometry(0.34, 0.042, 128, 8)
     const material = new MeshPhysicalMaterial({
       color: 0xd8fff7,
       emissive: 0x07191d,
@@ -123,5 +124,10 @@ export default function HeroAnimationLite() {
     }
   }, [])
 
-  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full opacity-60" />
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 block h-full w-full opacity-60 [image-rendering:auto]"
+    />
+  )
 }

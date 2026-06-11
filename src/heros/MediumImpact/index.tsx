@@ -11,13 +11,11 @@ import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
 export const MediumImpactHero: React.FC<
   Page['hero'] & { pageSlug?: string; showHeroAnimation?: boolean }
-> = ({
-  links,
-  media,
-  pageSlug,
-  richText,
-  showHeroAnimation = false,
-}) => {
+> = ({ links, media, pageSlug, richText, showHeroAnimation = false }) => {
+  if (pageSlug === 'about') {
+    console.log('[About bio debug] Top bio renderer would be MediumImpactHero')
+  }
+
   const heroMedia = media && typeof media === 'object' ? media : null
 
   const hasLinks = Array.isArray(links) && links.length > 0
@@ -35,7 +33,12 @@ export const MediumImpactHero: React.FC<
         {showHeroAnimation && <ContainedHeroAnimation />}
         {/* Image */}
         {heroMedia && (
-          <div className={cn('relative z-10 mb-6 w-full max-w-[420px]', isTimebite && 'bg-transparent')}>
+          <div
+            className={cn(
+              'relative z-10 mb-6 w-full max-w-[420px]',
+              isTimebite && 'bg-transparent',
+            )}
+          >
             <Media
               alt={
                 (typeof heroMedia.alt === 'string' && heroMedia.alt.trim()) ||

@@ -1,4 +1,4 @@
-import type { Page } from '@/payload-types'
+import type { Media, Page } from '@/payload-types'
 
 type BioAccentColor = 'mint' | 'teal' | 'pink' | 'white'
 
@@ -88,9 +88,13 @@ export const defaultBioPills: DefaultBioPill[] = [
 
 export const defaultBioHeadshot = '/media/erinjerri-book-headshot-green-no-glare-768.webp'
 
+type DefaultBioBlock = Extract<NonNullable<Page['layout']>[number], { blockType: 'bioBlock' }> & {
+  headshot?: (string | null) | Media
+}
+
 export function defaultBioBlock(
-  overrides: Partial<Extract<NonNullable<Page['layout']>[number], { blockType: 'bioBlock' }>> = {},
-): Extract<NonNullable<Page['layout']>[number], { blockType: 'bioBlock' }> {
+  overrides: Partial<DefaultBioBlock> = {},
+): DefaultBioBlock {
   return {
     blockName: 'Bio',
     blockType: 'bioBlock',

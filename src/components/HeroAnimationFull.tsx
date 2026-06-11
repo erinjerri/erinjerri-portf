@@ -16,7 +16,7 @@ import {
 import { disposeScene, resizeRendererToDisplaySize } from '@/utilities/three/performance'
 
 const TARGET_FPS = 30
-const MAX_PIXEL_RATIO = 1.5
+const MAX_PIXEL_RATIO = 2
 
 export default function HeroAnimationFull() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -37,13 +37,14 @@ export default function HeroAnimationFull() {
       canvas,
       powerPreference: 'high-performance',
     })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO))
     renderer.setClearColor(new Color(0x000000), 0)
 
     const scene = new Scene()
     const camera = new PerspectiveCamera(30, 1, 0.1, 100)
     camera.position.set(0.1, 0.08, 6.8)
 
-    const geometry = new TorusKnotGeometry(0.42, 0.052, 48, 6)
+    const geometry = new TorusKnotGeometry(0.42, 0.052, 160, 10)
     const material = new MeshPhysicalMaterial({
       color: 0xe0fff8,
       emissive: 0x07191d,
@@ -128,5 +129,10 @@ export default function HeroAnimationFull() {
     }
   }, [])
 
-  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full opacity-62" />
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 block h-full w-full opacity-62 [image-rendering:auto]"
+    />
+  )
 }

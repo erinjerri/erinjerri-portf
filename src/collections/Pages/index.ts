@@ -22,6 +22,9 @@ import { BookAcclaimStrip } from '../../blocks/BookAcclaimStrip/config'
 import { RibbonBlock } from '../../blocks/RibbonBlock/config'
 import { StatsBlock } from '../../blocks/StatsBlock/config'
 import { BioBlock } from '../../blocks/BioBlock/config'
+import { SpeakerBio } from '../../blocks/SpeakerBio/config'
+import { SpeakerKitHeadshots } from '../../blocks/SpeakerKitHeadshots/config'
+import { SpeakerKit } from '../../blocks/SpeakerKit/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -111,6 +114,9 @@ export const Pages: CollectionConfig<'pages'> = {
                 RibbonBlock,
                 StatsBlock,
                 BioBlock,
+                SpeakerBio,
+                SpeakerKitHeadshots,
+                SpeakerKit,
               ],
               required: true,
               admin: {

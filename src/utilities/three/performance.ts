@@ -13,7 +13,7 @@ export function createOptimizedRenderer(
   parameters: Omit<WebGLRendererParameters, 'canvas'> = {},
 ) {
   const renderer = new WebGLRenderer({
-    antialias: false,
+    antialias: true,
     powerPreference: 'high-performance',
     ...parameters,
     canvas,

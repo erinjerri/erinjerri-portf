@@ -14,6 +14,9 @@ const colorMap = {
 
 type BioParagraph = NonNullable<BioBlockBlockProps['paragraphs']>[number]
 type BioHighlight = NonNullable<NonNullable<BioParagraph['highlights']>>[number]
+type BioBlockBlockComponentProps = BioBlockBlockProps & {
+  pageSlug?: string
+}
 
 function renderParagraph(text: string, highlights: BioHighlight[] | null | undefined) {
   const activeHighlights = (highlights ?? []).filter((item) => item?.phrase?.trim())
@@ -69,13 +72,18 @@ function renderParagraph(text: string, highlights: BioHighlight[] | null | undef
   })
 }
 
-export const BioBlockBlock: React.FC<BioBlockBlockProps> = ({
+export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
   eyebrow,
   headshot,
   headline,
+  pageSlug,
   paragraphs,
   pills,
 }) => {
+  if (pageSlug === 'about') {
+    console.log('[About bio debug] Canonical bio renderer is BioBlockBlock')
+  }
+
   const bioParagraphs = paragraphs?.filter((paragraph) => paragraph?.text?.trim()) ?? []
   const bioPills = pills?.filter((pill) => pill?.label?.trim()) ?? []
   const hasHeadshot =
@@ -106,7 +114,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockProps> = ({
           <div className={headline?.trim() ? 'mt-8 space-y-7 md:mt-9' : 'space-y-7'}>
             {bioParagraphs.map((paragraph, index) => (
               <p
-                className="max-w-4xl text-[1.2rem] leading-9 text-white/78 md:text-[1.34rem] md:leading-10"
+                className="max-w-4xl text-base leading-8 text-white/78"
                 key={paragraph.id ?? index}
               >
                 {renderParagraph(paragraph.text?.trim() ?? '', paragraph.highlights)}
@@ -157,7 +165,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockProps> = ({
         ) : null}
       </div>
 
-      <SpeakerBioKit variants={bioVariants} />
+      {pageSlug !== 'home' ? <SpeakerBioKit variants={bioVariants} /> : null}
     </section>
   )
 }

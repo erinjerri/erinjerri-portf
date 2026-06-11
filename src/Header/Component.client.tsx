@@ -24,7 +24,7 @@ function themeForPathname(pathname: string): 'dark' | 'light' {
 const HEADER_ROW_CLASS =
   'relative grid h-16 grid-cols-[auto,minmax(0,1fr),auto] items-center gap-x-2 sm:gap-x-3 md:gap-x-4 lg:gap-x-6'
 
-const LOGO_LINK_CLASS = 'relative z-30 col-start-1 shrink-0 justify-self-start'
+const LOGO_LINK_CLASS = 'relative z-30 col-start-1 flex shrink-0 items-center justify-self-start'
 
 interface HeaderClientProps {
   data: Header | null

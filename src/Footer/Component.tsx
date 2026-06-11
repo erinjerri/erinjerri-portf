@@ -96,16 +96,14 @@ function SocialIcon({
   const fallbackIcon = resolveFallbackSocialIcon(label, url)
   // Use icon URL when: local /media/ file exists, or it's an external URL (R2, etc.)
   const resolvedIconUrl =
-    iconUrl && (hasLocalMediaFile(iconUrl) || iconUrl.startsWith('http'))
-      ? iconUrl
-      : null
+    iconUrl && (hasLocalMediaFile(iconUrl) || iconUrl.startsWith('http')) ? iconUrl : null
   const href =
     url.includes('@') && !url.includes('://') && !url.startsWith('mailto:') ? `mailto:${url}` : url
   const isExternal = href.startsWith('http://') || href.startsWith('https://')
   const FallbackIcon = fallbackIcon
 
   return (
-       <Link
+    <Link
       href={href}
       prefetch={false}
       target={isExternal ? '_blank' : undefined}
@@ -159,8 +157,8 @@ export async function Footer({ data }: FooterProps = {}) {
         <div className="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16 lg:items-start">
           {/* Left column: Logo, Subscribe, Slogan, Social */}
           <div className="flex min-h-0 flex-col gap-6 lg:max-w-sm [contain:layout]">
-            <Link className="flex items-center" href="/" prefetch={false}>
-              <Logo />
+            <Link className="flex w-fit items-center" href="/" prefetch={false}>
+              <Logo className="w-[8.75rem]" />
             </Link>
 
             {subscribeSection?.showSubscribe !== false && (

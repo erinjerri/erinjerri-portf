@@ -32,6 +32,7 @@ declare module 'three' {
     parent?: Object3D
     matrixAutoUpdate: boolean
     matrixWorld: unknown
+    position: { x: number; y: number; z: number; set(x: number, y: number, z: number): void }
     rotation: { x: number; y: number; z: number }
     add(object: Object3D): void
     remove(object: Object3D): void
@@ -53,7 +54,7 @@ declare module 'three' {
 
   export class PerspectiveCamera extends Object3D {
     aspect: number
-    position: { x: number; y: number; z: number }
+    position: { x: number; y: number; z: number; set(x: number, y: number, z: number): void }
     constructor(fov: number, aspect: number, near: number, far: number)
     updateProjectionMatrix(): void
   }
@@ -62,6 +63,7 @@ declare module 'three' {
     constructor(parameters?: WebGLRendererParameters)
     dispose(): void
     render(scene: Scene, camera: PerspectiveCamera): void
+    setClearColor(color: Color, alpha?: number): void
     setPixelRatio(pixelRatio: number): void
     setSize(width: number, height: number, updateStyle?: boolean): void
   }
@@ -80,8 +82,31 @@ declare module 'three' {
     constructor(radius?: number, widthSegments?: number, heightSegments?: number)
   }
 
+  export class TorusKnotGeometry extends BufferGeometry {
+    constructor(
+      radius?: number,
+      tube?: number,
+      tubularSegments?: number,
+      radialSegments?: number,
+      p?: number,
+      q?: number,
+    )
+  }
+
   export class MeshBasicMaterial extends Material {
     constructor(parameters?: Record<string, unknown>)
+  }
+
+  export class MeshPhysicalMaterial extends Material {
+    constructor(parameters?: Record<string, unknown>)
+  }
+
+  export class AmbientLight extends Object3D {
+    constructor(color?: number | string, intensity?: number)
+  }
+
+  export class DirectionalLight extends Object3D {
+    constructor(color?: number | string, intensity?: number)
   }
 
   export const LinearFilter: unknown

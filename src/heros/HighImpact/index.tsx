@@ -18,8 +18,7 @@ type HeroProps = Page['hero'] & {
   visualVariant?: 'prismatic'
 }
 
-const isPopulated = (m: unknown): m is MediaDoc =>
-  Boolean(m && typeof m === 'object' && 'url' in m)
+const isPopulated = (m: unknown): m is MediaDoc => Boolean(m && typeof m === 'object' && 'url' in m)
 
 const heroFallbacks = {
   background: '/media/dimensions-background-curves.webp',
@@ -52,8 +51,7 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
     aria-hidden
     className={className}
     style={{
-      background:
-        'linear-gradient(135deg, rgba(15,23,42,0.45) 0%, rgba(30,41,59,0.35) 100%)',
+      background: 'linear-gradient(135deg, rgba(15,23,42,0.45) 0%, rgba(30,41,59,0.35) 100%)',
     }}
   />
 )
@@ -79,11 +77,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasBackground = isPopulated(backgroundMedia)
   const hasPortrait = isPopulated(media)
   const hasAnyGridFields = Boolean(heroImage1 || heroImage2 || heroImage3)
-  const hasGridMedia =
-    isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
+  const hasGridMedia = isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
   /** Prefer Hero Image 1–3 grid over prismatic portrait when any grid slot has media (Payload uploads). */
-  const forcePortraitSplit =
-    visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
+  const forcePortraitSplit = visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
   const showGridLayout = !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
   const isPrismatic = visualVariant === 'prismatic'
   const backgroundImage = hasBackground ? backgroundMedia : null
@@ -96,10 +92,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     return (
       <div className={cn('hp-hero-content relative z-[2]', className)}>
         <div
-          className={cn(
-            'hp-hero-content-inner',
-            richText && 'hp-hero-content-inner--with-prose',
-          )}
+          className={cn('hp-hero-content-inner', richText && 'hp-hero-content-inner--with-prose')}
         >
           {richText && (
             <RichText
@@ -328,24 +321,24 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                 {renderHeroSlot(
                   heroImage1,
                   'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                  '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px',
-                  { priority: true, quality: 65 },
+                  '(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 760px',
+                  { priority: true, quality: 90 },
                 )}
               </div>
               <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
                 {renderHeroSlot(
                   heroImage2,
                   'Erin Jerri — book and profile',
-                  '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                  { unoptimized: true, quality: 72 },
+                  '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                  { quality: 90 },
                 )}
               </div>
               <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
                 {renderHeroSlot(
                   heroImage3,
                   'Erin Jerri — engineering, AI systems, and spatial computing',
-                  '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                  { quality: 72 },
+                  '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                  { quality: 90 },
                 )}
               </div>
             </div>
@@ -360,24 +353,24 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   {renderHeroSlot(
                     heroImage1,
                     'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                    '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px',
-                    { priority: true, quality: 65 },
+                    '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 760px',
+                    { priority: true, quality: 90 },
                   )}
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   {renderHeroSlot(
                     heroImage2,
                     'Erin Jerri Apple Vision Pro spatial computing work',
-                    '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                    { unoptimized: true, quality: 72 },
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 25vw, 380px',
+                    { quality: 90 },
                   )}
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   {renderHeroSlot(
                     heroImage3,
                     'Erin Jerri — engineering, AI systems, and spatial computing',
-                    '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                    { quality: 72 },
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 25vw, 380px',
+                    { quality: 90 },
                   )}
                 </div>
               </div>

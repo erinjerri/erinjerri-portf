@@ -12,6 +12,7 @@ import { AnalyticsSnapshots } from './collections/AnalyticsSnapshots'
 import { LinkedInMetrics } from './collections/LinkedInMetrics'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Poetry } from './collections/Poetry'
 import { Posts } from './collections/Posts'
 import { Projects } from './collections/Projects'
 import { Users } from './collections/Users'
@@ -133,6 +134,7 @@ export default buildConfig({
   }),
   collections: [
     Pages,
+    Poetry,
     Posts,
     Projects,
     Watch,

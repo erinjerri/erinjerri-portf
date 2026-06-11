@@ -1,4 +1,5 @@
 import type { Page, StatStripBlock } from '@/payload-types'
+import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 
 type LayoutBlock = NonNullable<Page['layout']>[number]
 
@@ -15,7 +16,8 @@ const DEFAULT_BOOK_PAGE_SLUGS = [
 ] as const
 
 function bookPageSlugList(): string[] {
-  const raw = typeof process.env.BOOK_PAGE_SLUG === 'string' ? process.env.BOOK_PAGE_SLUG.trim() : ''
+  const raw =
+    typeof process.env.BOOK_PAGE_SLUG === 'string' ? process.env.BOOK_PAGE_SLUG.trim() : ''
   if (raw) {
     return raw
       .split(',')
@@ -103,9 +105,28 @@ function ensureCreatingArVrBookMetrics(layout: Page['layout']): Page['layout'] {
   return [bookStatStripBlock(), ...rest]
 }
 
-export function enhancePageForRoute<T extends { layout: Page['layout'] }>(page: T, slug: string): T {
+function ensureSingleAboutBio(layout: Page['layout']): Page['layout'] {
+  const blocks = Array.isArray(layout) ? [...layout] : []
+  const blocksWithoutBio = blocks.filter((block) => block?.blockType !== 'bioBlock')
+
+  return [defaultBioBlock(), ...blocksWithoutBio]
+}
+
+export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
+  page: T,
+  slug: string,
+): T {
   const rewrittenPage = rewriteSpeakingCtaUrls(page)
   let layout = rewrittenPage.layout
+  let hero = (rewrittenPage as T & { hero?: Page['hero'] }).hero
+
+  if (slug === 'about') {
+    console.log(
+      '[About bio debug] Top bio renderer was MediumImpactHero; canonical bio renderer is BioBlockBlock',
+    )
+    layout = ensureSingleAboutBio(layout)
+    hero = { type: 'none' }
+  }
 
   if (isBookMetricsPageSlug(slug)) {
     layout = ensureCreatingArVrBookMetrics(layout)
@@ -113,6 +134,7 @@ export function enhancePageForRoute<T extends { layout: Page['layout'] }>(page: 
 
   return {
     ...rewrittenPage,
+    ...(hero ? { hero } : {}),
     layout,
   }
 }
