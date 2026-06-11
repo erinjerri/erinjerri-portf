@@ -12,11 +12,31 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   try {
     const pathname = request.nextUrl?.pathname ?? '/'
+    const forwardedHost = request.headers.get('x-forwarded-host')
+    const host = (forwardedHost || request.headers.get('host') || '')
+      .split(',')[0]
+      ?.trim()
+      .toLowerCase()
+    const hostname = host.split(':')[0]
+    const isPoetryHost = hostname === 'poetry.erinjerri.com'
     const requestHeaders = new Headers()
     request.headers.forEach((value, key) => {
       requestHeaders.set(key, value)
     })
     requestHeaders.set('x-pathname', pathname)
+    requestHeaders.set('x-site-hostname', hostname)
+    requestHeaders.set('x-is-poetry-host', isPoetryHost ? 'true' : 'false')
+
+    if (isPoetryHost && pathname === '/') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/poetry'
+
+      return NextResponse.rewrite(url, {
+        request: {
+          headers: requestHeaders,
+        },
+      })
+    }
 
     return NextResponse.next({
       request: {

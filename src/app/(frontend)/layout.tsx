@@ -4,6 +4,7 @@
  */
 import type { Metadata } from 'next'
 
+import { headers } from 'next/headers'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
@@ -23,8 +24,12 @@ import type { Footer as FooterType, Header as HeaderType } from '@/payload-types
 import './globals.css'
 import { fontJost, frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
+import { getRequestHostname, isPoetryHostname } from '@/utilities/poetry'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers()
+  const hostname = getRequestHostname(requestHeaders)
+  const isPoetrySite = isPoetryHostname(hostname)
   let headerData: HeaderType | null = null
   let footerData: FooterType | null = null
   let headerFailed = false
@@ -81,9 +86,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Providers>
           <AdminBar />
 
-          <Header data={headerFailed ? undefined : headerData} />
+          {!isPoetrySite ? <Header data={headerFailed ? undefined : headerData} /> : null}
           {children}
-          <Footer data={footerFailed ? undefined : footerData} />
+          <Footer data={footerFailed ? undefined : footerData} variant={isPoetrySite ? 'poetry' : 'main'} />
         </Providers>
         {enableThirdPartyScripts ? (
           <Analytics

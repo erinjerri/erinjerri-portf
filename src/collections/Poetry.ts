@@ -7,6 +7,13 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
+import {
+  MetaDescriptionField,
+  MetaImageField,
+  MetaTitleField,
+  OverviewField,
+  PreviewField,
+} from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
 import { authenticated } from '../access/authenticated'
@@ -26,6 +33,18 @@ export const Poetry: CollectionConfig = {
   admin: {
     defaultColumns: ['title', 'slug', 'publishedDate', 'featured', 'updatedAt'],
     useAsTitle: 'title',
+  },
+  defaultPopulate: {
+    title: true,
+    slug: true,
+    excerpt: true,
+    featuredImage: true,
+    publishedDate: true,
+    featured: true,
+    meta: {
+      image: true,
+      description: true,
+    },
   },
   fields: [
     {
@@ -92,6 +111,30 @@ export const Poetry: CollectionConfig = {
       admin: {
         position: 'sidebar',
       },
+    },
+    {
+      name: 'meta',
+      label: 'SEO',
+      type: 'group',
+      fields: [
+        OverviewField({
+          titlePath: 'meta.title',
+          descriptionPath: 'meta.description',
+          imagePath: 'meta.image',
+        }),
+        MetaTitleField({
+          hasGenerateFn: true,
+        }),
+        MetaImageField({
+          relationTo: 'media',
+        }),
+        MetaDescriptionField({}),
+        PreviewField({
+          hasGenerateFn: true,
+          titlePath: 'meta.title',
+          descriptionPath: 'meta.description',
+        }),
+      ],
     },
   ],
   versions: {

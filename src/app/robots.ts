@@ -18,6 +18,7 @@ export default function robots(): MetadataRoute.Robots {
       `${SITE_URL}/posts-sitemap.xml`,
       `${SITE_URL}/projects-sitemap.xml`,
       `${SITE_URL}/watch-sitemap.xml`,
+      `https://poetry.erinjerri.com/poetry-sitemap.xml`,
     ],
   }
 }

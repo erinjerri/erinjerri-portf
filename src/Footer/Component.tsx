@@ -127,9 +127,10 @@ function SocialIcon({
 
 interface FooterProps {
   data?: Footer | null
+  variant?: 'main' | 'poetry'
 }
 
-export async function Footer({ data }: FooterProps = {}) {
+export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
   const substackPublicationURL = getSubstackPublicationURL()
   const substackEmbedSrc = `${substackPublicationURL.replace(/\/$/, '')}/embed`
   let footerData: Footer | null = data ?? null
@@ -149,6 +150,7 @@ export async function Footer({ data }: FooterProps = {}) {
   const linkGroups = footerData?.linkGroups || []
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
+  const isPoetryFooter = variant === 'poetry'
 
   return (
     <footer className="mt-auto border-t border-border bg-transparent text-foreground [contain:paint]">
@@ -161,13 +163,13 @@ export async function Footer({ data }: FooterProps = {}) {
               <Logo className="w-[8.75rem]" />
             </Link>
 
-            {subscribeSection?.showSubscribe !== false && (
+            {!isPoetryFooter && subscribeSection?.showSubscribe !== false && (
               <div className="min-h-[7rem] w-full max-w-full">
                 <SubscribeForm action={substackEmbedSrc} />
               </div>
             )}
 
-            {subscribeSection?.slogan && (
+            {!isPoetryFooter && subscribeSection?.slogan && (
               <p className="text-sm text-muted-foreground">{subscribeSection.slogan}</p>
             )}
 
@@ -188,7 +190,24 @@ export async function Footer({ data }: FooterProps = {}) {
           </div>
 
           {/* Right column: Link groups */}
-          {linkGroups.length > 0 && (
+          {isPoetryFooter ? (
+            <nav className="flex flex-col gap-3 text-sm">
+              <Link
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                href="https://erinjerri.com"
+                prefetch={false}
+              >
+                Back to ErinJerri.com
+              </Link>
+              <Link
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                href="/poetry"
+                prefetch={false}
+              >
+                All poetry
+              </Link>
+            </nav>
+          ) : linkGroups.length > 0 ? (
             <nav className="flex flex-wrap gap-x-12 gap-y-8">
               {linkGroups.map((group, groupIndex) => (
                 <div
@@ -222,13 +241,29 @@ export async function Footer({ data }: FooterProps = {}) {
                 </div>
               ))}
             </nav>
-          )}
+          ) : null}
         </div>
 
         {/* Bottom: Copyright */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row sm:justify-between gap-4 text-sm text-muted-foreground">
           {copyright && <span>{copyright}</span>}
-          <span>Made with ❤️ and PayloadCMS</span>
+          {isPoetryFooter ? (
+            <Link
+              className="transition-colors hover:text-foreground"
+              href="https://erinjerri.com"
+              prefetch={false}
+            >
+              Back to ErinJerri.com
+            </Link>
+          ) : (
+            <Link
+              className="transition-colors hover:text-foreground"
+              href="https://poetry.erinjerri.com"
+              prefetch={false}
+            >
+              Poetry
+            </Link>
+          )}
         </div>
       </div>
     </footer>
