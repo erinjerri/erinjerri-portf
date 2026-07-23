@@ -9,7 +9,9 @@ type Args = {
   bookAffiliateProductId: AffiliateProduct['id']
 }
 
-export const creatingArVrBookPage = ({ bookAffiliateProductId }: Args): RequiredDataFromCollectionSlug<'pages'> => {
+export const creatingArVrBookPage = ({
+  bookAffiliateProductId,
+}: Args): RequiredDataFromCollectionSlug<'pages'> => {
   return {
     slug: 'creating-ar-vr-book',
     _status: 'published',
@@ -61,7 +63,7 @@ export const creatingArVrBookPage = ({ bookAffiliateProductId }: Args): Required
       {
         blockType: 'affiliateProductsBlock',
         blockName: 'Buy the book',
-        heading: 'Buy the book',
+        heading: 'Read the book',
         showDisclosure: true,
         disclosureText: 'As an Amazon Associate I earn from qualifying purchases.',
         columns: '3',
@@ -100,7 +102,7 @@ export const creatingArVrBookPage = ({ bookAffiliateProductId }: Args): Required
                     children: [
                       {
                         type: 'text',
-                        text: 'A practical, creator-friendly introduction to building for augmented and virtual reality. Replace this paragraph in the CMS with your full description, purchase links, and chapter overview.',
+                        text: 'Published by O’Reilly Media, Creating Augmented and Virtual Realities brings together practitioners across AR, VR, AI, games, and spatial computing. The book debuted #1 in Amazon’s Game Programming category, has been translated into Chinese and Korean, and continues to reach developers, researchers, and product teams around the world.',
                         version: 1,
                       },
                     ],

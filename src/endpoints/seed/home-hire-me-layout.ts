@@ -1,7 +1,12 @@
 import type { Page } from '@/payload-types'
 import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 
-const HOME_SIGNATURE_BLOCK_TYPES = ['ribbonBlock', 'statsBlock', 'bioBlock'] as const
+const HOME_SIGNATURE_BLOCK_TYPES = [
+  'ribbonBlock',
+  'statsBlock',
+  'bioBlock',
+  'signatureTalks',
+] as const
 const HOME_EXCLUDED_SPEAKER_BLOCK_TYPES = new Set([
   'speakerKit',
   'speakerBio',
@@ -69,6 +74,35 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
   defaultBioBlock({
     eyebrow: 'Hi, I’m Erin! 👋🏼',
   }),
+  {
+    blockName: 'Selected talks',
+    blockType: 'signatureTalks',
+    heading: 'Selected talks',
+    intro:
+      'Keynotes and executive sessions on AI, spatial computing, platform shifts, and the systems that connect them.',
+    talks: [
+      {
+        number: '01',
+        title: 'What Happens After the Model?',
+        subtitle: 'How AI moves from demos into products, workflows, and decisions.',
+      },
+      {
+        number: '02',
+        title: 'The Next Interface Shift',
+        subtitle: 'What spatial computing changes about software, presence, and context.',
+      },
+      {
+        number: '03',
+        title: 'AI Beyond Chatbots',
+        subtitle: 'Designing agentic systems that act across real-world tools and environments.',
+      },
+      {
+        number: '04',
+        title: 'Building During Platform Transitions',
+        subtitle: 'How founders and teams can navigate new computing waves before they settle.',
+      },
+    ],
+  },
 ]
 
 export function mergeHomeHireMeLayoutBlocks(
