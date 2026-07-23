@@ -80,10 +80,6 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
   paragraphs,
   pills,
 }) => {
-  if (pageSlug === 'about') {
-    console.log('[About bio debug] Canonical bio renderer is BioBlockBlock')
-  }
-
   const bioParagraphs = paragraphs?.filter((paragraph) => paragraph?.text?.trim()) ?? []
   const bioPills = pills?.filter((pill) => pill?.label?.trim()) ?? []
   const hasHeadshot =
@@ -114,7 +110,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
           <div className={headline?.trim() ? 'mt-8 space-y-7 md:mt-9' : 'space-y-7'}>
             {bioParagraphs.map((paragraph, index) => (
               <p
-                className="max-w-4xl text-base leading-8 text-white/78"
+                className="max-w-5xl text-[1rem] leading-8 text-white/82 md:text-[1.125rem] md:leading-9"
                 key={paragraph.id ?? index}
               >
                 {renderParagraph(paragraph.text?.trim() ?? '', paragraph.highlights)}
@@ -165,7 +161,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
         ) : null}
       </div>
 
-      {pageSlug !== 'home' ? <SpeakerBioKit variants={bioVariants} /> : null}
+      {pageSlug === 'speaking-info' ? <SpeakerBioKit variants={bioVariants} /> : null}
     </section>
   )
 }

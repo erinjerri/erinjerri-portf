@@ -107,9 +107,10 @@ function ensureCreatingArVrBookMetrics(layout: Page['layout']): Page['layout'] {
 
 function ensureSingleAboutBio(layout: Page['layout']): Page['layout'] {
   const blocks = Array.isArray(layout) ? [...layout] : []
+  const firstBioBlock = blocks.find((block) => block?.blockType === 'bioBlock')
   const blocksWithoutBio = blocks.filter((block) => block?.blockType !== 'bioBlock')
 
-  return [defaultBioBlock(), ...blocksWithoutBio]
+  return [firstBioBlock ?? defaultBioBlock(), ...blocksWithoutBio]
 }
 
 export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
@@ -121,9 +122,6 @@ export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
   let hero = (rewrittenPage as T & { hero?: Page['hero'] }).hero
 
   if (slug === 'about') {
-    console.log(
-      '[About bio debug] Top bio renderer was MediumImpactHero; canonical bio renderer is BioBlockBlock',
-    )
     layout = ensureSingleAboutBio(layout)
     hero = { type: 'none' }
   }

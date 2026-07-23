@@ -175,7 +175,6 @@
     --warning: 44 90% 62%;
     --error: 354 70% 55%;
   }
-
 }
 
 @layer base {
@@ -263,7 +262,23 @@
    * Specificity: .hero-bio-richtext.payload-richtext.prose … beats @layer base element selectors.
    */
   .hero-bio-richtext.payload-richtext.prose {
+    font-size: 1rem;
     font-weight: 300;
+  }
+
+  .hero-bio-richtext.payload-richtext.prose p,
+  .hero-bio-richtext.payload-richtext.prose > div {
+    font-size: 1rem;
+    line-height: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-bio-richtext.payload-richtext.prose,
+    .hero-bio-richtext.payload-richtext.prose p,
+    .hero-bio-richtext.payload-richtext.prose > div {
+      font-size: 1.125rem;
+      line-height: 2.25rem;
+    }
   }
 
   .hero-bio-richtext.payload-richtext.prose h1 {
