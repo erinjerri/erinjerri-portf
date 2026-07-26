@@ -189,6 +189,54 @@ function contentHasRichText(b: LayoutBlock | null | undefined): boolean {
   return Array.isArray(c.columns) && c.columns.some((col) => richTextHasContent(col?.richText))
 }
 
+function lexicalText(node: LexicalNode | null | undefined): string {
+  if (!node || typeof node !== 'object') return ''
+  const ownText = typeof node.text === 'string' ? node.text : ''
+  const childText = Array.isArray(node.children) ? node.children.map(lexicalText).join(' ') : ''
+  return `${ownText} ${childText}`.trim()
+}
+
+function richTextPlainText(value: unknown): string {
+  if (!value || typeof value !== 'object') return ''
+  const root = (value as { root?: { children?: LexicalNode[] } }).root
+  if (!root || !Array.isArray(root.children)) return ''
+  return root.children.map(lexicalText).join(' ').replace(/\s+/g, ' ').trim()
+}
+
+function contentPlainText(b: LayoutBlock | null | undefined): string {
+  if (!b) return ''
+  const c = b as ContentBlockType
+  if (!Array.isArray(c.columns)) return ''
+  return c.columns.map((col) => richTextPlainText(col?.richText)).join(' ').trim()
+}
+
+function isDuplicateHomeBiographyContent(
+  previousBlock: LayoutBlock | null | undefined,
+  currentBlock: LayoutBlock | null | undefined,
+): boolean {
+  if (previousBlock?.blockType !== 'bioBlock' || currentBlock?.blockType !== 'content') {
+    return false
+  }
+
+  const text = contentPlainText(currentBlock).toLowerCase()
+  if (!text) return false
+
+  const hasErinIdentity = text.includes('erin jerri') || text.includes('erin pangilinan')
+  const hasBioSignals = [
+    'software engineer',
+    'startup founder',
+    'former cto',
+    "o'reilly",
+    'o’ reilly',
+    'o’reilly',
+    'creating augmented and virtual realities',
+    'timebite',
+    'spatial computing',
+  ].filter((signal) => text.includes(signal)).length
+
+  return hasErinIdentity && hasBioSignals >= 2
+}
+
 function contentSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
   return contentHasLinks(b) && !contentHasRichText(b)
 }
@@ -315,6 +363,13 @@ export const RenderBlocks: React.FC<{
 
             if (typeof Block === 'function') {
               const prevBlock = blocksToRender[index - 1]
+              if (
+                pageSlug === 'home' &&
+                isDuplicateHomeBiographyContent(prevBlock, block)
+              ) {
+                return null
+              }
+
               const isMedia =
                 blockType === 'mediaBlock' || blockType === 'videoBackgroundTransition'
               const prevIsCta = prevBlock?.blockType === 'cta'

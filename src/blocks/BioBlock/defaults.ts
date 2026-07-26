@@ -18,11 +18,12 @@ type DefaultBioPill = {
 
 export const defaultBioParagraphs: DefaultBioParagraph[] = [
   {
-    text: 'Erin Jerri Malonzo Pañgilinan is a software engineer, startup founder, and former CTO working at the intersection of AI, spatial computing, and web3.',
+    text: 'Erin Jerri Malonzo Pañgilinan is a software engineer, startup founder, former CTO, and strategic advisor working at the intersection of AI, spatial computing, and emerging interfaces.',
     highlights: [
       { phrase: 'software engineer', color: 'mint', underline: false },
       { phrase: 'startup founder', color: 'teal', underline: false },
       { phrase: 'former CTO', color: 'pink', underline: false },
+      { phrase: 'strategic advisor', color: 'white', underline: false },
     ],
   },
   {
@@ -34,11 +35,12 @@ export const defaultBioParagraphs: DefaultBioParagraph[] = [
     ],
   },
   {
-    text: 'Erin is the founder of TimeBite, an AI-native product that bridges the physical and digital — embedding multimodal intelligence directly into how people interact with and move through the world.',
+    text: 'Erin is the founder of TimeBite, an AI-native product that bridges the physical and digital — embedding multimodal intelligence directly into how people interact with and move through the world. Her advisory and speaking work helps leaders reason about platform transitions before they harden into product, architecture, and organizational debt.',
     highlights: [
       { phrase: 'TimeBite', color: 'teal', underline: false },
       { phrase: 'AI-native product', color: 'mint', underline: false },
       { phrase: 'physical and digital', color: 'pink', underline: false },
+      { phrase: 'platform transitions', color: 'white', underline: false },
     ],
   },
   {
@@ -83,6 +85,8 @@ export const defaultBioPills: DefaultBioPill[] = [
   { label: 'UC Berkeley Alumna', color: 'mint' },
   { label: 'fast.ai Fellow', color: 'teal' },
   { label: 'AWS CTO Fellowship', color: 'pink' },
+  { label: 'Keynote Speaker', color: 'white' },
+  { label: 'Systems Architect', color: 'mint' },
   { label: 'FASTER President', color: 'white' },
 ]
 
