@@ -14,7 +14,9 @@ async function run() {
   await page.waitForTimeout(5000)
 
   // go to your profile
-  await page.goto('https://www.linkedin.com/in/erinjerri/')
+  const profileURL = process.env.LINKEDIN_PROFILE_URL
+  if (!profileURL) throw new Error('Set LINKEDIN_PROFILE_URL before running this script.')
+  await page.goto(profileURL)
 
   await page.waitForTimeout(3000)
 

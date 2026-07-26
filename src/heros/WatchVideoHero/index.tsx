@@ -21,14 +21,8 @@ type Props = {
  * Supports: uploaded video, external URLs (YouTube or any page with a video).
  * Falls back to heroImage when no video is set.
  */
-export const WatchVideoHero: React.FC<Props> = ({
-  video,
-  videoUrl,
-  videoSource,
-  heroImage,
-}) => {
-  const hasUploadedVideo =
-    video && typeof video === 'object' && video.mimeType?.includes('video')
+export const WatchVideoHero: React.FC<Props> = ({ video, videoUrl, videoSource, heroImage }) => {
+  const hasUploadedVideo = video && typeof video === 'object' && video.mimeType?.includes('video')
   const hasExternalUrl = videoSource === 'url' && videoUrl && videoUrl.trim().length > 0
   const embedUrl = hasExternalUrl ? getVideoEmbedUrl(videoUrl!) : null
   const isDirectVideo = hasExternalUrl && isDirectVideoUrl(videoUrl!)
@@ -54,7 +48,7 @@ export const WatchVideoHero: React.FC<Props> = ({
           <iframe
             className="h-full w-full"
             src={embedUrl}
-            title="Erin Jerri — video: speaking, AI, and spatial computing"
+            title="Featured talk or video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           />
@@ -95,7 +89,7 @@ export const WatchVideoHero: React.FC<Props> = ({
               <MediaComponent
                 alt={
                   (typeof heroImage!.alt === 'string' && heroImage!.alt.trim()) ||
-                  'Erin Jerri — talk and video hero, AI and spatial computing'
+                  'Featured talk or video'
                 }
                 fill
                 imgClassName="object-cover object-[40%_20%]"
@@ -164,8 +158,7 @@ export const WatchVideoHero: React.FC<Props> = ({
     <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 bg-black aspect-video">
       <MediaComponent
         alt={
-          (typeof heroImage!.alt === 'string' && heroImage!.alt.trim()) ||
-          'Erin Jerri — talk and video hero, AI and spatial computing'
+          (typeof heroImage!.alt === 'string' && heroImage!.alt.trim()) || 'Featured talk or video'
         }
         fill
         imgClassName="object-cover object-[40%_20%]"

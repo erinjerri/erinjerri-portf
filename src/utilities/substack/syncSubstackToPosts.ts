@@ -17,7 +17,7 @@ type SyncMode = 'auto_publish' | 'review'
 
 export type SyncSubstackToPostsOptions = {
   /**
-   * RSS feed URL, e.g. https://erinjerri.substack.com/feed
+   * RSS feed URL, e.g. https://yourpublication.substack.com/feed
    */
   rssURL: string
   /**
@@ -217,10 +217,7 @@ function deriveSubstackArchivePages(rssURL: string): string[] {
   try {
     const url = new URL(rssURL)
     const basePath = url.pathname.replace(/\/feed\/?$/, '').replace(/\/$/, '')
-    const pages = [
-      `${url.origin}${basePath}/archive`,
-      `${url.origin}${basePath || ''}/`,
-    ]
+    const pages = [`${url.origin}${basePath}/archive`, `${url.origin}${basePath || ''}/`]
 
     return Array.from(new Set(pages.map((value) => value.replace(/([^:]\/)\/+/g, '$1'))))
   } catch {
@@ -342,7 +339,9 @@ async function fetchSubstackFeed(args: {
 
         if (!res.ok) {
           const body = await res.text().catch(() => '')
-          throw new Error(`Substack RSS fetch failed with HTTP ${res.status} for ${feedURL}${body ? `: ${body.slice(0, 200)}` : ''}`)
+          throw new Error(
+            `Substack RSS fetch failed with HTTP ${res.status} for ${feedURL}${body ? `: ${body.slice(0, 200)}` : ''}`,
+          )
         }
 
         const xml = await res.text()
@@ -401,7 +400,11 @@ function extractSubstackS3Url(src: string): string | null {
     for (let i = candidates.length - 1; i >= 0; i--) {
       const raw = candidates[i]
       if (!raw) continue
-      if (!raw.includes('substack-post-media') && !raw.includes('https%3A') && !raw.includes('http'))
+      if (
+        !raw.includes('substack-post-media') &&
+        !raw.includes('https%3A') &&
+        !raw.includes('http')
+      )
         continue
 
       const decoded = tryDecode(raw)
@@ -446,7 +449,8 @@ function normalizeImageSrc(src: string): NormalizedImageSrc {
   }
 
   const isSubstackPostMedia =
-    cacheKey.includes(SUBSTACK_POST_MEDIA_HOST) && cacheKey.includes(SUBSTACK_POST_MEDIA_PATH_FRAGMENT)
+    cacheKey.includes(SUBSTACK_POST_MEDIA_HOST) &&
+    cacheKey.includes(SUBSTACK_POST_MEDIA_PATH_FRAGMENT)
 
   return { original, s3Url, cacheKey, isSubstackPostMedia }
 }
@@ -488,9 +492,7 @@ async function fetchImageToBuffer(
   const contentType = res.headers.get('content-type') || 'application/octet-stream'
   if (!contentType.toLowerCase().startsWith('image/')) {
     if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
-      console.warn(
-        `[Substack sync] Image fetch non-image content-type (${contentType}) for ${url}`,
-      )
+      console.warn(`[Substack sync] Image fetch non-image content-type (${contentType}) for ${url}`)
     }
     return null
   }
@@ -727,7 +729,10 @@ function parseArticleHtmlFromPage(html: string, articleUrl: string): FetchFullAr
       doc.querySelector('title')?.textContent?.trim() ||
       undefined
     const publishedAt =
-      doc.querySelector('meta[property="article:published_time"]')?.getAttribute('content')?.trim() ||
+      doc
+        .querySelector('meta[property="article:published_time"]')
+        ?.getAttribute('content')
+        ?.trim() ||
       doc.querySelector('time[datetime]')?.getAttribute('datetime')?.trim() ||
       undefined
 
@@ -741,7 +746,8 @@ function parseArticleHtmlFromPage(html: string, articleUrl: string): FetchFullAr
         const visit = (value: unknown): void => {
           if (!value) return
           if (typeof value === 'string') {
-            const looksLikeHtml = value.includes('<p') || value.includes('<div') || value.includes('<img')
+            const looksLikeHtml =
+              value.includes('<p') || value.includes('<div') || value.includes('<img')
             if (looksLikeHtml && value.length > best.length) best = value
             return
           }
@@ -927,7 +933,9 @@ export async function syncSubstackToPosts(args: {
 
   const explicitSourceUrls = parseExplicitSourceUrls(options.sourceURLs)
   const archiveUrls =
-    options.discoverFromArchive === false ? [] : await discoverSubstackArchivePostUrls(options.rssURL)
+    options.discoverFromArchive === false
+      ? []
+      : await discoverSubstackArchivePostUrls(options.rssURL)
   const knownUrls = new Set(
     items
       .flatMap((item) => [normalizeSubstackPostURL(item.link), normalizeSubstackPostURL(item.guid)])
@@ -956,9 +964,11 @@ export async function syncSubstackToPosts(args: {
       ? items.slice(0, options.maxItems)
       : items
 
-  const contentField = (Posts.fields ?? []).flatMap((f) =>
-    f.type === 'tabs' && 'tabs' in f ? (f.tabs ?? []).flatMap((t) => t.fields ?? []) : [f],
-  ).find((f): f is RichTextField => f.type === 'richText' && f.name === 'content')
+  const contentField = (Posts.fields ?? [])
+    .flatMap((f) =>
+      f.type === 'tabs' && 'tabs' in f ? (f.tabs ?? []).flatMap((t) => t.fields ?? []) : [f],
+    )
+    .find((f): f is RichTextField => f.type === 'richText' && f.name === 'content')
 
   const editorConfig = contentField
     ? await editorConfigFactory.fromField({ field: contentField })
@@ -987,8 +997,7 @@ export async function syncSubstackToPosts(args: {
     })
 
     const id = found.docs?.[0]?.id
-    const asString =
-      typeof id === 'string' || typeof id === 'number' ? String(id) : null
+    const asString = typeof id === 'string' || typeof id === 'number' ? String(id) : null
 
     existingMediaByFilenameCache.set(filename, asString)
     return asString ?? undefined
@@ -1087,15 +1096,21 @@ export async function syncSubstackToPosts(args: {
           try {
             let mediaID = uploadedImageCache.get(normalized.cacheKey)
             if (!mediaID) {
-              const stableId = normalized.s3Url ? getStableSubstackImageIdFromS3Url(normalized.s3Url) : null
+              const stableId = normalized.s3Url
+                ? getStableSubstackImageIdFromS3Url(normalized.s3Url)
+                : null
               const file = await downloadImageAsFile({
                 src,
-                nameHint: stableId ? `substack-${stableId}` : `${item.title || 'post'}-${processed + 1}`,
+                nameHint: stableId
+                  ? `substack-${stableId}`
+                  : `${item.title || 'post'}-${processed + 1}`,
                 referrer: normalizedLink || item.link,
               })
               if (!file) {
                 if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
-                  console.warn(`[Substack sync][Media] Failed to fetch image, falling back to link: ${src}`)
+                  console.warn(
+                    `[Substack sync][Media] Failed to fetch image, falling back to link: ${src}`,
+                  )
                 }
                 // Replace failed-download img with link so convertHTMLToLexical doesn't create invalid upload nodes
                 const link = document.createElement('a')
@@ -1107,9 +1122,7 @@ export async function syncSubstackToPosts(args: {
               }
 
               const existingMediaID = await findExistingMediaIDByFilename(file.name)
-              let createdMedia:
-                | Awaited<ReturnType<typeof payload.create>>
-                | undefined
+              let createdMedia: Awaited<ReturnType<typeof payload.create>> | undefined
               if (!existingMediaID) {
                 createdMedia = await payload.create({
                   collection: 'media',
@@ -1126,7 +1139,9 @@ export async function syncSubstackToPosts(args: {
 
               if (process.env.DEBUG_SUBSTACK_SYNC === 'true') {
                 if (existingMediaID) {
-                  console.log(`[Substack sync] Reused existing image -> media:${existingMediaID} filename=${file.name}`)
+                  console.log(
+                    `[Substack sync] Reused existing image -> media:${existingMediaID} filename=${file.name}`,
+                  )
                 } else {
                   const id = String(createdMedia!.id)
                   const filename =
@@ -1196,23 +1211,27 @@ export async function syncSubstackToPosts(args: {
     // convertHTMLToLexical doesn't produce invalid upload nodes
     const domForCleanup = new JSDOM(html)
     const docForCleanup = domForCleanup.window.document
-    docForCleanup.querySelectorAll('img[src^="http"]:not([data-lexical-upload-id])').forEach((img) => {
-      const src = img.getAttribute('src')
-      if (src) {
-        const link = docForCleanup.createElement('a')
-        link.setAttribute('href', src)
-        link.setAttribute('rel', 'noopener noreferrer')
-        link.textContent = img.getAttribute('alt') || '[Image]'
-        img.replaceWith(link)
-      }
-    })
+    docForCleanup
+      .querySelectorAll('img[src^="http"]:not([data-lexical-upload-id])')
+      .forEach((img) => {
+        const src = img.getAttribute('src')
+        if (src) {
+          const link = docForCleanup.createElement('a')
+          link.setAttribute('href', src)
+          link.setAttribute('rel', 'noopener noreferrer')
+          link.textContent = img.getAttribute('alt') || '[Image]'
+          img.replaceWith(link)
+        }
+      })
     html = docForCleanup.body.innerHTML || html
 
     let heroMediaId: string | undefined
     if (heroNormalized?.isSubstackPostMedia && options.downloadImages) {
       heroMediaId = uploadedImageCache.get(heroNormalized.cacheKey)
       if (!heroMediaId) {
-        const stableId = heroNormalized.s3Url ? getStableSubstackImageIdFromS3Url(heroNormalized.s3Url) : null
+        const stableId = heroNormalized.s3Url
+          ? getStableSubstackImageIdFromS3Url(heroNormalized.s3Url)
+          : null
         const heroFile = await downloadImageAsFile({
           src: heroNormalized.original,
           nameHint: stableId ? `substack-${stableId}-hero` : `${item.title || 'post'}-hero`,
@@ -1221,9 +1240,7 @@ export async function syncSubstackToPosts(args: {
         if (heroFile) {
           try {
             const existingMediaID = await findExistingMediaIDByFilename(heroFile.name)
-            let createdMedia:
-              | Awaited<ReturnType<typeof payload.create>>
-              | undefined
+            let createdMedia: Awaited<ReturnType<typeof payload.create>> | undefined
             if (!existingMediaID) {
               createdMedia = await payload.create({
                 collection: 'media',
@@ -1267,12 +1284,18 @@ export async function syncSubstackToPosts(args: {
       }) as Post['content']
     } catch (err) {
       errors++
-      console.error(`[Substack sync] Lexical conversion failed for "${item.title ?? item.link}":`, err)
+      console.error(
+        `[Substack sync] Lexical conversion failed for "${item.title ?? item.link}":`,
+        err,
+      )
       continue
     }
 
-    const slugBase = getSlugBaseFromLink(normalizedLink || item.link) || toSlug(item.title || 'untitled')
-    let slug = isUpdate ? (existingDoc!.slug as string) : slugBase || `substack-${Date.now().toString(36)}`
+    const slugBase =
+      getSlugBaseFromLink(normalizedLink || item.link) || toSlug(item.title || 'untitled')
+    let slug = isUpdate
+      ? (existingDoc!.slug as string)
+      : slugBase || `substack-${Date.now().toString(36)}`
     let attempts = 0
 
     if (!isUpdate) {
@@ -1301,7 +1324,9 @@ export async function syncSubstackToPosts(args: {
 
     try {
       const crosspostStatus = resolveCrosspostStatusForSync(existingDoc, options.mode)
-      const existingHeroImageID = relationID((existingDoc as { heroImage?: unknown } | undefined)?.heroImage)
+      const existingHeroImageID = relationID(
+        (existingDoc as { heroImage?: unknown } | undefined)?.heroImage,
+      )
       const existingMetaImageID = relationID(
         (existingDoc as { meta?: { image?: unknown } } | undefined)?.meta?.image,
       )
@@ -1331,7 +1356,9 @@ export async function syncSubstackToPosts(args: {
           ? await (async () => {
               const raw = (existingDoc as { relatedPosts?: Array<unknown> }).relatedPosts ?? []
               const ids = raw
-                .map((r) => (typeof r === 'object' && r && 'id' in r ? (r as { id: string }).id : r))
+                .map((r) =>
+                  typeof r === 'object' && r && 'id' in r ? (r as { id: string }).id : r,
+                )
                 .filter((id): id is string => typeof id === 'string')
               const selfId = String(existingDoc.id)
               const out: string[] = []
@@ -1392,7 +1419,10 @@ export async function syncSubstackToPosts(args: {
     } catch (err) {
       errors++
       const validationErrors =
-        err && typeof err === 'object' && 'data' in err && Array.isArray((err as { data?: { errors?: unknown } }).data?.errors)
+        err &&
+        typeof err === 'object' &&
+        'data' in err &&
+        Array.isArray((err as { data?: { errors?: unknown } }).data?.errors)
           ? (err as { data: { errors: unknown[] } }).data.errors
           : []
       console.error(

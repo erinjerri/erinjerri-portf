@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { SITE_OWNER_NAME } from '@/utilities/siteMetadata'
 
 import { Media } from '@/components/Media'
 import { PoetryLayout } from '@/components/Poetry/PoetryLayout'
@@ -9,8 +10,11 @@ import Link from 'next/link'
 import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 
-const POETRY_DESCRIPTION =
-  'Poetry and creative writing by Erin Jerri Pañgilinan.'
+const POETRY_DESCRIPTION = `Poetry and creative writing by ${SITE_OWNER_NAME}.`
+type PoetryCardData = Pick<
+  Poetry,
+  'excerpt' | 'featured' | 'featuredImage' | 'id' | 'publishedDate' | 'slug' | 'tags' | 'title'
+>
 
 const formatPoetryDate = (date?: string | null): string | null => {
   if (!date) return null
@@ -53,7 +57,7 @@ const getCachedPoems = unstable_cache(
   { revalidate: 60, tags: ['poetry'] },
 )
 
-function PoetryCard({ poem, featured = false }: { poem: Poetry; featured?: boolean }) {
+function PoetryCard({ poem, featured = false }: { poem: PoetryCardData; featured?: boolean }) {
   const image = typeof poem.featuredImage === 'object' ? poem.featuredImage : null
   const date = formatPoetryDate(poem.publishedDate)
 
@@ -65,7 +69,13 @@ function PoetryCard({ poem, featured = false }: { poem: Poetry; featured?: boole
             {date}
           </p>
         ) : null}
-        <h2 className={featured ? 'font-title text-4xl font-normal leading-tight' : 'font-title text-3xl font-normal leading-tight'}>
+        <h2
+          className={
+            featured
+              ? 'font-title text-4xl font-normal leading-tight'
+              : 'font-title text-3xl font-normal leading-tight'
+          }
+        >
           <Link className="hover:text-foreground/70" href={`/poetry/${poem.slug}`} prefetch={false}>
             {poem.title}
           </Link>
@@ -116,7 +126,18 @@ export default async function PoetryPage() {
   } catch (err) {
     if (!isBuild) throw err
     console.warn('[poetry/page] Skipping prerender because DB is unavailable:', err)
-    poems = { docs: [], totalDocs: 0, limit: 100, totalPages: 1, page: 1, pagingCounter: 1, hasPrevPage: false, hasNextPage: false, prevPage: null, nextPage: null }
+    poems = {
+      docs: [],
+      totalDocs: 0,
+      limit: 100,
+      totalPages: 1,
+      page: 1,
+      pagingCounter: 1,
+      hasPrevPage: false,
+      hasNextPage: false,
+      prevPage: null,
+      nextPage: null,
+    }
   }
 
   const featuredPoems = poems.docs.filter((poem) => poem.featured)
@@ -134,7 +155,10 @@ export default async function PoetryPage() {
               <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Featured
               </h2>
-              <Link className="text-sm text-muted-foreground hover:text-foreground" href="#all-poems">
+              <Link
+                className="text-sm text-muted-foreground hover:text-foreground"
+                href="#all-poems"
+              >
                 All poetry entries
               </Link>
             </div>
@@ -168,9 +192,9 @@ export const metadata: Metadata = {
   description: POETRY_DESCRIPTION,
   openGraph: {
     description: POETRY_DESCRIPTION,
-    title: 'Poetry | Erin Jerri',
+    title: `Poetry | ${SITE_OWNER_NAME}`,
     type: 'website',
     url: POETRY_ORIGIN,
   },
-  title: 'Poetry | Erin Jerri',
+  title: `Poetry | ${SITE_OWNER_NAME}`,
 }

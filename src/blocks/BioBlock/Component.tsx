@@ -4,6 +4,7 @@ import { Media } from '@/components/Media'
 import Image from 'next/image'
 import React, { Fragment } from 'react'
 import { SpeakerBioKit } from './SpeakerBioKit.client'
+import { SITE_OWNER_NAME } from '@/utilities/siteMetadata'
 
 const colorMap = {
   mint: '#9ff0bd',
@@ -145,7 +146,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
           <div className="relative mx-auto w-full max-w-[24rem] overflow-hidden rounded-lg border border-white/10 bg-white/[0.04] shadow-[0_24px_80px_rgba(0,0,0,0.24)] lg:sticky lg:top-28">
             {typeof headshot === 'string' ? (
               <Image
-                alt="Erin Jerri Malonzo Pañgilinan"
+                alt={SITE_OWNER_NAME}
                 className="aspect-[4/5] h-full w-full object-cover"
                 loading="lazy"
                 height={663}

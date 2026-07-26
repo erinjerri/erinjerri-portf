@@ -77,7 +77,7 @@ export const PostHero: React.FC<{
           <Media
             alt={
               (typeof heroImage.alt === 'string' && heroImage.alt.trim()) ||
-              `${title} — Erin Jerri, AI and spatial computing`
+              `${title} — article hero`
             }
             fill
             priority

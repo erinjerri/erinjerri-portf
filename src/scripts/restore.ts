@@ -6,8 +6,8 @@ import { seed } from '../endpoints/seed'
 async function runRestore(): Promise<void> {
   const payload = await getPayload({ config })
 
-  const adminEmail = process.env.RESTORE_ADMIN_EMAIL || 'admin@local.dev'
-  const adminPassword = process.env.RESTORE_ADMIN_PASSWORD || 'ChangeMe123!'
+  const adminEmail = process.env.RESTORE_ADMIN_EMAIL?.trim()
+  const adminPassword = process.env.RESTORE_ADMIN_PASSWORD
   const force = process.env.RESTORE_FORCE === 'true'
 
   const [users, pages, posts] = await Promise.all([
@@ -48,6 +48,11 @@ async function runRestore(): Promise<void> {
   const createdAdmin = !user
 
   if (createdAdmin) {
+    if (!adminEmail || !adminPassword) {
+      throw new Error(
+        'Set RESTORE_ADMIN_EMAIL and RESTORE_ADMIN_PASSWORD before seeding an empty database.',
+      )
+    }
     user = await payload.create({
       collection: 'users',
       data: {

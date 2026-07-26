@@ -14,6 +14,7 @@ import {
   CANONICAL_SITE_ORIGIN,
   SITE_DEFAULT_DESCRIPTION,
   SITE_DEFAULT_TITLE,
+  SITE_OWNER_NAME,
   canonicalUrlForPath,
   getFixedPageSeo,
 } from './siteMetadata'
@@ -73,17 +74,14 @@ export const generateMeta = async (args: {
   if (fixedPageSeo) {
     title = fixedPageSeo.title
   } else if (cmsTitle) {
-    title = `${cmsTitle} | Erin Jerri`
+    title = `${cmsTitle} | ${SITE_OWNER_NAME}`
   } else {
     title = SITE_DEFAULT_TITLE
   }
 
-  const description =
-    fixedPageSeo?.description ??
-    (cmsDescription || SITE_DEFAULT_DESCRIPTION)
+  const description = fixedPageSeo?.description ?? (cmsDescription || SITE_DEFAULT_DESCRIPTION)
 
-  const ogUrl =
-    path === '/' ? `${CANONICAL_SITE_ORIGIN}/` : `${CANONICAL_SITE_ORIGIN}${path}`
+  const ogUrl = path === '/' ? `${CANONICAL_SITE_ORIGIN}/` : `${CANONICAL_SITE_ORIGIN}${path}`
 
   return {
     alternates: {
@@ -109,7 +107,9 @@ export const generateMeta = async (args: {
     title,
     twitter: {
       card: 'summary_large_image',
-      creator: '@erinjerri',
+      ...(process.env.NEXT_PUBLIC_TWITTER_HANDLE
+        ? { creator: process.env.NEXT_PUBLIC_TWITTER_HANDLE }
+        : {}),
       description,
       title,
     },

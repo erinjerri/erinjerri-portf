@@ -13,7 +13,7 @@ export const BioBlock: Block = {
     {
       name: 'eyebrow',
       type: 'text',
-      defaultValue: 'Hi, I’m Erin! 👋🏼',
+      defaultValue: 'About',
     },
     {
       name: 'headline',

@@ -8,8 +8,8 @@ import { repairCrosspostPublishState } from '@/utilities/crossposts/repairCrossp
 
 export const maxDuration = 300
 
-const RSS_URL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@erinjerri'
-const PUBLICATION = process.env.PARAGRAPH_PUBLICATION || '@cypherpinay'
+const RSS_URL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@yourhandle'
+const PUBLICATION = process.env.PARAGRAPH_PUBLICATION || '@yourpublication'
 const MODE = process.env.MEDIUM_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 
 function isAuthorizedByCronSecret(authorization: string | null): boolean {
@@ -64,7 +64,11 @@ export async function POST(): Promise<Response> {
 
     return Response.json({
       success: true,
-      medium: { synced: mediumResult.synced, skipped: mediumResult.skipped, errors: mediumResult.errors },
+      medium: {
+        synced: mediumResult.synced,
+        skipped: mediumResult.skipped,
+        errors: mediumResult.errors,
+      },
       paragraph: {
         synced: paragraphResult.synced,
         skipped: paragraphResult.skipped,

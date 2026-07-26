@@ -1,4 +1,7 @@
-import type { AffiliateProduct, AffiliateProductsBlock as AffiliateProductsBlockProps } from '@/payload-types'
+import type {
+  AffiliateProduct,
+  AffiliateProductsBlock as AffiliateProductsBlockProps,
+} from '@/payload-types'
 
 import React from 'react'
 
@@ -27,9 +30,10 @@ function resolveColumnsClass(columns: Props['columns']): string {
   }
 }
 
-function coerceAffiliateProducts(
-  products: NonNullable<Props['products']>,
-): { docs: AffiliateProduct[]; missingIDs: string[] } {
+function coerceAffiliateProducts(products: NonNullable<Props['products']>): {
+  docs: AffiliateProduct[]
+  missingIDs: string[]
+} {
   const docs: AffiliateProduct[] = []
   const missingIDs: string[] = []
 
@@ -107,7 +111,7 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
   const associateTag =
     process.env.AMAZON_ASSOCIATE_TAG?.trim() ||
     process.env.NEXT_PUBLIC_AMAZON_ASSOCIATE_TAG?.trim() ||
-    'erinjerrimalo-20'
+    ''
 
   return (
     <section className="container" id={id ? `block-${id}` : undefined}>
@@ -122,12 +126,7 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
         </p>
       ) : null}
 
-      <div
-        className={cn(
-          'mt-6 grid grid-cols-1 gap-6',
-          resolveColumnsClass(columns),
-        )}
-      >
+      <div className={cn('mt-6 grid grid-cols-1 gap-6', resolveColumnsClass(columns))}>
         {resolvedProducts.map((product) => {
           const href = buildAmazonAffiliateURL({
             url: product.productURL ?? '',
@@ -179,7 +178,9 @@ export const AffiliateProductsBlock: React.FC<Props> = async (props) => {
 
               <div className="flex min-h-0 flex-col gap-y-1.5 px-3 pb-3">
                 {product.brand ? (
-                  <div className="text-xs uppercase tracking-wide text-white/70">{product.brand}</div>
+                  <div className="text-xs uppercase tracking-wide text-white/70">
+                    {product.brand}
+                  </div>
                 ) : null}
 
                 <h3 className="text-lg font-semibold leading-snug">{product.title}</h3>

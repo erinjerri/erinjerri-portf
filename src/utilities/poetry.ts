@@ -1,5 +1,8 @@
-export const POETRY_HOSTNAME = 'poetry.erinjerri.com'
-export const POETRY_ORIGIN = `https://${POETRY_HOSTNAME}`
+import { CANONICAL_SITE_ORIGIN } from './siteMetadata'
+
+/** Optional custom hostname. Leave unset to serve poetry at `/poetry` on the main site. */
+export const POETRY_HOSTNAME = process.env.NEXT_PUBLIC_POETRY_HOSTNAME?.trim().toLowerCase() || ''
+export const POETRY_ORIGIN = POETRY_HOSTNAME ? `https://${POETRY_HOSTNAME}` : CANONICAL_SITE_ORIGIN
 
 export function getRequestHostname(headers: Headers): string {
   const forwardedHost = headers.get('x-forwarded-host')
@@ -8,7 +11,7 @@ export function getRequestHostname(headers: Headers): string {
 }
 
 export function isPoetryHostname(hostname: string): boolean {
-  return hostname === POETRY_HOSTNAME
+  return Boolean(POETRY_HOSTNAME) && hostname === POETRY_HOSTNAME
 }
 
 export function poetryCanonicalUrlForPath(path: string): string {

@@ -10,7 +10,7 @@ type MediumSyncTaskIO = {
 }
 
 const enabled = process.env.MEDIUM_SYNC_ENABLED === 'true'
-const rssURL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@erinjerri'
+const rssURL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@yourhandle'
 const mode: 'auto_publish' | 'review' =
   process.env.MEDIUM_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 const cron = process.env.MEDIUM_SYNC_CRON || '0 30 * * * *'

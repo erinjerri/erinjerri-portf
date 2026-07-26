@@ -5,19 +5,18 @@ import type { Page } from '@/payload-types'
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 import { cn } from '@/utilities/ui'
 import { CMSLink } from '@/components/Link'
-import { ContainedHeroAnimation } from '@/components/ContainedHeroAnimation'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
-export const BackgroundCoverHero: React.FC<Page['hero'] & { showHeroAnimation?: boolean }> = ({
+export const BackgroundCoverHero: React.FC<Page['hero']> = ({
   backgroundMedia,
   links,
   richText,
-  showHeroAnimation = false,
 }) => {
-  const backgroundImage = backgroundMedia && typeof backgroundMedia === 'object' ? backgroundMedia : null
+  const backgroundImage =
+    backgroundMedia && typeof backgroundMedia === 'object' ? backgroundMedia : null
 
   return (
     <div
@@ -28,14 +27,12 @@ export const BackgroundCoverHero: React.FC<Page['hero'] & { showHeroAnimation?: 
         className="absolute inset-0 -z-10 bg-gradient-to-br from-[#000815] via-[#0c1633] to-[#020712]"
         aria-hidden
       />
-      {showHeroAnimation && <ContainedHeroAnimation />}
-
       {backgroundImage && (
         <div className="absolute inset-0 -z-10">
           <Media
             alt={
               (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
-              'Full-width hero background — Erin Jerri, AI and spatial computing'
+              'Full-width portfolio hero background'
             }
             fill
             className="absolute inset-0 h-full w-full"

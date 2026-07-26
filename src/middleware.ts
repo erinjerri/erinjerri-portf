@@ -18,7 +18,8 @@ export function middleware(request: NextRequest) {
       ?.trim()
       .toLowerCase()
     const hostname = host.split(':')[0]
-    const isPoetryHost = hostname === 'poetry.erinjerri.com'
+    const poetryHostname = process.env.NEXT_PUBLIC_POETRY_HOSTNAME?.trim().toLowerCase() || ''
+    const isPoetryHost = Boolean(poetryHostname) && hostname === poetryHostname
     const requestHeaders = new Headers()
     request.headers.forEach((value, key) => {
       requestHeaders.set(key, value)

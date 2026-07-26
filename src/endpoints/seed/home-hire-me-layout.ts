@@ -1,7 +1,12 @@
 import type { Page } from '@/payload-types'
 import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 
-const HOME_SIGNATURE_BLOCK_TYPES = ['ribbonBlock', 'statsBlock', 'signatureTalks', 'bioBlock'] as const
+const HOME_SIGNATURE_BLOCK_TYPES = [
+  'ribbonBlock',
+  'statsBlock',
+  'signatureTalks',
+  'bioBlock',
+] as const
 const HOME_EXCLUDED_SPEAKER_BLOCK_TYPES = new Set([
   'speakerKit',
   'speakerBio',
@@ -10,37 +15,37 @@ const HOME_EXCLUDED_SPEAKER_BLOCK_TYPES = new Set([
 ])
 
 /**
- * Default “Hire Me” section for the home page.
+ * Default portfolio sections for the home page.
  * Seeded so the block is visible on fresh installs, but the content remains editable in Payload.
  */
 export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
   {
     blockName: 'Ribbon intro',
     blockType: 'ribbonBlock',
-    tagline: "O'Reilly Media Author | Founder & Former Startup CTO | Software Engineer",
+    tagline: 'Strategy | Design | Technology',
     headline:
-      'I advise, architect, and build what happens after the model - when AI has to operate inside products, workflows, and environments.',
-    highlight: 'after the model',
+      'I turn ambitious ideas into clear, useful experiences that people can understand and trust.',
+    highlight: 'clear, useful experiences',
     supportingText:
-      'My work spans AI, spatial computing, and product systems built for real-world use - across iOS, visionOS, and emerging interfaces.',
+      'Replace this copy with a concise statement of what you do, who you help, and why your perspective is different.',
     columns: [
       {
         number: '01',
-        title: 'AI Agents',
+        title: 'Strategy',
         description:
-          'Systems that operate beyond chat - executing inside real products and workflows.',
+          'Frame the opportunity, align the team, and define a direction worth pursuing.',
       },
       {
         number: '02',
-        title: 'Spatial Computing',
+        title: 'Design',
         description:
-          'AR, VR, and mixed reality interfaces built for visionOS, iOS, and what comes next.',
+          'Turn complex requirements into accessible experiences with a strong point of view.',
       },
       {
         number: '03',
-        title: 'Product Systems',
+        title: 'Delivery',
         description:
-          'Architecture and strategy for AI-native products designed to scale in the real world.',
+          'Build, test, and ship work that performs reliably outside the presentation deck.',
       },
     ],
   },
@@ -48,32 +53,27 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
     blockName: 'Selected talks',
     blockType: 'signatureTalks',
     heading: 'Selected talks',
-    intro:
-      'Keynotes, executive briefings, and technical talks on AI, spatial computing, and interface shifts.',
+    intro: 'Use this section for talks, workshops, podcast topics, or areas of expertise.',
     talks: [
       {
         number: '01',
-        title: 'What Happens After the Model?',
-        subtitle:
-          'How AI moves from demos into products, workflows, environments, and decision systems.',
+        title: 'Turning Complexity Into Clarity',
+        subtitle: 'A practical approach to making difficult ideas understandable and actionable.',
       },
       {
         number: '02',
-        title: 'The Next Interface Shift',
-        subtitle:
-          'Why spatial computing and multimodal AI change how software is designed, operated, and trusted.',
+        title: 'Designing for Real People',
+        subtitle: 'How research, empathy, and iteration create experiences people can trust.',
       },
       {
         number: '03',
-        title: 'Building During Platform Transitions',
-        subtitle:
-          'How founders and technical leaders make architecture bets while the rules are still moving.',
+        title: 'From Idea to Launch',
+        subtitle: 'What it takes to move from an ambitious concept to a resilient product.',
       },
       {
         number: '04',
-        title: 'AI Beyond Chatbots',
-        subtitle:
-          'A practical view of agentic systems, ambient interfaces, and real-world product integration.',
+        title: 'Custom Topic',
+        subtitle: 'Tailor this entry to the audience, event, or collaboration you want to attract.',
       },
     ],
   },
@@ -83,24 +83,24 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
     eyebrow: 'Selected highlights',
     items: [
       {
-        value: '#1',
-        label: 'Game Programming on Amazon',
+        value: '10+',
+        label: 'Years of experience',
         color: 'mint',
       },
       {
-        value: '42+',
-        label: 'Countries distributed',
+        value: '25',
+        label: 'Projects delivered',
         color: 'teal',
       },
       {
-        value: '10+',
-        label: 'Years in AI, XR, spatial computing',
+        value: '8',
+        label: 'Teams supported',
         color: 'pink',
       },
     ],
   },
   defaultBioBlock({
-    eyebrow: 'Hi, I’m Erin! 👋🏼',
+    eyebrow: 'About',
   }),
 ]
 

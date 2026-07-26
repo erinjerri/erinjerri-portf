@@ -46,8 +46,6 @@ type Args = {
   }>
 }
 
-const MAIN_PAGE_HERO_ANIMATION_SLUGS = new Set(['home'])
-
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
@@ -124,15 +122,8 @@ export default async function Page({ params: paramsPromise }: Args) {
         <RenderHero
           {...hero}
           pageSlug={decodedSlug}
-          showHeroAnimation={MAIN_PAGE_HERO_ANIMATION_SLUGS.has(decodedSlug)}
           visualVariant={isHomePrismatic ? 'prismatic' : undefined}
         />
-        {(decodedSlug === 'timebite' || decodedSlug === 'timebite-download') && (
-          <p className="container mt-8 max-w-[48rem] text-base leading-relaxed text-muted-foreground">
-            TimeBite is an AI-powered productivity and spatial computing system designed for
-            real-world workflows.
-          </p>
-        )}
         <VideoEmbed
           className="container mt-8"
           video={selectedVideo}

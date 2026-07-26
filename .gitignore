@@ -220,7 +220,14 @@ node_modules 2/
 out/
 dist/
 *.tsbuildinfo
+playwright-report/
+test-results/
+*.report.html
 
 # OS noise
 .DS_Store
 .gstack/
+
+# Local Payload uploads (keep the directory, not its contents)
+public/media/*
+!public/media/.gitkeep

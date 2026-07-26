@@ -269,7 +269,7 @@ export interface Page {
          */
         overlayOpacity?: number | null;
         /**
-         * Links overlay the center of the image (e.g. O'Reilly, Amazon).
+         * Links overlay the center of the image.
          */
         links?:
           | {
@@ -1785,6 +1785,14 @@ export interface Poetry {
       }[]
     | null;
   featured?: boolean | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -2651,6 +2659,13 @@ export interface PoetrySelect<T extends boolean = true> {
         id?: T;
       };
   featured?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -3679,7 +3694,7 @@ export interface MediaBlock {
    */
   overlayOpacity?: number | null;
   /**
-   * Links overlay the center of the image (e.g. O'Reilly, Amazon).
+   * Links overlay the center of the image.
    */
   links?:
     | {

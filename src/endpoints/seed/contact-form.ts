@@ -35,8 +35,8 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   createdAt: '2023-01-12T21:47:41.374Z',
   emails: [
     {
-      emailFrom: '"Erin" \u003Cyouremail@domain.com\u003E',
-      emailTo: '{{contactme@erinjerri.xyz}}',
+      emailFrom: '"Portfolio contact form" <you@example.com>',
+      emailTo: '{{you@example.com}}',
       message: {
         root: {
           type: 'root',

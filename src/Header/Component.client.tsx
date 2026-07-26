@@ -38,9 +38,6 @@ type HeaderBodyProps = {
   scrolled: boolean
 }
 
-const DIMENSIONS_STRIP_SRC =
-  '/media/hero-top-banner-experience-dimensions-background-curves-cut-1400x155.webp'
-
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
@@ -66,12 +63,9 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
-            backgroundImage: [
-              scrolled
-                ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
-                : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
-              `url(${DIMENSIONS_STRIP_SRC})`,
-            ].join(', '),
+            backgroundImage: scrolled
+              ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
+              : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',

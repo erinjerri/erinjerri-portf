@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { SITE_OWNER_NAME } from '@/utilities/siteMetadata'
 
 import { Media } from '@/components/Media'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
@@ -94,7 +95,11 @@ export default async function PoetryDetailPage({ params: paramsPromise }: Args) 
   const date = formatPoetryDate(poem.publishedDate)
 
   return (
-    <PoetryLayout eyebrow={date ?? 'Poetry'} title={poem.title} description={poem.excerpt ?? undefined}>
+    <PoetryLayout
+      eyebrow={date ?? 'Poetry'}
+      title={poem.title}
+      description={poem.excerpt ?? undefined}
+    >
       <article className="container max-w-3xl px-6 py-12 md:py-16">
         {image ? (
           <div className="relative mb-12 aspect-[16/10] overflow-hidden rounded-sm border border-border bg-muted">
@@ -124,7 +129,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug = '' } = await paramsPromise
   const decodedSlug = safeDecodeURIComponent(slug)
   const canonical = poetryCanonicalUrlForPath(`/poetry/${decodedSlug}`)
-  const fallbackTitle = 'Poetry | Erin Jerri'
+  const fallbackTitle = `Poetry | ${SITE_OWNER_NAME}`
 
   try {
     const poem = await getPoemBySlug(decodedSlug, draft)
@@ -135,7 +140,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
           ? poem.featuredImage
           : null
     const title = poem?.meta?.title?.trim() || poem?.title || fallbackTitle
-    const description = poem?.meta?.description?.trim() || poem?.excerpt || 'Poetry by Erin Jerri.'
+    const description =
+      poem?.meta?.description?.trim() || poem?.excerpt || `Poetry by ${SITE_OWNER_NAME}.`
     const imageUrl = image?.sizes?.og?.url || image?.url
 
     return {
@@ -160,7 +166,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     console.warn('[poetry/[slug]] Skipping metadata because DB is unavailable:', err)
     return {
       alternates: { canonical },
-      description: 'Poetry by Erin Jerri.',
+      description: `Poetry by ${SITE_OWNER_NAME}.`,
       title: fallbackTitle,
     }
   }

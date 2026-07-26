@@ -14,9 +14,10 @@ import { validateSpeakingRequestTopics } from '@/hooks/validateSpeakingRequestTo
 
 import type { Page, Post, Project } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { SITE_OWNER_NAME } from '@/utilities/siteMetadata'
 
 const generateTitle: GenerateTitle<Post | Page | Project> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Erin Jerri` : 'Erin Jerri'
+  return doc?.title ? `${doc.title} | ${SITE_OWNER_NAME}` : SITE_OWNER_NAME
 }
 
 const generateURL: GenerateURL<Post | Page | Project> = ({ doc }) => {
@@ -56,8 +57,7 @@ const hasR2S3Config = Boolean(
   useR2Storage && r2Bucket && r2Endpoint && r2AccessKeyID && r2SecretAccessKey,
 )
 const useLightweightLocalPlugins =
-  process.env.NODE_ENV === 'development' &&
-  process.env.PAYLOAD_ENABLE_FULL_LOCAL_PLUGINS !== 'true'
+  process.env.NODE_ENV === 'development' && process.env.PAYLOAD_ENABLE_FULL_LOCAL_PLUGINS !== 'true'
 
 export const plugins: Plugin[] = [
   ...(!useLightweightLocalPlugins && hasR2S3Config
@@ -71,7 +71,9 @@ export const plugins: Plugin[] = [
                     generateFileURL: ({ filename, prefix }) => {
                       const base = `https://${r2PublicHostname.replace(/^https?:\/\//, '')}`
                       const encodedFilename = encodeURIComponent(
-                        typeof filename === 'string' ? filename.replace(/^\/+/, '') : String(filename),
+                        typeof filename === 'string'
+                          ? filename.replace(/^\/+/, '')
+                          : String(filename),
                       )
                       const path = prefix ? `${prefix}/${encodedFilename}` : encodedFilename
                       return `${base}/${path}`
@@ -86,7 +88,9 @@ export const plugins: Plugin[] = [
                     generateFileURL: ({ filename, prefix }) => {
                       const base = `https://${r2PublicHostname.replace(/^https?:\/\//, '')}`
                       const encodedFilename = encodeURIComponent(
-                        typeof filename === 'string' ? filename.replace(/^\/+/, '') : String(filename),
+                        typeof filename === 'string'
+                          ? filename.replace(/^\/+/, '')
+                          : String(filename),
                       )
                       const path = prefix ? `${prefix}/${encodedFilename}` : encodedFilename
                       return `${base}/${path}`

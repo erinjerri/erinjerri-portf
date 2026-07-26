@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import React from 'react'
+import { SITE_OWNER_NAME } from '@/utilities/siteMetadata'
 
 type PoetryLayoutProps = {
   children: React.ReactNode
@@ -8,7 +9,12 @@ type PoetryLayoutProps = {
   description?: string
 }
 
-export function PoetryLayout({ children, eyebrow = 'Poetry', title, description }: PoetryLayoutProps) {
+export function PoetryLayout({
+  children,
+  eyebrow = 'Poetry',
+  title,
+  description,
+}: PoetryLayoutProps) {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="border-b border-border/70 bg-background">
@@ -19,14 +25,10 @@ export function PoetryLayout({ children, eyebrow = 'Poetry', title, description 
               href="/poetry"
               prefetch={false}
             >
-              Erin Jerri Poetry
+              {SITE_OWNER_NAME} Poetry
             </Link>
-            <Link
-              className="transition-colors hover:text-foreground"
-              href="https://erinjerri.com"
-              prefetch={false}
-            >
-              ErinJerri.com
+            <Link className="transition-colors hover:text-foreground" href="/" prefetch={false}>
+              Portfolio
             </Link>
           </nav>
 

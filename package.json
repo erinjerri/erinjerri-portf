@@ -1,7 +1,7 @@
 {
-  "name": "freshest-portf-26",
+  "name": "payload-portfolio-starter",
   "version": "1.0.0",
-  "description": "Website template for Payload",
+  "description": "A customizable portfolio, publishing, and speaking starter built with Payload CMS and Next.js",
   "license": "MIT",
   "scripts": {
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS=--no-deprecation next build",
@@ -65,9 +65,6 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
-    "@react-three/postprocessing": "^3.0.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dotenv": "16.4.7",
@@ -84,8 +81,7 @@
     "rss-parser": "^3.13.0",
     "sharp": "0.34.5",
     "tailwind-merge": "^2.3.0",
-    "tailwindcss-animate": "^1.0.7",
-    "three": "^0.183.1"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -127,7 +123,7 @@
     "not op_mini all"
   ],
   "engines": {
-    "node": "^18.20.2 || >=20.9.0",
+    "node": "^20.19.0 || >=22.12.0",
     "pnpm": "^9 || ^10"
   },
   "pnpm": {

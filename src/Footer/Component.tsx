@@ -54,8 +54,9 @@ const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
 
 const getSubstackPublicationURL = (): string => {
-  const raw = process.env.SUBSTACK_SUBSCRIBE_URL?.trim()
-  if (!raw) return 'https://erinjerri.substack.com'
+  const raw =
+    process.env.SUBSTACK_SUBSCRIBE_URL?.trim() || process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim()
+  if (!raw) return ''
 
   const trimmed = raw.replace(/\/$/, '')
   const lower = trimmed.toLowerCase()
@@ -68,7 +69,7 @@ const getSubstackPublicationURL = (): string => {
     return lower.endsWith('/subscribe') ? trimmed.replace(/\/subscribe$/i, '') : trimmed
   }
 
-  return 'https://erinjerri.substack.com'
+  return ''
 }
 
 function SocialIcon({
@@ -132,7 +133,9 @@ interface FooterProps {
 
 export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
   const substackPublicationURL = getSubstackPublicationURL()
-  const substackEmbedSrc = `${substackPublicationURL.replace(/\/$/, '')}/embed`
+  const substackEmbedSrc = substackPublicationURL
+    ? `${substackPublicationURL.replace(/\/$/, '')}/embed`
+    : ''
   let footerData: Footer | null = data ?? null
 
   if (data === undefined) {
@@ -163,7 +166,7 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
               <Logo className="w-[8.75rem]" />
             </Link>
 
-            {!isPoetryFooter && subscribeSection?.showSubscribe !== false && (
+            {!isPoetryFooter && substackEmbedSrc && subscribeSection?.showSubscribe !== false && (
               <div className="min-h-[7rem] w-full max-w-full">
                 <SubscribeForm action={substackEmbedSrc} />
               </div>
@@ -194,10 +197,10 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
             <nav className="flex flex-col gap-3 text-sm">
               <Link
                 className="text-muted-foreground transition-colors hover:text-foreground"
-                href="https://erinjerri.com"
+                href="/"
                 prefetch={false}
               >
-                Back to ErinJerri.com
+                Back to portfolio
               </Link>
               <Link
                 className="text-muted-foreground transition-colors hover:text-foreground"
@@ -248,17 +251,13 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row sm:justify-between gap-4 text-sm text-muted-foreground">
           {copyright && <span>{copyright}</span>}
           {isPoetryFooter ? (
-            <Link
-              className="transition-colors hover:text-foreground"
-              href="https://erinjerri.com"
-              prefetch={false}
-            >
-              Back to ErinJerri.com
+            <Link className="transition-colors hover:text-foreground" href="/" prefetch={false}>
+              Back to portfolio
             </Link>
           ) : (
             <Link
               className="transition-colors hover:text-foreground"
-              href="https://poetry.erinjerri.com"
+              href="/poetry"
               prefetch={false}
             >
               Poetry

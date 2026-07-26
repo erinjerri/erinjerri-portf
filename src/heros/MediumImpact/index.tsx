@@ -3,15 +3,17 @@ import React from 'react'
 import type { Page } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
-import { ContainedHeroAnimation } from '@/components/ContainedHeroAnimation'
 import { cn } from '@/utilities/ui'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
-export const MediumImpactHero: React.FC<
-  Page['hero'] & { pageSlug?: string; showHeroAnimation?: boolean }
-> = ({ links, media, pageSlug, richText, showHeroAnimation = false }) => {
+export const MediumImpactHero: React.FC<Page['hero'] & { pageSlug?: string }> = ({
+  links,
+  media,
+  pageSlug,
+  richText,
+}) => {
   if (pageSlug === 'about') {
     console.log('[About bio debug] Top bio renderer would be MediumImpactHero')
   }
@@ -20,34 +22,19 @@ export const MediumImpactHero: React.FC<
 
   const hasLinks = Array.isArray(links) && links.length > 0
 
-  const isTimebite = pageSlug === 'timebite' || pageSlug === 'timebite-download'
-
   return (
     <div className="container">
-      <div
-        className={cn(
-          'relative isolate flex flex-col overflow-hidden',
-          isTimebite ? 'items-start' : 'items-center',
-        )}
-      >
-        {showHeroAnimation && <ContainedHeroAnimation />}
+      <div className={cn('relative isolate flex flex-col overflow-hidden', 'items-center')}>
         {/* Image */}
         {heroMedia && (
-          <div
-            className={cn(
-              'relative z-10 mb-6 w-full max-w-[420px]',
-              isTimebite && 'bg-transparent',
-            )}
-          >
+          <div className={cn('relative z-10 mb-6 w-full max-w-[420px]')}>
             <Media
               alt={
-                (typeof heroMedia.alt === 'string' && heroMedia.alt.trim()) ||
-                'Erin Jerri — about and profile, AI and spatial computing'
+                (typeof heroMedia.alt === 'string' && heroMedia.alt.trim()) || 'Profile portrait'
               }
               className="w-full"
-              imagePlaceholder={isTimebite ? 'empty' : undefined}
               imgClassName="h-auto w-full max-w-full"
-              pictureClassName={cn('block w-full', isTimebite && 'bg-transparent')}
+              pictureClassName="block w-full"
               priority
               quality={70}
               resource={heroMedia}

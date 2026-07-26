@@ -5,7 +5,7 @@ import { syncSubstackToPosts } from '@/utilities/substack/syncSubstackToPosts'
 
 export const maxDuration = 300
 
-const RSS_URL = process.env.SUBSTACK_RSS_URL || 'https://erinjerri.substack.com/feed'
+const RSS_URL = process.env.SUBSTACK_RSS_URL || 'https://yourpublication.substack.com/feed'
 const MODE: 'auto_publish' | 'review' =
   process.env.SUBSTACK_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 
@@ -70,21 +70,18 @@ export async function POST(request: Request): Promise<Response> {
           ? 'fast'
           : 'full'
     const alwaysFetchFullArticle =
-      parseBoolean(process.env.SUBSTACK_SYNC_ALWAYS_FETCH_FULL_ARTICLE) ??
-      (syncProfile === 'full')
+      parseBoolean(process.env.SUBSTACK_SYNC_ALWAYS_FETCH_FULL_ARTICLE) ?? syncProfile === 'full'
     const discoverFromArchive =
-      parseBoolean(process.env.SUBSTACK_SYNC_DISCOVER_FROM_ARCHIVE) ?? (syncProfile === 'full')
+      parseBoolean(process.env.SUBSTACK_SYNC_DISCOVER_FROM_ARCHIVE) ?? syncProfile === 'full'
     const maxItems =
       parsePositiveInt(process.env.SUBSTACK_SYNC_MAX_ITEMS) ??
       (syncProfile === 'fast' ? 5 : undefined)
     const maxImagesPerPost = parsePositiveInt(process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST)
     const body = request.headers.get('content-type')?.includes('application/json')
-      ? ((await request.json()) as
-          | {
-              sourceURL?: string
-              sourceURLs?: string[] | string
-            }
-          | null)
+      ? ((await request.json()) as {
+          sourceURL?: string
+          sourceURLs?: string[] | string
+        } | null)
       : null
     const sourceURLs =
       parseSourceURLs(body?.sourceURLs) ??
