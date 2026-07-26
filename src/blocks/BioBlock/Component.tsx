@@ -114,7 +114,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
           <div className={headline?.trim() ? 'mt-8 space-y-7 md:mt-9' : 'space-y-7'}>
             {bioParagraphs.map((paragraph, index) => (
               <p
-                className="max-w-4xl text-base leading-8 text-white/78"
+                className="max-w-4xl text-[1rem] leading-8 text-white/78 md:text-[1.0625rem] md:leading-9"
                 key={paragraph.id ?? index}
               >
                 {renderParagraph(paragraph.text?.trim() ?? '', paragraph.highlights)}

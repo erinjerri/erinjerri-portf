@@ -39,22 +39,22 @@ export const creatingArVrBookPage = ({ bookAffiliateProductId }: Args): Required
       {
         blockType: 'bookAcclaimStrip',
         blockName: 'Book acclaim',
-        heading: 'Book acclaim',
+        heading: 'Book authority',
         items: [
           {
             variant: 'numbered',
-            lead: '#1 Amazon Game Programming debut. Translated into Chinese and Korean.',
-            body: '',
+            lead: "O'Reilly Media publication with international distribution.",
+            body: 'Creating Augmented and Virtual Realities has reached readers across 42+ countries and positioned Erin in the AI, XR, and spatial computing ecosystem.',
           },
           {
             variant: 'numbered',
-            lead: '#2 BookAuthority Top VR Books to Read of all time.',
-            body: '',
+            lead: 'Translated editions in Chinese and Korean.',
+            body: 'The work travels beyond a single market and continues to support global teams learning emerging interface systems.',
           },
           {
             variant: 'check',
-            lead: 'Adopted as official curriculum by Univision for VR developers.',
-            body: '',
+            lead: '#1 Amazon Game Programming debut and BookAuthority recognition.',
+            body: 'Authority signals come before purchase links so the section reads as expertise, not a storefront.',
           },
         ],
       },

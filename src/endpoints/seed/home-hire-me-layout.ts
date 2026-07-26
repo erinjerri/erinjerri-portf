@@ -1,7 +1,7 @@
 import type { Page } from '@/payload-types'
 import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 
-const HOME_SIGNATURE_BLOCK_TYPES = ['ribbonBlock', 'statsBlock', 'bioBlock'] as const
+const HOME_SIGNATURE_BLOCK_TYPES = ['ribbonBlock', 'statsBlock', 'signatureTalks', 'bioBlock'] as const
 const HOME_EXCLUDED_SPEAKER_BLOCK_TYPES = new Set([
   'speakerKit',
   'speakerBio',
@@ -19,7 +19,7 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
     blockType: 'ribbonBlock',
     tagline: "O'Reilly Media Author | Founder & Former Startup CTO | Software Engineer",
     headline:
-      'I focus on what happens after the model - when AI has to operate inside products, workflows, and environments.',
+      'I advise, architect, and build what happens after the model - when AI has to operate inside products, workflows, and environments.',
     highlight: 'after the model',
     supportingText:
       'My work spans AI, spatial computing, and product systems built for real-world use - across iOS, visionOS, and emerging interfaces.',
@@ -41,6 +41,39 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
         title: 'Product Systems',
         description:
           'Architecture and strategy for AI-native products designed to scale in the real world.',
+      },
+    ],
+  },
+  {
+    blockName: 'Selected talks',
+    blockType: 'signatureTalks',
+    heading: 'Selected talks',
+    intro:
+      'Keynotes, executive briefings, and technical talks on AI, spatial computing, and interface shifts.',
+    talks: [
+      {
+        number: '01',
+        title: 'What Happens After the Model?',
+        subtitle:
+          'How AI moves from demos into products, workflows, environments, and decision systems.',
+      },
+      {
+        number: '02',
+        title: 'The Next Interface Shift',
+        subtitle:
+          'Why spatial computing and multimodal AI change how software is designed, operated, and trusted.',
+      },
+      {
+        number: '03',
+        title: 'Building During Platform Transitions',
+        subtitle:
+          'How founders and technical leaders make architecture bets while the rules are still moving.',
+      },
+      {
+        number: '04',
+        title: 'AI Beyond Chatbots',
+        subtitle:
+          'A practical view of agentic systems, ambient interfaces, and real-world product integration.',
       },
     ],
   },
