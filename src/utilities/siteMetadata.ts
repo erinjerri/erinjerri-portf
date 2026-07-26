@@ -1,64 +1,58 @@
-/** Production canonical origin for meta tags (explicit SEO; independent of dev env). */
-export const CANONICAL_SITE_ORIGIN = 'https://erinjerri.com'
+const withoutTrailingSlash = (value: string): string => value.replace(/\/+$/, '')
 
-/** Site-wide default document title when a page has no CMS title. */
-export const SITE_DEFAULT_TITLE = 'Erin Jerri Pañgilinan — AI, Spatial Computing, TimeBite'
+export const SITE_OWNER_NAME = process.env.NEXT_PUBLIC_SITE_OWNER_NAME?.trim() || 'Your Name'
 
-/** Site-wide default meta description. */
+/** Canonical origin used by metadata, sitemaps, and structured data. */
+export const CANONICAL_SITE_ORIGIN = withoutTrailingSlash(
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    process.env.NEXT_PUBLIC_SERVER_URL?.trim() ||
+    'http://localhost:3000',
+)
+
+/** Site-wide document title used when a Payload page has no SEO title. */
+export const SITE_DEFAULT_TITLE =
+  process.env.NEXT_PUBLIC_SITE_TITLE?.trim() || `${SITE_OWNER_NAME} — Portfolio`
+
+/** Site-wide description used when a Payload page has no SEO description. */
 export const SITE_DEFAULT_DESCRIPTION =
-  'Software engineer, founder, and O’Reilly author building AI and spatial computing systems. Creator of TimeBite, a LifeOS for real-world workflows.'
+  process.env.NEXT_PUBLIC_SITE_DESCRIPTION?.trim() ||
+  'Portfolio, selected work, writing, and ways to collaborate.'
 
-const TIMEBITE_DESCRIPTION =
-  'TimeBite is an AI-powered productivity and spatial computing system designed for real-world workflows.'
-
-/** Fixed SEO for key CMS pages (slug → values). Matched via `canonicalPathToSeoSlug`. */
+/** Fixed SEO for common CMS pages. Payload SEO fields still take precedence. */
 export const PAGE_SEO_BY_SLUG: Record<string, { title: string; description: string }> = {
   home: {
-    title: 'Erin Jerri — AI, Spatial Computing, TimeBite',
+    title: SITE_DEFAULT_TITLE,
     description: SITE_DEFAULT_DESCRIPTION,
   },
   about: {
-    title: 'About Erin Jerri Pañgilinan — AI & Spatial Computing',
-    description:
-      'Erin Jerri Pañgilinan is a software engineer, founder, and O’Reilly author working in AI and spatial computing.',
-  },
-  timebite: {
-    title: 'TimeBite — AI + Spatial Computing LifeOS',
-    description: TIMEBITE_DESCRIPTION,
-  },
-  'timebite-download': {
-    title: 'TimeBite — AI + Spatial Computing LifeOS',
-    description: TIMEBITE_DESCRIPTION,
+    title: `About ${SITE_OWNER_NAME}`,
+    description: `Learn more about ${SITE_OWNER_NAME}, their experience, and the work they care about.`,
   },
   advisory: {
-    title: 'Advisory — AI & Spatial Computing Strategy',
+    title: `Advisory — ${SITE_OWNER_NAME}`,
     description: SITE_DEFAULT_DESCRIPTION,
   },
   'speaking-info': {
-    title: 'Speaking — AI, XR, and Systems',
-    description:
-      'Keynotes, panels, and workshops on AI, spatial computing, and building at the frontier. Submit a speaking request.',
+    title: `Speaking — ${SITE_OWNER_NAME}`,
+    description: `Talks, workshops, and speaking information for ${SITE_OWNER_NAME}.`,
   },
 }
 
-/** Map pathname (with trailing slash normalized) to a key in PAGE_SEO_BY_SLUG. */
-export function getFixedPageSeo(canonicalPath: string): { title: string; description: string } | null {
-  const path =
-    canonicalPath === '/' ? '/' : canonicalPath.replace(/\/$/, '') || '/'
+/** Map a pathname to a key in PAGE_SEO_BY_SLUG. */
+export function getFixedPageSeo(
+  canonicalPath: string,
+): { title: string; description: string } | null {
+  const path = canonicalPath === '/' ? '/' : canonicalPath.replace(/\/$/, '') || '/'
   const key =
     path === '/'
       ? 'home'
       : path === '/about'
         ? 'about'
-        : path === '/timebite'
-          ? 'timebite'
-          : path === '/timebite-download'
-            ? 'timebite-download'
-            : path === '/advisory'
-              ? 'advisory'
-              : path === '/speaking-info'
-                ? 'speaking-info'
-                : null
+        : path === '/advisory'
+          ? 'advisory'
+          : path === '/speaking-info'
+            ? 'speaking-info'
+            : null
   return key ? (PAGE_SEO_BY_SLUG[key] ?? null) : null
 }
 
@@ -68,15 +62,18 @@ export function canonicalUrlForPath(path: string): string {
   return `${CANONICAL_SITE_ORIGIN}${normalized}`
 }
 
+const sameAs = [
+  process.env.NEXT_PUBLIC_LINKEDIN_URL,
+  process.env.NEXT_PUBLIC_GITHUB_URL,
+  process.env.NEXT_PUBLIC_SOCIAL_URL,
+  process.env.NEXT_PUBLIC_SUBSTACK_URL,
+].filter((value): value is string => Boolean(value?.trim()))
+
 export const PERSON_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'Person',
-  name: 'Erin Jerri Pañgilinan',
+  name: SITE_OWNER_NAME,
   url: CANONICAL_SITE_ORIGIN,
-  jobTitle: 'Software Engineer, Founder',
-  sameAs: [
-    'https://www.linkedin.com/in/erinjerri',
-    'https://twitter.com/erinjerri',
-    'https://erinjerri.substack.com',
-  ],
-} as const
+  jobTitle: process.env.NEXT_PUBLIC_SITE_OWNER_ROLE?.trim() || 'Creator',
+  ...(sameAs.length > 0 ? { sameAs } : {}),
+}

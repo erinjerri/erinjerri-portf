@@ -14,6 +14,7 @@ import { VideoEmbed } from '@/components/VideoEmbed'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import { safeDecodeURIComponent } from '@/utilities/safeDecodeURIComponent'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
@@ -56,7 +57,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const { slug = '' } = await paramsPromise
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
   // Decode to support slugs with special characters
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
   let post: Awaited<ReturnType<typeof getPostBySlug>> | null = null
 
@@ -115,7 +116,7 @@ export default async function Post({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
   try {

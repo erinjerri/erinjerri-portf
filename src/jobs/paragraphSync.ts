@@ -1,7 +1,5 @@
 import type { TaskConfig } from 'payload'
 
-import { syncParagraphToPosts } from '../utilities/paragraph/syncParagraphToPosts'
-
 type ParagraphSyncTaskIO = {
   input: Record<string, never>
   output: {
@@ -12,7 +10,7 @@ type ParagraphSyncTaskIO = {
 }
 
 const enabled = process.env.PARAGRAPH_SYNC_ENABLED === 'true'
-const publication = process.env.PARAGRAPH_PUBLICATION || '@cypherpinay'
+const publication = process.env.PARAGRAPH_PUBLICATION || '@yourpublication'
 const mode: 'auto_publish' | 'review' =
   process.env.PARAGRAPH_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 const cron = process.env.PARAGRAPH_SYNC_CRON || '0 45 * * * *'
@@ -22,6 +20,7 @@ export const paragraphSyncTask: TaskConfig<ParagraphSyncTaskIO> = {
   slug: 'paragraphSync',
   label: 'Sync Paragraph posts',
   handler: async ({ req }) => {
+    const { syncParagraphToPosts } = await import('../utilities/paragraph/syncParagraphToPosts')
     const maxItemsRaw = process.env.PARAGRAPH_SYNC_MAX_ITEMS
     const maxItems =
       typeof maxItemsRaw === 'string' && maxItemsRaw.trim().length > 0

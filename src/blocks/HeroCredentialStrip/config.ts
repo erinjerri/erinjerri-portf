@@ -18,7 +18,7 @@ export const HeroCredentialStrip: Block = {
         plural: 'Phrases',
       },
       defaultValue: [
-        { text: "O'Reilly author" },
+        { text: 'Published work' },
         { text: 'Founder & former CTO' },
         { text: 'AWS, Meta, and Verizon Ventures fellow' },
       ],

@@ -114,7 +114,8 @@ const API_BASE = 'https://public.api.paragraph.com/api/v1'
 const FETCH_HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-  Accept: 'application/json, text/html, image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+  Accept:
+    'application/json, text/html, image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
   'Accept-Language': 'en-US,en;q=0.9',
 } as const
 
@@ -174,13 +175,13 @@ function extFromMimeType(mimeType: string): string | undefined {
 
 function normalizeParagraphPublication(input: string): string {
   const trimmed = input.trim()
-  if (!trimmed) return 'cypherpinay'
+  if (!trimmed) return 'yourpublication'
 
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     try {
       const url = new URL(trimmed)
       const path = url.pathname.replace(/^\/+|\/+$/g, '')
-      const cleaned = path ? path.replace(/^@/, '') : 'cypherpinay'
+      const cleaned = path ? path.replace(/^@/, '') : 'yourpublication'
       return cleaned
     } catch {
       return trimmed.replace(/^@/, '')
@@ -238,7 +239,9 @@ async function fetchPublicationByDomain(domain: string): Promise<ParagraphPublic
 }
 
 async function fetchPublicationByID(publicationId: string): Promise<ParagraphPublication> {
-  return await fetchJSON<ParagraphPublication>(`${API_BASE}/publications/${encodeURIComponent(publicationId)}`)
+  return await fetchJSON<ParagraphPublication>(
+    `${API_BASE}/publications/${encodeURIComponent(publicationId)}`,
+  )
 }
 
 function extractPublicationIDFromHTML(html: string): string | null {
@@ -410,15 +413,16 @@ function matchesParagraphTarget(args: {
   const { item, normalizedPublication, rawPublication } = args
   const raw = rawPublication.trim().toLowerCase()
   const normalized = normalizedPublication.replace(/^@/, '').toLowerCase()
-  const parsedDomain = raw.startsWith('http://') || raw.startsWith('https://')
-    ? (() => {
-        try {
-          return new URL(rawPublication).hostname.replace(/^www\./, '').toLowerCase()
-        } catch {
-          return ''
-        }
-      })()
-    : ''
+  const parsedDomain =
+    raw.startsWith('http://') || raw.startsWith('https://')
+      ? (() => {
+          try {
+            return new URL(rawPublication).hostname.replace(/^www\./, '').toLowerCase()
+          } catch {
+            return ''
+          }
+        })()
+      : ''
 
   const candidates = [
     item.publication.slug,
@@ -428,7 +432,12 @@ function matchesParagraphTarget(args: {
     item.user?.farcaster?.displayName,
   ]
     .filter(Boolean)
-    .map((value) => String(value).replace(/^https?:\/\//, '').replace(/^www\./, '').toLowerCase())
+    .map((value) =>
+      String(value)
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .toLowerCase(),
+    )
 
   return candidates.some((candidate) => {
     return (
@@ -458,11 +467,14 @@ async function fetchPublicationAndPostsFromFeed(args: {
     })
     if (cursor) search.set('cursor', cursor)
 
-    const result = await fetchJSON<ParagraphFeedResponse>(`${API_BASE}/posts/feed?${search.toString()}`)
+    const result = await fetchJSON<ParagraphFeedResponse>(
+      `${API_BASE}/posts/feed?${search.toString()}`,
+    )
     const items = result.items ?? []
 
     for (const item of items) {
-      if (!matchesParagraphTarget({ item, normalizedPublication, rawPublication: publication })) continue
+      if (!matchesParagraphTarget({ item, normalizedPublication, rawPublication: publication }))
+        continue
       matchedPublication = item.publication
       matchedPosts.push(item.post)
 
@@ -532,11 +544,10 @@ async function fetchPostsFromPublicPage(args: {
   }
 
   return {
-    publication:
-      publication ?? {
-        id: discovery.publicationId ?? args.normalizedPublication,
-        slug: discovery.publicationSlug,
-      },
+    publication: publication ?? {
+      id: discovery.publicationId ?? args.normalizedPublication,
+      slug: discovery.publicationSlug,
+    },
     posts,
   }
 }
@@ -565,7 +576,9 @@ async function fetchImageToBuffer(
   const contentType = res.headers.get('content-type') || 'application/octet-stream'
   if (!contentType.toLowerCase().startsWith('image/')) {
     if (process.env.DEBUG_PARAGRAPH_SYNC === 'true') {
-      console.warn(`[Paragraph sync] Image fetch non-image content-type (${contentType}) for ${url}`)
+      console.warn(
+        `[Paragraph sync] Image fetch non-image content-type (${contentType}) for ${url}`,
+      )
     }
     return null
   }
@@ -750,11 +763,11 @@ function sanitizeParagraphHtml(html: string): string {
     node.remove()
   })
 
-  doc.querySelectorAll('[data-testid="video-player"], [data-video], [data-embed-type="video"]').forEach(
-    (node) => {
+  doc
+    .querySelectorAll('[data-testid="video-player"], [data-video], [data-embed-type="video"]')
+    .forEach((node) => {
       node.remove()
-    },
-  )
+    })
 
   return doc.body.innerHTML || html
 }
@@ -892,7 +905,9 @@ export async function syncParagraphToPosts(args: {
 
   const contentField = (Posts.fields ?? [])
     .flatMap((field) =>
-      field.type === 'tabs' && 'tabs' in field ? (field.tabs ?? []).flatMap((tab) => tab.fields ?? []) : [field],
+      field.type === 'tabs' && 'tabs' in field
+        ? (field.tabs ?? []).flatMap((tab) => tab.fields ?? [])
+        : [field],
     )
     .find((field): field is RichTextField => field.type === 'richText' && field.name === 'content')
 
@@ -966,7 +981,8 @@ export async function syncParagraphToPosts(args: {
     }
     const isUpdate =
       Boolean(existingDoc) &&
-      (options.forceUpdate || isLexicalContentEmpty((existingDoc as { content?: unknown })?.content))
+      (options.forceUpdate ||
+        isLexicalContentEmpty((existingDoc as { content?: unknown })?.content))
 
     if (existingDoc && !isUpdate) {
       skipped++
@@ -1164,7 +1180,9 @@ export async function syncParagraphToPosts(args: {
     }
 
     const slugBase = paragraphPost.slug || toSlug(paragraphPost.title || 'untitled')
-    let slug = isUpdate ? (existingDoc!.slug as string) : slugBase || `paragraph-${Date.now().toString(36)}`
+    let slug = isUpdate
+      ? (existingDoc!.slug as string)
+      : slugBase || `paragraph-${Date.now().toString(36)}`
     let attempts = 0
 
     if (!isUpdate) {
@@ -1195,7 +1213,9 @@ export async function syncParagraphToPosts(args: {
       existingDoc,
       shouldAutoPublish ? 'auto_published' : 'in_review',
     )
-    const existingHeroImageID = relationID((existingDoc as { heroImage?: unknown } | undefined)?.heroImage)
+    const existingHeroImageID = relationID(
+      (existingDoc as { heroImage?: unknown } | undefined)?.heroImage,
+    )
     const existingMetaImageID = relationID(
       (existingDoc as { meta?: { image?: unknown } } | undefined)?.meta?.image,
     )

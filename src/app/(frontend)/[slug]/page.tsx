@@ -11,6 +11,7 @@ import { resolveHeroMedia } from '@/heros/resolveHeroMedia'
 import { enhancePageForRoute } from '@/utilities/enhancePageForRoute'
 import { generateMeta } from '@/utilities/generateMeta'
 import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import { safeDecodeURIComponent } from '@/utilities/safeDecodeURIComponent'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
 import { mergeHomeHireMeLayoutBlocks } from '@/endpoints/seed/home-hire-me-layout'
@@ -32,11 +33,7 @@ export async function generateStaticParams() {
       }),
     )
 
-    return (
-      pages.docs
-        ?.filter((doc) => doc.slug !== 'home')
-        .map(({ slug }) => ({ slug })) ?? []
-    )
+    return pages.docs?.filter((doc) => doc.slug !== 'home').map(({ slug }) => ({ slug })) ?? []
   } catch (err) {
     console.warn('[generateStaticParams] Skipping pages prebuild:', err)
     return []
@@ -53,7 +50,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
   // Decode to support slugs with special characters
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const url = '/' + decodedSlug
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
@@ -85,7 +82,9 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const enhancedPage = enhancePageForRoute(renderedPage, decodedSlug)
 
-  const resolvedHero = await resolveHeroMedia(enhancedPage.hero)
+  const resolvedHero = await resolveHeroMedia(enhancedPage.hero, {
+    includeGridMedia: decodedSlug === 'home',
+  })
 
   const hasHomeGridMedia =
     decodedSlug === 'home' &&
@@ -104,9 +103,8 @@ export default async function Page({ params: paramsPromise }: Args) {
     : resolvedHero
 
   const { layout, videoAsset, videoSource, videoUrl } = enhancedPage
-  const selectedVideo = typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video')
-    ? videoAsset
-    : null
+  const selectedVideo =
+    typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video') ? videoAsset : null
 
   const isHomePrismatic = decodedSlug === 'home'
   const layoutToRender = isHomePrismatic ? mergeHomeHireMeLayoutBlocks(layout) : layout
@@ -126,13 +124,12 @@ export default async function Page({ params: paramsPromise }: Args) {
           pageSlug={decodedSlug}
           visualVariant={isHomePrismatic ? 'prismatic' : undefined}
         />
-        {(decodedSlug === 'timebite' || decodedSlug === 'timebite-download') && (
-          <p className="container mt-8 max-w-[48rem] text-base leading-relaxed text-muted-foreground">
-            TimeBite is an AI-powered productivity and spatial computing system designed for real-world
-            workflows.
-          </p>
-        )}
-        <VideoEmbed className="container mt-8" video={selectedVideo} videoSource={videoSource} videoUrl={videoUrl} />
+        <VideoEmbed
+          className="container mt-8"
+          video={selectedVideo}
+          videoSource={videoSource}
+          videoUrl={videoUrl}
+        />
         <RenderBlocks blocks={layoutToRender} pageSlug={decodedSlug} />
       </article>
     </>
@@ -142,7 +139,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
   try {

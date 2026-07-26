@@ -9,12 +9,14 @@ const defaultRibbonColumns = [
   {
     number: '02',
     title: 'Spatial Computing',
-    description: 'AR, VR, and mixed reality interfaces built for visionOS, iOS, and what comes next.',
+    description:
+      'AR, VR, and mixed reality interfaces built for visionOS, iOS, and what comes next.',
   },
   {
     number: '03',
     title: 'Product Systems',
-    description: 'Architecture and strategy for AI-native products designed to scale in the real world.',
+    description:
+      'Architecture and strategy for AI-native products designed to scale in the real world.',
   },
 ]
 
@@ -29,7 +31,7 @@ export const RibbonBlock: Block = {
     {
       name: 'tagline',
       type: 'text',
-      defaultValue: "O'Reilly Media Author | Founder & Former Startup CTO | Software Engineer",
+      defaultValue: 'Strategy | Design | Technology',
     },
     {
       name: 'headline',

@@ -48,7 +48,7 @@ export function SubscribeForm({ action, useApiForm = true }: SubscribeFormProps)
         }),
       })
 
-      const data = (await res.json()) as { ok?: boolean; error?: string }
+      const data = (await res.json()) as { ok?: boolean; error?: string; redirectTo?: string }
 
       if (data.ok) {
         setStatus('success')
@@ -57,6 +57,10 @@ export function SubscribeForm({ action, useApiForm = true }: SubscribeFormProps)
           window.gtag('event', 'newsletter_signup')
         }
       } else {
+        if (typeof window !== 'undefined' && data.redirectTo) {
+          window.location.assign(data.redirectTo)
+          return
+        }
         setStatus('error')
         setErrorMessage(data.error ?? 'Subscription failed. Please try again.')
       }
@@ -76,7 +80,11 @@ export function SubscribeForm({ action, useApiForm = true }: SubscribeFormProps)
           scrolling="no"
         />
         <noscript>
-          <form action="https://erinjerri.substack.com/subscribe" method="GET" className="flex gap-2">
+          <form
+            action={action.replace(/\/embed$/, '/subscribe')}
+            method="GET"
+            className="flex gap-2"
+          >
             <Input
               type="email"
               placeholder="Enter your email"

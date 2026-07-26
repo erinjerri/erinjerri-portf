@@ -13,6 +13,7 @@ import { VideoEmbed } from '@/components/VideoEmbed'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import { safeDecodeURIComponent } from '@/utilities/safeDecodeURIComponent'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
@@ -49,7 +50,7 @@ type Args = {
 export default async function ProjectPage({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const url = '/projects/' + decodedSlug
   const project = await getProjectBySlug(decodedSlug, draft)
   const selectedVideo =
@@ -101,7 +102,7 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const project = await getProjectBySlug(decodedSlug, draft)
 
   return generateMeta({ doc: project, canonicalPath: `/projects/${decodedSlug}` })

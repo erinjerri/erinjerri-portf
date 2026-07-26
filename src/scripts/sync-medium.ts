@@ -5,7 +5,7 @@
  * and creates draft posts for review. Run with: pnpm sync:medium
  *
  * Requires: DATABASE_URL (or MONGODB_URI) and PAYLOAD_SECRET in .env or environment.
- * Set MEDIUM_RSS_URL env var to override the default (@erinjerri).
+ * Set MEDIUM_RSS_URL to your profile feed before running.
  * Optional: set MEDIUM_SYNC_DOWNLOAD_IMAGES=true to import images into the Media collection.
  */
 
@@ -16,7 +16,7 @@ import { getPayload } from 'payload'
 import config from '../payload.config'
 import { syncMediumToPosts } from '../utilities/medium/syncMediumToPosts'
 
-const RSS_URL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@erinjerri'
+const RSS_URL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@yourhandle'
 const MODE: 'auto_publish' | 'review' =
   process.env.MEDIUM_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 

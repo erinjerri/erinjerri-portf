@@ -1,8 +1,7 @@
 /**
- * Performance: defer Substack subscribe client bundle (dynamic import) + reserve vertical space
- * so the footer does not jump when the form mounts (CLS on mobile Lighthouse).
+ * Performance: keep the footer subscribe form isolated in its own client component + reserve
+ * vertical space so the footer does not jump when the form mounts (CLS on mobile Lighthouse).
  */
-import dynamic from 'next/dynamic'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { Facebook, Github, Linkedin, Mail, Youtube } from 'lucide-react'
@@ -16,20 +15,7 @@ import type { Footer, Media as MediaType } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
 import { SocialIconImage } from './SocialIconImage'
-
-const SubscribeFormClient = dynamic(
-  () => import('./SubscribeForm').then((m) => ({ default: m.SubscribeForm })),
-  {
-    loading: () => (
-      <div
-        className="flex min-h-[7rem] w-full max-w-xl flex-col justify-center gap-2"
-        aria-hidden
-      >
-        <div className="h-10 w-full rounded-md bg-muted/20" />
-      </div>
-    ),
-  },
-)
+import { SubscribeForm } from './SubscribeForm'
 
 const resolveFallbackSocialIcon = (
   label: string,
@@ -68,8 +54,9 @@ const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
 
 const getSubstackPublicationURL = (): string => {
-  const raw = process.env.SUBSTACK_SUBSCRIBE_URL?.trim()
-  if (!raw) return 'https://erinjerri.substack.com'
+  const raw =
+    process.env.SUBSTACK_SUBSCRIBE_URL?.trim() || process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim()
+  if (!raw) return ''
 
   const trimmed = raw.replace(/\/$/, '')
   const lower = trimmed.toLowerCase()
@@ -82,7 +69,7 @@ const getSubstackPublicationURL = (): string => {
     return lower.endsWith('/subscribe') ? trimmed.replace(/\/subscribe$/i, '') : trimmed
   }
 
-  return 'https://erinjerri.substack.com'
+  return ''
 }
 
 function SocialIcon({
@@ -110,16 +97,14 @@ function SocialIcon({
   const fallbackIcon = resolveFallbackSocialIcon(label, url)
   // Use icon URL when: local /media/ file exists, or it's an external URL (R2, etc.)
   const resolvedIconUrl =
-    iconUrl && (hasLocalMediaFile(iconUrl) || iconUrl.startsWith('http'))
-      ? iconUrl
-      : null
+    iconUrl && (hasLocalMediaFile(iconUrl) || iconUrl.startsWith('http')) ? iconUrl : null
   const href =
     url.includes('@') && !url.includes('://') && !url.startsWith('mailto:') ? `mailto:${url}` : url
   const isExternal = href.startsWith('http://') || href.startsWith('https://')
   const FallbackIcon = fallbackIcon
 
   return (
-       <Link
+    <Link
       href={href}
       prefetch={false}
       target={isExternal ? '_blank' : undefined}
@@ -143,16 +128,19 @@ function SocialIcon({
 
 interface FooterProps {
   data?: Footer | null
+  variant?: 'main' | 'poetry'
 }
 
-export async function Footer({ data }: FooterProps = {}) {
+export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
   const substackPublicationURL = getSubstackPublicationURL()
-  const substackEmbedSrc = `${substackPublicationURL.replace(/\/$/, '')}/embed`
+  const substackEmbedSrc = substackPublicationURL
+    ? `${substackPublicationURL.replace(/\/$/, '')}/embed`
+    : ''
   let footerData: Footer | null = data ?? null
 
   if (data === undefined) {
     try {
-      footerData = (await getCachedGlobal('footer', 2)()) as Footer
+      footerData = (await getCachedGlobal('footer', 1)()) as Footer
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[Footer] Failed to fetch footer:', err)
@@ -165,6 +153,7 @@ export async function Footer({ data }: FooterProps = {}) {
   const linkGroups = footerData?.linkGroups || []
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
+  const isPoetryFooter = variant === 'poetry'
 
   return (
     <footer className="mt-auto border-t border-border bg-transparent text-foreground [contain:paint]">
@@ -173,17 +162,17 @@ export async function Footer({ data }: FooterProps = {}) {
         <div className="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16 lg:items-start">
           {/* Left column: Logo, Subscribe, Slogan, Social */}
           <div className="flex min-h-0 flex-col gap-6 lg:max-w-sm [contain:layout]">
-            <Link className="flex items-center" href="/" prefetch={false}>
-              <Logo />
+            <Link className="flex w-fit items-center" href="/" prefetch={false}>
+              <Logo className="w-[8.75rem]" />
             </Link>
 
-            {subscribeSection?.showSubscribe !== false && (
+            {!isPoetryFooter && substackEmbedSrc && subscribeSection?.showSubscribe !== false && (
               <div className="min-h-[7rem] w-full max-w-full">
-                <SubscribeFormClient action={substackEmbedSrc} />
+                <SubscribeForm action={substackEmbedSrc} />
               </div>
             )}
 
-            {subscribeSection?.slogan && (
+            {!isPoetryFooter && subscribeSection?.slogan && (
               <p className="text-sm text-muted-foreground">{subscribeSection.slogan}</p>
             )}
 
@@ -204,7 +193,24 @@ export async function Footer({ data }: FooterProps = {}) {
           </div>
 
           {/* Right column: Link groups */}
-          {linkGroups.length > 0 && (
+          {isPoetryFooter ? (
+            <nav className="flex flex-col gap-3 text-sm">
+              <Link
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                href="/"
+                prefetch={false}
+              >
+                Back to portfolio
+              </Link>
+              <Link
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                href="/poetry"
+                prefetch={false}
+              >
+                All poetry
+              </Link>
+            </nav>
+          ) : linkGroups.length > 0 ? (
             <nav className="flex flex-wrap gap-x-12 gap-y-8">
               {linkGroups.map((group, groupIndex) => (
                 <div
@@ -238,13 +244,25 @@ export async function Footer({ data }: FooterProps = {}) {
                 </div>
               ))}
             </nav>
-          )}
+          ) : null}
         </div>
 
         {/* Bottom: Copyright */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row sm:justify-between gap-4 text-sm text-muted-foreground">
           {copyright && <span>{copyright}</span>}
-          <span>Made with ❤️ and PayloadCMS</span>
+          {isPoetryFooter ? (
+            <Link className="transition-colors hover:text-foreground" href="/" prefetch={false}>
+              Back to portfolio
+            </Link>
+          ) : (
+            <Link
+              className="transition-colors hover:text-foreground"
+              href="/poetry"
+              prefetch={false}
+            >
+              Poetry
+            </Link>
+          )}
         </div>
       </div>
     </footer>

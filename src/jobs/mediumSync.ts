@@ -1,7 +1,5 @@
 import type { TaskConfig } from 'payload'
 
-import { syncMediumToPosts } from '../utilities/medium/syncMediumToPosts'
-
 type MediumSyncTaskIO = {
   input: Record<string, never>
   output: {
@@ -12,7 +10,7 @@ type MediumSyncTaskIO = {
 }
 
 const enabled = process.env.MEDIUM_SYNC_ENABLED === 'true'
-const rssURL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@erinjerri'
+const rssURL = process.env.MEDIUM_RSS_URL || 'https://medium.com/feed/@yourhandle'
 const mode: 'auto_publish' | 'review' =
   process.env.MEDIUM_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 const cron = process.env.MEDIUM_SYNC_CRON || '0 30 * * * *'
@@ -22,6 +20,7 @@ export const mediumSyncTask: TaskConfig<MediumSyncTaskIO> = {
   slug: 'mediumSync',
   label: 'Sync Medium posts',
   handler: async ({ req }) => {
+    const { syncMediumToPosts } = await import('../utilities/medium/syncMediumToPosts')
     const maxItemsRaw = process.env.MEDIUM_SYNC_MAX_ITEMS
     const maxItems =
       typeof maxItemsRaw === 'string' && maxItemsRaw.trim().length > 0

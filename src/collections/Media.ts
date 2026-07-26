@@ -124,6 +124,10 @@ export const Media: CollectionConfig = {
         width: 1400,
       },
       {
+        name: 'collage',
+        width: 1200,
+      },
+      {
         name: 'xlarge',
         width: 1920,
       },

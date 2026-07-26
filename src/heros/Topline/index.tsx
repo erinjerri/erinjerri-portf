@@ -16,13 +16,14 @@ export const ToplineHero: React.FC<Props> = ({ media, overlayTitle }) => {
   const title = overlayTitle?.trim() || 'Title'
 
   return (
-    <div className={cn('relative left-1/2 right-1/2 h-32 w-screen -translate-x-1/2 overflow-hidden md:h-44')}>
+    <div
+      className={cn(
+        'relative left-1/2 right-1/2 h-32 w-screen -translate-x-1/2 overflow-hidden md:h-44',
+      )}
+    >
       <div className="absolute inset-0">
         <Media
-          alt={
-            (typeof media.alt === 'string' && media.alt.trim()) ||
-            `${title} — Erin Jerri, AI and spatial computing`
-          }
+          alt={(typeof media.alt === 'string' && media.alt.trim()) || `${title} — page hero`}
           fill={!isVideo}
           imgClassName="h-full w-full object-cover object-[40%_20%]"
           pictureClassName="absolute inset-0"

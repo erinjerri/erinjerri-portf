@@ -6,7 +6,7 @@ import {
   DEFAULT_OG_IMAGE_WIDTH,
 } from '@/constants/defaultOgImage'
 
-import { SITE_DEFAULT_DESCRIPTION, SITE_DEFAULT_TITLE } from './siteMetadata'
+import { SITE_DEFAULT_DESCRIPTION, SITE_DEFAULT_TITLE, SITE_OWNER_NAME } from './siteMetadata'
 import { getServerSideURL } from './getURL'
 
 function absoluteOgImageUrl(): string {
@@ -24,10 +24,10 @@ const defaultOpenGraph: Metadata['openGraph'] = {
       url: absoluteOgImageUrl(),
       width: DEFAULT_OG_IMAGE_WIDTH,
       height: DEFAULT_OG_IMAGE_HEIGHT,
-      alt: "Creating Augmented and Virtual Realities O'Reilly book cover — Erin Jerri",
+      alt: `${SITE_OWNER_NAME} portfolio`,
     },
   ],
-  siteName: 'Erin Jerri',
+  siteName: SITE_OWNER_NAME,
   title: SITE_DEFAULT_TITLE,
 }
 

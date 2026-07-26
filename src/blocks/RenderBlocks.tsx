@@ -30,6 +30,9 @@ import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
 import { RibbonBlockBlock } from '@/blocks/RibbonBlock/Component'
 import { StatsBlockBlock } from '@/blocks/StatsBlock/Component'
 import { BioBlockBlock } from '@/blocks/BioBlock/Component'
+import { SpeakerBioBlock } from '@/blocks/SpeakerBio/Component'
+import { SpeakerKitHeadshotsBlock } from '@/blocks/SpeakerKitHeadshots/Component'
+import { SpeakerKitBlock } from '@/blocks/SpeakerKit/Component'
 import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 
 const blockComponents = {
@@ -53,10 +56,17 @@ const blockComponents = {
   ribbonBlock: RibbonBlockBlock,
   statsBlock: StatsBlockBlock,
   bioBlock: BioBlockBlock,
+  speakerBio: SpeakerBioBlock,
+  speakerKitHeadshots: SpeakerKitHeadshotsBlock,
+  speakerKit: SpeakerKitBlock,
 }
 
 /** Layout block - element of page layout array */
-type LayoutBlock = Page['layout'] extends (infer B)[] ? B : Page['layout'] extends readonly (infer B)[] ? B : Record<string, unknown> & { blockType?: string }
+type LayoutBlock = Page['layout'] extends (infer B)[]
+  ? B
+  : Page['layout'] extends readonly (infer B)[]
+    ? B
+    : Record<string, unknown> & { blockType?: string }
 
 /** Narrow layout block to MediaBlock */
 function asMediaBlock(b: LayoutBlock | null | undefined): MediaBlockType | null {
@@ -209,7 +219,8 @@ export const RenderBlocks: React.FC<{
       const maybeLinksBlock = blocks[leadingTrimCount]
       const mergedLinksBlock =
         maybeLinksBlock &&
-        ((maybeLinksBlock.blockType === 'content' && contentSupportsOverlayMerge(maybeLinksBlock)) ||
+        ((maybeLinksBlock.blockType === 'content' &&
+          contentSupportsOverlayMerge(maybeLinksBlock)) ||
           (maybeLinksBlock.blockType === 'cta' && ctaHasLinks(maybeLinksBlock)))
 
       if (mergedLinksBlock) {
@@ -230,9 +241,7 @@ export const RenderBlocks: React.FC<{
           // Merge mediaBlock (image) + content/cta with links into hero-style overlay
           const blockMedia = asMediaBlock(block)
           const isMediaBlockWithImage =
-            blockMedia &&
-            blockMedia.mediaType === 'image' &&
-            (blockMedia.image || blockMedia.media)
+            blockMedia && blockMedia.mediaType === 'image' && (blockMedia.image || blockMedia.media)
           const nextHasLinks =
             nextBlock?.blockType === 'content' && contentSupportsOverlayMerge(nextBlock)
           const nextCtaHasLinks = nextBlock?.blockType === 'cta' && ctaHasLinks(nextBlock)
@@ -286,13 +295,15 @@ export const RenderBlocks: React.FC<{
             const prevBlock = blocksToRender[index - 1]
             const prevMedia = prevBlock ? asMediaBlock(prevBlock) : null
             const prevIsMediaBlockWithImage =
-              prevMedia &&
-              prevMedia.mediaType === 'image' &&
-              (prevMedia.image || prevMedia.media)
+              prevMedia && prevMedia.mediaType === 'image' && (prevMedia.image || prevMedia.media)
             const thisHasLinks =
               (blockType === 'cta' && ctaHasLinks(block)) ||
               (blockType === 'content' && contentSupportsOverlayMerge(block))
-            if (prevIsMediaBlockWithImage && mediaBlockSupportsOverlayMerge(prevBlock) && thisHasLinks) {
+            if (
+              prevIsMediaBlockWithImage &&
+              mediaBlockSupportsOverlayMerge(prevBlock) &&
+              thisHasLinks
+            ) {
               return null
             }
           }
@@ -398,6 +409,7 @@ export const RenderBlocks: React.FC<{
                       ) : null}
                       <Block
                         {...blockProps}
+                        pageSlug={pageSlug}
                         {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
                         {...(homepageWatchCap !== undefined ? { homepageWatchCap } : {})}
                         {...(blockType === 'watchBlock' && isHomePage ? { limit: 8 } : {})}
@@ -408,6 +420,7 @@ export const RenderBlocks: React.FC<{
                     <>
                       <Block
                         {...blockProps}
+                        pageSlug={pageSlug}
                         {...(homepagePostsCap !== undefined ? { homepagePostsCap } : {})}
                         {...(homepageWatchCap !== undefined ? { homepageWatchCap } : {})}
                         {...(blockType === 'watchBlock' && isHomePage ? { limit: 8 } : {})}

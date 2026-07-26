@@ -1,4 +1,5 @@
 import type { Form } from '@/payload-types'
+import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 import { RequiredDataFromCollectionSlug } from 'payload'
 
 type AboutArgs = {
@@ -6,7 +7,7 @@ type AboutArgs = {
 }
 
 /**
- * About page with speaking request form. Consulting stays on Cal.com — edit the Cal link in the intro in the CMS.
+ * Starter About page with an editable bio and inquiry form.
  */
 export const aboutPage = ({
   speakingRequestForm,
@@ -15,15 +16,15 @@ export const aboutPage = ({
     slug: 'about',
     _status: 'published',
     meta: {
-      title: 'About Erin Jerri Pañgilinan — AI & Spatial Computing',
-      description:
-        'Erin Jerri Pañgilinan is a software engineer, founder, and O’Reilly author working in AI and spatial computing.',
+      title: 'About Your Name',
+      description: 'Learn more about Your Name, their experience, and the work they care about.',
     },
     title: 'About',
     hero: {
       type: 'none',
     },
     layout: [
+      defaultBioBlock(),
       {
         blockType: 'formBlock',
         enableIntro: true,
@@ -42,7 +43,7 @@ export const aboutPage = ({
                     format: 0,
                     mode: 'normal',
                     style: '',
-                    text: 'Work with Erin',
+                    text: 'Work with me',
                     version: 1,
                   },
                 ],
@@ -60,7 +61,7 @@ export const aboutPage = ({
                     format: 0,
                     mode: 'normal',
                     style: '',
-                    text: 'Consulting sessions: book via your Cal.com link (replace this sentence in the admin with the real URL). ',
+                    text: 'Replace this paragraph with your preferred way to discuss projects, collaborations, or advisory work.',
                     version: 1,
                   },
                 ],
@@ -79,7 +80,7 @@ export const aboutPage = ({
                     format: 0,
                     mode: 'normal',
                     style: '',
-                    text: 'Speaking engagements: use the form below — it is separate from consulting and captures event, budget, and logistics details.',
+                    text: 'Use the form below for speaking inquiries, workshops, collaborations, or other opportunities.',
                     version: 1,
                   },
                 ],

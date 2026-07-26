@@ -15,6 +15,7 @@ import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient, withPayloadClientRetry } from '@/utilities/getPayloadClient'
+import { safeDecodeURIComponent } from '@/utilities/safeDecodeURIComponent'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ReadingProgress } from '@/components/ReadingProgress'
 
@@ -49,7 +50,7 @@ type Args = {
 export default async function WatchPage({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const url = '/watch/' + decodedSlug
   const watchDoc = await getWatchBySlug(decodedSlug, draft)
 
@@ -140,7 +141,7 @@ export default async function WatchPage({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = safeDecodeURIComponent(slug)
   const watchDoc = await getWatchBySlug(decodedSlug, draft)
 
   return generateMeta({ doc: watchDoc as Project, canonicalPath: `/watch/${decodedSlug}` })

@@ -157,7 +157,11 @@ function TabButton({
   onClick: () => void
 }) {
   return (
-    <button type="button" className={cn(active ? styles.tabButtonActive : styles.tabButton)} onClick={onClick}>
+    <button
+      type="button"
+      className={cn(active ? styles.tabButtonActive : styles.tabButton)}
+      onClick={onClick}
+    >
       {label}
     </button>
   )
@@ -210,7 +214,9 @@ function EventLogRow({ row }: { row: EventRow }) {
   )
 }
 
-export default function AnalyticsDashboardClient({ recentPosts = [] }: AnalyticsDashboardClientProps) {
+export default function AnalyticsDashboardClient({
+  recentPosts = [],
+}: AnalyticsDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TrafficTab>('visitors')
 
   const maxSource = Math.max(...MOCK_SOURCES.map((s) => s.value))
@@ -226,8 +232,10 @@ export default function AnalyticsDashboardClient({ recentPosts = [] }: Analytics
     <div className={styles.shell}>
       <header className={styles.header}>
         <div>
-          <div className={styles.title}>erinjerri.com · analytics</div>
-          <p className={styles.subtitle}>Traffic mix, sources, and highlights — connect GA4 for live data.</p>
+          <div className={styles.title}>Portfolio analytics</div>
+          <p className={styles.subtitle}>
+            Traffic mix, sources, and highlights — connect GA4 for live data.
+          </p>
         </div>
         <div className={styles.statusRow}>
           <span className={styles.liveDot} aria-hidden />
@@ -236,9 +244,21 @@ export default function AnalyticsDashboardClient({ recentPosts = [] }: Analytics
       </header>
 
       <div className={styles.tabs} role="tablist" aria-label="Analytics sections">
-        <TabButton label="unique visitors" active={activeTab === 'visitors'} onClick={() => setActiveTab('visitors')} />
-        <TabButton label="new subscribers" active={activeTab === 'subscribers'} onClick={() => setActiveTab('subscribers')} />
-        <TabButton label="content perf" active={activeTab === 'content'} onClick={() => setActiveTab('content')} />
+        <TabButton
+          label="unique visitors"
+          active={activeTab === 'visitors'}
+          onClick={() => setActiveTab('visitors')}
+        />
+        <TabButton
+          label="new subscribers"
+          active={activeTab === 'subscribers'}
+          onClick={() => setActiveTab('subscribers')}
+        />
+        <TabButton
+          label="content perf"
+          active={activeTab === 'content'}
+          onClick={() => setActiveTab('content')}
+        />
       </div>
 
       <div className={styles.metricsGrid}>
@@ -282,7 +302,11 @@ export default function AnalyticsDashboardClient({ recentPosts = [] }: Analytics
                     tickLine={false}
                     axisLine={false}
                   />
-                  <YAxis tick={{ fill: '#666', fontSize: 9, fontFamily: 'inherit' }} tickLine={false} axisLine={false} />
+                  <YAxis
+                    tick={{ fill: '#666', fontSize: 9, fontFamily: 'inherit' }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <Tooltip content={<CustomTooltip />} />
                   {STREAM_LEGEND.map(({ key, color }) => (
                     <Area
@@ -304,9 +328,21 @@ export default function AnalyticsDashboardClient({ recentPosts = [] }: Analytics
           {activeTab === 'subscribers' ? (
             <div className={styles.chartWrapSm}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={MOCK_SUBSCRIBER_WEEKLY} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} />
+                <BarChart
+                  data={MOCK_SUBSCRIBER_WEEKLY}
+                  margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(255,255,255,0.06)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fill: '#666', fontSize: 10 }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <YAxis tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(201,168,76,0.08)' }} />
                   <Bar dataKey="newSubs" fill="#C9A84C" radius={[4, 4, 0, 0]} maxBarSize={48} />
@@ -318,7 +354,8 @@ export default function AnalyticsDashboardClient({ recentPosts = [] }: Analytics
           {activeTab === 'content' ? (
             <>
               <p className={styles.placeholderNote}>
-                Recent published posts from your CMS. Hook views or engagement from GA4 or snapshots when available.
+                Recent published posts from your CMS. Hook views or engagement from GA4 or snapshots
+                when available.
               </p>
               {recentPosts.length === 0 ? (
                 <p className={styles.placeholderNote}>No published posts found.</p>
@@ -326,7 +363,10 @@ export default function AnalyticsDashboardClient({ recentPosts = [] }: Analytics
                 <ul className={styles.contentList}>
                   {recentPosts.map((post) => (
                     <li key={post.id} className={styles.contentListItem}>
-                      <Link className={styles.contentLink} href={`/admin/collections/posts/${post.id}`}>
+                      <Link
+                        className={styles.contentLink}
+                        href={`/admin/collections/posts/${post.id}`}
+                      >
                         {post.title}
                       </Link>
                     </li>

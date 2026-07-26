@@ -1,36 +1,79 @@
 import type { Page } from '@/payload-types'
+import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 
-const HOME_SIGNATURE_BLOCK_TYPES = ['ribbonBlock', 'statsBlock', 'bioBlock'] as const
+const HOME_SIGNATURE_BLOCK_TYPES = [
+  'ribbonBlock',
+  'statsBlock',
+  'signatureTalks',
+  'bioBlock',
+] as const
+const HOME_EXCLUDED_SPEAKER_BLOCK_TYPES = new Set([
+  'speakerKit',
+  'speakerBio',
+  'speakerBioKit',
+  'speakerKitHeadshots',
+])
 
 /**
- * Default “Hire Me” section for the home page.
+ * Default portfolio sections for the home page.
  * Seeded so the block is visible on fresh installs, but the content remains editable in Payload.
  */
 export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
   {
     blockName: 'Ribbon intro',
     blockType: 'ribbonBlock',
-    tagline: "O'Reilly Media Author | Founder & Former Startup CTO | Software Engineer",
+    tagline: 'Strategy | Design | Technology',
     headline:
-      'I focus on what happens after the model - when AI has to operate inside products, workflows, and environments.',
-    highlight: 'after the model',
+      'I turn ambitious ideas into clear, useful experiences that people can understand and trust.',
+    highlight: 'clear, useful experiences',
     supportingText:
-      'My work spans AI, spatial computing, and product systems built for real-world use - across iOS, visionOS, and emerging interfaces.',
+      'Replace this copy with a concise statement of what you do, who you help, and why your perspective is different.',
     columns: [
       {
         number: '01',
-        title: 'AI Agents',
-        description: 'Systems that operate beyond chat - executing inside real products and workflows.',
+        title: 'Strategy',
+        description:
+          'Frame the opportunity, align the team, and define a direction worth pursuing.',
       },
       {
         number: '02',
-        title: 'Spatial Computing',
-        description: 'AR, VR, and mixed reality interfaces built for visionOS, iOS, and what comes next.',
+        title: 'Design',
+        description:
+          'Turn complex requirements into accessible experiences with a strong point of view.',
       },
       {
         number: '03',
-        title: 'Product Systems',
-        description: 'Architecture and strategy for AI-native products designed to scale in the real world.',
+        title: 'Delivery',
+        description:
+          'Build, test, and ship work that performs reliably outside the presentation deck.',
+      },
+    ],
+  },
+  {
+    blockName: 'Selected talks',
+    blockType: 'signatureTalks',
+    heading: 'Selected talks',
+    intro: 'Use this section for talks, workshops, podcast topics, or areas of expertise.',
+    talks: [
+      {
+        number: '01',
+        title: 'Turning Complexity Into Clarity',
+        subtitle: 'A practical approach to making difficult ideas understandable and actionable.',
+      },
+      {
+        number: '02',
+        title: 'Designing for Real People',
+        subtitle: 'How research, empathy, and iteration create experiences people can trust.',
+      },
+      {
+        number: '03',
+        title: 'From Idea to Launch',
+        subtitle: 'What it takes to move from an ambitious concept to a resilient product.',
+      },
+      {
+        number: '04',
+        title: 'Custom Topic',
+        subtitle: 'Tailor this entry to the audience, event, or collaboration you want to attract.',
       },
     ],
   },
@@ -40,52 +83,25 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
     eyebrow: 'Selected highlights',
     items: [
       {
-        value: '#1',
-        label: 'Game Programming on Amazon',
+        value: '10+',
+        label: 'Years of experience',
         color: 'mint',
       },
       {
-        value: '42+',
-        label: 'Countries distributed',
+        value: '25',
+        label: 'Projects delivered',
         color: 'teal',
       },
       {
-        value: '10+',
-        label: 'Years in AI, XR, spatial computing',
+        value: '8',
+        label: 'Teams supported',
         color: 'pink',
       },
     ],
   },
-  {
-    blockName: 'Bio',
-    blockType: 'bioBlock',
-    eyebrow: "Hi, I'm Erin",
-    headline: 'Software engineer, startup founder, and writer - born and raised in Silicon Valley.',
-    paragraphs: [
-      {
-        text: "I've been building in AI, spatial computing, and web3 since 2015.",
-        highlights: [
-          { phrase: 'AI', color: 'mint', underline: false },
-          { phrase: 'spatial computing', color: 'teal', underline: false },
-          { phrase: 'web3', color: 'pink', underline: false },
-        ],
-      },
-      {
-        text: "I'm the lead author of one of the first comprehensive AR/VR books published by O'Reilly Media in over five years - helping define how engineering, design, and business come together in real systems.",
-        highlights: [{ phrase: "O'Reilly Media", color: 'mint', underline: false }],
-      },
-      {
-        text: "I'm a software engineer, startup founder, and former CTO. Right now I'm building TimeBite - along with new books, apps, and film projects.",
-        highlights: [{ phrase: 'TimeBite', color: 'teal', underline: false }],
-      },
-    ],
-    pills: [
-      { label: 'UC Berkeley Alumna', color: 'mint' },
-      { label: 'fast.ai Fellow', color: 'teal' },
-      { label: 'AWS CTO Fellowship', color: 'pink' },
-      { label: 'FASTER President', color: 'white' },
-    ],
-  },
+  defaultBioBlock({
+    eyebrow: 'About',
+  }),
 ]
 
 export function mergeHomeHireMeLayoutBlocks(
@@ -103,6 +119,10 @@ export function mergeHomeHireMeLayoutBlocks(
       if (!existingSignatureBlocks.has(blockType)) {
         existingSignatureBlocks.set(blockType, block)
       }
+      continue
+    }
+
+    if (blockType && HOME_EXCLUDED_SPEAKER_BLOCK_TYPES.has(blockType)) {
       continue
     }
 

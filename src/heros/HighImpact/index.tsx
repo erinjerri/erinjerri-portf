@@ -12,44 +12,21 @@ import RichText from '@/components/RichText'
 
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
-type HeroProps = Page['hero'] & { visualVariant?: 'prismatic' }
+type HeroProps = Page['hero'] & {
+  visualVariant?: 'prismatic'
+}
 
-const isPopulated = (m: unknown): m is MediaDoc =>
-  Boolean(m && typeof m === 'object' && 'url' in m)
-
-const heroFallbacks = {
-  background: '/media/dimensions-background-curves.webp',
-} as const
+const isPopulated = (m: unknown): m is MediaDoc => Boolean(m && typeof m === 'object' && 'url' in m)
 
 /** Full-bleed / slot heroes: cover + bias upper area so heads stay in frame (spec: top center or 40% 20%). */
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
-
-const StaticHeroImage: React.FC<{
-  alt: string
-  className: string
-  src: string
-  position?: string
-}> = ({ alt, className, src, position = 'center' }) => (
-  <div
-    aria-label={alt}
-    className={className}
-    role="img"
-    style={{
-      backgroundImage: `url(${src})`,
-      backgroundPosition: position,
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-    }}
-  />
-)
 
 const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   <div
     aria-hidden
     className={className}
     style={{
-      background:
-        'linear-gradient(135deg, rgba(15,23,42,0.45) 0%, rgba(30,41,59,0.35) 100%)',
+      background: 'linear-gradient(135deg, rgba(15,23,42,0.45) 0%, rgba(30,41,59,0.35) 100%)',
     }}
   />
 )
@@ -74,15 +51,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasBackground = isPopulated(backgroundMedia)
   const hasPortrait = isPopulated(media)
   const hasAnyGridFields = Boolean(heroImage1 || heroImage2 || heroImage3)
-  const hasGridMedia =
-    isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
+  const hasGridMedia = isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
   /** Prefer Hero Image 1–3 grid over prismatic portrait when any grid slot has media (Payload uploads). */
-  const forcePortraitSplit =
-    visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
+  const forcePortraitSplit = visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
   const showGridLayout = !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
   const isPrismatic = visualVariant === 'prismatic'
   const backgroundImage = hasBackground ? backgroundMedia : null
-  const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
 
   const renderHeroCopy = (className?: string) => {
     const hasLinks = Array.isArray(links) && links.length > 0
@@ -90,7 +64,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
     return (
       <div className={cn('hp-hero-content relative z-[2]', className)}>
-        <div className="hp-hero-content-inner">
+        <div
+          className={cn('hp-hero-content-inner', richText && 'hp-hero-content-inner--with-prose')}
+        >
           {richText && (
             <RichText
               className={cn(
@@ -136,8 +112,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         >
           <Media
             alt={
-              (typeof media.alt === 'string' && media.alt.trim()) ||
-              'Erin Jerri Apple Vision Pro spatial computing work'
+              (typeof media.alt === 'string' && media.alt.trim()) || 'Featured portfolio portrait'
             }
             fill
             className="absolute inset-0"
@@ -154,10 +129,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
     return (
       <Media
-        alt={
-          (typeof media.alt === 'string' && media.alt.trim()) ||
-          'Erin Jerri Apple Vision Pro spatial computing work'
-        }
+        alt={(typeof media.alt === 'string' && media.alt.trim()) || 'Featured portfolio portrait'}
         imgClassName={cn(
           'h-auto w-full object-cover object-center object-[40%_20%]',
           'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
@@ -184,7 +156,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           alt={
             (typeof resource.alt === 'string' && resource.alt.trim()) ||
             alt ||
-            'Erin Jerri — AI, spatial computing, and engineering work'
+            'Selected portfolio work'
           }
           fill
           htmlElement={null}
@@ -206,7 +178,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     <div
       className={cn(
         /* No negative margin: sticky header (z-50) must sit above hero; content clears nav via padding below. */
-        'relative mt-0 flex w-full flex-col overflow-hidden text-foreground',
+        'relative isolate mt-0 flex w-full flex-col overflow-hidden text-foreground',
         /* CLS: reserve at least one viewport height before paint (Lighthouse); prismatic keeps flex centering inside. */
         'min-h-[100dvh]',
         isPrismatic && 'hp-hero-root',
@@ -228,7 +200,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           <Media
             alt={
               (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
-              'Full-width hero background — Erin Jerri, AI and spatial computing'
+              'Full-width portfolio hero background'
             }
             fill
             className="absolute inset-0 h-full w-full"
@@ -241,19 +213,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           />
         </div>
       )}
-      {/* Curves asset lives in the nav on home (prismatic); hero uses ink + mist only. */}
-      {!backgroundImage && !isPrismatic && (
-        <div className="absolute inset-0 -z-10">
-          <StaticHeroImage
-            alt="Decorative hero background — Erin Jerri portfolio"
-            className="h-full w-full"
-            src={backgroundSrc!}
-            position="40% 20%"
-          />
-        </div>
-      )}
-
-      {/* Mobile-only: gradient + vignette above background, below copy (canvas lives in fixed ambient layer). */}
+      {/* Mobile-only: gradient + vignette above background, below copy. */}
       <div
         aria-hidden
         className="hp-hero-mobile-overlay pointer-events-none absolute inset-0 z-[1] hidden max-[768px]:block"
@@ -265,16 +225,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           {isPrismatic ? (
             <div
               className={cn(
-                'relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-6 px-6 md:px-10',
+                'relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-6 overflow-hidden px-6 md:px-10',
                 /* Tighter vertical rhythm into first homepage section */
                 'pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:pt-[calc(var(--nav-height)+3rem)]',
                 'xl:grid xl:min-h-0 xl:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] xl:items-center xl:gap-10 xl:pb-14 xl:pt-[calc(var(--nav-height)+2.5rem)]',
               )}
             >
-              <div className="order-2 xl:order-1">
+              <div className="relative z-10 order-2 xl:order-1">
                 {renderHeroCopy('max-w-[min(calc(100vw-2.5rem),40rem)]')}
               </div>
-              <div className="order-1 flex justify-center xl:order-2 xl:items-center xl:justify-end">
+              <div className="relative z-10 order-1 flex justify-center xl:order-2 xl:items-center xl:justify-end">
                 <div className="w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px] xl:max-w-[500px]">
                   {renderPortrait()}
                 </div>
@@ -302,11 +262,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : isPrismatic ? (
-        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-8 px-6 pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-14 lg:pt-[calc(var(--nav-height)+3rem)] xl:gap-12">
-          <div className="min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
+        <div className="relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-8 overflow-hidden px-6 pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-14 lg:pt-[calc(var(--nav-height)+3rem)] xl:gap-12">
+          <div className="relative z-10 min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
             {renderHeroCopy()}
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="relative z-10 min-w-0 flex-1">
             <div
               className={cn(
                 'grid w-full grid-cols-2 gap-3 sm:gap-4 lg:max-w-[min(100%,40rem)] lg:justify-self-end xl:max-w-[44rem]',
@@ -316,25 +276,25 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               <div className="relative col-span-2 aspect-[16/9] min-h-[10.5rem] sm:min-h-[12.5rem]">
                 {renderHeroSlot(
                   heroImage1,
-                  'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                  '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px',
-                  { priority: true, quality: 65 },
+                  'Featured portfolio project',
+                  '(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 760px',
+                  { priority: true, quality: 90 },
                 )}
               </div>
               <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
                 {renderHeroSlot(
                   heroImage2,
-                  'Erin Jerri — book and profile',
-                  '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                  { unoptimized: true, quality: 72 },
+                  'Portfolio profile and selected work',
+                  '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                  { quality: 90 },
                 )}
               </div>
               <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
                 {renderHeroSlot(
                   heroImage3,
-                  'Erin Jerri — engineering, AI systems, and spatial computing',
-                  '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                  { quality: 72 },
+                  'Selected portfolio work',
+                  '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                  { quality: 90 },
                 )}
               </div>
             </div>
@@ -348,25 +308,25 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                 <div className="relative col-span-2 aspect-[16/9] overflow-hidden">
                   {renderHeroSlot(
                     heroImage1,
-                    'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                    '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px',
-                    { priority: true, quality: 65 },
+                    'Featured portfolio project',
+                    '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 760px',
+                    { priority: true, quality: 90 },
                   )}
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   {renderHeroSlot(
                     heroImage2,
-                    'Erin Jerri Apple Vision Pro spatial computing work',
-                    '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                    { unoptimized: true, quality: 72 },
+                    'Portfolio profile',
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 25vw, 380px',
+                    { quality: 90 },
                   )}
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   {renderHeroSlot(
                     heroImage3,
-                    'Erin Jerri — engineering, AI systems, and spatial computing',
-                    '(max-width: 768px) 48vw, (max-width: 1280px) 26vw, 320px',
-                    { quality: 72 },
+                    'Selected portfolio work',
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 25vw, 380px',
+                    { quality: 90 },
                   )}
                 </div>
               </div>

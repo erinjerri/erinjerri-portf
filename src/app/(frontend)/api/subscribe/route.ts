@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const DEFAULT_SUBSTACK_BASE_URL = 'https://erinjerri.substack.com'
+const DEFAULT_SUBSTACK_BASE_URL = 'https://yourpublication.substack.com'
 
 function normalizeSubstackSubscribeURL(raw: string): string {
   const trimmed = raw.trim().replace(/\/$/, '')
@@ -27,7 +27,9 @@ function normalizeSubstackSubscribeURL(raw: string): string {
 export async function POST(req: Request): Promise<Response> {
   try {
     const raw = await req.text()
-    const body = raw ? (JSON.parse(raw) as { email?: string; currentUrl?: string; referrer?: string }) : {}
+    const body = raw
+      ? (JSON.parse(raw) as { email?: string; currentUrl?: string; referrer?: string })
+      : {}
     const email = body?.email?.trim().toLowerCase()
 
     if (!email || !emailRegex.test(email)) {
@@ -35,12 +37,14 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     const configured = (process.env.SUBSTACK_SUBSCRIBE_URL || DEFAULT_SUBSTACK_BASE_URL).trim()
-    const subscribeApiUrl = normalizeSubstackSubscribeURL(configured) || `${DEFAULT_SUBSTACK_BASE_URL}/api/v1/free`
+    const subscribeApiUrl =
+      normalizeSubstackSubscribeURL(configured) || `${DEFAULT_SUBSTACK_BASE_URL}/api/v1/free`
 
     const publicationBaseUrl = (() => {
       const trimmed = configured.replace(/\/$/, '')
       if (!trimmed) return DEFAULT_SUBSTACK_BASE_URL
-      if (trimmed.toLowerCase().includes('/api/v1/free')) return trimmed.replace(/\/api\/v1\/free$/i, '')
+      if (trimmed.toLowerCase().includes('/api/v1/free'))
+        return trimmed.replace(/\/api\/v1\/free$/i, '')
       if (trimmed.toLowerCase().endsWith('/subscribe')) return trimmed.replace(/\/subscribe$/i, '')
       return trimmed
     })()

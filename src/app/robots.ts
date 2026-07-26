@@ -6,6 +6,15 @@ const SITE_URL =
   'https://example.com'
 
 export default function robots(): MetadataRoute.Robots {
+  const poetryHostname = process.env.NEXT_PUBLIC_POETRY_HOSTNAME?.trim()
+  const sitemaps = [
+    `${SITE_URL}/pages-sitemap.xml`,
+    `${SITE_URL}/posts-sitemap.xml`,
+    `${SITE_URL}/projects-sitemap.xml`,
+    `${SITE_URL}/watch-sitemap.xml`,
+    ...(poetryHostname ? [`https://${poetryHostname}/poetry-sitemap.xml`] : []),
+  ]
+
   return {
     rules: [
       {
@@ -13,11 +22,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/admin/',
       },
     ],
-    sitemap: [
-      `${SITE_URL}/pages-sitemap.xml`,
-      `${SITE_URL}/posts-sitemap.xml`,
-      `${SITE_URL}/projects-sitemap.xml`,
-      `${SITE_URL}/watch-sitemap.xml`,
-    ],
+    sitemap: sitemaps,
   }
 }

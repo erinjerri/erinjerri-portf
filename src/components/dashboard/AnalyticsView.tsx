@@ -4,8 +4,6 @@ import { DefaultTemplate } from '@payloadcms/next/templates'
 import { Gutter } from '@payloadcms/ui'
 import React from 'react'
 
-import AnalyticsDashboard from './AnalyticsDashboard'
-
 /**
  * Dedicated Analytics Dashboard view at /admin/analytics-dashboard.
  * Uses DefaultTemplate for layout; renders full analytics dashboard.
@@ -32,6 +30,8 @@ export default async function AnalyticsView({
       </DefaultTemplate>
     )
   }
+
+  const { default: AnalyticsDashboard } = await import('./AnalyticsDashboard')
 
   return (
     <DefaultTemplate

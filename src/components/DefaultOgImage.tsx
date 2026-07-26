@@ -29,7 +29,7 @@ export function DefaultOgImage({ image: imageProp }: DefaultOgImageProps) {
   return (
     <Image
       src={image}
-      alt="Creating Augmented and Virtual Realities O'Reilly book cover"
+      alt="Default portfolio social sharing image"
       width={DEFAULT_OG_IMAGE_WIDTH}
       height={DEFAULT_OG_IMAGE_HEIGHT}
       quality={100}

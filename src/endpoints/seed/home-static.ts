@@ -2,10 +2,11 @@ import type { RequiredDataFromCollectionSlug } from 'payload'
 
 import { homeHireMeLayoutBlocks } from './home-hire-me-layout'
 
-// Used for pre-seeded content so that the homepage is not empty
+// Used during builds when the database has not been seeded yet.
 export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
   slug: 'home',
   _status: 'published',
+  title: 'Home',
   hero: {
     type: 'highImpact',
     links: [
@@ -13,8 +14,8 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
         link: {
           type: 'custom',
           appearance: 'default',
-          label: 'All posts',
-          url: '/posts',
+          label: 'View my work',
+          url: '/projects',
         },
       },
       {
@@ -39,7 +40,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'Erin Jerri',
+                text: 'Your Name',
                 version: 1,
               },
             ],
@@ -53,35 +54,12 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
             type: 'paragraph',
             children: [
               {
-                type: 'link',
-                children: [
-                  {
-                    type: 'text',
-                    detail: 0,
-                    format: 0,
-                    mode: 'normal',
-                    style: '',
-                    text: 'Explore the site',
-                    version: 1,
-                  },
-                ],
-                direction: 'ltr',
-                fields: {
-                  linkType: 'custom',
-                  newTab: false,
-                  url: '/posts',
-                },
-                format: '',
-                indent: 0,
-                version: 2,
-              },
-              {
                 type: 'text',
                 detail: 0,
                 format: 0,
                 mode: 'normal',
                 style: '',
-                  text: ' to browse recent posts and updates.',
+                text: 'A concise statement about the work you do and the people you help.',
                 version: 1,
               },
             ],
@@ -99,11 +77,9 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
       },
     },
   },
-  meta: {
-    description:
-      'Software engineer, founder, and O’Reilly author building AI and spatial computing systems. Creator of TimeBite, a LifeOS for real-world workflows.',
-    title: 'Erin Jerri — AI, Spatial Computing, TimeBite',
-  },
-  title: 'Home',
   layout: [...homeHireMeLayoutBlocks],
+  meta: {
+    title: 'Your Name — Portfolio',
+    description: 'Portfolio, selected work, writing, and ways to collaborate.',
+  },
 }

@@ -5,7 +5,7 @@
  * and creates draft posts for review. Run with: pnpm sync:substack
  *
  * Requires: DATABASE_URL (or MONGODB_URI) and PAYLOAD_SECRET in .env or environment.
- * Set SUBSTACK_RSS_URL env var to override the default (erinjerri.substack.com).
+ * Set SUBSTACK_RSS_URL to your publication feed before running.
  * Optional: set SUBSTACK_SYNC_DOWNLOAD_IMAGES=true to import images into the Media collection.
  */
 
@@ -16,7 +16,7 @@ import { getPayload } from 'payload'
 import config from '../payload.config'
 import { syncSubstackToPosts } from '../utilities/substack/syncSubstackToPosts'
 
-const RSS_URL = process.env.SUBSTACK_RSS_URL || 'https://erinjerri.substack.com/feed'
+const RSS_URL = process.env.SUBSTACK_RSS_URL || 'https://yourpublication.substack.com/feed'
 const MODE: 'auto_publish' | 'review' =
   process.env.SUBSTACK_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 

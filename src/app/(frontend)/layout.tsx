@@ -1,22 +1,20 @@
 /**
- * Performance: avoid early preconnect to Clarity (loads after LCP via AnalyticsScripts) so DNS/TCP
+ * Performance: avoid early preconnect to Clarity (loads after LCP via Analytics) so DNS/TCP
  * does not compete with hero assets on slow 4G.
  */
 import type { Metadata } from 'next'
 
+import { headers } from 'next/headers'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
-import { SiteAmbientCurvesLoader } from '@/components/SiteAmbientCurvesLoader'
+import { Analytics } from '@/components/Analytics'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
-import { AnalyticsScripts } from '@/components/AnalyticsScripts'
-import { GoogleTagManagerHead, GoogleTagManagerNoScript } from '@/components/GoogleTagManager'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import {
   CANONICAL_SITE_ORIGIN,
-  PERSON_JSON_LD,
   SITE_DEFAULT_DESCRIPTION,
   SITE_DEFAULT_TITLE,
 } from '@/utilities/siteMetadata'
@@ -26,8 +24,12 @@ import type { Footer as FooterType, Header as HeaderType } from '@/payload-types
 import './globals.css'
 import { fontJost, frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
+import { getRequestHostname, isPoetryHostname } from '@/utilities/poetry'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers()
+  const hostname = getRequestHostname(requestHeaders)
+  const isPoetrySite = isPoetryHostname(hostname)
   let headerData: HeaderType | null = null
   let footerData: FooterType | null = null
   let headerFailed = false
@@ -35,7 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const headerStartedAt = Date.now()
   const [headerResult, footerResult] = await Promise.allSettled([
     getCachedGlobal('header', 1)(),
-    getCachedGlobal('footer', 2)(),
+    getCachedGlobal('footer', 1)(),
   ])
 
   if (headerResult.status === 'fulfilled') {
@@ -62,65 +64,43 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     console.log(`[layout] header ${Date.now() - headerStartedAt}ms`)
   }
 
-  const gtmContainerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined
+  const enableClarity = process.env.NEXT_PUBLIC_ENABLE_CLARITY === 'true'
   const enableThirdPartyScripts = process.env.NODE_ENV === 'production'
 
-  /** Site is dark-only — no OS / localStorage theme branching (avoids flash and keeps editorial palette). */
-  const themeBootstrapScript =
-    '(function(){try{document.documentElement.setAttribute("data-theme","dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();'
-
   return (
-    <html
-      className={frontendFontVariables}
-      lang="en"
-      suppressHydrationWarning
-      data-theme="dark"
-    >
+    <html className={frontendFontVariables} lang="en" suppressHydrationWarning data-theme="dark">
       <head>
-        {/* eslint-disable-next-line react/no-danger -- sync data-theme before first paint */}
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
-        />
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {/* Preconnect to analytics origins to reduce connection latency when scripts load */}
-        {enableThirdPartyScripts &&
-        (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || gtmContainerId) ? (
+        {enableThirdPartyScripts && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
           <link rel="preconnect" href="https://www.googletagmanager.com" />
-        ) : null}
-        {enableThirdPartyScripts && gtmContainerId ? (
-          <GoogleTagManagerHead containerId={gtmContainerId} />
         ) : null}
       </head>
       <body className={fontJost.className}>
-        {enableThirdPartyScripts && gtmContainerId ? (
-          <GoogleTagManagerNoScript containerId={gtmContainerId} />
-        ) : null}
         <Providers>
-          <SiteAmbientCurvesLoader />
           <AdminBar />
 
-          <Header data={headerFailed ? undefined : headerData} />
+          {!isPoetrySite ? <Header data={headerFailed ? undefined : headerData} /> : null}
           {children}
-          <Footer data={footerFailed ? undefined : footerData} />
+          <Footer
+            data={footerFailed ? undefined : footerData}
+            variant={isPoetrySite ? 'poetry' : 'main'}
+          />
         </Providers>
-        <script
-          id="person-jsonld-schema"
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_JSON_LD) }}
-        />
         {enableThirdPartyScripts ? (
-          <AnalyticsScripts
+          <Analytics
             measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
-            clarityProjectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}
+            clarityProjectId={
+              enableClarity ? process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID : undefined
+            }
           />
         ) : null}
       </body>
     </html>
   )
 }
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   alternates: {
@@ -132,9 +112,8 @@ export const metadata: Metadata = {
   title: SITE_DEFAULT_TITLE,
   twitter: {
     card: 'summary_large_image',
-    creator: '@erinjerri',
-  },
-  other: {
-    'facebook-domain-verification': 'e7i7sx90g844e0evm09nqf9repc7pr',
+    ...(process.env.NEXT_PUBLIC_TWITTER_HANDLE
+      ? { creator: process.env.NEXT_PUBLIC_TWITTER_HANDLE }
+      : {}),
   },
 }

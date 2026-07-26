@@ -1,7 +1,5 @@
 import type { TaskConfig } from 'payload'
 
-import { syncSubstackToPosts } from '../utilities/substack/syncSubstackToPosts'
-
 type SubstackSyncTaskIO = {
   input: Record<string, never>
   output: {
@@ -14,7 +12,7 @@ type SubstackSyncTaskIO = {
 // Registers Payload’s scheduled task. On serverless (e.g. Netlify), something must still
 // invoke sync — see netlify/functions/substack-sync-cron.ts or POST /next/sync-substack.
 const enabled = process.env.SUBSTACK_SYNC_ENABLED === 'true'
-const rssURL = process.env.SUBSTACK_RSS_URL || 'https://erinjerri.substack.com/feed'
+const rssURL = process.env.SUBSTACK_RSS_URL || 'https://yourpublication.substack.com/feed'
 const mode: 'auto_publish' | 'review' =
   process.env.SUBSTACK_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 const cron = process.env.SUBSTACK_SYNC_CRON || '0 0 * * * *'
@@ -35,13 +33,18 @@ export const substackSyncTask: TaskConfig<SubstackSyncTaskIO> = {
   slug: 'substackSync',
   label: 'Sync Substack posts',
   handler: async ({ req }) => {
+    const { syncSubstackToPosts } = await import('../utilities/substack/syncSubstackToPosts')
     const maxItemsRaw = process.env.SUBSTACK_SYNC_MAX_ITEMS
     const maxItems =
-      typeof maxItemsRaw === 'string' && maxItemsRaw.trim().length > 0 ? Number(maxItemsRaw) : undefined
+      typeof maxItemsRaw === 'string' && maxItemsRaw.trim().length > 0
+        ? Number(maxItemsRaw)
+        : undefined
 
     const maxImagesRaw = process.env.SUBSTACK_SYNC_MAX_IMAGES_PER_POST
     const maxImagesPerPost =
-      typeof maxImagesRaw === 'string' && maxImagesRaw.trim().length > 0 ? Number(maxImagesRaw) : undefined
+      typeof maxImagesRaw === 'string' && maxImagesRaw.trim().length > 0
+        ? Number(maxImagesRaw)
+        : undefined
 
     const forceUpdateEnv = process.env.SUBSTACK_SYNC_FORCE_UPDATE?.trim()
     const downloadImagesEnv = process.env.SUBSTACK_SYNC_DOWNLOAD_IMAGES?.trim()

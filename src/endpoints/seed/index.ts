@@ -2,13 +2,13 @@ import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from '
 import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs/promises'
+import { randomBytes } from 'node:crypto'
 
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { speakingRequestFormData } from './speaking-request-form'
 import { aboutPage as aboutPageData } from './about-page'
 import { speakingInfoPage as speakingInfoPageData } from './speaking-info-page'
-import { creatingArVrBookPage } from './creating-ar-vr-book-page'
 import { home } from './home'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
@@ -176,47 +176,20 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding media...`)
 
-  const [
-    image1Buffer,
-    image2Buffer,
-    image3Buffer,
-    hero1Buffer,
-    bookCoverBuffer,
-    homeHeroTopBuffer,
-    homeHeroBottomLeftBuffer,
-    homeHeroBottomRightBuffer,
-  ] = await Promise.all([
+  const [image1Buffer, image2Buffer, image3Buffer, hero1Buffer] = await Promise.all([
     fetchFileByPath(path.join(dirname, 'image-post1.webp')),
     fetchFileByPath(path.join(dirname, 'image-post2.webp')),
     fetchFileByPath(path.join(dirname, 'image-post3.webp')),
     fetchFileByPath(path.join(dirname, 'image-hero1.webp')),
-    fetchFileByPath(
-      path.join(process.cwd(), 'public', 'media', 'CYR-CreatingARVR-X-cover-updated@1x.png'),
-    ),
-    fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'dimensions-background-curves.webp')),
-    fetchFileByPath(
-      path.join(process.cwd(), 'public', 'media', 'erinjerri-book-headshot-green-no-glare-2400x2654.webp'),
-    ),
-    fetchFileByPath(path.join(process.cwd(), 'public', 'media', 'erin-AVP-headshot-95op.png')),
   ])
 
-  const [
-    demoAuthor,
-    image1Doc,
-    image2Doc,
-    image3Doc,
-    imageHomeDoc,
-    bookCoverDoc,
-    homeHeroTopDoc,
-    homeHeroBottomLeftDoc,
-    homeHeroBottomRightDoc,
-  ] = await Promise.all([
+  const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
     payload.create({
       collection: 'users',
       data: {
         name: 'Demo Author',
         email: 'demo-author@example.com',
-        password: 'password',
+        password: randomBytes(32).toString('base64url'),
       },
       req,
     }),
@@ -244,42 +217,6 @@ export const seed = async ({
       file: hero1Buffer,
       req,
     }),
-    payload.create({
-      collection: 'media',
-      data: {
-        alt: 'Creating Augmented and Virtual Realities book cover',
-        mediaType: 'image',
-      },
-      file: bookCoverBuffer,
-      req,
-    }),
-    payload.create({
-      collection: 'media',
-      data: {
-        alt: 'Abstract background curves for the homepage hero',
-        mediaType: 'image',
-      },
-      file: homeHeroTopBuffer,
-      req,
-    }),
-    payload.create({
-      collection: 'media',
-      data: {
-        alt: 'Erin Jerri — author portrait, green backdrop (no glare)',
-        mediaType: 'image',
-      },
-      file: homeHeroBottomLeftBuffer,
-      req,
-    }),
-    payload.create({
-      collection: 'media',
-      data: {
-        alt: 'Erin wearing an AVP headset',
-        mediaType: 'image',
-      },
-      file: homeHeroBottomRightBuffer,
-      req,
-    }),
     ...categories.map((category) =>
       payload.create({
         collection: 'categories',
@@ -291,23 +228,6 @@ export const seed = async ({
       }),
     ),
   ])
-
-  payload.logger.info(`— Seeding affiliate products...`)
-
-  const bookAffiliateProduct = await payload.create({
-    collection: 'affiliateProducts',
-    depth: 0,
-    data: {
-      title: 'Creating Augmented and Virtual Realities',
-      brand: "O'Reilly Media",
-      productURL: 'https://www.amazon.com/s?k=Creating+Augmented+and+Virtual+Realities',
-      ctaLabel: 'View on Amazon',
-      openInNewTab: true,
-      image: bookCoverDoc.id,
-      featured: true,
-    },
-    req,
-  })
 
   payload.logger.info(`— Seeding posts...`)
 
@@ -388,14 +308,14 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
-  const [_, contactPage, aboutPage, speakingInfoPage, _bookPage] = await Promise.all([
+  const [_, contactPage, aboutPage, speakingInfoPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
       data: home({
-        heroImage1: homeHeroTopDoc,
-        heroImage2: homeHeroBottomLeftDoc,
-        heroImage3: homeHeroBottomRightDoc,
+        heroImage1: imageHomeDoc,
+        heroImage2: image1Doc,
+        heroImage3: image2Doc,
         metaImage: imageHomeDoc,
       }),
       req,
@@ -416,14 +336,6 @@ export const seed = async ({
       collection: 'pages',
       depth: 0,
       data: speakingInfoPageData({ speakingRequestForm: speakingRequestForm }),
-      req,
-    }),
-    payload.create({
-      collection: 'pages',
-      depth: 0,
-      data: creatingArVrBookPage({
-        bookAffiliateProductId: String(bookAffiliateProduct.id),
-      }),
       req,
     }),
   ])
@@ -487,7 +399,7 @@ export const seed = async ({
       slug: 'footer',
       data: {
         subscribeSection: {
-          slogan: 'Making my cathedral one code block at a time.',
+          slogan: 'Ideas, selected work, and occasional updates.',
           showSubscribe: true,
         },
         linkGroups: [
@@ -518,7 +430,7 @@ export const seed = async ({
             url: 'https://github.com',
           },
         ],
-        copyright: '2026 Erin Jerri. All rights reserved.',
+        copyright: `${new Date().getFullYear()} Your Name. All rights reserved.`,
       },
       req,
     }),

@@ -93,8 +93,8 @@ export const speakingRequestFormData = {
   },
   emails: [
     {
-      emailFrom: '"Erin Jerri" <youremail@domain.com>',
-      emailTo: '{{contactme@erinjerri.xyz}}',
+      emailFrom: '"Speaking request form" <you@example.com>',
+      emailTo: '{{you@example.com}}',
       subject: 'New speaking request',
       message: {
         root: {

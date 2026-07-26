@@ -1,35 +1,16 @@
-# Image Resolution Guidelines
+# Image Recommendations
 
-Recommended minimum dimensions for sharp display on standard and retina screens.
+| Use | Recommended size | Ratio | Notes |
+| --- | ---: | ---: | --- |
+| Homepage hero | 1600 × 900 | 16:9 | WebP or AVIF; keep the focal point away from text |
+| Project card | 1200 × 800 | 3:2 | Use a consistent ratio across projects |
+| Project detail hero | 1920 × 1080 | 16:9 | Compress before upload |
+| Headshot | 1200 × 1500 | 4:5 | Leave safe space around the face |
+| Article hero | 1600 × 900 | 16:9 | Avoid embedding important text in the image |
+| Publication cover | 1200 × 1600 | 3:4 | PNG or WebP |
+| Social sharing image | 1200 × 630 | 1.91:1 | Update `NEXT_PUBLIC_DEFAULT_OG_IMAGE_PATH` |
+| Logo | SVG preferred | flexible | Use a transparent background |
 
-## Quick Reference
-
-| Use Case | Min Width | Aspect | Notes |
-|----------|-----------|--------|-------|
-| **Hero / full-width** | 1920px | 16:9 or 3:2 | Creating AR VR book page, home hero |
-| **Card thumbnail (grid)** | 1280px | 4:3 or 16:10 | Archive cards, affiliate products |
-| **Event/speaking** | 1200px | 4:3 | Berkeley, Harvard WeCode, etc. |
-| **Book cover (overlay)** | 1200px | 3:4 | O'Reilly/Amazon overlay blocks |
-| **Icon / small** | 256px | 1:1 | Icons in content columns |
-| **Default OG / social share** | **2000–2400px** | varies (e.g. 2400×2654) | WebP; filename in `generateMeta` / `mergeOpenGraph`: `erinjerri-book-headshot-green-no-glare-2400x2654.webp` |
-
-## High-Res Source Files
-
-For best results with images like `CreatingXR-Cal-VR-at-Berkeley` and `erin-jazmin-harvard-wecode`:
-
-- **Upload at native resolution** — no need to downscale before upload
-- Next.js Image handles optimization and will serve appropriate sizes
-- Quality is now 85 for content images (was 60), 80 for hero images (was 75)
-- `sizes` attributes ensure retina displays get 2x resolution
-
-## Custom Overrides
-
-Pass `quality` or `size` to the Media component when needed:
-
-```tsx
-<Media
-  resource={image}
-  quality={90}
-  size="(max-width: 640px) 100vw, 1920px"
-/>
-```
+Payload generates configured image sizes after upload. Keep original files large enough for the
+largest required output, but compress them before uploading. Production media should live in
+persistent object storage such as Cloudflare R2.

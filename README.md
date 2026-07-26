@@ -1,115 +1,206 @@
-# freshest-portf-26
+# Payload Portfolio Starter
 
-Payload CMS + Next.js site intended to be used as a reusable “starter/template”:
-- Same collections/blocks/components each time
-- Seed content (pages/posts/media/globals) included in-repo
-- Deployable to Netlify
+A customizable portfolio, writing, projects, speaking, and newsletter starter built with
+[Payload CMS](https://payloadcms.com/) and Next.js.
 
-## Use as a template (GitHub + Netlify)
+The starter includes:
 
-1. In GitHub, click **Use this template** (or fork).
-2. In Netlify, create a new site from the repo and set environment variables:
-   - `PAYLOAD_SECRET`
-   - `DATABASE_URL` (MongoDB connection string)
-   - `NEXT_PUBLIC_SERVER_URL` (your site URL)
-   - Optional: `EMAIL_VERIFY_TRANSPORT=true` to enable SMTP verification on startup
-3. Deploy, then open `/admin`, login, and click **Seed your database** from the dashboard.
+- A Payload admin panel at `/admin`
+- Editable pages, projects, posts, videos, poetry, forms, navigation, footer, and branding
+- Drafts, live preview, SEO fields, redirects, search, and scheduled publishing
+- Optional Substack, Medium, and Paragraph imports
+- Optional Google Analytics, Microsoft Clarity, Amazon Associates, SMTP, and Cloudflare R2
+- Generic demo content that can be seeded into a new database
+- Netlify deployment configuration
+- A static visual system with no Three.js or animated canvas background
 
-### Seeding in production (recommended flow)
+## Start here
 
-The admin “Seed your database” button hits `POST /next/seed`.
-- In production this route returns 404 unless `ALLOW_SEED_IN_PROD=true`.
-- It also requires you to be logged into the admin (403 if not authenticated).
+### Requirements
 
-Suggested workflow:
-1. Temporarily set `ALLOW_SEED_IN_PROD=true` in Netlify
-2. Seed once from the admin dashboard
-3. Remove `ALLOW_SEED_IN_PROD` (or set it back to `false`)
+- Node.js 20.19 or newer (Node 22.12+ recommended)
+- pnpm 10
+- Git
+- MongoDB, either through Docker or MongoDB Atlas
 
-## Local development
+Payload is already included in `package.json`. Do not install Payload globally.
 
-- `pnpm dev`
-- `pnpm seed` (runs `src/scripts/restore.ts` to seed locally; uses `DATABASE_URL`)
+### 1. Install the project
 
-## Substack cross-post sync (auto-import)
+```bash
+git clone https://github.com/YOUR-USERNAME/YOUR-PORTFOLIO.git
+cd YOUR-PORTFOLIO
+corepack enable
+corepack prepare pnpm@10.23.0 --activate
+pnpm install
+cp .env.example .env
+```
 
-This repo can import your Substack posts (via RSS) into the `posts` collection as either:
-- **Drafts for review** (default): `_status=draft`, `crosspostReviewStatus=in_review`, and an optional email notification
-- **Auto-published**: `_status=published`, `crosspostReviewStatus=auto_published`
+### 2. Start MongoDB
 
-### One-time import (past posts)
+With Docker Desktop installed:
 
-- `pnpm sync:substack`
+```bash
+docker compose up -d mongo
+```
 
-Optional env vars:
-- `SUBSTACK_RSS_URL` (default: `https://erinjerri.substack.com/feed`)
-- `SUBSTACK_SYNC_MODE` (`review` or `auto_publish`)
-- `SUBSTACK_SYNC_NOTIFY_EMAIL` (send a summary email when new posts are imported)
-- `SUBSTACK_DEFAULT_AUTHOR_ID` or `SUBSTACK_DEFAULT_AUTHOR_EMAIL` (set `posts.authors`)
-- `SUBSTACK_SYNC_MAX_ITEMS` (cap items processed per run)
-- `SUBSTACK_SYNC_FORCE_UPDATE=true` (re-fetch full article and update existing synced posts)
-- `SUBSTACK_SYNC_DOWNLOAD_IMAGES=true` (download Substack images into `media` and embed them)
-- `SUBSTACK_SYNC_MAX_IMAGES_PER_POST` (cap images imported per post; default 25)
+The default `.env.example` connects to this database at:
 
-### Automated (scheduled) sync
+```text
+mongodb://127.0.0.1:27017/payload-portfolio
+```
 
-1. Set environment variables:
-   - `SUBSTACK_SYNC_ENABLED` (optional; defaults to enabled unless explicitly `false`)
-   - `SUBSTACK_RSS_URL` (optional)
-   - `SUBSTACK_SYNC_MODE` (optional)
-   - `SUBSTACK_SYNC_NOTIFY_EMAIL` (optional)
-   - `SUBSTACK_SYNC_DOWNLOAD_IMAGES` (optional)
-   - `SUBSTACK_SYNC_FORCE_UPDATE` (optional)
-   - `SUBSTACK_SYNC_CRON` (optional; default `0 0 * * * *`) — used by Payload’s job **schedule** in config; on Netlify you still need a runner (below).
-   - `SUBSTACK_SYNC_QUEUE` (optional; default `substack`)
-   - `CRON_SECRET` (required for any automated trigger: Netlify scheduler or external cron)
+You can use MongoDB Atlas instead. Replace `DATABASE_URL` in `.env` with the Atlas connection
+string.
 
-2. **Netlify:** with `CRON_SECRET` set, the scheduled function `netlify/functions/substack-sync-cron.ts` runs **hourly** and `POST`s `/next/sync-substack` (same as manual cron). It forwards `x-substack-sync-mode` (`auto_publish` by default, or `review` if `SUBSTACK_SYNC_MODE=review`). Set `SUBSTACK_SYNC_ENABLED=false` to disable. The separate `schedule-publish` function only drains the `schedulePublish` queue — it does **not** import Substack by itself.
+### 3. Configure local secrets
 
-3. **Other hosts / extra triggers:** use an external cron (cron-job.org, UptimeRobot, etc.) calling:
-   - `POST https://your-site/next/sync-substack`
-   - header: `Authorization: Bearer $CRON_SECRET`
+Generate secrets:
 
-## Medium cross-post sync
+```bash
+openssl rand -base64 32
+openssl rand -base64 32
+openssl rand -hex 32
+```
 
-Import Medium posts (via RSS) into the `posts` collection. Same modes as Substack: **review** (drafts) or **auto_publish**.
+Use those values for `PAYLOAD_SECRET`, `PREVIEW_SECRET`, and `CRON_SECRET`.
 
-### One-time import
+Before using `pnpm seed` on an empty database, also set:
 
-- `pnpm sync:medium`
+```env
+RESTORE_ADMIN_EMAIL=you@example.com
+RESTORE_ADMIN_PASSWORD=use-a-unique-long-password
+```
 
-Requires: `DATABASE_URL` (or `MONGODB_URI`) and `PAYLOAD_SECRET` in `.env`.
+### 4. Seed and run
 
-Optional env vars:
-- `MEDIUM_RSS_URL` (default: `https://medium.com/feed/@erinjerri`)
-- `MEDIUM_SYNC_MODE` (`review` or `auto_publish`) — use `auto_publish` if you want posts to show on `/posts` immediately
-- `MEDIUM_SYNC_DOWNLOAD_IMAGES=true` (import images into Media)
-- `MEDIUM_SYNC_MAX_ITEMS`, `MEDIUM_SYNC_FORCE_UPDATE`, etc.
+```bash
+pnpm seed
+pnpm dev
+```
 
-### Automated sync
+Open:
 
-- `MEDIUM_SYNC_ENABLED=true`
-- `MEDIUM_RSS_URL`, `MEDIUM_SYNC_MODE`, etc. (see `.env.example`)
-- Trigger: `POST /next/sync-content` with header `Authorization: Bearer $CRON_SECRET`
+- Portfolio: [http://localhost:3000](http://localhost:3000)
+- Payload admin: [http://localhost:3000/admin](http://localhost:3000/admin)
 
-## Paragraph cross-post sync
+The seed command refuses to overwrite a non-empty database. `RESTORE_FORCE=true` enables a
+destructive reseed; use it only when you intend to replace existing content.
 
-Import Paragraph posts into the `posts` collection. Same modes as Substack.
+## Customize the starter
 
-### One-time import
+Set your identity in `.env`:
 
-- `pnpm sync:paragraph`
+```env
+NEXT_PUBLIC_SITE_OWNER_NAME=Your Name
+NEXT_PUBLIC_SITE_OWNER_ROLE=Designer and Developer
+NEXT_PUBLIC_SITE_TITLE=Your Name — Portfolio
+NEXT_PUBLIC_SITE_DESCRIPTION=Your short portfolio description.
+NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+```
 
-Optional env vars:
-- `PARAGRAPH_PUBLICATION` (default: `@cypherpinay`) — slug or full publication URL
-- `PARAGRAPH_SYNC_MODE` (`review` or `auto_publish`)
-- `PARAGRAPH_SYNC_DOWNLOAD_IMAGES=true`, etc.
+Then use Payload admin to edit:
 
-### Automated sync
+1. **Pages → Home** — hero, calls to action, biography, talks, and highlights
+2. **Pages → About** — biography and inquiry content
+3. **Projects** — case studies and project media
+4. **Posts** — articles and imported newsletter posts
+5. **Globals → Header** — navigation
+6. **Globals → Footer** — footer links, social links, and subscription visibility
+7. **Globals → Brand** — colors, fonts, and radius tokens
+8. **Media** — headshots, project screenshots, and social images
 
-- `PARAGRAPH_SYNC_ENABLED=true`
-- Trigger: `POST /next/sync-content` with header `Authorization: Bearer $CRON_SECRET`
+See [Customization](docs/CUSTOMIZATION.md) for the complete handoff checklist.
 
-## Branding / theme tokens
+## Connect Substack
 
-This repo stores runtime theme tokens in the `brand` global (fonts/colors/radius). This is meant to be populated from your design system / Figma token export so new sites share the same features/components but can swap brand styling without rewriting UI.
+There are two separate integrations:
+
+1. The footer subscription form sends readers to your Substack publication.
+2. The sync system imports Substack articles into the Payload `posts` collection.
+
+Minimum configuration:
+
+```env
+NEXT_PUBLIC_SUBSTACK_URL=https://yourpublication.substack.com
+SUBSTACK_SUBSCRIBE_URL=https://yourpublication.substack.com
+SUBSTACK_RSS_URL=https://yourpublication.substack.com/feed
+SUBSTACK_SYNC_MODE=review
+SUBSTACK_SYNC_DOWNLOAD_IMAGES=true
+```
+
+Run a one-time import:
+
+```bash
+pnpm sync:substack
+```
+
+The default `review` mode imports articles as drafts. Review them in Payload before publishing.
+
+See [Substack integration](docs/SUBSTACK.md) for author mapping, images, scheduled sync, modes, and
+troubleshooting.
+
+## Deploy
+
+The included configuration targets Netlify. Production requires:
+
+- A hosted MongoDB database
+- `DATABASE_URL`
+- `PAYLOAD_SECRET`
+- `PREVIEW_SECRET`
+- `NEXT_PUBLIC_SERVER_URL`
+- `NEXT_PUBLIC_SITE_URL`
+
+Cloudflare R2 is recommended for persistent production media because serverless filesystems are
+not durable upload storage.
+
+See [Deployment](docs/DEPLOYMENT.md) for the full Netlify, MongoDB Atlas, R2, seeding, cron, and
+domain checklist.
+
+## Documentation
+
+- [Installation and Payload setup](docs/INSTALLATION.md)
+- [Customization and handoff checklist](docs/CUSTOMIZATION.md)
+- [Substack integration](docs/SUBSTACK.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Media and Cloudflare R2](docs/MEDIA_AND_R2.md)
+- [Analytics dashboard](docs/ANALYTICS_DASHBOARD_SETUP.md)
+- [Image recommendations](docs/IMAGE_RESOLUTIONS.md)
+
+## Common commands
+
+```bash
+pnpm dev                 # Start Next.js and Payload
+pnpm build               # Production build
+pnpm start:only          # Start an existing production build
+pnpm seed                # Seed an empty database
+pnpm generate:types      # Regenerate Payload TypeScript types
+pnpm generate:importmap  # Regenerate Payload admin component imports
+pnpm test:int            # Run integration tests
+pnpm test:e2e            # Run Playwright tests
+pnpm sync:substack       # Import Substack posts
+pnpm sync:medium         # Import Medium posts
+pnpm sync:paragraph      # Import Paragraph posts
+```
+
+After changing a Payload collection, global, block, or field:
+
+```bash
+pnpm generate:types
+pnpm generate:importmap
+pnpm exec tsc --noEmit
+```
+
+## Security notes
+
+- Never commit `.env` or `.env.local`.
+- Use unique production secrets and passwords.
+- Keep `ALLOW_SEED_IN_PROD=false` except during an intentional one-time seed.
+- The Local API bypasses access control by default. When acting as a user, pass
+  `overrideAccess: false`.
+- Nested Payload operations inside hooks must receive the original `req` to participate in the
+  same transaction.
+
+## License
+
+MIT. Replace this section if you choose a different license for your portfolio.

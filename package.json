@@ -1,13 +1,13 @@
 {
-  "name": "freshest-portf-26",
+  "name": "payload-portfolio-starter",
   "version": "1.0.0",
-  "description": "Website template for Payload",
+  "description": "A customizable portfolio, publishing, and speaking starter built with Payload CMS and Next.js",
   "license": "MIT",
   "scripts": {
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS=--no-deprecation next build",
     "clean:next": "rm -rf .next .next-dev",
     "build": "pnpm clean:next && cross-env NODE_OPTIONS=--no-deprecation next build",
-    "build:netlify": "node -e \"console.log('node', process.version)\" && node -e \"console.log('next', require('next/package.json').version)\" && node -e \"console.log('react', require('react/package.json').version)\" && cross-env NODE_OPTIONS=--no-deprecation next build",
+    "build:netlify": "node -e \"console.log('node', process.version)\" && node -e \"console.log('next', require('next/package.json').version)\" && node -e \"console.log('react', require('react/package.json').version)\" && NODE_OPTIONS=--no-deprecation next build",
     "build:fast": "pnpm clean:next && cross-env NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY=false NODE_OPTIONS=--no-deprecation next build",
     "build:turbo": "pnpm clean:next && cross-env NODE_OPTIONS=--no-deprecation next build --turbo",
     "postbuild": "node -e \"console.log('Skipping next-sitemap postbuild; custom App Router sitemap routes handle sitemap generation.')\"",
@@ -65,9 +65,6 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
-    "@react-three/postprocessing": "^3.0.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dotenv": "16.4.7",
@@ -84,13 +81,12 @@
     "rss-parser": "^3.13.0",
     "sharp": "0.34.5",
     "tailwind-merge": "^2.3.0",
-    "tailwindcss-animate": "^1.0.7",
-    "three": "^0.183.1"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@netlify/plugin-nextjs": "^5.15.9",
-    "@next/bundle-analyzer": "^15.4.11",
+    "@next/bundle-analyzer": "^15.5.12",
     "@playwright/test": "1.56.1",
     "@tailwindcss/typography": "^0.5.13",
     "@testing-library/react": "16.3.0",
@@ -127,7 +123,7 @@
     "not op_mini all"
   ],
   "engines": {
-    "node": "^18.20.2 || >=20.9.0",
+    "node": "^20.19.0 || >=22.12.0",
     "pnpm": "^9 || ^10"
   },
   "pnpm": {
@@ -154,5 +150,5 @@
       "unrs-resolver"
     ]
   },
-  "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247"
+  "packageManager": "pnpm@10.23.0"
 }

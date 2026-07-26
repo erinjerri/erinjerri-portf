@@ -72,16 +72,17 @@ export const PostHero: React.FC<{
           </div>
         </div>
       </div>
-      <div className="min-h-[65vh] md:min-h-[72vh] select-none">
+      <div className="relative min-h-[65vh] md:min-h-[72vh] select-none">
         {heroImage && typeof heroImage !== 'string' && (
           <Media
             alt={
               (typeof heroImage.alt === 'string' && heroImage.alt.trim()) ||
-              `${title} — Erin Jerri, AI and spatial computing`
+              `${title} — article hero`
             }
             fill
             priority
             imgClassName="-z-10 object-cover object-[40%_20%]"
+            pictureClassName="absolute inset-0 block h-full w-full"
             quality={72}
             resource={heroImage}
             size="(max-width: 768px) 100vw, (max-width: 1440px) 100vw, 1920px"

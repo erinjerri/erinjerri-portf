@@ -1,4 +1,7 @@
-import type { BookCoverRowBlock as BookCoverRowBlockProps, Media as MediaType } from '@/payload-types'
+import type {
+  BookCoverRowBlock as BookCoverRowBlockProps,
+  Media as MediaType,
+} from '@/payload-types'
 import { cn } from '@/utilities/ui'
 import Link from 'next/link'
 import React from 'react'
@@ -32,8 +35,7 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
           'grid gap-10',
           covers.length === 1 && 'max-w-sm justify-items-center md:mx-auto',
           covers.length === 2 && 'grid-cols-1 sm:grid-cols-2 sm:gap-8 lg:gap-12',
-          covers.length >= 3 &&
-            'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12',
+          covers.length >= 3 && 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12',
         )}
       >
         {covers.map((row, i) => {
@@ -43,7 +45,7 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
           const alt =
             (typeof media.alt === 'string' && media.alt.trim()) ||
             row.caption?.trim() ||
-            "Creating Augmented and Virtual Realities O'Reilly book cover"
+            'Featured publication cover'
           const btnLabel = typeof row.buttonLabel === 'string' ? row.buttonLabel.trim() : ''
           const btnUrl = typeof row.buttonUrl === 'string' ? row.buttonUrl.trim() : ''
           const showButton = Boolean(btnLabel && btnUrl)

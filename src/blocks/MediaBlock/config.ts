@@ -98,7 +98,7 @@ export const MediaBlock: Block = {
         admin: {
           condition: (_, siblingData) =>
             siblingData?.displayStyle === 'heroOverlay' && siblingData?.mediaType === 'image',
-          description: "Links overlay the center of the image (e.g. O'Reilly, Amazon).",
+          description: 'Links overlay the center of the image.',
         },
         maxRows: 4,
       },

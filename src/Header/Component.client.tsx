@@ -24,7 +24,7 @@ function themeForPathname(pathname: string): 'dark' | 'light' {
 const HEADER_ROW_CLASS =
   'relative grid h-16 grid-cols-[auto,minmax(0,1fr),auto] items-center gap-x-2 sm:gap-x-3 md:gap-x-4 lg:gap-x-6'
 
-const LOGO_LINK_CLASS = 'relative z-30 col-start-1 shrink-0 justify-self-start'
+const LOGO_LINK_CLASS = 'relative z-30 col-start-1 flex shrink-0 items-center justify-self-start'
 
 interface HeaderClientProps {
   data: Header | null
@@ -37,9 +37,6 @@ type HeaderBodyProps = {
   pathname: string
   scrolled: boolean
 }
-
-const DIMENSIONS_STRIP_SRC =
-  '/media/hero-top-banner-experience-dimensions-background-curves-cut-1400x155.webp'
 
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
@@ -66,12 +63,9 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
-            backgroundImage: [
-              scrolled
-                ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
-                : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
-              `url(${DIMENSIONS_STRIP_SRC})`,
-            ].join(', '),
+            backgroundImage: scrolled
+              ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
+              : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',

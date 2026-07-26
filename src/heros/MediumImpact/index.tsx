@@ -14,27 +14,27 @@ export const MediumImpactHero: React.FC<Page['hero'] & { pageSlug?: string }> = 
   pageSlug,
   richText,
 }) => {
+  if (pageSlug === 'about') {
+    console.log('[About bio debug] Top bio renderer would be MediumImpactHero')
+  }
+
   const heroMedia = media && typeof media === 'object' ? media : null
 
   const hasLinks = Array.isArray(links) && links.length > 0
 
-  const isTimebite = pageSlug === 'timebite' || pageSlug === 'timebite-download'
-
   return (
     <div className="container">
-      <div className={cn('flex flex-col', isTimebite ? 'items-start' : 'items-center')}>
+      <div className={cn('relative isolate flex flex-col overflow-hidden', 'items-center')}>
         {/* Image */}
         {heroMedia && (
-          <div className={cn('mb-6 w-full max-w-[420px]', isTimebite && 'bg-transparent')}>
+          <div className={cn('relative z-10 mb-6 w-full max-w-[420px]')}>
             <Media
               alt={
-                (typeof heroMedia.alt === 'string' && heroMedia.alt.trim()) ||
-                'Erin Jerri — about and profile, AI and spatial computing'
+                (typeof heroMedia.alt === 'string' && heroMedia.alt.trim()) || 'Profile portrait'
               }
               className="w-full"
-              imagePlaceholder={isTimebite ? 'empty' : undefined}
               imgClassName="h-auto w-full max-w-full"
-              pictureClassName={cn('block w-full', isTimebite && 'bg-transparent')}
+              pictureClassName="block w-full"
               priority
               quality={70}
               resource={heroMedia}
@@ -51,7 +51,7 @@ export const MediumImpactHero: React.FC<Page['hero'] & { pageSlug?: string }> = 
         {hasLinks && (
           <ul
             className={cn(
-              'm-0 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 self-start p-0',
+              'relative z-10 m-0 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-start gap-3.5 self-start p-0',
               heroMedia ? 'mt-4 mb-6' : 'mb-6',
             )}
           >
@@ -64,7 +64,7 @@ export const MediumImpactHero: React.FC<Page['hero'] & { pageSlug?: string }> = 
         )}
         {/* Rich text below image + links */}
         {richText && (
-          <div className="w-full max-w-[52rem]">
+          <div className="relative z-10 w-full max-w-[52rem]">
             <RichText className={heroBioRichTextClassName} data={richText} enableGutter={false} />
           </div>
         )}

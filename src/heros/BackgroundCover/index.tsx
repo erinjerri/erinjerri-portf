@@ -15,24 +15,24 @@ export const BackgroundCoverHero: React.FC<Page['hero']> = ({
   links,
   richText,
 }) => {
-  const backgroundImage = backgroundMedia && typeof backgroundMedia === 'object' ? backgroundMedia : null
+  const backgroundImage =
+    backgroundMedia && typeof backgroundMedia === 'object' ? backgroundMedia : null
 
   return (
     <div
-      className="relative -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] md:min-h-[72vh] w-full overflow-hidden text-white"
+      className="relative isolate -mt-[6.75rem] md:-mt-[10.4rem] min-h-[65vh] md:min-h-[72vh] w-full overflow-hidden text-white"
       data-theme="dark"
     >
       <div
         className="absolute inset-0 -z-10 bg-gradient-to-br from-[#000815] via-[#0c1633] to-[#020712]"
         aria-hidden
       />
-
       {backgroundImage && (
         <div className="absolute inset-0 -z-10">
           <Media
             alt={
               (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
-              'Full-width hero background — Erin Jerri, AI and spatial computing'
+              'Full-width portfolio hero background'
             }
             fill
             className="absolute inset-0 h-full w-full"

@@ -12,6 +12,7 @@ import { AnalyticsSnapshots } from './collections/AnalyticsSnapshots'
 import { LinkedInMetrics } from './collections/LinkedInMetrics'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Poetry } from './collections/Poetry'
 import { Posts } from './collections/Posts'
 import { Projects } from './collections/Projects'
 import { Users } from './collections/Users'
@@ -22,15 +23,7 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-import { mediumSyncTask } from './jobs/mediumSync'
 import { analyticsSyncTask } from './jobs/analyticsSync'
-import { paragraphSyncTask } from './jobs/paragraphSync'
-import { substackSyncTask } from './jobs/substackSync'
-import {
-  analyticsGoalOptions,
-  analyticsWidgetPlatformFilterOptions,
-  analyticsWidgetTimeframeOptions,
-} from './utilities/analytics/constants'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -81,133 +74,6 @@ const allowedOrigins = Array.from(
 
 export default buildConfig({
   admin: {
-    dashboard: {
-      widgets: [
-        {
-          slug: 'conversion-overview',
-          label: 'Conversion Overview',
-          ComponentPath: '@/components/dashboard/widgets/ConversionOverviewWidget',
-          minWidth: 'medium',
-          maxWidth: 'full',
-          fields: [
-            {
-              name: 'title',
-              type: 'text',
-            },
-            {
-              name: 'timeframe',
-              type: 'select',
-              defaultValue: '30d',
-              options: [...analyticsWidgetTimeframeOptions],
-            },
-            {
-              name: 'platform',
-              type: 'select',
-              defaultValue: 'all',
-              options: [...analyticsWidgetPlatformFilterOptions],
-            },
-            {
-              name: 'goal',
-              type: 'select',
-              defaultValue: 'newsletter_signup',
-              options: [...analyticsGoalOptions],
-            },
-          ],
-        },
-        {
-          slug: 'source-performance',
-          label: 'Channel Performance',
-          ComponentPath: '@/components/dashboard/widgets/SourcePerformanceWidget',
-          minWidth: 'large',
-          maxWidth: 'full',
-          fields: [
-            {
-              name: 'title',
-              type: 'text',
-            },
-            {
-              name: 'timeframe',
-              type: 'select',
-              defaultValue: '30d',
-              options: [...analyticsWidgetTimeframeOptions],
-            },
-            {
-              name: 'goal',
-              type: 'select',
-              defaultValue: 'newsletter_signup',
-              options: [...analyticsGoalOptions],
-            },
-          ],
-        },
-        {
-          slug: 'sync-health',
-          label: 'Analytics Connection Health',
-          ComponentPath: '@/components/dashboard/widgets/SyncHealthWidget',
-          minWidth: 'large',
-          maxWidth: 'full',
-          fields: [
-            {
-              name: 'title',
-              type: 'text',
-            },
-          ],
-        },
-      ],
-      defaultLayout: () => [
-        {
-          widgetSlug: 'conversion-overview',
-          width: 'large',
-          data: {
-            title: '30-Day Conversion Overview',
-            timeframe: '30d',
-            platform: 'all',
-            goal: 'newsletter_signup',
-          },
-        },
-        {
-          widgetSlug: 'source-performance',
-          width: 'full',
-          data: {
-            title: 'Source Performance',
-            timeframe: '30d',
-            goal: 'newsletter_signup',
-          },
-        },
-        {
-          widgetSlug: 'sync-health',
-          width: 'large',
-          data: {
-            title: 'Provider Setup Status',
-          },
-        },
-        { widgetSlug: 'collections', width: 'full' },
-      ],
-    },
-    components: {
-      // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
-      beforeLogin: ['@/components/BeforeLogin#default'],
-      // The `BeforeDashboard` component renders the 'welcome' block and seed action.
-      beforeDashboard: [
-        '@/components/BeforeDashboard#default',
-        '@/components/LoadLexicalList#default',
-      ],
-      afterNavLinks: [
-        '@/components/dashboard/AnalyticsNavLink#default',
-        '@/components/AdminLogoutNavLink#default',
-      ],
-      graphics: {
-        Icon: '@/components/AdminGraphics/Icon#default',
-        Logo: '@/components/AdminGraphics/Logo#default',
-      },
-      views: {
-        analyticsDashboard: {
-          Component: '@/components/dashboard/AnalyticsView#default',
-          path: '/analytics-dashboard',
-          meta: { title: 'Analytics Dashboard' },
-        },
-      },
-    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -268,6 +134,7 @@ export default buildConfig({
   }),
   collections: [
     Pages,
+    Poetry,
     Posts,
     Projects,
     Watch,
@@ -304,7 +171,7 @@ export default buildConfig({
         return authHeader === `Bearer ${secret}`
       },
     },
-    tasks: [analyticsSyncTask, substackSyncTask, mediumSyncTask, paragraphSyncTask],
+    tasks: [analyticsSyncTask],
   },
   onInit: async (payload) => {
     const hasDatabaseURL = Boolean(process.env.DATABASE_URL)

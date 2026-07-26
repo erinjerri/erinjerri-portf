@@ -5,7 +5,7 @@
  * and creates draft blog posts for review. Run with: pnpm sync:paragraph
  *
  * Requires: DATABASE_URL (or MONGODB_URI) and PAYLOAD_SECRET in .env or environment.
- * Set PARAGRAPH_PUBLICATION to a full publication URL or slug (defaults to @cypherpinay).
+ * Set PARAGRAPH_PUBLICATION to a full publication URL or slug.
  * Optional: set PARAGRAPH_SYNC_DOWNLOAD_IMAGES=true to import images into the Media collection.
  */
 
@@ -16,7 +16,7 @@ import { getPayload } from 'payload'
 import config from '../payload.config'
 import { syncParagraphToPosts } from '../utilities/paragraph/syncParagraphToPosts'
 
-const PUBLICATION = process.env.PARAGRAPH_PUBLICATION || '@cypherpinay'
+const PUBLICATION = process.env.PARAGRAPH_PUBLICATION || '@yourpublication'
 const MODE: 'auto_publish' | 'review' =
   process.env.PARAGRAPH_SYNC_MODE === 'auto_publish' ? 'auto_publish' : 'review'
 
