@@ -74,6 +74,7 @@ const allowedOrigins = Array.from(
 
 export default buildConfig({
   admin: {
+    suppressHydrationWarning: true,
     importMap: {
       baseDir: path.resolve(dirname),
     },
