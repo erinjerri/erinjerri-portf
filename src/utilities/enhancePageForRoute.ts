@@ -107,9 +107,28 @@ function ensureCreatingArVrBookMetrics(layout: Page['layout']): Page['layout'] {
 
 function ensureSingleAboutBio(layout: Page['layout']): Page['layout'] {
   const blocks = Array.isArray(layout) ? [...layout] : []
-  const blocksWithoutBio = blocks.filter((block) => block?.blockType !== 'bioBlock')
+  const savedBio = blocks.find((block) => block?.blockType === 'bioBlock')
+  const blocksWithoutOtherBios = blocks.filter(
+    (block) => block?.blockType !== 'bioBlock' || block === savedBio,
+  )
 
-  return [defaultBioBlock(), ...blocksWithoutBio]
+  if (savedBio) {
+    return [savedBio, ...blocksWithoutOtherBios.filter((block) => block !== savedBio)]
+  }
+
+  const blocksWithoutLegacyBio = blocks.filter((block) => {
+    if (block?.blockType !== 'content') return true
+
+    const serializedBlock = JSON.stringify(block).toLowerCase()
+    const isLegacyAboutBio =
+      serializedBlock.includes('erin jerri') &&
+      serializedBlock.includes('creating augmented and virtual realities') &&
+      serializedBlock.includes('timebite')
+
+    return !isLegacyAboutBio
+  })
+
+  return [defaultBioBlock(), ...blocksWithoutLegacyBio]
 }
 
 export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
