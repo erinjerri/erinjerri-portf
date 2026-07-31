@@ -1,26 +1,107 @@
 'use client'
 
 import type { BioVariant } from './bioVariants'
+import type { Media as MediaType } from '@/payload-types'
 
+import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 import { CheckIcon, CopyIcon } from 'lucide-react'
-import { useId, useRef, useState } from 'react'
+import Image from 'next/image'
+import { useId, useMemo, useRef, useState } from 'react'
+
+export type SpeakerHeadshotOption = {
+  id?: string | null
+  image: string | MediaType
+  label?: string | null
+  caption?: string | null
+}
 
 type SpeakerBioKitProps = {
+  headshots?: SpeakerHeadshotOption[]
+  headshotsDownloadable?: boolean
   variants: BioVariant[]
 }
 
-export function SpeakerBioKit({ variants }: SpeakerBioKitProps) {
+function getHeadshotUrl(resource: SpeakerHeadshotOption['image']): string | null {
+  if (typeof resource === 'string') {
+    const value = resource.trim()
+    return /^(?:https?:\/\/|\/)/.test(value) ? value : null
+  }
+
+  if (typeof resource.url === 'string' && resource.url.trim()) return resource.url
+  if (typeof resource.filename === 'string' && resource.filename.trim()) {
+    return `/api/media/file/${encodeURIComponent(resource.filename)}`
+  }
+
+  return null
+}
+
+function getHeadshotAlt(resource: SpeakerHeadshotOption['image'], label?: string | null) {
+  if (typeof resource === 'object' && typeof resource.alt === 'string' && resource.alt.trim()) {
+    return resource.alt
+  }
+
+  return label?.trim() || 'Erin Jerri Malonzo Pañgilinan headshot'
+}
+
+function HeadshotImage({
+  alt,
+  resource,
+}: {
+  alt: string
+  resource: SpeakerHeadshotOption['image']
+}) {
+  if (typeof resource === 'string') {
+    return (
+      <Image
+        alt={alt}
+        className="object-cover"
+        fill
+        sizes="(max-width: 768px) 80vw, 18rem"
+        src={resource}
+      />
+    )
+  }
+
+  return (
+    <Media
+      alt={alt}
+      fill
+      imgClassName="h-full w-full object-cover"
+      resource={resource}
+      size="(max-width: 768px) 80vw, 18rem"
+    />
+  )
+}
+
+export function SpeakerBioKit({
+  headshots = [],
+  headshotsDownloadable = true,
+  variants,
+}: SpeakerBioKitProps) {
   const [activeId, setActiveId] = useState(variants[0]?.id)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [activeHeadshotId, setActiveHeadshotId] = useState(headshots[0]?.id ?? 'headshot-0')
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
   const reactId = useId()
+  const visibleHeadshots = useMemo(
+    () => headshots.filter((headshot) => Boolean(getHeadshotUrl(headshot.image))),
+    [headshots],
+  )
 
   const activeIndex = Math.max(
     variants.findIndex((variant) => variant.id === activeId),
     0,
   )
   const activeVariant = variants[activeIndex]
+  const activeHeadshotIndex = Math.max(
+    visibleHeadshots.findIndex(
+      (headshot, index) => (headshot.id ?? `headshot-${index}`) === activeHeadshotId,
+    ),
+    0,
+  )
+  const activeHeadshot = visibleHeadshots[activeHeadshotIndex]
+  const activeHeadshotUrl = activeHeadshot ? getHeadshotUrl(activeHeadshot.image) : null
 
   if (!activeVariant) return null
 
@@ -181,6 +262,78 @@ export function SpeakerBioKit({ variants }: SpeakerBioKitProps) {
                 {activeVariant.copy}
               </p>
             </div>
+
+            {activeHeadshot && activeHeadshotUrl ? (
+              <div className="mt-6 border-t border-slate-200 pt-6">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-950">Approved headshots</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-500">
+                      Choose an image for event, press, or media use.
+                    </p>
+                  </div>
+                  <span className="text-xs font-medium text-slate-500">
+                    {activeHeadshotIndex + 1} of {visibleHeadshots.length}
+                  </span>
+                </div>
+
+                <div className="mt-4 grid gap-5 md:grid-cols-[13rem_minmax(0,1fr)]">
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                    <HeadshotImage
+                      alt={getHeadshotAlt(activeHeadshot.image, activeHeadshot.label)}
+                      resource={activeHeadshot.image}
+                    />
+                  </div>
+
+                  <div>
+                    <div
+                      aria-label="Headshot options"
+                      className="grid gap-2 sm:grid-cols-2"
+                      role="tablist"
+                    >
+                      {visibleHeadshots.map((headshot, index) => {
+                        const headshotId = headshot.id ?? `headshot-${index}`
+                        const isActive = index === activeHeadshotIndex
+
+                        return (
+                          <button
+                            aria-selected={isActive}
+                            className={cn(
+                              'rounded-lg border px-3 py-3 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
+                              isActive
+                                ? 'border-teal-300 bg-teal-50 font-semibold text-slate-950'
+                                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-950',
+                            )}
+                            key={headshotId}
+                            onClick={() => setActiveHeadshotId(headshotId)}
+                            role="tab"
+                            type="button"
+                          >
+                            {headshot.label?.trim() || `Headshot ${index + 1}`}
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    {activeHeadshot.caption?.trim() ? (
+                      <p className="mt-4 text-sm leading-6 text-slate-500">
+                        {activeHeadshot.caption.trim()}
+                      </p>
+                    ) : null}
+
+                    {headshotsDownloadable ? (
+                      <a
+                        className="mt-4 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                        download
+                        href={activeHeadshotUrl}
+                      >
+                        Download selected headshot
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

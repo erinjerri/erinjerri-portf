@@ -1662,9 +1662,30 @@ export interface BioBlockBlock {
    */
   headline?: string | null;
   /**
-   * Optional headshot shown beside the bio copy.
+   * Primary headshot shown beside the bio copy and included first in the Speaker Bio Kit.
    */
   headshot?: (string | null) | Media;
+  /**
+   * Upload or select alternate approved headshots. Visitors can toggle between these images in the Speaker Bio Kit.
+   */
+  speakerHeadshots?:
+    | {
+        image: string | Media;
+        /**
+         * Short option label, such as “Book headshot” or “Studio portrait”.
+         */
+        label?: string | null;
+        /**
+         * Optional credit, usage note, or description.
+         */
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Shows a download link for the selected Speaker Bio Kit headshot.
+   */
+  headshotsDownloadable?: boolean | null;
   paragraphs?:
     | {
         text: string;
@@ -1785,6 +1806,14 @@ export interface Poetry {
       }[]
     | null;
   featured?: boolean | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -2559,6 +2588,15 @@ export interface BioBlockBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   headline?: T;
   headshot?: T;
+  speakerHeadshots?:
+    | T
+    | {
+        image?: T;
+        label?: T;
+        caption?: T;
+        id?: T;
+      };
+  headshotsDownloadable?: T;
   paragraphs?:
     | T
     | {
@@ -2651,6 +2689,13 @@ export interface PoetrySelect<T extends boolean = true> {
         id?: T;
       };
   featured?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
