@@ -30,6 +30,7 @@ import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
 import { RibbonBlockBlock } from '@/blocks/RibbonBlock/Component'
 import { StatsBlockBlock } from '@/blocks/StatsBlock/Component'
 import { BioBlockBlock } from '@/blocks/BioBlock/Component'
+import { isDuplicateHomeBiographyText } from '@/blocks/BioBlock/isDuplicateHomeBiographyText'
 import { SpeakerBioBlock } from '@/blocks/SpeakerBio/Component'
 import { SpeakerKitHeadshotsBlock } from '@/blocks/SpeakerKitHeadshots/Component'
 import { SpeakerKitBlock } from '@/blocks/SpeakerKit/Component'
@@ -207,7 +208,10 @@ function contentPlainText(b: LayoutBlock | null | undefined): string {
   if (!b) return ''
   const c = b as ContentBlockType
   if (!Array.isArray(c.columns)) return ''
-  return c.columns.map((col) => richTextPlainText(col?.richText)).join(' ').trim()
+  return c.columns
+    .map((col) => richTextPlainText(col?.richText))
+    .join(' ')
+    .trim()
 }
 
 function isDuplicateHomeBiographyContent(
@@ -219,22 +223,7 @@ function isDuplicateHomeBiographyContent(
   }
 
   const text = contentPlainText(currentBlock).toLowerCase()
-  if (!text) return false
-
-  const hasErinIdentity = text.includes('erin jerri') || text.includes('erin pangilinan')
-  const hasBioSignals = [
-    'software engineer',
-    'startup founder',
-    'former cto',
-    "o'reilly",
-    'o’ reilly',
-    'o’reilly',
-    'creating augmented and virtual realities',
-    'timebite',
-    'spatial computing',
-  ].filter((signal) => text.includes(signal)).length
-
-  return hasErinIdentity && hasBioSignals >= 2
+  return isDuplicateHomeBiographyText(text)
 }
 
 function contentSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
@@ -363,10 +352,7 @@ export const RenderBlocks: React.FC<{
 
             if (typeof Block === 'function') {
               const prevBlock = blocksToRender[index - 1]
-              if (
-                pageSlug === 'home' &&
-                isDuplicateHomeBiographyContent(prevBlock, block)
-              ) {
+              if (pageSlug === 'home' && isDuplicateHomeBiographyContent(prevBlock, block)) {
                 return null
               }
 
