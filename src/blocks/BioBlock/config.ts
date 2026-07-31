@@ -26,13 +26,59 @@ export const BioBlock: Block = {
     },
     {
       name: 'headshot',
+      label: 'Primary Bio Headshot',
       type: 'upload',
       relationTo: 'media',
       filterOptions: {
         mediaType: { equals: 'image' },
       },
       admin: {
-        description: 'Optional headshot shown beside the bio copy.',
+        description:
+          'Primary headshot shown beside the bio copy and included first in the Speaker Bio Kit.',
+      },
+    },
+    {
+      name: 'speakerHeadshots',
+      label: 'Speaker Bio Kit Headshot Options',
+      type: 'array',
+      maxRows: 8,
+      admin: {
+        description:
+          'Upload or select alternate approved headshots. Visitors can toggle between these images in the Speaker Bio Kit.',
+      },
+      fields: [
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          required: true,
+          filterOptions: {
+            mediaType: { equals: 'image' },
+          },
+        },
+        {
+          name: 'label',
+          type: 'text',
+          admin: {
+            description: 'Short option label, such as “Book headshot” or “Studio portrait”.',
+          },
+        },
+        {
+          name: 'caption',
+          type: 'textarea',
+          admin: {
+            description: 'Optional credit, usage note, or description.',
+          },
+        },
+      ],
+    },
+    {
+      name: 'headshotsDownloadable',
+      label: 'Allow Speaker Headshot Downloads',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        description: 'Shows a download link for the selected Speaker Bio Kit headshot.',
       },
     },
     {

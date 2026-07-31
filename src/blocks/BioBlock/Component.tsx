@@ -4,7 +4,7 @@ import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 import Image from 'next/image'
 import React, { Fragment } from 'react'
-import { SpeakerBioKit } from './SpeakerBioKit.client'
+import { SpeakerBioKit, type SpeakerHeadshotOption } from './SpeakerBioKit.client'
 
 const colorMap = {
   mint: '#9ff0bd',
@@ -17,6 +17,20 @@ type BioParagraph = NonNullable<BioBlockBlockProps['paragraphs']>[number]
 type BioHighlight = NonNullable<NonNullable<BioParagraph['highlights']>>[number]
 type BioBlockBlockComponentProps = BioBlockBlockProps & {
   pageSlug?: string
+}
+
+function isHeadshotResource(
+  resource: BioBlockBlockProps['headshot'],
+): resource is SpeakerHeadshotOption['image'] {
+  return Boolean(
+    (resource && typeof resource === 'object') ||
+    (typeof resource === 'string' && resource.trim().length > 0),
+  )
+}
+
+function headshotResourceKey(resource: SpeakerHeadshotOption['image']): string {
+  if (typeof resource === 'string') return resource
+  return String(resource.id ?? resource.url ?? resource.filename ?? '')
 }
 
 function renderParagraph(text: string, highlights: BioHighlight[] | null | undefined) {
@@ -76,10 +90,12 @@ function renderParagraph(text: string, highlights: BioHighlight[] | null | undef
 export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
   eyebrow,
   headshot,
+  headshotsDownloadable,
   headline,
   pageSlug,
   paragraphs,
   pills,
+  speakerHeadshots,
 }) => {
   if (pageSlug === 'about') {
     console.log('[About bio debug] Canonical bio renderer is BioBlockBlock')
@@ -87,9 +103,35 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
 
   const bioParagraphs = paragraphs?.filter((paragraph) => paragraph?.text?.trim()) ?? []
   const bioPills = pills?.filter((pill) => pill?.label?.trim()) ?? []
-  const hasHeadshot =
-    (headshot && typeof headshot === 'object') ||
-    (typeof headshot === 'string' && headshot.trim().length > 0)
+  const hasHeadshot = isHeadshotResource(headshot)
+  const speakerKitHeadshots = [
+    ...(hasHeadshot
+      ? [
+          {
+            id: 'primary',
+            image: headshot,
+            label: 'Primary headshot',
+          } satisfies SpeakerHeadshotOption,
+        ]
+      : []),
+    ...(speakerHeadshots ?? [])
+      .filter((item) => isHeadshotResource(item?.image))
+      .map(
+        (item, index) =>
+          ({
+            id: item.id ?? `alternate-${index + 1}`,
+            image: item.image,
+            label: item.label,
+            caption: item.caption,
+          }) satisfies SpeakerHeadshotOption,
+      ),
+  ].filter((item, index, items) => {
+    const key = headshotResourceKey(item.image)
+    return (
+      Boolean(key) &&
+      items.findIndex((candidate) => headshotResourceKey(candidate.image) === key) === index
+    )
+  })
 
   if (!headline?.trim() && !bioParagraphs.length && !bioPills.length && !hasHeadshot) return null
 
@@ -135,7 +177,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
 
                 return (
                   <span
-                    className="inline-flex items-center rounded-full bg-white/[0.06] px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
+                    className="inline-flex items-center rounded-none bg-white/[0.06] px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
                     key={pill.id ?? index}
                     style={{ color }}
                   >
@@ -171,7 +213,13 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
         ) : null}
       </div>
 
-      {pageSlug !== 'home' ? <SpeakerBioKit variants={bioVariants} /> : null}
+      {pageSlug !== 'home' ? (
+        <SpeakerBioKit
+          headshots={speakerKitHeadshots}
+          headshotsDownloadable={headshotsDownloadable ?? true}
+          variants={bioVariants}
+        />
+      ) : null}
     </section>
   )
 }
