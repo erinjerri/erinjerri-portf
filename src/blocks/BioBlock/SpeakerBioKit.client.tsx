@@ -3,7 +3,6 @@
 import type { BioVariant } from './bioVariants'
 import type { Media as MediaType } from '@/payload-types'
 
-import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 import { CheckIcon, CopyIcon } from 'lucide-react'
 import Image from 'next/image'
@@ -51,25 +50,16 @@ function HeadshotImage({
   alt: string
   resource: SpeakerHeadshotOption['image']
 }) {
-  if (typeof resource === 'string') {
-    return (
-      <Image
-        alt={alt}
-        className="object-cover"
-        fill
-        sizes="(max-width: 768px) 80vw, 18rem"
-        src={resource}
-      />
-    )
-  }
+  const src = getHeadshotUrl(resource)
+  if (!src) return null
 
   return (
-    <Media
+    <Image
       alt={alt}
+      className="object-cover"
       fill
-      imgClassName="h-full w-full object-cover"
-      resource={resource}
-      size="(max-width: 768px) 80vw, 18rem"
+      sizes="(max-width: 768px) 80vw, 18rem"
+      src={src}
     />
   )
 }
@@ -278,7 +268,10 @@ export function SpeakerBioKit({
                 </div>
 
                 <div className="mt-4 grid gap-5 md:grid-cols-[13rem_minmax(0,1fr)]">
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                  <div
+                    className="relative aspect-[4/5] overflow-hidden rounded-lg border border-slate-200 bg-slate-100"
+                    data-testid="speaker-headshot-preview"
+                  >
                     <HeadshotImage
                       alt={getHeadshotAlt(activeHeadshot.image, activeHeadshot.label)}
                       resource={activeHeadshot.image}
