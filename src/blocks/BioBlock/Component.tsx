@@ -135,7 +135,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
 
                 return (
                   <span
-                    className="inline-flex items-center rounded-[8px] bg-white/[0.06] px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
+                    className="inline-flex items-center rounded-none bg-white/[0.06] px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
                     key={pill.id ?? index}
                     style={{ color }}
                   >
