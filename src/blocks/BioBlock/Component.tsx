@@ -1,6 +1,7 @@
 import type { BioBlockBlock as BioBlockBlockProps } from '@/payload-types'
 import { bioVariants } from './bioVariants'
 import { Media } from '@/components/Media'
+import { cn } from '@/utilities/ui'
 import Image from 'next/image'
 import React, { Fragment } from 'react'
 import { SpeakerBioKit } from './SpeakerBioKit.client'
@@ -114,7 +115,12 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
           <div className={headline?.trim() ? 'mt-8 space-y-7 md:mt-9' : 'space-y-7'}>
             {bioParagraphs.map((paragraph, index) => (
               <p
-                className="max-w-4xl text-[1rem] leading-8 text-white/78 md:text-[1.0625rem] md:leading-9"
+                className={cn(
+                  'max-w-4xl text-white/78',
+                  pageSlug === 'home'
+                    ? 'text-[clamp(1.125rem,2vw,1.375rem)] font-normal leading-[1.72]'
+                    : 'text-[1rem] leading-8 md:text-[1.0625rem] md:leading-9',
+                )}
                 key={paragraph.id ?? index}
               >
                 {renderParagraph(paragraph.text?.trim() ?? '', paragraph.highlights)}
