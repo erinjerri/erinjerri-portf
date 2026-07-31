@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { Media } from '@/components/Media'
 import { PoetryLayout } from '@/components/Poetry/PoetryLayout'
-import type { Media as MediaType, Poetry } from '@/payload-types'
+import type { Media as MediaType } from '@/payload-types'
 import { poetryCanonicalUrlForPath, POETRY_ORIGIN } from '@/utilities/poetry'
 import configPromise from '@payload-config'
 import Link from 'next/link'
@@ -53,7 +53,9 @@ const getCachedPoems = unstable_cache(
   { revalidate: 60, tags: ['poetry'] },
 )
 
-function PoetryCard({ poem, featured = false }: { poem: Poetry; featured?: boolean }) {
+type PoetryCardPoem = Awaited<ReturnType<typeof getCachedPoems>>['docs'][number]
+
+function PoetryCard({ poem, featured = false }: { poem: PoetryCardPoem; featured?: boolean }) {
   const image = typeof poem.featuredImage === 'object' ? poem.featuredImage : null
   const date = formatPoetryDate(poem.publishedDate)
 
