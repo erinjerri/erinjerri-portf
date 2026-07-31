@@ -4,7 +4,7 @@ import type { BioVariant } from './bioVariants'
 import type { Media as MediaType } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
-import { CheckIcon, CopyIcon } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, CopyIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useId, useMemo, useRef, useState } from 'react'
 
@@ -122,6 +122,18 @@ export function SpeakerBioKit({
 
     setActiveId(nextVariant.id)
     tabRefs.current[nextIndex]?.focus()
+  }
+
+  function changeHeadshot(direction: -1 | 1) {
+    if (visibleHeadshots.length < 2) return
+
+    const nextIndex =
+      (activeHeadshotIndex + direction + visibleHeadshots.length) % visibleHeadshots.length
+    const nextHeadshot = visibleHeadshots[nextIndex]
+
+    if (!nextHeadshot) return
+
+    setActiveHeadshotId(nextHeadshot.id ?? `headshot-${nextIndex}`)
   }
 
   return (
@@ -247,29 +259,26 @@ export function SpeakerBioKit({
               </button>
             </div>
 
-            <div className="mt-5 min-h-[15rem] rounded-lg border border-slate-200 bg-slate-50 p-4 md:min-h-[17rem] md:p-5">
-              <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-                {activeVariant.copy}
-              </p>
-            </div>
-
             {activeHeadshot && activeHeadshotUrl ? (
-              <div className="mt-6 border-t border-slate-200 pt-6">
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-950">Approved headshots</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-500">
-                      Choose an image for event, press, or media use.
-                    </p>
-                  </div>
-                  <span className="text-xs font-medium text-slate-500">
-                    {activeHeadshotIndex + 1} of {visibleHeadshots.length}
-                  </span>
-                </div>
+              <div className="border-b border-slate-200 py-6">
+                <div
+                  aria-label="Headshot carousel"
+                  className="mx-auto flex w-full max-w-md items-center justify-center gap-3 sm:gap-5"
+                  role="group"
+                >
+                  {visibleHeadshots.length > 1 ? (
+                    <button
+                      aria-label="Previous headshot"
+                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                      onClick={() => changeHeadshot(-1)}
+                      type="button"
+                    >
+                      <ArrowLeftIcon aria-hidden="true" className="h-5 w-5" />
+                    </button>
+                  ) : null}
 
-                <div className="mt-4 grid gap-5 md:grid-cols-[13rem_minmax(0,1fr)]">
                   <div
-                    className="relative aspect-[4/5] overflow-hidden rounded-lg border border-slate-200 bg-slate-100"
+                    className="relative aspect-[4/5] min-w-0 max-w-64 flex-1 overflow-hidden rounded-lg border border-slate-200 bg-slate-100"
                     data-testid="speaker-headshot-preview"
                   >
                     <HeadshotImage
@@ -278,55 +287,47 @@ export function SpeakerBioKit({
                     />
                   </div>
 
-                  <div>
-                    <div
-                      aria-label="Headshot options"
-                      className="grid gap-2 sm:grid-cols-2"
-                      role="tablist"
+                  {visibleHeadshots.length > 1 ? (
+                    <button
+                      aria-label="Next headshot"
+                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                      onClick={() => changeHeadshot(1)}
+                      type="button"
                     >
-                      {visibleHeadshots.map((headshot, index) => {
-                        const headshotId = headshot.id ?? `headshot-${index}`
-                        const isActive = index === activeHeadshotIndex
-
-                        return (
-                          <button
-                            aria-selected={isActive}
-                            className={cn(
-                              'rounded-lg border px-3 py-3 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
-                              isActive
-                                ? 'border-teal-300 bg-teal-50 font-semibold text-slate-950'
-                                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-950',
-                            )}
-                            key={headshotId}
-                            onClick={() => setActiveHeadshotId(headshotId)}
-                            role="tab"
-                            type="button"
-                          >
-                            {headshot.label?.trim() || `Headshot ${index + 1}`}
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    {activeHeadshot.caption?.trim() ? (
-                      <p className="mt-4 text-sm leading-6 text-slate-500">
-                        {activeHeadshot.caption.trim()}
-                      </p>
-                    ) : null}
-
-                    {headshotsDownloadable ? (
-                      <a
-                        className="mt-4 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
-                        download
-                        href={activeHeadshotUrl}
-                      >
-                        Download selected headshot
-                      </a>
-                    ) : null}
-                  </div>
+                      <ArrowRightIcon aria-hidden="true" className="h-5 w-5" />
+                    </button>
+                  ) : null}
                 </div>
+
+                <p aria-live="polite" className="sr-only">
+                  Headshot {activeHeadshotIndex + 1} of {visibleHeadshots.length}
+                </p>
+
+                {activeHeadshot.caption?.trim() ? (
+                  <p className="mx-auto mt-3 max-w-md text-center text-sm leading-6 text-slate-500">
+                    {activeHeadshot.caption.trim()}
+                  </p>
+                ) : null}
+
+                {headshotsDownloadable ? (
+                  <div className="mt-4 text-center">
+                    <a
+                      className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                      download
+                      href={activeHeadshotUrl}
+                    >
+                      Download selected headshot
+                    </a>
+                  </div>
+                ) : null}
               </div>
             ) : null}
+
+            <div className="mt-5 min-h-[15rem] rounded-lg border border-slate-200 bg-slate-50 p-4 md:min-h-[17rem] md:p-5">
+              <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
+                {activeVariant.copy}
+              </p>
+            </div>
           </div>
         </div>
       </div>
