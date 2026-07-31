@@ -13,13 +13,37 @@ import RichText from '@/components/RichText'
 import { heroBioRichTextClassName } from '@/heros/heroBioRichTextClassName'
 
 type HeroProps = Page['hero'] & {
+  showHeroAnimation?: boolean
   visualVariant?: 'prismatic'
 }
 
 const isPopulated = (m: unknown): m is MediaDoc => Boolean(m && typeof m === 'object' && 'url' in m)
 
+const heroFallbacks = {
+  background: '/media/dimensions-background-curves.webp',
+} as const
+
 /** Full-bleed / slot heroes: cover + bias upper area so heads stay in frame (spec: top center or 40% 20%). */
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
+
+const StaticHeroImage: React.FC<{
+  alt: string
+  className: string
+  src: string
+  position?: string
+}> = ({ alt, className, src, position = 'center' }) => (
+  <div
+    aria-label={alt}
+    className={className}
+    role="img"
+    style={{
+      backgroundImage: `url(${src})`,
+      backgroundPosition: position,
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
+    }}
+  />
+)
 
 const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   <div
@@ -46,6 +70,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   heroImage1,
   heroImage2,
   heroImage3,
+  showHeroAnimation = false,
   visualVariant,
 }) => {
   const hasBackground = isPopulated(backgroundMedia)
@@ -57,6 +82,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const showGridLayout = !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
   const isPrismatic = visualVariant === 'prismatic'
   const backgroundImage = hasBackground ? backgroundMedia : null
+  const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
 
   const renderHeroCopy = (className?: string) => {
     const hasLinks = Array.isArray(links) && links.length > 0
@@ -112,7 +138,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         >
           <Media
             alt={
-              (typeof media.alt === 'string' && media.alt.trim()) || 'Featured portfolio portrait'
+              (typeof media.alt === 'string' && media.alt.trim()) ||
+              'Erin Jerri Apple Vision Pro spatial computing work'
             }
             fill
             className="absolute inset-0"
@@ -129,7 +156,10 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
     return (
       <Media
-        alt={(typeof media.alt === 'string' && media.alt.trim()) || 'Featured portfolio portrait'}
+        alt={
+          (typeof media.alt === 'string' && media.alt.trim()) ||
+          'Erin Jerri Apple Vision Pro spatial computing work'
+        }
         imgClassName={cn(
           'h-auto w-full object-cover object-center object-[40%_20%]',
           'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
@@ -156,7 +186,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           alt={
             (typeof resource.alt === 'string' && resource.alt.trim()) ||
             alt ||
-            'Selected portfolio work'
+            'Erin Jerri — AI, spatial computing, and engineering work'
           }
           fill
           htmlElement={null}
@@ -200,7 +230,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           <Media
             alt={
               (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
-              'Full-width portfolio hero background'
+              'Full-width hero background — Erin Jerri, AI and spatial computing'
             }
             fill
             className="absolute inset-0 h-full w-full"

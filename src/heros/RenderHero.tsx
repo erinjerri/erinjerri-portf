@@ -20,9 +20,10 @@ export const RenderHero: React.FC<
   Page['hero'] & {
     visualVariant?: 'prismatic'
     pageSlug?: string
+    showHeroAnimation?: boolean
   }
 > = (props) => {
-  const { visualVariant, pageSlug, ...heroProps } = props
+  const { visualVariant, pageSlug, showHeroAnimation = false, ...heroProps } = props
   const { type } = heroProps || {}
   const heroType = type as string | undefined
 
@@ -35,8 +36,9 @@ export const RenderHero: React.FC<
   return (
     <HeroToRender
       {...heroProps}
-      {...(heroType === 'highImpact' ? { visualVariant } : {})}
-      {...(heroType === 'mediumImpact' ? { pageSlug } : {})}
+      {...(heroType === 'backgroundCover' ? { showHeroAnimation } : {})}
+      {...(heroType === 'highImpact' ? { showHeroAnimation, visualVariant } : {})}
+      {...(heroType === 'mediumImpact' ? { pageSlug, showHeroAnimation } : {})}
     />
   )
 }

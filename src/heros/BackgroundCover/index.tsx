@@ -10,13 +10,13 @@ import RichText from '@/components/RichText'
 
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
-export const BackgroundCoverHero: React.FC<Page['hero']> = ({
+export const BackgroundCoverHero: React.FC<Page['hero'] & { showHeroAnimation?: boolean }> = ({
   backgroundMedia,
   links,
   richText,
+  showHeroAnimation = false,
 }) => {
-  const backgroundImage =
-    backgroundMedia && typeof backgroundMedia === 'object' ? backgroundMedia : null
+  const backgroundImage = backgroundMedia && typeof backgroundMedia === 'object' ? backgroundMedia : null
 
   return (
     <div
@@ -32,7 +32,7 @@ export const BackgroundCoverHero: React.FC<Page['hero']> = ({
           <Media
             alt={
               (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
-              'Full-width portfolio hero background'
+              'Full-width hero background — Erin Jerri, AI and spatial computing'
             }
             fill
             className="absolute inset-0 h-full w-full"
