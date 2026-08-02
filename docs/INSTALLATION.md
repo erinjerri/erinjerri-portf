@@ -1,4 +1,6 @@
-# Installation and Payload Setup
+# Local Installation & Development Setup
+
+This guide covers local development setup. For production deployment, see [PRODUCTION_SETUP.md](PRODUCTION_SETUP.md).
 
 This guide assumes little or no prior Payload experience.
 
@@ -135,19 +137,44 @@ Open:
 
 Sign in with `RESTORE_ADMIN_EMAIL` and `RESTORE_ADMIN_PASSWORD`.
 
-## 7. Understand Payload in this project
+## 7. Content Model Overview
 
-Payload is embedded in the Next.js application:
+### Editable in the CMS
+
+- **Pages:** Home, about, contact, custom pages (heroes, blocks, SEO metadata)
+- **Posts:** Blog posts (native or imported from Substack/Medium/Paragraph)
+- **Projects:** Portfolio work showcase
+- **Watch:** Curated video/media collections
+- **Poetry:** Published poetry (optional)
+- **Media:** Images, videos, documents (metadata in MongoDB, files in R2 or local storage)
+- **Globals:** Header, footer, brand configuration
+- **Categories:** Tags for posts and projects
+- **Forms:** Contact, speaking request (configured via page blocks)
+
+See [PRODUCTION_SETUP.md](PRODUCTION_SETUP.md#part-1-content-model-overview) for complete details.
+
+### Hard-Coded or Environment-Driven
+
+- **Site identity:** `NEXT_PUBLIC_SITE_OWNER_NAME`, `NEXT_PUBLIC_SITE_TITLE`, etc.
+- **Routes:** `/admin`, `/posts`, `/projects`, `/search`, `/poetry`
+- **Third-party integrations:** Substack, Medium, Paragraph URLs
+- **Analytics:** Google Analytics, Microsoft Clarity (via env vars)
+
+## 8. Payload Architecture
+
+Payload is embedded in Next.js:
 
 - `src/payload.config.ts` registers collections, globals, plugins, jobs, and admin components.
-- `src/collections/` contains content schemas.
+- `src/collections/` contains content schemas (Pages, Posts, Projects, etc.).
 - `src/blocks/` contains reusable page-builder blocks.
 - `src/Header/` and `src/Footer/` contain global navigation configuration.
-- `src/app/(payload)/` exposes Payload admin and API routes.
+- `src/app/(payload)/` exposes Payload admin UI and API routes.
 - `src/app/(frontend)/` contains public Next.js routes.
-- `src/endpoints/seed/` contains starter content.
+- `src/endpoints/seed/` contains starter content for seeding.
 
-Schema changes require:
+### When Schema Changes
+
+After modifying collections or globals:
 
 ```bash
 pnpm generate:types
