@@ -14,6 +14,15 @@ The starter includes:
 - Netlify deployment configuration
 - A static visual system with no Three.js or animated canvas background
 
+## Documentation
+
+- **[PRODUCTION_SETUP.md](docs/PRODUCTION_SETUP.md)** – Complete launch order for production (MongoDB → R2 → Netlify → domain)
+- **[INSTALLATION.md](docs/INSTALLATION.md)** – Local development setup
+- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** – Netlify deployment details
+- **[MEDIA_AND_R2.md](docs/MEDIA_AND_R2.md)** – Media storage, Cloudflare R2 configuration
+- **[SUBSTACK.md](docs/SUBSTACK.md)** – Substack, Medium, Paragraph imports
+- **[CUSTOMIZATION.md](docs/CUSTOMIZATION.md)** – Customizing pages, blocks, and styles
+
 ## Start here
 
 ### Requirements

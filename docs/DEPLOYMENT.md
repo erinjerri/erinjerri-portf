@@ -1,17 +1,18 @@
-# Deployment
+# Deployment to Netlify
 
-The repository includes a Netlify configuration. The same application can be adapted to other
-Node-compatible hosts, but scheduled functions and media storage must be configured separately.
+**For complete step-by-step production setup, see [PRODUCTION_SETUP.md](PRODUCTION_SETUP.md).**
 
-## Before deploying
+This page covers Netlify-specific deployment details. The repository includes a Netlify configuration via `netlify.toml`. The same application can be adapted to other Node-compatible hosts (Vercel, AWS, Render), but scheduled functions and media storage must be configured separately.
+
+## Prerequisites
 
 You need:
 
 - A GitHub repository containing the customized starter
 - A production MongoDB Atlas database
 - A Netlify account
-- Persistent media storage, preferably Cloudflare R2
-- A custom domain, optional during the first deployment
+- Persistent media storage via Cloudflare R2
+- A custom domain (optional during first deployment)
 
 ## 1. Create production secrets
 

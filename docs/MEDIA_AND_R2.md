@@ -95,3 +95,42 @@ If images appear as **links** instead of embedded media, the image download is f
 | `R2_FORCE_PATH_STYLE`         | No              | S3 path-style requests (default: true)           |
 | `R2_MEDIA_PREFIX`             | No              | Object key prefix (default: `media`)              |
 | `NEXT_PUBLIC_USE_PAYLOAD_MEDIA_PROXY` | No      | Force Payload media proxy for all reads          |
+
+## Media Upload Smoke Test
+
+A smoke test verifies that uploaded images survive deployment and redeploy:
+
+1. **Upload via CMS:**
+   - Go to `/admin` → Media → Upload
+   - Select: JPEG or PNG (1000×600px recommended)
+   - Enter alt text: "Test image for verification"
+   - Verify: File appears in Media collection with metadata
+
+2. **Check public URL (if R2 custom domain is configured):**
+   ```bash
+   curl -I https://media.yourdomain.com/test-image.jpg
+   # Expected: 200 OK
+   ```
+
+3. **Redeploy the app (without clearing media):**
+   ```bash
+   git commit --allow-empty -m "redeploy test" && git push
+   ```
+
+4. **Verify image still loads after redeploy:**
+   ```bash
+   curl -I https://media.yourdomain.com/test-image.jpg
+   # Expected: still 200 OK
+   ```
+   
+   Media should survive redeploy because:
+   - Metadata stays in MongoDB (persists across deploys)
+   - File bytes stay in R2 (not on ephemeral filesystem)
+
+5. **Visual confirmation:**
+   - Create/edit a page and reference the uploaded image
+   - Publish the page
+   - Verify image displays on the live page
+   - Image should be the one you uploaded earlier
+
+If this test passes, media storage is working correctly for production.
