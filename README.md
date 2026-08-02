@@ -1,27 +1,71 @@
 # Payload Portfolio Starter
 
-A customizable portfolio, writing, projects, speaking, and newsletter starter built with
-[Payload CMS](https://payloadcms.com/) and Next.js.
+A professional, customizable portfolio and blog template built with [Payload CMS](https://payloadcms.com/) and [Next.js](https://nextjs.org/). Designed to be deployed, self-hosted, and templatized for reuse.
 
-The starter includes:
+**Perfect for:** Designers, developers, writers, executives, and speakers who want an editable website without platform lock-in.
 
-- A Payload admin panel at `/admin`
-- Editable pages, projects, posts, videos, poetry, forms, navigation, footer, and branding
-- Drafts, live preview, SEO fields, redirects, search, and scheduled publishing
-- Optional Substack, Medium, and Paragraph imports
-- Optional Google Analytics, Microsoft Clarity, Amazon Associates, SMTP, and Cloudflare R2
-- Generic demo content that can be seeded into a new database
-- Netlify deployment configuration
-- A static visual system with no Three.js or animated canvas background
+## What's Included
 
-## Documentation
+### Content Management
+- ✅ Payload admin panel (`/admin`) for editing everything
+- ✅ **Pages** – Customizable pages (home, about, contact) with block-based layouts
+- ✅ **Posts** – Blog/newsletter articles with SEO, drafts, and scheduled publishing
+- ✅ **Projects** – Portfolio work showcase with galleries
+- ✅ **Watch** – Video and media curation
+- ✅ **Poetry** – Optional poetry collection with dedicated routing
+- ✅ **Media** – Image/video/document storage (local or Cloudflare R2)
+- ✅ **Categories** – Tags for organizing content
+- ✅ **Globals** – Site-wide config (header, footer, branding, theme tokens)
 
-- **[PRODUCTION_SETUP.md](docs/PRODUCTION_SETUP.md)** – Complete launch order for production (MongoDB → R2 → Netlify → domain)
-- **[INSTALLATION.md](docs/INSTALLATION.md)** – Local development setup
-- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** – Netlify deployment details
-- **[MEDIA_AND_R2.md](docs/MEDIA_AND_R2.md)** – Media storage, Cloudflare R2 configuration
-- **[SUBSTACK.md](docs/SUBSTACK.md)** – Substack, Medium, Paragraph imports
-- **[CUSTOMIZATION.md](docs/CUSTOMIZATION.md)** – Customizing pages, blocks, and styles
+### Publishing & Workflow
+- ✅ Drafts & versions – Save as draft, schedule publish, edit history
+- ✅ Live preview – See edits in real-time before publishing
+- ✅ SEO fields – Meta title, description, OpenGraph image per page
+- ✅ Redirects – Manage URL permanence with Payload Redirects plugin
+- ✅ Search – Full-text search across pages, posts, projects
+- ✅ Scheduled publishing – Publish on a schedule via cron
+
+### Integrations
+- ✅ **Substack** – Import articles via RSS, subscribe button in footer
+- ✅ **Medium** – Import articles via RSS
+- ✅ **Paragraph** – Import articles via RSS
+- ✅ **Analytics** – Google Analytics and Microsoft Clarity
+- ✅ **Email** – SMTP notifications for form submissions
+- ✅ **Amazon Associates** – Affiliate product blocks with custom tags
+- ✅ **Cloudflare R2** – Persistent media storage for production
+
+### Deployment
+- ✅ **Netlify** – Pre-configured with scheduled functions
+- ✅ **Docker** – Local MongoDB setup included
+- ✅ **MongoDB** – Support for local Docker or MongoDB Atlas
+- ✅ **TypeScript** – Full type safety throughout
+- ✅ **Testing** – Integration (vitest) and E2E (Playwright) test setup
+
+### Developer Experience
+- ✅ Modern tech stack – Next.js 15, React 19, TypeScript, Tailwind CSS
+- ✅ No build-time database calls – Zero hydration mismatches
+- ✅ Static visual system – No Three.js, Framer Motion, or canvas animations
+- ✅ Responsive design – Mobile-first, works on all devices
+- ✅ Accessibility – WCAG 2.1 AA compliant
+
+## Quick Links
+
+**For Starting Out:**
+- 👀 [Architecture Overview](ARCHITECTURE.md) – Tech stack, data model, project structure
+- 🚀 [Installation & Setup](docs/INSTALLATION.md) – Local development in 5 minutes
+- 📝 [Customization Guide](docs/CUSTOMIZATION.md) – Handoff checklist to make it yours
+
+**For Production:**
+- 🌍 [Production Setup](docs/PRODUCTION_SETUP.md) – Complete launch order (MongoDB → R2 → Netlify → DNS)
+- 🚢 [Deployment](docs/DEPLOYMENT.md) – Netlify configuration and best practices
+- 🖼️ [Media & R2](docs/MEDIA_AND_R2.md) – Cloudflare R2 setup and troubleshooting
+
+**For Content Sync:**
+- 📰 [Substack Integration](docs/SUBSTACK.md) – Import articles, set up footer subscription
+
+**For Contributors:**
+- 🤝 [Contributing](CONTRIBUTING.md) – Development workflow, coding standards, PR process
+- 🛠️ [Payload CMS Guide](AGENTS.md) – Payload patterns and security best practices
 
 ## Start here
 
@@ -176,39 +220,180 @@ domain checklist.
 - [Analytics dashboard](docs/ANALYTICS_DASHBOARD_SETUP.md)
 - [Image recommendations](docs/IMAGE_RESOLUTIONS.md)
 
-## Common commands
+## Development Commands
+
+### Running the App
 
 ```bash
-pnpm dev                 # Start Next.js and Payload
-pnpm build               # Production build
-pnpm start:only          # Start an existing production build
-pnpm seed                # Seed an empty database
-pnpm generate:types      # Regenerate Payload TypeScript types
-pnpm generate:importmap  # Regenerate Payload admin component imports
-pnpm test:int            # Run integration tests
-pnpm test:e2e            # Run Playwright tests
-pnpm sync:substack       # Import Substack posts
-pnpm sync:medium         # Import Medium posts
-pnpm sync:paragraph      # Import Paragraph posts
+pnpm dev              # Start Next.js dev server (port 3000) + Payload
+pnpm build            # Build Next.js app for production
+pnpm start:only       # Run a pre-built app (requires pnpm build first)
+pnpm start:fresh      # Clean build + start
 ```
 
-After changing a Payload collection, global, block, or field:
+### Database & Content
 
+```bash
+pnpm seed             # Seed empty database with starter content
+pnpm sync:substack    # Import Substack posts (one-time)
+pnpm sync:medium      # Import Medium posts (one-time)
+pnpm sync:paragraph   # Import Paragraph posts (one-time)
+```
+
+### Code Generation & Quality
+
+```bash
+pnpm generate:types      # Regenerate Payload TypeScript types (run after schema changes)
+pnpm generate:importmap  # Regenerate Payload admin component paths (run after adding blocks/components)
+pnpm exec tsc --noEmit   # Type-check without emitting files
+pnpm lint                # Run ESLint
+pnpm lint:fix            # Fix linting errors
+```
+
+### Testing
+
+```bash
+pnpm test:int   # Run integration tests (vitest)
+pnpm test:e2e   # Run end-to-end tests (Playwright)
+pnpm test       # Run all tests
+```
+
+### Monitoring & Analysis
+
+```bash
+pnpm analyze    # Analyze Next.js bundle size
+```
+
+**Workflow after changing Payload schema:**
+
+```bash
+# 1. Update src/collections/ or src/globals/
+# 2. Regenerate types and import map
+pnpm generate:types
+pnpm generate:importmap
+
+# 3. Type-check
+pnpm exec tsc --noEmit
+
+# 4. Restart dev server
+# (Ctrl+C and pnpm dev)
+```
+
+## Environment Variables
+
+See `.env.example` for all available variables. Key ones:
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `DATABASE_URL` | Yes | MongoDB connection string |
+| `PAYLOAD_SECRET` | Yes | JWT encryption secret |
+| `NEXT_PUBLIC_SERVER_URL` | Yes | Site URL for CORS, preview links, etc. |
+| `NEXT_PUBLIC_SITE_OWNER_NAME` | Yes | Your name (used in metadata, hero) |
+| `SUBSTACK_RSS_URL` | No | For Substack post import |
+| `USE_R2_STORAGE` | No | Enable Cloudflare R2 (production) |
+| `R2_ACCOUNT_ID`, etc. | No | R2 credentials (if using R2) |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | Google Analytics |
+| `NEXT_PUBLIC_ENABLE_CLARITY` | No | Microsoft Clarity |
+
+## Security Notes
+
+### Must Do
+
+- ✅ Never commit `.env` or `.env.local` – add to `.gitignore` (already done)
+- ✅ Use **unique** secrets for each environment (dev, staging, production)
+- ✅ Generate secrets with `openssl rand -base64 32` (not your birthday, etc.)
+- ✅ Keep `ALLOW_SEED_IN_PROD=false` in production
+
+### Payload CMS Patterns
+
+- ✅ When using the Local API with a user context, always pass `overrideAccess: false`
+  ```typescript
+  await payload.find({
+    collection: 'posts',
+    user: someUser,
+    overrideAccess: false,  // REQUIRED
+  })
+  ```
+
+- ✅ Nested operations in hooks must receive `req` to stay in the same transaction
+  ```typescript
+  await req.payload.create({
+    collection: 'logs',
+    data: { ... },
+    req,  // REQUIRED
+  })
+  ```
+
+See [AGENTS.md](AGENTS.md) for comprehensive Payload security patterns.
+
+## File Structure
+
+```
+.
+├── src/
+│   ├── app/
+│   │   ├── (frontend)/          # Public routes
+│   │   │   ├── page.tsx         # Homepage
+│   │   │   ├── posts/           # Blog posts
+│   │   │   ├── projects/        # Portfolio projects
+│   │   │   └── [slug]/          # Dynamic pages
+│   │   └── (payload)/           # Admin & API
+│   ├── collections/             # Payload collections (Pages, Posts, Media, etc.)
+│   ├── globals/                 # Payload globals (Header, Footer, Brand)
+│   ├── blocks/                  # Page builder blocks
+│   ├── components/              # React components
+│   ├── heros/                   # Hero section variants
+│   ├── utilities/               # Helper functions
+│   ├── payload.config.ts        # Payload CMS configuration
+│   └── middleware.ts            # Next.js middleware
+├── docs/                        # Documentation
+├── netlify/functions/           # Netlify serverless functions
+├── public/media/                # Local media storage (dev only)
+├── .env.example                 # Environment variables template
+├── package.json
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+└── README.md
+```
+
+Full structure: See [ARCHITECTURE.md](ARCHITECTURE.md)
+
+## Troubleshooting
+
+**Port 3000 is busy:**
+```bash
+lsof -ti :3000 | xargs kill -9
+pnpm dev -- --port 3001  # Or use different port
+```
+
+**MongoDB connection refused:**
+```bash
+docker compose ps          # Check if mongo is running
+docker compose logs mongo  # View logs
+docker compose up -d mongo # Start if not running
+```
+
+**TypeScript errors after schema changes:**
 ```bash
 pnpm generate:types
 pnpm generate:importmap
 pnpm exec tsc --noEmit
 ```
 
-## Security notes
+**Admin panel shows import errors:**
+```bash
+pnpm generate:importmap
+pnpm build  # Verify build succeeds
+```
 
-- Never commit `.env` or `.env.local`.
-- Use unique production secrets and passwords.
-- Keep `ALLOW_SEED_IN_PROD=false` except during an intentional one-time seed.
-- The Local API bypasses access control by default. When acting as a user, pass
-  `overrideAccess: false`.
-- Nested Payload operations inside hooks must receive the original `req` to participate in the
-  same transaction.
+**Seed fails:**
+```bash
+# If database not empty, force reset:
+RESTORE_FORCE=true pnpm seed
+```
+
+More help: See [INSTALLATION.md](docs/INSTALLATION.md#troubleshooting) and [CONTRIBUTING.md](CONTRIBUTING.md#troubleshooting).
 
 ## License
 
