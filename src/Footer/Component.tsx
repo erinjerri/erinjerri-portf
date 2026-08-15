@@ -16,6 +16,7 @@ import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
 import { SocialIconImage } from './SocialIconImage'
 import { SubscribeForm } from './SubscribeForm'
+import { SubstackIcon } from './SubstackIcon'
 
 const resolveFallbackSocialIcon = (
   label: string,
@@ -24,6 +25,7 @@ const resolveFallbackSocialIcon = (
   const value = `${label} ${url}`.toLowerCase()
 
   if (value.includes('mail') || value.includes('email') || url.includes('@')) return Mail
+  if (value.includes('substack') || value.includes('erinjerri.substack.com')) return SubstackIcon
   if (value.includes('github')) return Github
   if (value.includes('linkedin')) return Linkedin
   if (value.includes('youtube')) return Youtube
@@ -53,22 +55,43 @@ const hasLocalMediaFile = (mediaUrl: string): boolean => {
 const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
 
+const normalizeSubstackPublicationURL = (rawValue?: string | null): string => {
+  const fallback = 'https://erinjerri.substack.com'
+  const raw = rawValue?.trim()
+  if (!raw) return fallback
+
+  try {
+    const url = new URL(raw)
+    const host = url.hostname.toLowerCase()
+
+    if (!host.endsWith('.substack.com')) return fallback
+
+    const pathname = url.pathname.replace(/\/+$/, '').toLowerCase()
+    if (pathname === '' || pathname === '/subscribe' || pathname === '/embed') {
+      url.pathname = ''
+      url.search = ''
+      url.hash = ''
+      return url.toString().replace(/\/$/, '')
+    }
+
+    if (pathname.startsWith('/api/v1/free')) {
+      url.pathname = ''
+      url.search = ''
+      url.hash = ''
+      return url.toString().replace(/\/$/, '')
+    }
+
+    url.pathname = ''
+    url.search = ''
+    url.hash = ''
+    return url.toString().replace(/\/$/, '')
+  } catch {
+    return fallback
+  }
+}
+
 const getSubstackPublicationURL = (): string => {
-  const raw = process.env.SUBSTACK_SUBSCRIBE_URL?.trim()
-  if (!raw) return 'https://erinjerri.substack.com'
-
-  const trimmed = raw.replace(/\/$/, '')
-  const lower = trimmed.toLowerCase()
-
-  if (lower.includes('/api/v1/free')) {
-    return trimmed.replace(/\/api\/v1\/free(\?.*)?$/i, '')
-  }
-
-  if (lower.endsWith('.substack.com') || lower.includes('.substack.com/')) {
-    return lower.endsWith('/subscribe') ? trimmed.replace(/\/subscribe$/i, '') : trimmed
-  }
-
-  return 'https://erinjerri.substack.com'
+  return normalizeSubstackPublicationURL(process.env.SUBSTACK_SUBSCRIBE_URL)
 }
 
 function SocialIcon({
@@ -102,25 +125,39 @@ function SocialIcon({
   const isExternal = href.startsWith('http://') || href.startsWith('https://')
   const FallbackIcon = fallbackIcon
 
+  const content = resolvedIconUrl ? (
+    <SocialIconImage
+      src={resolvedIconUrl}
+      alt=""
+      className="h-5 w-5 object-contain"
+      fallback={<FallbackIcon className="h-5 w-5" />}
+    />
+  ) : (
+    <FallbackIcon className="h-5 w-5" />
+  )
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-foreground hover:text-foreground/80 transition-colors"
+        aria-label={label}
+      >
+        {content}
+      </a>
+    )
+  }
+
   return (
     <Link
       href={href}
       prefetch={false}
-      target={isExternal ? '_blank' : undefined}
-      rel={isExternal ? 'noopener noreferrer' : undefined}
       className="text-foreground hover:text-foreground/80 transition-colors"
       aria-label={label}
     >
-      {resolvedIconUrl ? (
-        <SocialIconImage
-          src={resolvedIconUrl}
-          alt=""
-          className="h-5 w-5 object-contain"
-          fallback={<FallbackIcon className="h-5 w-5" />}
-        />
-      ) : (
-        <FallbackIcon className="h-5 w-5" />
-      )}
+      {content}
     </Link>
   )
 }
