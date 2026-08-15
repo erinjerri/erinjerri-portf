@@ -1,76 +1,191 @@
-# Media Storage: public/media and R2
+# Media Storage: Local vs. Cloudflare R2
 
 This project supports two media storage modes:
 
-1. **Local (public/media)** – Files stored in `public/media/`, served by Next.js at `/media/*`
-2. **R2 (Cloudflare)** – Files stored in Cloudflare R2, served via public hostname or app proxy
+1. **Local (public/media)** – Files stored in `public/media/`, served by Next.js at `/media/*`  
+   Local dev or small sites only. Files are lost on serverless redeploy.
 
-## Configuration
+2. **Cloudflare R2 (S3-compatible)** – Files stored in R2, metadata in MongoDB  
+   Recommended for production. Survives redeploys and scales to any size.
 
-### Local storage (default)
+## Quick Start
 
-When R2 is **not** enabled, Payload stores uploads in `public/media/` (see `src/collections/Media.ts`). Files are served directly by Next.js at `/media/<filename>`.
+### Local Storage (Default)
 
-No extra env vars are required.
+When `USE_R2_STORAGE=false` or unset, Payload stores uploads in `public/media/` and serves them at `/media/<filename>`. No configuration needed.
 
-### R2 storage
+```bash
+pnpm dev
+# Upload an image in /admin → Media
+# File appears at: http://localhost:3000/media/your-image.jpg
+```
 
-Set `USE_R2_STORAGE=true` and configure R2 credentials:
+### Cloudflare R2 (Production Recommended)
+
+R2 is Cloudflare's S3-compatible object storage. Set it up before enabling in code.
+
+#### Step 1: Create R2 Bucket
+
+1. Go to **Cloudflare Dashboard → R2**
+2. Click **Create bucket**
+3. Name it (e.g., `portfolio-media`)
+4. Select **Location: Automatic**
+5. Click **Create bucket**
+
+#### Step 2: Get Account ID
+
+1. Go to **R2 → Overview**  
+2. Right side panel → **Account details**
+3. Copy your **Account ID** (32 characters)
+4. Note it for `.env` later
+
+#### Step 3: Create API Token
+
+1. Go to **R2 → Overview → Manage API tokens**
+2. Click **Create API token**
+3. Select **Object Read & Write** permission (not Admin, not Read-only)
+4. Select **Apply to specific buckets only**
+5. Check the bucket you created
+6. Click **Create API Token**
+7. Copy both keys (secret shows once only):
+   - Access Key ID
+   - Secret Access Key
+
+Keep these secure. **Never commit to Git.**
+
+#### Step 4: Add Custom Domain (Optional but Recommended)
+
+1. Go to **Cloudflare Dashboard → DNS → Records**
+2. **Delete any existing record** for your subdomain first (avoid 522 errors)
+3. Go to **R2 → Your Bucket → Settings → Public access**
+4. Click **Custom Domains → Connect Domain**
+5. Enter subdomain (e.g., `media.yourdomain.com`) — no `https://`, no trailing slash
+6. Wait for **Active** status (usually 1–2 minutes)
+
+#### Step 5: Enable in Code
 
 ```env
 USE_R2_STORAGE=true
-R2_BUCKET=your-bucket-name
-R2_ACCOUNT_ID=your-cloudflare-account-id
-R2_ACCESS_KEY_ID=...
-R2_SECRET_ACCESS_KEY=...
-R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com   # optional, auto-derived from R2_ACCOUNT_ID
-R2_FORCE_PATH_STYLE=true   # optional, default true
-R2_MEDIA_PREFIX=media      # optional, prefix for object keys (default: media)
+R2_ACCOUNT_ID=your-32-char-id
+R2_BUCKET=portfolio-media
+R2_ACCESS_KEY_ID=your-access-key
+R2_SECRET_ACCESS_KEY=your-secret-key
+R2_PUBLIC_HOSTNAME=media.yourdomain.com  # no scheme, no slash
 ```
 
-### Serving R2 files publicly
+**Important:** R2_ENDPOINT is auto-derived from R2_ACCOUNT_ID. Only set if using a regional bucket.
 
-R2’s S3 API URL (`r2.cloudflarestorage.com`) is **not** publicly readable in the browser. You must expose files via one of these options:
+## Verification: Is R2 Actually Working?
 
-#### Option A: Custom domain (recommended)
+After enabling R2, verify uploads actually go to the cloud (not disk):
 
-Use a Cloudflare R2 custom domain (e.g. `media.yourdomain.com`):
+### Test 1: Check Custom Domain (if configured)
 
-```env
-R2_PUBLIC_HOSTNAME=https://media.yourdomain.com
+```bash
+# If R2_PUBLIC_HOSTNAME is set
+curl -sI https://media.yourdomain.com/anything | head -1
+
+# Expected output:
+#   HTTP/2 404  →  ✅ PASS (bucket reached, key absent)
+#   HTTP/2 522  →  ❌ FAIL (domain not bound to bucket; check DNS/R2 settings)
 ```
 
-Configure the domain in Cloudflare Dashboard → R2 → your bucket → Settings → Custom Domains.
+### Test 2: Upload One Image
 
-#### Option B: App proxy
+1. Go to `http://localhost:3000/admin` → **Media** → **Upload**
+2. Select any image (JPG or PNG)
+3. Publish
+4. Note the filename
 
-If you don’t use a custom domain, the app proxies R2 files via `/api/media/file/[filename]`. The `rewriteBrokenR2Urls` hook rewrites broken R2 URLs to this proxy path.
+### Test 3: Check Local Disk (Definitive Test)
 
-**Important:** The proxy route requires `R2_BUCKET` to be set. If you use R2 storage, you must have R2 env vars configured.
+```bash
+# After upload, check if file exists locally
+ls public/media/
 
-#### Option C: Public bucket (not recommended)
-
-```env
-R2_PUBLIC_READS=true
+# Expected:
+#   (empty)        →  ✅ PASS (R2 is storing files)
+#   a file         →  ❌ FAIL (R2 is off; file on disk, will be lost on redeploy)
 ```
 
-This uses the direct R2 S3 URL, which is typically not publicly readable. Prefer Option A or B.
+**Empty local `public/media/` is proof R2 is live.**
 
-## Substack, Medium, and Paragraph sync images
+### Test 4: Verify Image Displays
 
-When syncing Substack, Medium, or Paragraph posts with image downloads enabled, the sync:
+- Go to homepage or any page with the uploaded image
+- Image should display correctly
+- If 404: check R2_PUBLIC_HOSTNAME, custom domain binding, or ensure app is restarted after env changes
 
-1. Downloads source images from the origin CDN
-2. Creates Media documents via `payload.create`
-3. Stores files in `public/media` (local) or R2 (when enabled)
-4. Rewrites post HTML so Lexical creates Upload nodes referencing those Media docs
+## Critical: The Import Map Trap
 
-If images appear as **links** instead of embedded media, the image download is failing (Substack CDN may block Node’s default fetch). Try:
+**When toggling `USE_R2_STORAGE` on or off, R2 registration changes require this:**
 
-- `DEBUG_SUBSTACK_SYNC=true pnpm sync:substack` to see which URLs fail
-- `DEBUG_MEDIUM_SYNC=true pnpm sync:medium` to see which Medium image URLs fail
-- `DEBUG_PARAGRAPH_SYNC=true pnpm sync:paragraph` to see which Paragraph image URLs fail
-- Running sync with the dev server and using the image proxy (if implemented)
+```bash
+# 1. Delete the import map
+rm src/app/\(payload\)/admin/importMap.js
+
+# 2. Regenerate it
+pnpm generate:importmap
+
+# 3. Restart dev server (Ctrl+C, then pnpm dev)
+```
+
+If you skip this and see:
+
+```
+getFromImportMap: PayloadComponent not found in importMap null
+"You may need to run the `payload generate:importmap` command"
+```
+
+It means the import map is stale. Delete and regenerate.
+
+(When R2 is ON, the `s3Storage` plugin registers an admin component `S3ClientUploadHandler`. When R2 is OFF, this component is never loaded. The import map must match the current config state.)
+
+## Architecture: Two Separate Systems
+
+**MongoDB stores content metadata.** R2 stores the actual bytes.
+
+When you upload an image:
+
+1. **Payload creates a Media record** in MongoDB with:
+   - Filename
+   - Alt text, caption
+   - MIME type, file size
+   - Dimensions (if image)
+   - URLs generated by the S3 adapter
+
+2. **S3 adapter uploads bytes** to:
+   - Local disk (`public/media/`) if `USE_R2_STORAGE=false`
+   - R2 bucket if `USE_R2_STORAGE=true`
+
+They are **not alternatives** — both operations happen. If either fails, the upload fails.
+
+This split means:
+- Redeploy doesn’t delete R2 files (they’re not on ephemeral filesystem)
+- Metadata stays searchable (in MongoDB)
+- Files scale infinitely (R2 size limit is huge)
+
+## Substack, Medium, and Paragraph Sync Images
+
+When syncing Substack, Medium, or Paragraph posts with image downloads enabled:
+
+1. Downloads source images from origin CDN
+2. Creates Media documents (MongoDB) + stores bytes (local or R2)
+3. Rewrites post HTML so Lexical creates Upload nodes referencing those Media docs
+
+If images appear as **links** instead of embedded media:
+
+```bash
+# Debug with verbose logging
+DEBUG_SUBSTACK_SYNC=true pnpm sync:substack
+DEBUG_MEDIUM_SYNC=true pnpm sync:medium
+DEBUG_PARAGRAPH_SYNC=true pnpm sync:paragraph
+
+# Common causes:
+# - CDN blocks Node.js user-agent (add Browser user-agent to fetch)
+# - Bucket not yet created / R2 credentials incomplete
+# - Sync runs before R2 is fully configured
+```
 
 ## File flow summary
 

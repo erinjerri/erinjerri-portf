@@ -562,8 +562,21 @@ pnpm exec tsc --noEmit
 ```
 
 #### Admin import errors
+
+Check if you recently toggled `USE_R2_STORAGE` on/off:
+
 ```bash
-# Clear Next.js cache and regenerate import map
+# Delete the stale import map and regenerate
+rm src/app/\(payload\)/admin/importMap.js
+pnpm generate:importmap
+
+# Restart dev server (Ctrl+C, then pnpm dev)
+```
+
+**Why?** When R2 is enabled, the `s3Storage` plugin registers an admin component. The import map must be regenerated when toggling R2 state, or you'll see `"PayloadComponent not found in importMap"` errors.
+
+If not R2-related:
+```bash
 pnpm generate:importmap
 pnpm exec tsc --noEmit
 pnpm build
