@@ -55,18 +55,19 @@ export default async function Page({ params: paramsPromise }: Args) {
   const decodedSlug = safeDecodeURIComponent(slug)
   const url = '/' + decodedSlug
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+  const allowStaticFallback = isBuild || process.env.NODE_ENV === 'development'
 
   let page: Awaited<ReturnType<typeof getPageBySlug>> | null = null
 
   try {
     page = await getPageBySlug(decodedSlug, draft)
   } catch (err) {
-    if (!isBuild) throw err
-    console.warn('[slug/page] Skipping prerender because DB is unavailable:', err)
+    if (!allowStaticFallback) throw err
+    console.warn('[slug/page] Using static fallback because DB is unavailable:', err)
     page = null
   }
 
-  const renderedPage = page ?? (isBuild && decodedSlug === 'home' ? homeStatic : null)
+  const renderedPage = page ?? (allowStaticFallback && decodedSlug === 'home' ? homeStatic : null)
 
   if (!renderedPage) {
     if (isBuild) {
@@ -150,6 +151,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug = 'home' } = await paramsPromise
   const decodedSlug = safeDecodeURIComponent(slug)
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+  const allowStaticFallback = isBuild || process.env.NODE_ENV === 'development'
 
   try {
     const page = await getPageBySlug(decodedSlug, draft)
@@ -159,8 +161,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
       canonicalPath: path,
     })
   } catch (err) {
-    if (!isBuild) throw err
-    console.warn('[slug/page] Skipping metadata because DB is unavailable:', err)
+    if (!allowStaticFallback) throw err
+    console.warn('[slug/page] Using fallback metadata because DB is unavailable:', err)
     const path = decodedSlug === 'home' ? '/' : `/${decodedSlug}`
     return generateMeta({
       doc: decodedSlug === 'home' ? homeStatic : null,

@@ -55,6 +55,16 @@ const hasLocalMediaFile = (mediaUrl: string): boolean => {
 const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
 
+const normalizeSocialHref = (url: string): string => {
+  const trimmed = url.trim()
+  if (!trimmed) return trimmed
+  if (trimmed.startsWith('mailto:')) return trimmed
+  if (trimmed.includes('@') && !trimmed.includes('://')) return `mailto:${trimmed}`
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) return trimmed
+  if (trimmed.startsWith('//')) return `https:${trimmed}`
+  return `https://${trimmed}`
+}
+
 const normalizeSubstackPublicationURL = (rawValue?: string | null): string => {
   const fallback = 'https://erinjerri.substack.com'
   const raw = rawValue?.trim()
@@ -120,8 +130,7 @@ function SocialIcon({
   // Use icon URL when: local /media/ file exists, or it's an external URL (R2, etc.)
   const resolvedIconUrl =
     iconUrl && (hasLocalMediaFile(iconUrl) || iconUrl.startsWith('http')) ? iconUrl : null
-  const href =
-    url.includes('@') && !url.includes('://') && !url.startsWith('mailto:') ? `mailto:${url}` : url
+  const href = normalizeSocialHref(url)
   const isExternal = href.startsWith('http://') || href.startsWith('https://')
   const FallbackIcon = fallbackIcon
 
@@ -164,10 +173,9 @@ function SocialIcon({
 
 interface FooterProps {
   data?: Footer | null
-  variant?: 'main' | 'poetry'
 }
 
-export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
+export async function Footer({ data }: FooterProps = {}) {
   const substackPublicationURL = getSubstackPublicationURL()
   const substackEmbedSrc = `${substackPublicationURL.replace(/\/$/, '')}/embed`
   let footerData: Footer | null = data ?? null
@@ -187,7 +195,6 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
   const linkGroups = footerData?.linkGroups || []
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
-  const isPoetryFooter = variant === 'poetry'
 
   return (
     <footer className="mt-auto border-t border-border bg-transparent text-foreground [contain:paint]">
@@ -200,13 +207,13 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
               <Logo className="w-[8.75rem]" />
             </Link>
 
-            {!isPoetryFooter && subscribeSection?.showSubscribe !== false && (
+            {subscribeSection?.showSubscribe !== false && (
               <div className="min-h-[7rem] w-full max-w-full">
                 <SubscribeForm action={substackEmbedSrc} />
               </div>
             )}
 
-            {!isPoetryFooter && subscribeSection?.slogan && (
+            {subscribeSection?.slogan && (
               <p className="text-sm text-muted-foreground">{subscribeSection.slogan}</p>
             )}
 
@@ -227,24 +234,7 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
           </div>
 
           {/* Right column: Link groups */}
-          {isPoetryFooter ? (
-            <nav className="flex flex-col gap-3 text-sm">
-              <Link
-                className="text-muted-foreground transition-colors hover:text-foreground"
-                href="https://erinjerri.com"
-                prefetch={false}
-              >
-                Back to ErinJerri.com
-              </Link>
-              <Link
-                className="text-muted-foreground transition-colors hover:text-foreground"
-                href="/poetry"
-                prefetch={false}
-              >
-                All poetry
-              </Link>
-            </nav>
-          ) : linkGroups.length > 0 ? (
+          {linkGroups.length > 0 ? (
             <nav className="flex flex-wrap gap-x-12 gap-y-8">
               {linkGroups.map((group, groupIndex) => (
                 <div
@@ -284,23 +274,6 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
         {/* Bottom: Copyright */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row sm:justify-between gap-4 text-sm text-muted-foreground">
           {copyright && <span>{copyright}</span>}
-          {isPoetryFooter ? (
-            <Link
-              className="transition-colors hover:text-foreground"
-              href="https://erinjerri.com"
-              prefetch={false}
-            >
-              Back to ErinJerri.com
-            </Link>
-          ) : (
-            <Link
-              className="transition-colors hover:text-foreground"
-              href="https://poetry.erinjerri.com"
-              prefetch={false}
-            >
-              Poetry
-            </Link>
-          )}
         </div>
       </div>
     </footer>

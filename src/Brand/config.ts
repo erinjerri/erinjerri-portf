@@ -16,14 +16,13 @@ export const Brand: GlobalConfig = {
           type: 'text',
           required: true,
           defaultValue:
-            "var(--font-league-spartan), var(--font-jost), 'Satoshi', 'Glacial Indifference', sans-serif",
+            "var(--font-league-spartan), var(--font-satoshi), system-ui, sans-serif",
         },
         {
           name: 'copy',
           type: 'text',
           required: true,
-          defaultValue:
-            "var(--font-jost), 'Satoshi', 'Glacial Indifference', var(--font-league-spartan), sans-serif",
+          defaultValue: "var(--font-satoshi), system-ui, sans-serif",
         },
       ],
     },
@@ -150,4 +149,3 @@ export const Brand: GlobalConfig = {
     },
   ],
 }
-

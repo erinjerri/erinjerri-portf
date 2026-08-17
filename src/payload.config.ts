@@ -78,6 +78,16 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      afterNavLinks: ['/components/dashboard/AnalyticsNavLink', '/components/AdminLogoutNavLink'],
+      views: {
+        analyticsDashboard: {
+          Component: '/components/dashboard/AnalyticsView',
+          path: '/analytics-dashboard',
+          exact: true,
+        },
+      },
+    },
     user: Users.slug,
     livePreview: {
       breakpoints: [
