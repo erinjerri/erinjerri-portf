@@ -9,6 +9,27 @@ export const resetPayloadClient = () => {
   globalThis.__payloadClientPromise = undefined
 }
 
+const PAYLOAD_STARTUP_TIMEOUT_MS =
+  process.env.NODE_ENV === 'development' ? 10000 : 30000
+
+const withStartupTimeout = async <T>(promise: Promise<T>): Promise<T> => {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(
+          () => reject(new Error(`Payload startup timed out after ${PAYLOAD_STARTUP_TIMEOUT_MS}ms`)),
+          PAYLOAD_STARTUP_TIMEOUT_MS,
+        )
+      }),
+    ])
+  } finally {
+    if (timeout) clearTimeout(timeout)
+  }
+}
+
 export const getPayloadClient = async (options?: { forceRefresh?: boolean }) => {
   if (options?.forceRefresh) {
     resetPayloadClient()
@@ -24,7 +45,7 @@ export const getPayloadClient = async (options?: { forceRefresh?: boolean }) => 
   }
 
   try {
-    return await globalThis.__payloadClientPromise
+    return await withStartupTimeout(globalThis.__payloadClientPromise)
   } catch (error) {
     resetPayloadClient()
     throw error

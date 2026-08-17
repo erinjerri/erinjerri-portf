@@ -22,7 +22,7 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Footer as FooterType, Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
-import { fontJost, frontendFontVariables } from './fonts'
+import { frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
 import { getRequestHostname, isPoetryHostname } from '@/utilities/poetry'
 
@@ -82,13 +82,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <link rel="preconnect" href="https://www.googletagmanager.com" />
         ) : null}
       </head>
-      <body className={fontJost.className}>
+      <body>
         <Providers>
           <AdminBar />
 
-          {!isPoetrySite ? <Header data={headerFailed ? undefined : headerData} /> : null}
+          {!isPoetrySite ? <Header data={headerFailed ? null : headerData} /> : null}
           {children}
-          <Footer data={footerFailed ? undefined : footerData} variant={isPoetrySite ? 'poetry' : 'main'} />
+          <Footer data={footerFailed ? null : footerData} />
         </Providers>
         {enableThirdPartyScripts ? (
           <Analytics

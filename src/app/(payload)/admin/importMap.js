@@ -29,6 +29,9 @@ import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
+import { default as default_88c57d26ace6364590b44a2b22a682cc } from '../../../components/dashboard/AnalyticsNavLink'
+import { default as default_f88ccbe473db06b5dff1d35b29f7238f } from '../../../components/AdminLogoutNavLink'
+import { default as default_fdc531c161c680e8396d19136233b744 } from '../../../components/dashboard/AnalyticsView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -63,5 +66,8 @@ export const importMap = {
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
+  "/components/dashboard/AnalyticsNavLink#default": default_88c57d26ace6364590b44a2b22a682cc,
+  "/components/AdminLogoutNavLink#default": default_f88ccbe473db06b5dff1d35b29f7238f,
+  "/components/dashboard/AnalyticsView#default": default_fdc531c161c680e8396d19136233b744,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
