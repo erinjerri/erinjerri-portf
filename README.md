@@ -5,6 +5,14 @@ Payload CMS + Next.js site intended to be used as a reusable “starter/template
 - Seed content (pages/posts/media/globals) included in-repo
 - Deployable to Netlify
 
+## References
+
+Payload setup/tutorial links:
+
+- Cloudflare + Payload video: https://www.youtube.com/watch?v=8jPNsLX7XGg
+- Payload DB + file storage video: https://www.youtube.com/watch?v=-0CCUkoBDSY&t=692s
+- Payload + Supabase video: https://www.youtube.com/watch?v=L5w2QYB9-UU&t=161s
+
 ## Use as a template (GitHub + Netlify)
 
 1. In GitHub, click **Use this template** (or fork).
