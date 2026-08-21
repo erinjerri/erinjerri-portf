@@ -25,6 +25,12 @@ const heroFallbacks = {
   background: '/media/dimensions-background-curves.webp',
 } as const
 
+const homeHeroImageFallbacks = [
+  '/media/erinjerri-headshot-1.jpeg',
+  '/media/Erin-Book-Headshot.webp',
+  '/media/Erin-AVP-1000-80op.png',
+] as const
+
 /** Full-bleed / slot heroes: cover + bias upper area so heads stay in frame (spec: top center or 40% 20%). */
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
@@ -87,7 +93,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     ? media
     : isPopulated(primaryHeroImage)
       ? primaryHeroImage
-      : null
+      : homeHeroImageFallbacks[0]
   const hasPortrait = Boolean(portraitResource)
   const selectedHeroImages =
     imageCount === '1'
@@ -97,7 +103,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         : [heroImage1, heroImage2, heroImage3]
   const hasAnyGridFields = selectedHeroImages.some(Boolean)
   const hasGridMedia = selectedHeroImages.some(isPopulated)
-  const galleryImages = [heroImage1, heroImage2, heroImage3].filter(isPopulated)
+  const galleryImages = [heroImage1, heroImage2, heroImage3].map(
+    (resource, index) => (isPopulated(resource) ? resource : homeHeroImageFallbacks[index]),
+  )
   const isPrismatic = visualVariant === 'prismatic'
   /** Home keeps the Ali-style intro split even when the CMS has gallery assets. */
   const forcePortraitSplit = isPrismatic && hasPortrait
@@ -116,6 +124,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const productScreenshotResource: MediaDoc | string = isPopulated(productMockup)
     ? productMockup
     : productScreenshotFallback
+  const portraitAlt =
+    (isPopulated(portraitResource) && typeof portraitResource.alt === 'string' && portraitResource.alt.trim()) ||
+    'Erin Jerri Apple Vision Pro spatial computing work'
 
   const renderHeroCopy = (className?: string, ctaLinks = links) => {
     const hasLinks = Array.isArray(ctaLinks) && ctaLinks.length > 0
@@ -171,17 +182,14 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           )}
         >
           <Media
-            alt={
-              (typeof portraitResource!.alt === 'string' && portraitResource!.alt.trim()) ||
-              'Erin Jerri Apple Vision Pro spatial computing work'
-            }
+            alt={portraitAlt}
             fill
             className="absolute inset-0"
             imgClassName="object-contain object-center"
             pictureClassName="absolute inset-0 block h-full w-full"
             priority
             quality={60}
-            resource={portraitResource!}
+            {...(isPopulated(portraitResource) ? { resource: portraitResource } : { src: portraitResource })}
             size="(max-width: 768px) min(100vw, 400px), (max-width: 1024px) 38vw, 420px"
           />
         </div>
@@ -190,10 +198,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 
     return (
       <Media
-        alt={
-          (typeof portraitResource!.alt === 'string' && portraitResource!.alt.trim()) ||
-          'Erin Jerri Apple Vision Pro spatial computing work'
-        }
+        alt={portraitAlt}
         imgClassName={cn(
           'h-auto w-full object-cover object-center object-[40%_20%]',
           'rounded-[1.5rem] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.58)]',
@@ -201,7 +206,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         pictureClassName="relative block w-full overflow-hidden"
         priority
         quality={60}
-        resource={portraitResource!}
+        {...(isPopulated(portraitResource) ? { resource: portraitResource } : { src: portraitResource })}
         size="(max-width: 768px) min(100vw, 400px), (max-width: 1024px) 38vw, 440px"
       />
     )
@@ -213,12 +218,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     size?: string,
     opts?: HeroSlotOpts,
   ) => {
-    if (isPopulated(resource)) {
+    if (isPopulated(resource) || typeof resource === 'string') {
       const { unoptimized, priority: slotPriority, quality: slotQuality } = opts ?? {}
       return (
         <Media
           alt={
-            (typeof resource.alt === 'string' && resource.alt.trim()) ||
+            (isPopulated(resource) && typeof resource.alt === 'string' && resource.alt.trim()) ||
             alt ||
             'Erin Jerri — AI, spatial computing, and engineering work'
           }
@@ -229,7 +234,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           priority={slotPriority}
           quality={slotQuality}
           {...(unoptimized ? { unoptimized: true } : {})}
-          resource={resource}
+          {...(isPopulated(resource) ? { resource } : { src: resource })}
           size={size}
         />
       )
