@@ -56,6 +56,31 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   />
 )
 
+const ProductScreenshot: React.FC<{ resource: MediaDoc }> = ({ resource }) => (
+  <div className="relative mx-auto w-full max-w-[38rem] overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#111827] p-2 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.8)] sm:p-2.5">
+    <div className="flex h-6 items-center gap-1.5 px-2 sm:h-7">
+      <span className="h-2 w-2 rounded-full bg-[#ff5f57] sm:h-2.5 sm:w-2.5" />
+      <span className="h-2 w-2 rounded-full bg-[#febc2e] sm:h-2.5 sm:w-2.5" />
+      <span className="h-2 w-2 rounded-full bg-[#28c840] sm:h-2.5 sm:w-2.5" />
+      <span className="ml-2 text-[0.6rem] font-medium tracking-[0.08em] text-white/40 sm:text-[0.68rem]">
+        TimeBite
+      </span>
+    </div>
+    <div className="relative aspect-[16/10] overflow-hidden rounded-[0.85rem] border border-white/10 bg-[#090d18]">
+      <Media
+        alt={(typeof resource.alt === 'string' && resource.alt.trim()) || 'TimeBite macOS app screenshot'}
+        fill
+        imagePlaceholder="empty"
+        imgClassName="object-contain object-center"
+        pictureClassName="absolute inset-0 block h-full w-full"
+        quality={80}
+        resource={resource}
+        size="(max-width: 768px) min(100vw, 38rem), (max-width: 1280px) 38vw, 608px"
+      />
+    </div>
+  </div>
+)
+
 type HeroSlotOpts = {
   unoptimized?: boolean
   /** First visible hero tile — LCP candidate (preload + eager decode). */
@@ -121,33 +146,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             </ul>
           )}
         </div>
-  </div>
-)
+      </div>
+    )
 
-const ProductScreenshot: React.FC<{ resource: MediaDoc }> = ({ resource }) => (
-  <div className="relative mx-auto w-full max-w-[38rem] overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#111827] p-2 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.8)] sm:p-2.5">
-    <div className="flex h-6 items-center gap-1.5 px-2 sm:h-7">
-      <span className="h-2 w-2 rounded-full bg-[#ff5f57] sm:h-2.5 sm:w-2.5" />
-      <span className="h-2 w-2 rounded-full bg-[#febc2e] sm:h-2.5 sm:w-2.5" />
-      <span className="h-2 w-2 rounded-full bg-[#28c840] sm:h-2.5 sm:w-2.5" />
-      <span className="ml-2 text-[0.6rem] font-medium tracking-[0.08em] text-white/40 sm:text-[0.68rem]">
-        TimeBite
-      </span>
-    </div>
-    <div className="relative aspect-[16/10] overflow-hidden rounded-[0.85rem] border border-white/10 bg-[#090d18]">
-      <Media
-        alt={(typeof resource.alt === 'string' && resource.alt.trim()) || 'TimeBite macOS app screenshot'}
-        fill
-        imagePlaceholder="empty"
-        imgClassName="object-contain object-center"
-        pictureClassName="absolute inset-0 block h-full w-full"
-        quality={80}
-        resource={resource}
-        size="(max-width: 768px) min(100vw, 38rem), (max-width: 1280px) 38vw, 608px"
-      />
-    </div>
-  </div>
-)
   }
 
   const renderPortrait = () => {
