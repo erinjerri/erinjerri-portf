@@ -11,6 +11,16 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
+      name: 'navBackgroundImage',
+      type: 'upload',
+      admin: {
+        description: 'Optional image strip behind the top navigation. Falls back to the built-in dimensions artwork when empty.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      label: 'Navigation Background Image',
+      relationTo: 'media',
+    },
+    {
       name: 'navItems',
       type: 'array',
       label: 'Header Links',
