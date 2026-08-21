@@ -333,48 +333,50 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           </div>
         </div>
       ) : isPrismatic ? (
-        <div className="relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-8 overflow-hidden px-6 pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-14 lg:pt-[calc(var(--nav-height)+3rem)] xl:gap-12">
-          <div className="relative z-10 min-w-0 shrink-0 lg:max-w-[min(100%,26rem)] xl:max-w-[28rem]">
-            {renderHeroCopy()}
-          </div>
-          <div className="relative z-10 min-w-0 flex-1">
-            <div
-              className={cn(
-                'grid w-full grid-cols-2 gap-2.5 sm:gap-3 lg:max-w-[min(100%,34rem)] lg:justify-self-end xl:max-w-[38rem]',
-                '[&_.relative]:overflow-hidden',
-              )}
-            >
-              <div className="relative col-span-2 aspect-[16/9] min-h-[8.5rem] sm:min-h-[10rem]">
-                {renderHeroSlot(
-                  heroImage1,
-                  'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                  '(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 760px',
-                  { priority: true, quality: 90 },
+        <div className="relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 pb-16 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 md:pb-20 md:pt-[calc(var(--nav-height)+3rem)]">
+          <div className="flex w-full flex-col items-stretch justify-center gap-8 lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-center lg:gap-10 xl:grid-cols-[minmax(0,28rem)_minmax(0,38rem)] xl:gap-12 xl:self-center">
+            <div className="relative z-10 min-w-0">
+              {renderHeroCopy()}
+            </div>
+            <div className="relative z-10 min-w-0">
+              <div
+                className={cn(
+                  'mx-auto grid w-full max-w-[38rem] grid-cols-2 gap-2.5 sm:gap-3 lg:mx-0 lg:ml-auto',
+                  '[&_.relative]:overflow-hidden',
                 )}
-              </div>
-              <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
-                {renderHeroSlot(
-                  heroImage2,
-                  'Erin Jerri — book and profile',
-                  '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
-                  { quality: 90 },
-                )}
-              </div>
-              <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
-                {renderHeroSlot(
-                  heroImage3,
-                  'Erin Jerri — engineering, AI systems, and spatial computing',
-                  '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
-                  { quality: 90 },
-                )}
+              >
+                <div className="relative col-span-2 aspect-[16/9] min-h-[8.5rem] sm:min-h-[10rem]">
+                  {renderHeroSlot(
+                    heroImage1,
+                    'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
+                    '(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 760px',
+                    { priority: true, quality: 90 },
+                  )}
+                </div>
+                <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
+                  {renderHeroSlot(
+                    heroImage2,
+                    'Erin Jerri — book and profile',
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                    { quality: 90 },
+                  )}
+                </div>
+                <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
+                  {renderHeroSlot(
+                    heroImage3,
+                    'Erin Jerri — engineering, AI systems, and spatial computing',
+                    '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                    { quality: 90 },
+                  )}
+                </div>
               </div>
             </div>
-            {isPopulated(productMockup) && (
-              <div className="mt-4 sm:mt-5 lg:max-w-[min(100%,34rem)] xl:max-w-[38rem]">
-                <ProductScreenshot resource={productMockup} />
-              </div>
-            )}
           </div>
+          {isPopulated(productMockup) && (
+            <section className="mt-16 flex w-full justify-center px-0 sm:mt-20 md:mt-24" aria-label="TimeBite product preview">
+              <ProductScreenshot resource={productMockup} />
+            </section>
+          )}
         </div>
       ) : (
         <>
