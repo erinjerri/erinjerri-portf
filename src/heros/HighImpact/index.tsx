@@ -57,7 +57,7 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
 )
 
 const ProductScreenshot: React.FC<{ resource: MediaDoc }> = ({ resource }) => (
-  <div className="relative mx-auto w-full max-w-[38rem] overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#111827] p-2 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.8)] sm:p-2.5">
+  <div className="relative mx-auto w-full max-w-[52rem] overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#111827] p-2 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.8)] sm:p-2.5">
     <div className="flex h-6 items-center gap-1.5 px-2 sm:h-7">
       <span className="h-2 w-2 rounded-full bg-[#ff5f57] sm:h-2.5 sm:w-2.5" />
       <span className="h-2 w-2 rounded-full bg-[#febc2e] sm:h-2.5 sm:w-2.5" />
@@ -75,7 +75,7 @@ const ProductScreenshot: React.FC<{ resource: MediaDoc }> = ({ resource }) => (
         pictureClassName="absolute inset-0 block h-full w-full"
         quality={80}
         resource={resource}
-        size="(max-width: 768px) min(100vw, 38rem), (max-width: 1280px) 38vw, 608px"
+        size="(max-width: 768px) min(100vw, 52rem), (max-width: 1280px) 52vw, 832px"
       />
     </div>
   </div>
@@ -111,8 +111,15 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const backgroundImage = hasBackground ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
 
-  const renderHeroCopy = (className?: string) => {
-    const hasLinks = Array.isArray(links) && links.length > 0
+  const isBetaLink = ({ link }: { link: { label?: string | null } }) => {
+    const label = typeof link.label === 'string' ? link.label.toLowerCase() : ''
+    return label.includes('timebite') || label.includes('beta')
+  }
+  const betaLinks = Array.isArray(links) ? links.filter(isBetaLink) : []
+  const workLinks = Array.isArray(links) ? links.filter((entry) => !isBetaLink(entry)) : []
+
+  const renderHeroCopy = (className?: string, ctaLinks = links) => {
+    const hasLinks = Array.isArray(ctaLinks) && ctaLinks.length > 0
     if (!richText && !hasLinks) return null
 
     return (
@@ -138,7 +145,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                 isPrismatic && 'hp-hero-links',
               )}
             >
-              {links.map(({ link }, i) => (
+              {ctaLinks.map(({ link }, i) => (
                 <li className="shrink-0" key={i}>
                   <CMSLink {...link} />
                 </li>
@@ -336,24 +343,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         <div className="relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 pb-16 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 md:pb-20 md:pt-[calc(var(--nav-height)+3rem)]">
           <div className="flex w-full flex-col items-stretch justify-center gap-8 lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-center lg:gap-10 xl:grid-cols-[minmax(0,28rem)_minmax(0,38rem)] xl:gap-12 xl:self-center">
             <div className="relative z-10 min-w-0">
-              {renderHeroCopy()}
+              {renderHeroCopy(undefined, workLinks)}
             </div>
             <div className="relative z-10 min-w-0">
               <div
                 className={cn(
-                  'mx-auto grid w-full max-w-[38rem] grid-cols-2 gap-2.5 sm:gap-3 lg:mx-0 lg:ml-auto',
+                  'mx-auto grid w-full max-w-[30rem] grid-cols-2 gap-2.5 sm:gap-3 lg:mx-0 lg:ml-auto',
                   '[&_.relative]:overflow-hidden',
                 )}
               >
-                <div className="relative col-span-2 aspect-[16/9] min-h-[8.5rem] sm:min-h-[10rem]">
-                  {renderHeroSlot(
-                    heroImage1,
-                    'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
-                    '(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 760px',
-                    { priority: true, quality: 90 },
-                  )}
-                </div>
-                <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
+                <div className="relative aspect-[3/4] min-h-[9rem] sm:min-h-[10.5rem]">
                   {renderHeroSlot(
                     heroImage2,
                     'Erin Jerri — book and profile',
@@ -361,7 +360,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                     { quality: 90 },
                   )}
                 </div>
-                <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
+                <div className="relative aspect-[3/4] min-h-[9rem] sm:min-h-[10.5rem]">
                   {renderHeroSlot(
                     heroImage3,
                     'Erin Jerri — engineering, AI systems, and spatial computing',
@@ -372,9 +371,18 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               </div>
             </div>
           </div>
-          {isPopulated(productMockup) && (
-            <section className="mt-16 flex w-full justify-center px-0 sm:mt-20 md:mt-24" aria-label="TimeBite product preview">
-              <ProductScreenshot resource={productMockup} />
+          {(isPopulated(productMockup) || betaLinks.length > 0) && (
+            <section className="mt-16 flex w-full flex-col items-center justify-center px-0 sm:mt-20 md:mt-24" aria-label="TimeBite product preview">
+              {isPopulated(productMockup) && <ProductScreenshot resource={productMockup} />}
+              {betaLinks.length > 0 && (
+                <ul className="hp-hero-cta-row hp-hero-links m-0 mt-6 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-center gap-3.5 p-0">
+                  {betaLinks.map(({ link }, i) => (
+                    <li className="shrink-0" key={i}>
+                      <CMSLink {...link} />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           )}
         </div>
