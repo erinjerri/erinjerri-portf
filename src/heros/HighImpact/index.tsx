@@ -71,6 +71,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   heroImage1,
   heroImage2,
   heroImage3,
+  productMockup,
   showHeroAnimation = false,
   visualVariant,
 }) => {
@@ -120,8 +121,33 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             </ul>
           )}
         </div>
-      </div>
-    )
+  </div>
+)
+
+const ProductScreenshot: React.FC<{ resource: MediaDoc }> = ({ resource }) => (
+  <div className="relative mx-auto w-full max-w-[38rem] overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#111827] p-2 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.8)] sm:p-2.5">
+    <div className="flex h-6 items-center gap-1.5 px-2 sm:h-7">
+      <span className="h-2 w-2 rounded-full bg-[#ff5f57] sm:h-2.5 sm:w-2.5" />
+      <span className="h-2 w-2 rounded-full bg-[#febc2e] sm:h-2.5 sm:w-2.5" />
+      <span className="h-2 w-2 rounded-full bg-[#28c840] sm:h-2.5 sm:w-2.5" />
+      <span className="ml-2 text-[0.6rem] font-medium tracking-[0.08em] text-white/40 sm:text-[0.68rem]">
+        TimeBite
+      </span>
+    </div>
+    <div className="relative aspect-[16/10] overflow-hidden rounded-[0.85rem] border border-white/10 bg-[#090d18]">
+      <Media
+        alt={(typeof resource.alt === 'string' && resource.alt.trim()) || 'TimeBite macOS app screenshot'}
+        fill
+        imagePlaceholder="empty"
+        imgClassName="object-contain object-center"
+        pictureClassName="absolute inset-0 block h-full w-full"
+        quality={80}
+        resource={resource}
+        size="(max-width: 768px) min(100vw, 38rem), (max-width: 1280px) 38vw, 608px"
+      />
+    </div>
+  </div>
+)
   }
 
   const renderPortrait = () => {
@@ -313,11 +339,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           <div className="relative z-10 min-w-0 flex-1">
             <div
               className={cn(
-                'grid w-full grid-cols-2 gap-3 sm:gap-4 lg:max-w-[min(100%,40rem)] lg:justify-self-end xl:max-w-[44rem]',
+                'grid w-full grid-cols-2 gap-2.5 sm:gap-3 lg:max-w-[min(100%,34rem)] lg:justify-self-end xl:max-w-[38rem]',
                 '[&_.relative]:overflow-hidden',
               )}
             >
-              <div className="relative col-span-2 aspect-[16/9] min-h-[10.5rem] sm:min-h-[12.5rem]">
+              <div className="relative col-span-2 aspect-[16/9] min-h-[8.5rem] sm:min-h-[10rem]">
                 {renderHeroSlot(
                   heroImage1,
                   'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
@@ -325,7 +351,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   { priority: true, quality: 90 },
                 )}
               </div>
-              <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
+              <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
                 {renderHeroSlot(
                   heroImage2,
                   'Erin Jerri — book and profile',
@@ -333,7 +359,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                   { quality: 90 },
                 )}
               </div>
-              <div className="relative aspect-[3/4] min-h-[11rem] sm:min-h-[13rem]">
+              <div className="relative aspect-[3/4] min-h-[9.5rem] sm:min-h-[11rem]">
                 {renderHeroSlot(
                   heroImage3,
                   'Erin Jerri — engineering, AI systems, and spatial computing',
@@ -342,6 +368,11 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                 )}
               </div>
             </div>
+            {isPopulated(productMockup) && (
+              <div className="mt-4 sm:mt-5 lg:max-w-[min(100%,34rem)] xl:max-w-[38rem]">
+                <ProductScreenshot resource={productMockup} />
+              </div>
+            )}
           </div>
         </div>
       ) : (

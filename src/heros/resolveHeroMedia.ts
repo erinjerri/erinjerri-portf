@@ -3,7 +3,13 @@ import type { Media, Page } from '@/payload-types'
 import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 
 type Hero = Page['hero']
-type HeroMediaField = Hero['backgroundMedia'] | Hero['heroImage1'] | Hero['heroImage2'] | Hero['heroImage3'] | Hero['media']
+type HeroMediaField =
+  | Hero['backgroundMedia']
+  | Hero['heroImage1']
+  | Hero['heroImage2']
+  | Hero['heroImage3']
+  | Hero['productMockup']
+  | Hero['media']
 type ResolvedHeroMediaField = string | Media | null | undefined
 type ResolveHeroMediaOptions = {
   includeGridMedia?: boolean
@@ -37,11 +43,12 @@ export const resolveHeroMedia = async (
   if (!hero) return hero
   const { includeGridMedia = true } = options
 
-  const [backgroundMedia, heroImage1, heroImage2, heroImage3, media] = await Promise.all([
+  const [backgroundMedia, heroImage1, heroImage2, heroImage3, productMockup, media] = await Promise.all([
     resolveMedia(hero.backgroundMedia),
     includeGridMedia ? resolveMedia(hero.heroImage1) : Promise.resolve(hero.heroImage1),
     includeGridMedia ? resolveMedia(hero.heroImage2) : Promise.resolve(hero.heroImage2),
     includeGridMedia ? resolveMedia(hero.heroImage3) : Promise.resolve(hero.heroImage3),
+    resolveMedia(hero.productMockup),
     resolveMedia(hero.media),
   ])
 
@@ -51,6 +58,7 @@ export const resolveHeroMedia = async (
     heroImage1,
     heroImage2,
     heroImage3,
+    productMockup,
     media,
   }
 }
