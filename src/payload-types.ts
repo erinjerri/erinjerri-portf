@@ -231,6 +231,10 @@ export interface Page {
      */
     backgroundMedia?: (string | null) | Media;
     /**
+     * Choose how many hero images to show on the homepage: one headshot, two portraits, or the full three-image collage.
+     */
+    heroImageCount?: ('1' | '2' | '3') | null;
+    /**
      * Home: wide top slot in the image collage (row above the two portrait slots). Use with Hero 2 & 3 for a balanced bento layout.
      */
     heroImage1?: (string | null) | Media;
@@ -2184,6 +2188,7 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
             };
         backgroundMedia?: T;
+        heroImageCount?: T;
         heroImage1?: T;
         heroImage2?: T;
         heroImage3?: T;

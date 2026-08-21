@@ -107,6 +107,21 @@ export const hero: Field = {
       },
     },
     {
+      name: 'heroImageCount',
+      type: 'select',
+      defaultValue: '1',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description: 'Choose how many hero images to show on the homepage: one headshot, two portraits, or the full three-image collage.',
+      },
+      label: 'Hero Image Count',
+      options: [
+        { label: '1 image (headshot)', value: '1' },
+        { label: '2 images', value: '2' },
+        { label: '3 images', value: '3' },
+      ],
+    },
+    {
       name: 'heroImage1',
       type: 'upload',
       admin: {

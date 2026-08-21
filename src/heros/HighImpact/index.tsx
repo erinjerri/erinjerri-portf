@@ -56,30 +56,39 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   />
 )
 
-const ProductScreenshot: React.FC<{ resource: MediaDoc }> = ({ resource }) => (
-  <div className="relative mx-auto w-full max-w-[52rem] overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#111827] p-2 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.8)] sm:p-2.5">
-    <div className="flex h-6 items-center gap-1.5 px-2 sm:h-7">
-      <span className="h-2 w-2 rounded-full bg-[#ff5f57] sm:h-2.5 sm:w-2.5" />
-      <span className="h-2 w-2 rounded-full bg-[#febc2e] sm:h-2.5 sm:w-2.5" />
-      <span className="h-2 w-2 rounded-full bg-[#28c840] sm:h-2.5 sm:w-2.5" />
-      <span className="ml-2 text-[0.6rem] font-medium tracking-[0.08em] text-white/40 sm:text-[0.68rem]">
-        TimeBite
-      </span>
+const productScreenshotFallback = '/api/media/file/timebite-macos-sample-screen.png'
+
+const ProductScreenshot: React.FC<{ resource: MediaDoc | string }> = ({ resource }) => {
+  const isMediaDocument = typeof resource === 'object'
+
+  return (
+    <div className="relative mx-auto w-full max-w-[52rem] overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#111827] p-2 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.8)] sm:p-2.5">
+      <div className="flex h-6 items-center gap-1.5 px-2 sm:h-7">
+        <span className="h-2 w-2 rounded-full bg-[#ff5f57] sm:h-2.5 sm:w-2.5" />
+        <span className="h-2 w-2 rounded-full bg-[#febc2e] sm:h-2.5 sm:w-2.5" />
+        <span className="h-2 w-2 rounded-full bg-[#28c840] sm:h-2.5 sm:w-2.5" />
+        <span className="ml-2 text-[0.6rem] font-medium tracking-[0.08em] text-white/40 sm:text-[0.68rem]">
+          TimeBite
+        </span>
+      </div>
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[0.85rem] border border-white/10 bg-[#090d18]">
+        <Media
+          alt={
+            (isMediaDocument && typeof resource.alt === 'string' && resource.alt.trim()) ||
+            'TimeBite macOS app screenshot'
+          }
+          fill
+          imagePlaceholder="empty"
+          imgClassName="object-contain object-center"
+          pictureClassName="absolute inset-0 block h-full w-full"
+          quality={80}
+          {...(isMediaDocument ? { resource } : { src: resource })}
+          size="(max-width: 768px) min(100vw, 52rem), (max-width: 1280px) 52vw, 832px"
+        />
+      </div>
     </div>
-    <div className="relative aspect-[16/10] overflow-hidden rounded-[0.85rem] border border-white/10 bg-[#090d18]">
-      <Media
-        alt={(typeof resource.alt === 'string' && resource.alt.trim()) || 'TimeBite macOS app screenshot'}
-        fill
-        imagePlaceholder="empty"
-        imgClassName="object-contain object-center"
-        pictureClassName="absolute inset-0 block h-full w-full"
-        quality={80}
-        resource={resource}
-        size="(max-width: 768px) min(100vw, 52rem), (max-width: 1280px) 52vw, 832px"
-      />
-    </div>
-  </div>
-)
+  )
+}
 
 type HeroSlotOpts = {
   unoptimized?: boolean
@@ -93,6 +102,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   media,
   richText,
   backgroundMedia,
+  heroImageCount,
   heroImage1,
   heroImage2,
   heroImage3,
@@ -102,8 +112,16 @@ export const HighImpactHero: React.FC<HeroProps> = ({
 }) => {
   const hasBackground = isPopulated(backgroundMedia)
   const hasPortrait = isPopulated(media)
-  const hasAnyGridFields = Boolean(heroImage1 || heroImage2 || heroImage3)
-  const hasGridMedia = isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
+  const imageCount = heroImageCount ?? '1'
+  const primaryHeroImage = heroImage2 || heroImage1 || heroImage3
+  const selectedHeroImages =
+    imageCount === '1'
+      ? [primaryHeroImage]
+      : imageCount === '2'
+        ? [heroImage2, heroImage3]
+        : [heroImage1, heroImage2, heroImage3]
+  const hasAnyGridFields = selectedHeroImages.some(Boolean)
+  const hasGridMedia = selectedHeroImages.some(isPopulated)
   /** Prefer Hero Image 1–3 grid over prismatic portrait when any grid slot has media (Payload uploads). */
   const forcePortraitSplit = visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
   const showGridLayout = !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
@@ -117,6 +135,10 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   }
   const betaLinks = Array.isArray(links) ? links.filter(isBetaLink) : []
   const workLinks = Array.isArray(links) ? links.filter((entry) => !isBetaLink(entry)) : []
+  // Keep the preview visible while an older CMS record is missing the relation.
+  const productScreenshotResource: MediaDoc | string = isPopulated(productMockup)
+    ? productMockup
+    : productScreenshotFallback
 
   const renderHeroCopy = (className?: string, ctaLinks = links) => {
     const hasLinks = Array.isArray(ctaLinks) && ctaLinks.length > 0
@@ -342,47 +364,73 @@ export const HighImpactHero: React.FC<HeroProps> = ({
       ) : isPrismatic ? (
         <div className="relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 pb-16 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 md:pb-20 md:pt-[calc(var(--nav-height)+3rem)]">
           <div className="flex w-full flex-col items-stretch justify-center gap-8 lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-center lg:gap-10 xl:grid-cols-[minmax(0,28rem)_minmax(0,38rem)] xl:gap-12 xl:self-center">
-            <div className="relative z-10 min-w-0">
+            <div className={cn('relative z-10 min-w-0', imageCount === '1' && 'lg:self-center')}>
               {renderHeroCopy(undefined, workLinks)}
             </div>
             <div className="relative z-10 min-w-0">
-              <div
-                className={cn(
-                  'mx-auto grid w-full max-w-[30rem] grid-cols-2 gap-2.5 sm:gap-3 lg:mx-0 lg:ml-auto',
-                  '[&_.relative]:overflow-hidden',
-                )}
-              >
-                <div className="relative aspect-[3/4] min-h-[9rem] sm:min-h-[10.5rem]">
+              {imageCount === '1' ? (
+                <div className="relative mx-auto h-[clamp(22rem,58vh,34rem)] w-full max-w-[20rem] overflow-hidden rounded-2xl shadow-[0_24px_70px_-28px_rgba(0,0,0,0.6)] lg:mx-0 lg:ml-auto">
                   {renderHeroSlot(
-                    heroImage2,
-                    'Erin Jerri — book and profile',
-                    '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
-                    { quality: 90 },
+                    primaryHeroImage,
+                    'Erin Jerri — portrait',
+                    '(max-width: 768px) min(100vw, 320px), (max-width: 1280px) 30vw, 320px',
+                    { priority: true, quality: 90 },
                   )}
                 </div>
-                <div className="relative aspect-[3/4] min-h-[9rem] sm:min-h-[10.5rem]">
-                  {renderHeroSlot(
-                    heroImage3,
-                    'Erin Jerri — engineering, AI systems, and spatial computing',
-                    '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
-                    { quality: 90 },
+              ) : (
+                <div
+                  className={cn(
+                    'mx-auto grid w-full max-w-[30rem] grid-cols-2 gap-2.5 sm:gap-3 lg:mx-0 lg:ml-auto',
+                    '[&_.relative]:overflow-hidden',
                   )}
+                >
+                  {imageCount === '3' && (
+                    <div className="relative col-span-2 aspect-[16/9] min-h-[7rem] sm:min-h-[8rem]">
+                      {renderHeroSlot(
+                        heroImage1,
+                        'Erin Jerri — featured work spanning AI, spatial computing, and creative technology',
+                        '(max-width: 768px) 100vw, (max-width: 1280px) 44vw, 640px',
+                        { priority: true, quality: 90 },
+                      )}
+                    </div>
+                  )}
+                  <div className="relative aspect-[3/4] min-h-[9rem] sm:min-h-[10.5rem]">
+                    {renderHeroSlot(
+                      heroImage2,
+                      'Erin Jerri — book and profile',
+                      '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                      { priority: imageCount === '2', quality: 90 },
+                    )}
+                  </div>
+                  <div className="relative aspect-[3/4] min-h-[9rem] sm:min-h-[10.5rem]">
+                    {renderHeroSlot(
+                      heroImage3,
+                      'Erin Jerri — engineering, AI systems, and spatial computing',
+                      '(max-width: 768px) 48vw, (max-width: 1280px) 29vw, 380px',
+                      { quality: 90 },
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
-          {(isPopulated(productMockup) || betaLinks.length > 0) && (
-            <section className="mt-16 flex w-full flex-col items-center justify-center px-0 sm:mt-20 md:mt-24" aria-label="TimeBite product preview">
-              {isPopulated(productMockup) && <ProductScreenshot resource={productMockup} />}
-              {betaLinks.length > 0 && (
-                <ul className="hp-hero-cta-row hp-hero-links m-0 mt-6 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-center gap-3.5 p-0">
-                  {betaLinks.map(({ link }, i) => (
-                    <li className="shrink-0" key={i}>
-                      <CMSLink {...link} />
-                    </li>
-                  ))}
-                </ul>
-              )}
+          {(productScreenshotResource || betaLinks.length > 0) && (
+            <section
+              className="relative left-1/2 mt-16 flex w-screen -translate-x-1/2 flex-col items-center justify-center border-y border-white/10 bg-[#0b1428] px-6 py-14 shadow-[0_-24px_80px_-48px_rgba(37,99,235,0.4)] sm:mt-20 sm:py-16 md:mt-24 md:py-20"
+              aria-label="TimeBite product preview"
+            >
+              <div className="flex w-full max-w-7xl flex-col items-center">
+                <ProductScreenshot resource={productScreenshotResource} />
+                {betaLinks.length > 0 && (
+                  <ul className="hp-hero-cta-row hp-hero-links m-0 mt-6 inline-flex max-w-full list-none flex-row flex-wrap items-center justify-center gap-3.5 p-0">
+                    {betaLinks.map(({ link }, i) => (
+                      <li className="shrink-0" key={i}>
+                        <CMSLink {...link} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </section>
           )}
         </div>
