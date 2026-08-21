@@ -243,7 +243,7 @@ export interface Page {
      */
     heroImage3?: (string | null) | Media;
     /**
-     * TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results.
+     * TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results. This field is available for every hero type.
      */
     productMockup?: (string | null) | Media;
     /**
