@@ -305,6 +305,62 @@
     font-weight: 500;
   }
 
+  /**
+   * Per-section surfaces, driven by the `background` field on every layout block
+   * (see src/fields/blockBackground.ts). The page shell only spans 8-11%
+   * lightness top to bottom, so sections need their own surface to separate at
+   * all - without these every block reads as one continuous grey.
+   *
+   * Applied to the full-width section wrapper so the colour runs edge to edge.
+   */
+  .block-surface-raised {
+    background-color: hsl(228 17% 13%);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.05),
+      inset 0 -1px 0 hsl(0 0% 0% / 0.25);
+  }
+
+  /**
+   * Light surface flips the semantic tokens rather than hard-coding colours, so
+   * any block dropped onto it inherits readable text without per-block work.
+   */
+  .block-surface-light {
+    --background: 210 20% 97%;
+    --foreground: 228 24% 12%;
+    --muted-foreground: 226 10% 38%;
+    --card: 0 0% 100%;
+    --card-foreground: 228 24% 12%;
+    --border: 220 13% 85%;
+    --primary: 203.7 77.2% 34%;
+
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  /* Doubled class to outrank `.theme-prismatic h1`, which sets a light heading
+     colour later in this stylesheet and would otherwise win the tie. */
+  .block-surface-light.block-surface-light :is(h1, h2, h3, h4, h5, h6) {
+    color: hsl(var(--foreground));
+  }
+
+  /**
+   * Most blocks predate this surface and hard-code white text for the dark page
+   * (StatsBlock uses text-white, text-white/28, text-white/34). Remap those so
+   * `light` is safe to pick on any block instead of rendering white on white.
+   * Solid white becomes the foreground; the translucent steps stay secondary.
+   */
+  .block-surface-light.block-surface-light [class*='text-white'] {
+    color: hsl(var(--foreground));
+  }
+
+  .block-surface-light.block-surface-light [class*='text-white/'] {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .block-surface-light.block-surface-light [class*='border-white'] {
+    border-color: hsl(var(--border));
+  }
+
   /* Prismatic page shell — add class `theme-prismatic` on any wrapper; tokens live on :root. */
   .theme-prismatic {
     background: linear-gradient(
