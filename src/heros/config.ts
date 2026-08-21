@@ -145,9 +145,8 @@ export const hero: Field = {
       name: 'productMockup',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) => siblingData?.type === 'highImpact',
         description:
-          'TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results.',
+          'TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results. This field is available for every hero type.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
       relationTo: 'media',
