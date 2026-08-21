@@ -70,6 +70,7 @@ type HeroSlotOpts = {
 export const HighImpactHero: React.FC<HeroProps> = ({
   links,
   media,
+  introMedia,
   richText,
   backgroundMedia,
   heroImageCount,
@@ -83,7 +84,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasBackground = isPopulated(backgroundMedia)
   const imageCount = heroImageCount ?? '1'
   const primaryHeroImage = heroImage2 || heroImage1 || heroImage3
-  const portraitResource = isPopulated(media)
+  const portraitResource = isPopulated(introMedia)
+    ? introMedia
+    : isPopulated(media)
     ? media
     : isPopulated(primaryHeroImage)
       ? primaryHeroImage

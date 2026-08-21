@@ -235,6 +235,10 @@ export interface Page {
      */
     heroImageCount?: ('1' | '2' | '3') | null;
     /**
+     * Primary portrait shown to the right of the high-impact intro copy. This is separate from the three-image work gallery below.
+     */
+    introMedia?: (string | null) | Media;
+    /**
      * Home: wide top slot in the image collage (row above the two portrait slots). Use with Hero 2 & 3 for a balanced bento layout.
      */
     heroImage1?: (string | null) | Media;
@@ -2189,6 +2193,7 @@ export interface PagesSelect<T extends boolean = true> {
             };
         backgroundMedia?: T;
         heroImageCount?: T;
+        introMedia?: T;
         heroImage1?: T;
         heroImage2?: T;
         heroImage3?: T;
@@ -3341,6 +3346,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: string;
+  /**
+   * Optional image strip behind the top navigation. Falls back to the built-in dimensions artwork when empty.
+   */
+  navBackgroundImage?: (string | null) | Media;
   navItems?:
     | {
         link: {
@@ -3514,6 +3523,7 @@ export interface PayloadJobsStat {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  navBackgroundImage?: T;
   navItems?:
     | T
     | {

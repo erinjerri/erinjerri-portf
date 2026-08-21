@@ -122,6 +122,18 @@ export const hero: Field = {
       ],
     },
     {
+      name: 'introMedia',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description:
+          'Primary portrait shown to the right of the high-impact intro copy. This is separate from the three-image work gallery below.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Intro Portrait (Right Side)',
+    },
+    {
       name: 'heroImage1',
       type: 'upload',
       admin: {
