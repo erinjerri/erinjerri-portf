@@ -101,7 +101,8 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const isPrismatic = visualVariant === 'prismatic'
   /** Home keeps the Ali-style intro split even when the CMS has gallery assets. */
   const forcePortraitSplit = isPrismatic && hasPortrait
-  const showGridLayout = !isPrismatic && !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
+  const showGridLayout =
+    isPrismatic || (!forcePortraitSplit && (hasAnyGridFields || hasGridMedia))
   const backgroundImage = hasBackground ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
 
