@@ -25,12 +25,6 @@ const heroFallbacks = {
   background: '/media/dimensions-background-curves.webp',
 } as const
 
-const homeHeroImageFallbacks = [
-  '/media/erinjerri-headshot-1.jpeg',
-  '/media/Erin-Book-Headshot.webp',
-  '/media/Erin-AVP-1000-80op.png',
-] as const
-
 /** Full-bleed / slot heroes: cover + bias upper area so heads stay in frame (spec: top center or 40% 20%). */
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
@@ -93,8 +87,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     ? media
     : isPopulated(primaryHeroImage)
       ? primaryHeroImage
-      : homeHeroImageFallbacks[0]
-  const hasPortrait = Boolean(portraitResource)
+      : null
+  const portraitDocument = isPopulated(portraitResource) ? portraitResource : null
+  const hasPortrait = Boolean(portraitDocument)
   const selectedHeroImages =
     imageCount === '1'
       ? [primaryHeroImage]
@@ -103,9 +98,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         : [heroImage1, heroImage2, heroImage3]
   const hasAnyGridFields = selectedHeroImages.some(Boolean)
   const hasGridMedia = selectedHeroImages.some(isPopulated)
-  const galleryImages = [heroImage1, heroImage2, heroImage3].map(
-    (resource, index) => (isPopulated(resource) ? resource : homeHeroImageFallbacks[index]),
-  )
+  const galleryImages = [heroImage1, heroImage2, heroImage3].filter(isPopulated)
   const isPrismatic = visualVariant === 'prismatic'
   /** Home keeps the Ali-style intro split even when the CMS has gallery assets. */
   const forcePortraitSplit = isPrismatic && hasPortrait
@@ -125,7 +118,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     ? productMockup
     : productScreenshotFallback
   const portraitAlt =
-    (isPopulated(portraitResource) && typeof portraitResource.alt === 'string' && portraitResource.alt.trim()) ||
+    (portraitDocument && typeof portraitDocument.alt === 'string' && portraitDocument.alt.trim()) ||
     'Erin Jerri Apple Vision Pro spatial computing work'
 
   const renderHeroCopy = (className?: string, ctaLinks = links) => {
@@ -189,7 +182,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             pictureClassName="absolute inset-0 block h-full w-full"
             priority
             quality={60}
-            {...(isPopulated(portraitResource) ? { resource: portraitResource } : { src: portraitResource })}
+            resource={portraitDocument!}
             size="(max-width: 768px) min(100vw, 400px), (max-width: 1024px) 38vw, 420px"
           />
         </div>
@@ -206,7 +199,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         pictureClassName="relative block w-full overflow-hidden"
         priority
         quality={60}
-        {...(isPopulated(portraitResource) ? { resource: portraitResource } : { src: portraitResource })}
+        resource={portraitDocument!}
         size="(max-width: 768px) min(100vw, 400px), (max-width: 1024px) 38vw, 440px"
       />
     )
@@ -218,7 +211,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     size?: string,
     opts?: HeroSlotOpts,
   ) => {
-    if (isPopulated(resource) || typeof resource === 'string') {
+    if (isPopulated(resource)) {
       const { unoptimized, priority: slotPriority, quality: slotQuality } = opts ?? {}
       return (
         <Media
@@ -234,7 +227,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           priority={slotPriority}
           quality={slotQuality}
           {...(unoptimized ? { unoptimized: true } : {})}
-          {...(isPopulated(resource) ? { resource } : { src: resource })}
+          resource={resource}
           size={size}
         />
       )
