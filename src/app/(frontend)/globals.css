@@ -74,7 +74,9 @@
 @layer base {
   :root {
     --font-title: var(--font-league-spartan), system-ui, sans-serif;
-    --font-copy: var(--font-satoshi), system-ui, sans-serif;
+    /* Glacial Indifference for body copy; Satoshi stays as the metric-compatible
+       fallback so text stays readable if the primary face fails to load. */
+    --font-copy: var(--font-glacial-indifference), var(--font-satoshi), system-ui, sans-serif;
   }
 
   h1 {

@@ -22,7 +22,7 @@ export const Brand: GlobalConfig = {
           name: 'copy',
           type: 'text',
           required: true,
-          defaultValue: "var(--font-satoshi), system-ui, sans-serif",
+          defaultValue: "var(--font-glacial-indifference), var(--font-satoshi), system-ui, sans-serif",
         },
       ],
     },

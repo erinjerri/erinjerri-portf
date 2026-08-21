@@ -22,4 +22,22 @@ const satoshi = localFont({
   display: 'swap',
 })
 
-export const frontendFontVariables = `${leagueSpartan.variable} ${satoshi.variable}`
+/**
+ * Body copy. Geometric sans with a single-storey 'a', which is the shape
+ * Satoshi and League Spartan both lack (they use a double-storey 'a').
+ *
+ * Ships Regular and Bold only - there is no medium weight, so a 500 request
+ * resolves to Regular by normal CSS font matching rather than being synthesised.
+ *
+ * Alfredo Marco Pradil, SIL Open Font License 1.1 (see GlacialIndifference-OFL.txt).
+ */
+const glacialIndifference = localFont({
+  src: [
+    { path: './fonts/GlacialIndifference-Regular.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/GlacialIndifference-Bold.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-glacial-indifference',
+  display: 'swap',
+})
+
+export const frontendFontVariables = `${leagueSpartan.variable} ${satoshi.variable} ${glacialIndifference.variable}`
