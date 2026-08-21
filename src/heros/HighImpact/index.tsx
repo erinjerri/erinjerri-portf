@@ -24,6 +24,8 @@ const heroFallbacks = {
   background: '/media/dimensions-background-curves.webp',
 } as const
 
+const timebiteMockupSrc = '/media/TimeBite-1200x630.png'
+
 /** Full-bleed / slot heroes: cover + bias upper area so heads stay in frame (spec: top center or 40% 20%). */
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
 
@@ -56,6 +58,38 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   />
 )
 
+const TimeBiteMockup: React.FC = () => (
+  <div className="relative mx-auto w-full max-w-[min(100%,42rem)]">
+    <div className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-white/[0.04] p-3 shadow-[0_32px_120px_-36px_rgba(0,0,0,0.78)] backdrop-blur-sm sm:p-4">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-8 top-4 h-px bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent"
+      />
+      <div className="flex items-center justify-between px-2 pb-3 pt-1 text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-white/50">
+        <span>TimeBite</span>
+        <span className="hidden sm:inline">Product preview</span>
+      </div>
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#07111d] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.05),transparent_30%)]"
+        />
+        <Media
+          alt="TimeBite app screenshot placeholder"
+          fill
+          imagePlaceholder="empty"
+          imgClassName="object-cover object-center"
+          pictureClassName="absolute inset-0 block h-full w-full"
+          priority
+          quality={80}
+          src={timebiteMockupSrc}
+          size="(max-width: 768px) min(100vw, 32rem), (max-width: 1280px) 44vw, 680px"
+        />
+      </div>
+    </div>
+  </div>
+)
+
 type HeroSlotOpts = {
   unoptimized?: boolean
   /** First visible hero tile — LCP candidate (preload + eager decode). */
@@ -79,11 +113,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasAnyGridFields = Boolean(heroImage1 || heroImage2 || heroImage3)
   const hasGridMedia = isPopulated(heroImage1) || isPopulated(heroImage2) || isPopulated(heroImage3)
   /** Prefer Hero Image 1–3 grid over prismatic portrait when any grid slot has media (Payload uploads). */
-  const forcePortraitSplit = visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
-  const showGridLayout = !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
   const isPrismatic = visualVariant === 'prismatic'
+  const forcePortraitSplit = visualVariant === 'prismatic' && hasPortrait && !hasGridMedia
+  const showGridLayout = !isPrismatic && !forcePortraitSplit && (hasAnyGridFields || hasGridMedia)
   const backgroundImage = hasBackground ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
+  const showProductMockup = isPrismatic
 
   const renderHeroCopy = (className?: string) => {
     const hasLinks = Array.isArray(links) && links.length > 0
@@ -264,7 +299,22 @@ export const HighImpactHero: React.FC<HeroProps> = ({
       />
 
       {/* Foreground visuals fill the hero; prismatic variant uses a tighter side-by-side layout so the portrait and copy read as one composition. */}
-      {!showGridLayout && hasPortrait ? (
+      {showProductMockup ? (
+        <div
+          className={cn(
+            'relative z-10 isolate mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-8 overflow-hidden px-6',
+            'pb-14 pt-[calc(var(--nav-height)+2.5rem)] md:px-10 md:pt-[calc(var(--nav-height)+3rem)]',
+            'lg:grid lg:min-h-0 lg:grid-cols-[minmax(0,1.03fr)_minmax(320px,0.97fr)] lg:items-center lg:gap-10 xl:gap-12',
+          )}
+        >
+          <div className="relative z-10 min-w-0">
+            {renderHeroCopy('max-w-[min(calc(100vw-2.5rem),40rem)]')}
+          </div>
+          <div className="relative z-10 min-w-0 lg:pl-2">
+            <TimeBiteMockup />
+          </div>
+        </div>
+      ) : !showGridLayout && hasPortrait ? (
         <>
           {isPrismatic ? (
             <div
