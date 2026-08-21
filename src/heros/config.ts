@@ -141,6 +141,18 @@ export const hero: Field = {
       label: 'Hero Image 3 (Bottom Right)',
     },
     {
+      name: 'productMockup',
+      type: 'upload',
+      admin: {
+        condition: (_, siblingData) => siblingData?.type === 'highImpact',
+        description:
+          'Optional TimeBite product screenshot shown below the three-image collage. Upload the wide macOS capture through Media so it uses the configured storage provider (R2 in production).',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Product Screenshot (TimeBite)',
+    },
+    {
       name: 'media',
       type: 'upload',
       admin: {
