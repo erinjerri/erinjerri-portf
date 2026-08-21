@@ -56,7 +56,8 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   />
 )
 
-const productScreenshotFallback = '/api/media/file/timebite-macos-sample-screen.png'
+// Public asset fallback so the TimeBite preview still renders when the CMS relation is empty.
+const productScreenshotFallback = '/media/timebite-macos-sample-screen.png'
 
 const ProductScreenshot: React.FC<{ resource: MediaDoc | string }> = ({ resource }) => {
   const isMediaDocument = typeof resource === 'object'
