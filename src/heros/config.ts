@@ -58,7 +58,7 @@ export const hero: Field = {
         return 'Please enter overlay title text.'
       },
       admin: {
-        condition: (_, siblingData) => siblingData?.type === 'topline',
+        condition: (_, { type } = {}) => type === 'topline',
         description: 'Large white text over the media (example: Experience).',
       },
     },
@@ -77,13 +77,13 @@ export const hero: Field = {
       }),
       label: false,
       admin: {
-        condition: (_, siblingData) => siblingData?.type !== 'topline',
+        condition: (_, { type } = {}) => type !== 'topline',
       },
     },
     linkGroup({
       overrides: {
         admin: {
-          condition: (_, siblingData) => siblingData?.type !== 'topline',
+          condition: (_, { type } = {}) => type !== 'topline',
         },
         maxRows: 6,
       },
@@ -92,8 +92,7 @@ export const hero: Field = {
       name: 'backgroundMedia',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) =>
-          siblingData?.type === 'highImpact' || siblingData?.type === 'backgroundCover',
+        condition: (_, { type } = {}) => type === 'highImpact' || type === 'backgroundCover',
         description:
           'Background image for high-impact or background-cover heroes. Background Cover uses only this image.',
       },
@@ -111,7 +110,7 @@ export const hero: Field = {
       name: 'heroImage1',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) => siblingData?.type === 'highImpact',
+        condition: (_, { type } = {}) => type === 'highImpact',
         description:
           'Home: wide top slot in the image collage (row above the two portrait slots). Use with Hero 2 & 3 for a balanced bento layout.',
       },
@@ -123,7 +122,7 @@ export const hero: Field = {
       name: 'heroImage2',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) => siblingData?.type === 'highImpact',
+        condition: (_, { type } = {}) => type === 'highImpact',
         description: 'Home: bottom-left portrait in the collage (e.g. book / headshot). Pairs with Hero 1 & 3.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
@@ -134,7 +133,7 @@ export const hero: Field = {
       name: 'heroImage3',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) => siblingData?.type === 'highImpact',
+        condition: (_, { type } = {}) => type === 'highImpact',
         description: 'Home: bottom-right portrait in the collage (e.g. AVP / secondary). Pairs with Hero 1 & 2.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
@@ -142,22 +141,10 @@ export const hero: Field = {
       label: 'Hero Image 3 (Bottom Right)',
     },
     {
-      name: 'productMockup',
-      type: 'upload',
-      admin: {
-        description:
-          'TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results. This field is available for every hero type.',
-      },
-      filterOptions: () => ({ mediaType: { equals: 'image' } }),
-      relationTo: 'media',
-      label: 'Product Mockup (TimeBite)',
-    },
-    {
       name: 'media',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) =>
-          ['mediumImpact', 'topline'].includes(siblingData?.type ?? ''),
+        condition: (_, { type } = {}) => ['mediumImpact', 'topline'].includes(type),
         description: 'Main image for the medium-impact/about hero. Topline also uses this media field.',
       },
       filterOptions: ({ data }) => {

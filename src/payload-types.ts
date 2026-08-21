@@ -214,7 +214,7 @@ export interface Page {
                 } | null);
             archive?: ('posts' | 'projects' | 'watch') | null;
             /**
-             * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+             * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
              */
             url?: string | null;
             label: string;
@@ -242,10 +242,6 @@ export interface Page {
      * Home: bottom-right portrait in the collage (e.g. AVP / secondary). Pairs with Hero 1 & 2.
      */
     heroImage3?: (string | null) | Media;
-    /**
-     * TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results. This field is available for every hero type.
-     */
-    productMockup?: (string | null) | Media;
     /**
      * Main image for the medium-impact/about hero. Topline also uses this media field.
      */
@@ -291,7 +287,7 @@ export interface Page {
                     } | null);
                 archive?: ('posts' | 'projects' | 'watch') | null;
                 /**
-                 * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+                 * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
                  */
                 url?: string | null;
                 label: string;
@@ -708,7 +704,7 @@ export interface CallToActionBlock {
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
           /**
-           * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
            */
           url?: string | null;
           label: string;
@@ -786,7 +782,7 @@ export interface ContentBlock {
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
           /**
-           * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
            */
           url?: string | null;
           label: string;
@@ -1187,7 +1183,7 @@ export interface VideoBackgroundTransitionBlock {
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
           /**
-           * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
            */
           url?: string | null;
           label: string;
@@ -2187,7 +2183,6 @@ export interface PagesSelect<T extends boolean = true> {
         heroImage1?: T;
         heroImage2?: T;
         heroImage3?: T;
-        productMockup?: T;
         media?: T;
       };
   layout?:
@@ -3352,7 +3347,7 @@ export interface Header {
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
           /**
-           * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
            */
           url?: string | null;
           label: string;
@@ -3391,7 +3386,7 @@ export interface Footer {
                 } | null);
             archive?: ('posts' | 'projects' | 'watch') | null;
             /**
-             * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+             * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
              */
             url?: string | null;
             label: string;
@@ -3405,7 +3400,7 @@ export interface Footer {
     | {
         label: string;
         /**
-         * Enter the full external URL, e.g. https://github.com/you, or email (e.g. you@domain.com — mailto: is added automatically)
+         * URL (e.g. https://github.com/you) or email (e.g. you@domain.com — mailto: is added automatically)
          */
         url: string;
         icon?: (string | null) | Media;
@@ -3747,7 +3742,7 @@ export interface MediaBlock {
               } | null);
           archive?: ('posts' | 'projects' | 'watch') | null;
           /**
-           * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+           * URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)
            */
           url?: string | null;
           label: string;

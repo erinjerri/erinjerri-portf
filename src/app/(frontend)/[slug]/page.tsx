@@ -95,8 +95,7 @@ export default async function Page({ params: paramsPromise }: Args) {
       resolvedHero?.backgroundMedia ||
       resolvedHero?.heroImage1 ||
       resolvedHero?.heroImage2 ||
-      resolvedHero?.heroImage3 ||
-      resolvedHero?.productMockup,
+      resolvedHero?.heroImage3,
     )
 
   const hero = hasHomeGridMedia
