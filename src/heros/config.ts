@@ -141,6 +141,18 @@ export const hero: Field = {
       label: 'Hero Image 3 (Bottom Right)',
     },
     {
+      name: 'productMockup',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description:
+          'TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Product Mockup (TimeBite)',
+    },
+    {
       name: 'media',
       type: 'upload',
       admin: {

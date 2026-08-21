@@ -58,7 +58,7 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   />
 )
 
-const TimeBiteMockup: React.FC = () => (
+const TimeBiteMockup: React.FC<{ resource?: MediaDoc | string | number | null }> = ({ resource }) => (
   <div className="relative mx-auto w-full max-w-[min(100%,42rem)]">
     <div className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-white/[0.04] p-3 shadow-[0_32px_120px_-36px_rgba(0,0,0,0.78)] backdrop-blur-sm sm:p-4">
       <div
@@ -75,14 +75,17 @@ const TimeBiteMockup: React.FC = () => (
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.05),transparent_30%)]"
         />
         <Media
-          alt="TimeBite app screenshot placeholder"
+          alt={
+            (isPopulated(resource) && typeof resource.alt === 'string' && resource.alt.trim()) ||
+            'TimeBite app screenshot'
+          }
           fill
           imagePlaceholder="empty"
           imgClassName="object-cover object-center"
           pictureClassName="absolute inset-0 block h-full w-full"
           priority
           quality={80}
-          src={timebiteMockupSrc}
+          {...(isPopulated(resource) ? { resource } : { src: timebiteMockupSrc })}
           size="(max-width: 768px) min(100vw, 32rem), (max-width: 1280px) 44vw, 680px"
         />
       </div>
@@ -105,6 +108,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   heroImage1,
   heroImage2,
   heroImage3,
+  productMockup,
   showHeroAnimation = false,
   visualVariant,
 }) => {
@@ -311,7 +315,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             {renderHeroCopy('max-w-[min(calc(100vw-2.5rem),40rem)]')}
           </div>
           <div className="relative z-10 min-w-0 lg:pl-2">
-            <TimeBiteMockup />
+            <TimeBiteMockup resource={productMockup} />
           </div>
         </div>
       ) : !showGridLayout && hasPortrait ? (
