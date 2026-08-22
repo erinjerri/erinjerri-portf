@@ -231,6 +231,14 @@ export interface Page {
      */
     backgroundMedia?: (string | null) | Media;
     /**
+     * Choose how many hero images to show on the homepage: one headshot, two portraits, or the full three-image collage.
+     */
+    heroImageCount?: ('1' | '2' | '3') | null;
+    /**
+     * Primary portrait shown to the right of the high-impact intro copy. This is separate from the three-image work gallery below.
+     */
+    introMedia?: (string | null) | Media;
+    /**
      * Home: wide top slot in the image collage (row above the two portrait slots). Use with Hero 2 & 3 for a balanced bento layout.
      */
     heroImage1?: (string | null) | Media;
@@ -243,7 +251,7 @@ export interface Page {
      */
     heroImage3?: (string | null) | Media;
     /**
-     * TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results.
+     * Moved. The product screenshot is now the "Product showcase" block, added under Content like any other section, where its copy, links, and background are editable. This field is no longer rendered and is kept only so the existing image can be migrated. Safe to clear once the block is in place.
      */
     productMockup?: (string | null) | Media;
     /**
@@ -343,6 +351,10 @@ export interface Page {
          * Legacy field for existing content. Use Image/Video/Audio above for new content.
          */
         media?: (string | null) | Media;
+        /**
+         * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+         */
+        background?: ('auto' | 'default' | 'raised' | 'light') | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'mediaBlock';
@@ -359,6 +371,7 @@ export interface Page {
     | BookCoverRowBlock
     | HeroCredentialStripBlock
     | SignatureTalksBlock
+    | ProductShowcaseBlock
     | BookAcclaimStripBlock
     | RibbonBlockBlock
     | StatsBlockBlock
@@ -720,6 +733,10 @@ export interface CallToActionBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'cta';
@@ -798,6 +815,10 @@ export interface ContentBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'content';
@@ -811,6 +832,10 @@ export interface DocumentBlock {
    * Select or upload a PDF to embed on the page.
    */
   document: string | Document;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'documentBlock';
@@ -895,6 +920,10 @@ export interface ArchiveBlock {
           }
       )[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
@@ -1088,6 +1117,10 @@ export interface AffiliateProductsBlock {
    * Controls grid columns on desktop. Mobile is always 1 column.
    */
   columns?: ('2' | '3' | '4') | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'affiliateProductsBlock';
@@ -1138,6 +1171,10 @@ export interface WatchBlock {
   } | null;
   categories?: (string | Category)[] | null;
   limit?: number | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'watchBlock';
@@ -1199,6 +1236,10 @@ export interface VideoBackgroundTransitionBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'videoBackgroundTransition';
@@ -1225,6 +1266,10 @@ export interface FormBlock {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'formBlock';
@@ -1417,6 +1462,10 @@ export interface ToplineHeaderBlock {
    */
   media: string | Media;
   height?: ('small' | 'medium' | 'large') | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'toplineHeader';
@@ -1445,6 +1494,10 @@ export interface StatStripBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'statStrip';
@@ -1464,6 +1517,10 @@ export interface TagPillsBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'tagPills';
@@ -1499,6 +1556,10 @@ export interface BrandLogosBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'brandLogos';
@@ -1541,6 +1602,10 @@ export interface BookCoverRowBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'bookCoverRow';
@@ -1560,6 +1625,10 @@ export interface HeroCredentialStripBlock {
    * Separator between the 3 credibility phrases.
    */
   separator?: ('bullet' | 'middot' | 'pipe') | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'heroCredentialStrip';
@@ -1585,9 +1654,71 @@ export interface SignatureTalksBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'signatureTalks';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductShowcaseBlock".
+ */
+export interface ProductShowcaseBlock {
+  /**
+   * App screenshot shown inside the window frame.
+   */
+  screenshot: string | Media;
+  /**
+   * Small label in the window title bar. Leave blank to hide it.
+   */
+  windowLabel?: string | null;
+  eyebrow?: string | null;
+  headline: string;
+  /**
+   * One supporting sentence under the headline.
+   */
+  blurb?: string | null;
+  /**
+   * Primary action, e.g. join the beta.
+   */
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'archive') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          archive?: ('posts' | 'projects' | 'watch') | null;
+          /**
+           * Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)
+           */
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'accent' | 'light' | 'inactive' | 'filter' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'productShowcase';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1609,6 +1740,10 @@ export interface BookAcclaimStripBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'bookAcclaimStrip';
@@ -1633,6 +1768,10 @@ export interface RibbonBlockBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'ribbonBlock';
@@ -1651,6 +1790,10 @@ export interface StatsBlockBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'statsBlock';
@@ -1714,6 +1857,10 @@ export interface BioBlockBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'bioBlock';
@@ -1726,6 +1873,10 @@ export interface SpeakerBioBlock {
   shortBio: string;
   mediumBio: string;
   longBio: string;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'speakerBio';
@@ -1744,6 +1895,10 @@ export interface SpeakerKitHeadshotsBlock {
       }[]
     | null;
   downloadable?: boolean | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'speakerKitHeadshots';
@@ -1769,6 +1924,10 @@ export interface SpeakerKitBlock {
       }[]
     | null;
   downloadable?: boolean | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'speakerKit';
@@ -2184,6 +2343,8 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
             };
         backgroundMedia?: T;
+        heroImageCount?: T;
+        introMedia?: T;
         heroImage1?: T;
         heroImage2?: T;
         heroImage3?: T;
@@ -2209,6 +2370,7 @@ export interface PagesSelect<T extends boolean = true> {
         bookCoverRow?: T | BookCoverRowBlockSelect<T>;
         heroCredentialStrip?: T | HeroCredentialStripBlockSelect<T>;
         signatureTalks?: T | SignatureTalksBlockSelect<T>;
+        productShowcase?: T | ProductShowcaseBlockSelect<T>;
         bookAcclaimStrip?: T | BookAcclaimStripBlockSelect<T>;
         ribbonBlock?: T | RibbonBlockBlockSelect<T>;
         statsBlock?: T | StatsBlockBlockSelect<T>;
@@ -2257,6 +2419,7 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2290,6 +2453,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2299,6 +2463,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
  */
 export interface DocumentBlockSelect<T extends boolean = true> {
   document?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2335,6 +2500,7 @@ export interface MediaBlockSelect<T extends boolean = true> {
   thumbnail?: T;
   audio?: T;
   media?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2349,6 +2515,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   categories?: T;
   limit?: T;
   selectedDocs?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2362,6 +2529,7 @@ export interface AffiliateProductsBlockSelect<T extends boolean = true> {
   disclosureText?: T;
   products?: T;
   columns?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2373,6 +2541,7 @@ export interface WatchBlockSelect<T extends boolean = true> {
   introContent?: T;
   categories?: T;
   limit?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2401,6 +2570,7 @@ export interface VideoBackgroundTransitionBlockSelect<T extends boolean = true> 
             };
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2412,6 +2582,7 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2423,6 +2594,7 @@ export interface ToplineHeaderBlockSelect<T extends boolean = true> {
   title?: T;
   media?: T;
   height?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2441,6 +2613,7 @@ export interface StatStripBlockSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2456,6 +2629,7 @@ export interface TagPillsBlockSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2475,6 +2649,7 @@ export interface BrandLogosBlockSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2495,6 +2670,7 @@ export interface BookCoverRowBlockSelect<T extends boolean = true> {
         buttonUrl?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2510,6 +2686,7 @@ export interface HeroCredentialStripBlockSelect<T extends boolean = true> {
         id?: T;
       };
   separator?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2528,6 +2705,37 @@ export interface SignatureTalksBlockSelect<T extends boolean = true> {
         subtitle?: T;
         id?: T;
       };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductShowcaseBlock_select".
+ */
+export interface ProductShowcaseBlockSelect<T extends boolean = true> {
+  screenshot?: T;
+  windowLabel?: T;
+  eyebrow?: T;
+  headline?: T;
+  blurb?: T;
+  links?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              archive?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2545,6 +2753,7 @@ export interface BookAcclaimStripBlockSelect<T extends boolean = true> {
         body?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2565,6 +2774,7 @@ export interface RibbonBlockBlockSelect<T extends boolean = true> {
         description?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2582,6 +2792,7 @@ export interface StatsBlockBlockSelect<T extends boolean = true> {
         color?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2623,6 +2834,7 @@ export interface BioBlockBlockSelect<T extends boolean = true> {
         color?: T;
         id?: T;
       };
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2634,6 +2846,7 @@ export interface SpeakerBioBlockSelect<T extends boolean = true> {
   shortBio?: T;
   mediumBio?: T;
   longBio?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2651,6 +2864,7 @@ export interface SpeakerKitHeadshotsBlockSelect<T extends boolean = true> {
         id?: T;
       };
   downloadable?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2672,6 +2886,7 @@ export interface SpeakerKitBlockSelect<T extends boolean = true> {
         id?: T;
       };
   downloadable?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -3336,6 +3551,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: string;
+  /**
+   * Optional image strip behind the top navigation. Falls back to the built-in dimensions artwork when empty.
+   */
+  navBackgroundImage?: (string | null) | Media;
   navItems?:
     | {
         link: {
@@ -3509,6 +3728,7 @@ export interface PayloadJobsStat {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  navBackgroundImage?: T;
   navItems?:
     | T
     | {

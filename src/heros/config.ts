@@ -107,6 +107,33 @@ export const hero: Field = {
       },
     },
     {
+      name: 'heroImageCount',
+      type: 'select',
+      defaultValue: '1',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description: 'Choose how many hero images to show on the homepage: one headshot, two portraits, or the full three-image collage.',
+      },
+      label: 'Hero Image Count',
+      options: [
+        { label: '1 image (headshot)', value: '1' },
+        { label: '2 images', value: '2' },
+        { label: '3 images', value: '3' },
+      ],
+    },
+    {
+      name: 'introMedia',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => type === 'highImpact',
+        description:
+          'Primary portrait shown to the right of the high-impact intro copy. This is separate from the three-image work gallery below.',
+      },
+      filterOptions: () => ({ mediaType: { equals: 'image' } }),
+      relationTo: 'media',
+      label: 'Intro Portrait (Right Side)',
+    },
+    {
       name: 'heroImage1',
       type: 'upload',
       admin: {
@@ -144,13 +171,13 @@ export const hero: Field = {
       name: 'productMockup',
       type: 'upload',
       admin: {
-        condition: (_, { type } = {}) => type === 'highImpact',
+        condition: (_, siblingData) => siblingData?.type === 'highImpact',
         description:
-          'TimeBite product screenshot or device mockup shown beside the hero copy. Upload a landscape image for best results.',
+          'Moved. The product screenshot is now the "Product showcase" block, added under Content like any other section, where its copy, links, and background are editable. This field is no longer rendered and is kept only so the existing image can be migrated. Safe to clear once the block is in place.',
       },
       filterOptions: () => ({ mediaType: { equals: 'image' } }),
       relationTo: 'media',
-      label: 'Product Mockup (TimeBite)',
+      label: 'Product Screenshot (TimeBite) — moved to Product showcase block',
     },
     {
       name: 'media',

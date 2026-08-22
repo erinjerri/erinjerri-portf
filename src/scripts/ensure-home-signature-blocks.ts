@@ -41,9 +41,6 @@ async function run(): Promise<void> {
     id: homePage.id,
     depth: 0,
     overrideAccess: true,
-    context: {
-      disableRevalidate: true,
-    },
     data: {
       layout: mergedLayout,
     } as Partial<Page>,

@@ -146,7 +146,7 @@ export const BioBlockBlock: React.FC<BioBlockBlockComponentProps> = ({
         </div>
       ) : null}
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(260px,360px)] lg:items-start">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,42rem)_minmax(260px,360px)] lg:items-start lg:justify-center lg:gap-14">
         <div>
           {headline?.trim() ? (
             <h2 className="max-w-4xl font-title text-[2.35rem] font-normal leading-[1.18] text-white md:text-[3.1rem]">

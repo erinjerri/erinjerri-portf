@@ -41,9 +41,22 @@ type HeaderBodyProps = {
 const DIMENSIONS_STRIP_SRC =
   '/media/hero-top-banner-experience-dimensions-background-curves-cut-1400x155.webp'
 
+function getNavBackgroundSrc(data: Header | null): string {
+  const image = data?.navBackgroundImage
+  if (!image || typeof image !== 'object') return DIMENSIONS_STRIP_SRC
+
+  if (typeof image.url === 'string' && image.url.trim()) return image.url
+  if (typeof image.filename === 'string' && image.filename.trim()) {
+    return `/api/media/file/${encodeURIComponent(image.filename)}`
+  }
+
+  return DIMENSIONS_STRIP_SRC
+}
+
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
+  const navBackgroundSrc = getNavBackgroundSrc(data)
   /** Keep the dimensions strip on every “dark header” route (same set as `themeForPathname`), not only `/`. */
   const stripPinned = theme === 'dark'
   const stripVisible = stripPinned ? true : !scrolled
@@ -70,7 +83,7 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
               scrolled
                 ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
                 : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
-              `url(${DIMENSIONS_STRIP_SRC})`,
+              `url(${navBackgroundSrc})`,
             ].join(', '),
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
