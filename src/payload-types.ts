@@ -251,7 +251,7 @@ export interface Page {
      */
     heroImage3?: (string | null) | Media;
     /**
-     * Optional TimeBite product screenshot shown below the three-image collage. Upload the wide macOS capture through Media so it uses the configured storage provider (R2 in production).
+     * Moved. The product screenshot is now the "Product showcase" block, added under Content like any other section, where its copy, links, and background are editable. This field is no longer rendered and is kept only so the existing image can be migrated. Safe to clear once the block is in place.
      */
     productMockup?: (string | null) | Media;
     /**
