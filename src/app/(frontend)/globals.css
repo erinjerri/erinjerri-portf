@@ -74,7 +74,9 @@
 @layer base {
   :root {
     --font-title: var(--font-league-spartan), system-ui, sans-serif;
-    --font-copy: var(--font-satoshi), system-ui, sans-serif;
+    /* Glacial Indifference for body copy; Satoshi stays as the metric-compatible
+       fallback so text stays readable if the primary face fails to load. */
+    --font-copy: var(--font-glacial-indifference), var(--font-satoshi), system-ui, sans-serif;
   }
 
   h1 {
@@ -229,6 +231,30 @@
     --tw-prose-headings: hsl(222, 35%, 12%);
     --tw-prose-links: hsl(203.7, 70%, 40%);
     color: hsl(222, 35%, 12%);
+  }
+
+  /**
+   * Paragraph nodes that carry a nested block child still render as <div>
+   * (a <p> cannot legally contain one). Give those the same vertical rhythm as
+   * a real paragraph so mixed content does not collapse into a wall of text.
+   */
+  .payload-richtext.prose > div:not([class]) {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+  }
+
+  .payload-richtext.prose > div:not([class]):first-child {
+    margin-top: 0;
+  }
+
+  /**
+   * Headings sit closer to the section they introduce than to the text above.
+   * Tailwind's h1 rhythm assumes a page title (margin-top: 0), which is wrong
+   * for a mid-article heading, so set the asymmetry explicitly.
+   */
+  .payload-richtext.prose :where(h1, h2, h3):not(:first-child) {
+    margin-top: 1.9em;
+    margin-bottom: 0.6em;
   }
 
   @media (min-width: 768px) {

@@ -89,7 +89,7 @@ export const seed = async ({
         fonts: {
           title:
             "var(--font-league-spartan), var(--font-satoshi), system-ui, sans-serif",
-          copy: "var(--font-satoshi), system-ui, sans-serif",
+          copy: "var(--font-glacial-indifference), var(--font-satoshi), system-ui, sans-serif",
         },
         colors: {
           light: {
