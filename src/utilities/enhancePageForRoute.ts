@@ -131,6 +131,29 @@ function ensureSingleAboutBio(layout: Page['layout']): Page['layout'] {
   return [defaultBioBlock(), ...blocksWithoutLegacyBio]
 }
 
+/**
+ * Home's About media column is the canonical current bio portrait. Keep an older
+ * Bio block headshot from shadowing the image selected in the CMS About section.
+ */
+function syncHomeBioHeadshot(layout: Page['layout']): Page['layout'] {
+  const blocks = Array.isArray(layout) ? [...layout] : []
+  const aboutBlock = blocks.find(
+    (block) => block?.blockType === 'content' && block.blockName === 'About',
+  )
+  const aboutMedia =
+    aboutBlock?.blockType === 'content'
+      ? aboutBlock.columns?.find(
+          (column) => column?.contentType === 'media' && Boolean(column.media),
+        )?.media
+      : null
+
+  if (!aboutMedia) return blocks
+
+  return blocks.map((block) =>
+    block?.blockType === 'bioBlock' ? { ...block, headshot: aboutMedia } : block,
+  )
+}
+
 export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
   page: T,
   slug: string,
@@ -138,6 +161,10 @@ export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
   const rewrittenPage = rewriteSpeakingCtaUrls(page)
   let layout = rewrittenPage.layout
   let hero = (rewrittenPage as T & { hero?: Page['hero'] }).hero
+
+  if (slug === 'home') {
+    layout = syncHomeBioHeadshot(layout)
+  }
 
   if (slug === 'about') {
     console.log(

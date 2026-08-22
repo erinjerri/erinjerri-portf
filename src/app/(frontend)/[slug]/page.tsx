@@ -14,7 +14,6 @@ import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { safeDecodeURIComponent } from '@/utilities/safeDecodeURIComponent'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
-import { mergeHomeHireMeLayoutBlocks } from '@/endpoints/seed/home-hire-me-layout'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { cn } from '@/utilities/ui'
 
@@ -111,7 +110,7 @@ export default async function Page({ params: paramsPromise }: Args) {
     typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video') ? videoAsset : null
 
   const isHomePrismatic = decodedSlug === 'home'
-  const layoutToRender = isHomePrismatic ? mergeHomeHireMeLayoutBlocks(layout) : layout
+  const layoutToRender = layout
 
   return (
     <>
