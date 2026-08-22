@@ -18,6 +18,8 @@ import { BrandLogos } from '../../blocks/BrandLogos/config'
 import { BookCoverRow } from '../../blocks/BookCoverRow/config'
 import { HeroCredentialStrip } from '../../blocks/HeroCredentialStrip/config'
 import { SignatureTalks } from '../../blocks/SignatureTalks/config'
+import { ProductShowcase } from '../../blocks/ProductShowcase/config'
+import { withBlockBackground } from '../../fields/blockBackground'
 import { BookAcclaimStrip } from '../../blocks/BookAcclaimStrip/config'
 import { RibbonBlock } from '../../blocks/RibbonBlock/config'
 import { StatsBlock } from '../../blocks/StatsBlock/config'
@@ -93,6 +95,9 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
+              // withBlockBackground appends the per-section surface control to
+              // every block, so the field is registered in one place instead of
+              // being copied into each block config.
               blocks: [
                 CallToAction,
                 Content,
@@ -110,6 +115,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 BookCoverRow,
                 HeroCredentialStrip,
                 SignatureTalks,
+                ProductShowcase,
                 BookAcclaimStrip,
                 RibbonBlock,
                 StatsBlock,
@@ -117,7 +123,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 SpeakerBio,
                 SpeakerKitHeadshots,
                 SpeakerKit,
-              ],
+              ].map(withBlockBackground),
               required: true,
               admin: {
                 initCollapsed: true,

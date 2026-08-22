@@ -26,6 +26,8 @@ import { BrandLogosBlock } from '@/blocks/BrandLogos/Component'
 import { BookCoverRowBlock } from '@/blocks/BookCoverRow/Component'
 import { HeroCredentialStripBlock } from '@/blocks/HeroCredentialStrip/Component'
 import { SignatureTalksBlock } from '@/blocks/SignatureTalks/Component'
+import { ProductShowcaseBlock } from '@/blocks/ProductShowcase/Component'
+import { BLOCK_SURFACE_CLASS, resolveBlockSurfaces } from '@/utilities/blockSurfaces'
 import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
 import { RibbonBlockBlock } from '@/blocks/RibbonBlock/Component'
 import { StatsBlockBlock } from '@/blocks/StatsBlock/Component'
@@ -53,6 +55,7 @@ const blockComponents = {
   bookCoverRow: BookCoverRowBlock,
   heroCredentialStrip: HeroCredentialStripBlock,
   signatureTalks: SignatureTalksBlock,
+  productShowcase: ProductShowcaseBlock,
   bookAcclaimStrip: BookAcclaimStripBlock,
   ribbonBlock: RibbonBlockBlock,
   statsBlock: StatsBlockBlock,
@@ -268,6 +271,12 @@ export const RenderBlocks: React.FC<{
 
   const blocksToRender = leadingTrimCount > 0 ? blocks.slice(leadingTrimCount) : blocks
 
+  // Resolved once for the whole layout so `auto` can alternate against the
+  // surface its neighbour actually landed on.
+  const blockSurfaces = resolveBlockSurfaces(
+    blocksToRender.map((block) => (block as { background?: string | null })?.background),
+  )
+
   if (hasBlocks) {
     return (
       <Fragment>
@@ -423,6 +432,14 @@ export const RenderBlocks: React.FC<{
                 (blockType === 'cta' && ctaHasLinks(block)) ||
                 (blockType === 'content' && contentHasLinks(block))
 
+              const surfaceClass = BLOCK_SURFACE_CLASS[blockSurfaces[index] ?? 'default']
+
+              // Interior pages space sections with vertical margin. A painted
+              // surface needs padding instead, or the colour band stops short of
+              // the content and leaves a gap between sections.
+              const spacingClass =
+                !isHomePage && surfaceClass ? 'py-20 md:py-24 lg:py-28' : marginClass
+
               const sectionClassName = cn(
                 isHomePage
                   ? index === 0
@@ -432,7 +449,8 @@ export const RenderBlocks: React.FC<{
                       : prevIsBookCoverRow && isStandaloneLinksBlock
                         ? 'pt-4 pb-16 md:pt-6 md:pb-20'
                         : 'py-16 md:py-24'
-                  : marginClass,
+                  : spacingClass,
+                surfaceClass,
               )
               const blockProps = block as Record<string, unknown>
 

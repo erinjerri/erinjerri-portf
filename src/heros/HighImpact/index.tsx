@@ -8,7 +8,6 @@ import type { Media as MediaDoc, Page } from '@/payload-types'
 import { cn } from '@/utilities/ui'
 import { CMSLink } from '@/components/Link'
 import { ContainedHeroAnimation } from '@/components/ContainedHeroAnimation'
-import { HomeHeroShowcase } from '@/components/HomeHeroShowcase/Component'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
@@ -60,7 +59,6 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
 )
 
 // Public asset fallback so the TimeBite preview still renders when the CMS relation is empty.
-const productScreenshotFallback = '/media/timebite-macos-sample-screen.png'
 
 type HeroSlotOpts = {
   unoptimized?: boolean
@@ -79,7 +77,6 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   heroImage1,
   heroImage2,
   heroImage3,
-  productMockup,
   showHeroAnimation = false,
   visualVariant,
 }) => {
@@ -111,12 +108,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     const label = typeof link.label === 'string' ? link.label.toLowerCase() : ''
     return label.includes('timebite') || label.includes('beta')
   }
-  const betaLinks = Array.isArray(links) ? links.filter(isBetaLink) : []
   const workLinks = Array.isArray(links) ? links.filter((entry) => !isBetaLink(entry)) : []
-  // Keep the preview visible while an older CMS record is missing the relation.
-  const productScreenshotResource: MediaDoc | string = isPopulated(productMockup)
-    ? productMockup
-    : productScreenshotFallback
   const portraitAlt =
     (portraitDocument && typeof portraitDocument.alt === 'string' && portraitDocument.alt.trim()) ||
     'Erin Jerri Apple Vision Pro spatial computing work'
@@ -369,7 +361,6 @@ export const HighImpactHero: React.FC<HeroProps> = ({
               </div>
             </section>
           )}
-          <HomeHeroShowcase resource={productScreenshotResource} betaLinks={betaLinks} />
         </div>
       ) : (
         <>
