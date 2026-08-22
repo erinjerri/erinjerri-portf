@@ -221,6 +221,8 @@
     --tw-prose-headings: hsl(var(--foreground));
     --tw-prose-links: hsl(var(--primary));
     --tw-prose-bold: hsl(var(--foreground));
+    --tw-prose-quotes: hsl(var(--foreground));
+    --tw-prose-quote-borders: hsl(var(--foreground) / 0.32);
     --tw-prose-code: hsl(var(--secondary));
     --tw-prose-pre-bg: hsl(var(--card));
     color: hsl(var(--foreground));
@@ -460,6 +462,8 @@
     --tw-prose-body: hsl(var(--hp-mist) / 0.86);
     --tw-prose-headings: hsl(var(--hp-mist));
     --tw-prose-bold: hsl(var(--hp-mist));
+    --tw-prose-quotes: hsl(var(--hp-mist) / 0.86);
+    --tw-prose-quote-borders: hsl(var(--hp-mint) / 0.55);
     --tw-prose-links: hsl(var(--hp-mint));
     --tw-prose-bullets: hsl(var(--hp-mint) / 0.55);
   }

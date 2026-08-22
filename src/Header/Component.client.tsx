@@ -56,7 +56,9 @@ function getNavBackgroundSrc(data: Header | null): string {
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
-  const navBackgroundSrc = getNavBackgroundSrc(data)
+  // The homepage hero owns the full ribbon artwork. Avoid requesting the same
+  // image again in the sticky header while keeping the editable strip elsewhere.
+  const navBackgroundSrc = pathname === '/' ? null : getNavBackgroundSrc(data)
   /** Keep the dimensions strip on every “dark header” route (same set as `themeForPathname`), not only `/`. */
   const stripPinned = theme === 'dark'
   const stripVisible = stripPinned ? true : !scrolled
@@ -83,7 +85,7 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
               scrolled
                 ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
                 : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
-              `url(${navBackgroundSrc})`,
+              navBackgroundSrc ? `url(${navBackgroundSrc})` : 'none',
             ].join(', '),
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
