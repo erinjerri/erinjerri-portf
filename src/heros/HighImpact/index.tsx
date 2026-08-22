@@ -99,9 +99,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const forcePortraitSplit = isPrismatic && hasPortrait
   const showGridLayout =
     isPrismatic || (!forcePortraitSplit && (hasAnyGridFields || hasGridMedia))
-  // The prismatic homepage supplies its own CSS/canvas backdrop. Keeping the CMS
-  // background here would fetch the same large ribbon asset a second time.
-  const backgroundImage = hasBackground && !isPrismatic ? backgroundMedia : null
+  // Keep the CMS ribbon artwork visible on the homepage. The header suppresses
+  // its duplicate strip image on `/`, so this remains a single image request.
+  const backgroundImage = hasBackground ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
   const isBetaLink = ({ link }: { link: { label?: string | null } }) => {
     const label = typeof link.label === 'string' ? link.label.toLowerCase() : ''
