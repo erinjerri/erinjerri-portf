@@ -58,8 +58,6 @@ const StaticHeroSlot: React.FC<{ className?: string }> = ({ className }) => (
   />
 )
 
-// Public asset fallback so the TimeBite preview still renders when the CMS relation is empty.
-
 type HeroSlotOpts = {
   unoptimized?: boolean
   centerCrop?: boolean
@@ -101,9 +99,10 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const forcePortraitSplit = isPrismatic && hasPortrait
   const showGridLayout =
     isPrismatic || (!forcePortraitSplit && (hasAnyGridFields || hasGridMedia))
-  const backgroundImage = hasBackground ? backgroundMedia : null
+  // The prismatic homepage supplies its own CSS/canvas backdrop. Keeping the CMS
+  // background here would fetch the same large ribbon asset a second time.
+  const backgroundImage = hasBackground && !isPrismatic ? backgroundMedia : null
   const backgroundSrc = backgroundImage ? undefined : heroFallbacks.background
-
   const isBetaLink = ({ link }: { link: { label?: string | null } }) => {
     const label = typeof link.label === 'string' ? link.label.toLowerCase() : ''
     return label.includes('timebite') || label.includes('beta')

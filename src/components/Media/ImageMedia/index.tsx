@@ -95,10 +95,9 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     return null
   }
 
-  // Preserve the original for PNG sources that visibly degrade through the optimizer.
-  // Other images should stay optimized so mobile receives responsive srcset candidates.
-  const isPngSource = typeof src === 'string' && /\.png($|\?)/i.test(src)
-  const disableOptimization = Boolean(unoptimizedFromProps) || isPngSource
+  // Let Next convert PNGs to modern formats and generate responsive candidates.
+  // Callers can still opt out for assets that genuinely need their original bytes.
+  const disableOptimization = Boolean(unoptimizedFromProps)
 
   const loading =
     loadingFromProps ?? (priority ? 'eager' : 'lazy')
