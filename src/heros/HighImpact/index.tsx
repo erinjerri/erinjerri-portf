@@ -27,6 +27,8 @@ const heroFallbacks = {
 
 /** Full-bleed / slot heroes: cover + bias upper area so heads stay in frame (spec: top center or 40% 20%). */
 const heroCoverImgClassName = 'object-cover object-[40%_20%]'
+/** The left portrait is taller than its 4:3 tile, so keep its face near the top of the crop. */
+const centeredGalleryImgClassName = 'object-cover !object-[50%_12%]'
 
 const StaticHeroImage: React.FC<{
   alt: string
@@ -62,6 +64,7 @@ const productScreenshotFallback = '/media/timebite-macos-sample-screen.png'
 
 type HeroSlotOpts = {
   unoptimized?: boolean
+  centerCrop?: boolean
   /** First visible hero tile — LCP candidate (preload + eager decode). */
   priority?: boolean
   quality?: number
@@ -69,7 +72,6 @@ type HeroSlotOpts = {
 
 export const HighImpactHero: React.FC<HeroProps> = ({
   links,
-  media,
   introMedia,
   richText,
   backgroundMedia,
@@ -84,14 +86,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
   const hasBackground = isPopulated(backgroundMedia)
   const imageCount = heroImageCount ?? '1'
   const primaryHeroImage = heroImage2 || heroImage1 || heroImage3
-  const portraitResource = isPopulated(introMedia)
-    ? introMedia
-    : isPopulated(media)
-    ? media
-    : isPopulated(primaryHeroImage)
-      ? primaryHeroImage
-      : null
-  const portraitDocument = isPopulated(portraitResource) ? portraitResource : null
+  // Keep the optional intro portrait independent from the work gallery. An empty
+  // Intro Portrait should remove the main photo, not promote a gallery image.
+  const portraitDocument = isPopulated(introMedia) ? introMedia : null
   const hasPortrait = Boolean(portraitDocument)
   const selectedHeroImages =
     imageCount === '1'
@@ -215,7 +212,12 @@ export const HighImpactHero: React.FC<HeroProps> = ({
     opts?: HeroSlotOpts,
   ) => {
     if (isPopulated(resource)) {
-      const { unoptimized, priority: slotPriority, quality: slotQuality } = opts ?? {}
+      const {
+        centerCrop,
+        unoptimized,
+        priority: slotPriority,
+        quality: slotQuality,
+      } = opts ?? {}
       return (
         <Media
           alt={
@@ -225,7 +227,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
           }
           fill
           htmlElement={null}
-          imgClassName={heroCoverImgClassName}
+          imgClassName={centerCrop ? centeredGalleryImgClassName : heroCoverImgClassName}
           pictureClassName="relative block h-full w-full"
           priority={slotPriority}
           quality={slotQuality}
@@ -360,7 +362,7 @@ export const HighImpactHero: React.FC<HeroProps> = ({
                       image,
                       `Erin Jerri — selected work ${index + 1}`,
                       '(max-width: 640px) 100vw, (max-width: 1280px) 30vw, 420px',
-                      { priority: index === 0, quality: 90 },
+                      { centerCrop: index === 0, priority: index === 0, quality: 90 },
                     )}
                   </div>
                 ))}
