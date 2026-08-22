@@ -23,6 +23,27 @@ Payload setup/tutorial links:
    - Optional: `EMAIL_VERIFY_TRANSPORT=true` to enable SMTP verification on startup
 3. Deploy, then open `/admin`, login, and click **Seed your database** from the dashboard.
 
+### Microsoft Clarity (safe rollout)
+
+Clarity is disabled by default. To enable it locally or in Netlify, set both variables:
+
+```env
+NEXT_PUBLIC_ENABLE_CLARITY=true
+NEXT_PUBLIC_CLARITY_PROJECT_ID=your-clarity-project-id
+```
+
+`NEXT_PUBLIC_ENABLE_CLARITY` must be the literal string `true`. The project ID is client-visible configuration, not a secret. If the flag is missing, set to `false`, or the project ID is empty, no Clarity script is loaded.
+
+Before deploying, run a production build with the same variables Netlify will use:
+
+```bash
+NEXT_PUBLIC_ENABLE_CLARITY=true NEXT_PUBLIC_CLARITY_PROJECT_ID=your-clarity-project-id pnpm run build:netlify
+```
+
+After deployment, verify the site in a private browser window: open DevTools → Network, reload the page, wait about two seconds, and look for a request to `https://www.clarity.ms/tag/<project-id>`. Then open the Microsoft Clarity dashboard and confirm a recent session appears. A successful build proves the site compiles; the browser request and dashboard session prove Clarity is actually running.
+
+Keep Clarity enabled only in the Netlify deploy contexts where it is intended. Do not put the project ID or the enable flag in server-only code, and do not add the Clarity script directly to the root HTML layout.
+
 ### Seeding in production (recommended flow)
 
 The admin “Seed your database” button hits `POST /next/seed`.
