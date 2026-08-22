@@ -86,8 +86,13 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '25mb',
     },
-    // Inline critical CSS in prod only; skip in dev to speed up compilation.
-    inlineCss: process.env.NODE_ENV !== 'development',
+    // DISABLED: `inlineCss` silently breaks the Payload admin in production.
+    // It inlines the marketing site's CSS fine (~1,094 rules) but does not
+    // inline @payloadcms/next/css, so /admin and /admin/login ship with only
+    // runtime-injected modal styles (~305 rules), no layout rules, and render
+    // as a blank white page (login <section> collapses to 1280x0).
+    // Re-enable only if Next ships per-route-group control for this.
+    inlineCss: false,
     // Smaller client chunks for barrel-heavy packages (TBT / main-thread).
     optimizePackageImports: [
       'lucide-react',
