@@ -30,6 +30,11 @@ export const PAGE_SEO_BY_SLUG: Record<string, { title: string; description: stri
     title: 'TimeBite — AI + Spatial Computing LifeOS',
     description: TIMEBITE_DESCRIPTION,
   },
+  'shop/creating-your-reality': {
+    title: 'Creating Your Reality + TimeBite | Erin Pangilinan',
+    description:
+      'Explore TimeBite and the Creating Your Reality planner, a connected digital and physical system for planning time, goals and reflection.',
+  },
   advisory: {
     title: 'Advisory — AI & Spatial Computing Strategy',
     description: SITE_DEFAULT_DESCRIPTION,
@@ -52,9 +57,11 @@ export function getFixedPageSeo(canonicalPath: string): { title: string; descrip
         ? 'about'
         : path === '/timebite'
           ? 'timebite'
-          : path === '/timebite-download'
-            ? 'timebite-download'
-            : path === '/advisory'
+            : path === '/timebite-download'
+              ? 'timebite-download'
+              : path === '/shop/creating-your-reality'
+                ? 'shop/creating-your-reality'
+              : path === '/advisory'
               ? 'advisory'
               : path === '/speaking-info'
                 ? 'speaking-info'

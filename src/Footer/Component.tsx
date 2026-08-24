@@ -193,6 +193,7 @@ export async function Footer({ data }: FooterProps = {}) {
 
   const subscribeSection = footerData?.subscribeSection
   const linkGroups = footerData?.linkGroups || []
+  const hasShopGroup = linkGroups.some((group) => group?.header?.trim().toLowerCase() === 'shop')
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
 
@@ -264,11 +265,43 @@ export async function Footer({ data }: FooterProps = {}) {
                         </li>
                       )
                     })}
+                    {group.header?.trim().toLowerCase() === 'shop' &&
+                    !group.links?.some((item) => item?.link?.url === '/shop/creating-your-reality') ? (
+                      <li>
+                        <Link
+                          className="text-muted-foreground transition-colors hover:text-foreground"
+                          href="/shop/creating-your-reality"
+                        >
+                          Creating Your Reality
+                        </Link>
+                      </li>
+                    ) : null}
                   </ul>
                 </div>
               ))}
+              {!hasShopGroup && (
+                <div className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]">
+                  <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">Shop</span>
+                  <ul className="flex flex-col gap-2">
+                    <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/store">Amazon Store</Link></li>
+                    <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/creating-ar-vr-book">Books</Link></li>
+                    <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/shop/creating-your-reality">Creating Your Reality</Link></li>
+                  </ul>
+                </div>
+              )}
             </nav>
-          ) : null}
+          ) : (
+            <nav className="flex flex-wrap gap-x-12 gap-y-8">
+              <div className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]">
+                <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">Shop</span>
+                <ul className="flex flex-col gap-2">
+                  <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/store">Amazon Store</Link></li>
+                  <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/creating-ar-vr-book">Books</Link></li>
+                  <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/shop/creating-your-reality">Creating Your Reality</Link></li>
+                </ul>
+              </div>
+            </nav>
+          )}
         </div>
 
         {/* Bottom: Copyright */}
