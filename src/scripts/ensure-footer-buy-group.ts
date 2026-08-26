@@ -102,6 +102,7 @@ async function run(): Promise<void> {
 
   await payload.updateGlobal({
     slug: 'footer',
+    context: { disableRevalidate: true },
     depth: 0,
     overrideAccess: true,
     data: { linkGroups: groups } as never,

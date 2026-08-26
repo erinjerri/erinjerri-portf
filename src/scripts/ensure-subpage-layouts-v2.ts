@@ -96,6 +96,7 @@ async function applyTo(
   await payload.update({
     collection: 'pages',
     id: page.id,
+    context: { disableRevalidate: true },
     depth: 0,
     draft: true,
     overrideAccess: true,

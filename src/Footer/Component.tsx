@@ -112,8 +112,21 @@ function BuyFooterGroup() {
     <div className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]">
       <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">Buy</span>
       <ul className="flex flex-col gap-2">
-        <li><Link className={footerLinkClass} href="/store">Amazon Store</Link></li>
-        <li><Link className={footerLinkClass} href="/creating-ar-vr-book">Books</Link></li>
+        <li>
+          <a
+            className={footerLinkClass}
+            href={creatingYourRealityConfig.amazonURL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Amazon Store
+          </a>
+        </li>
+        <li>
+          <Link className={footerLinkClass} href={creatingYourRealityConfig.booksURL}>
+            Books
+          </Link>
+        </li>
         <li>
           <a className={footerLinkClass} href={creatingYourRealityConfig.cyraURL} target="_blank" rel="noopener noreferrer">
             Creating Your Reality
@@ -302,7 +315,11 @@ export async function Footer({ data }: FooterProps = {}) {
                     ) : null}
                     {group.header?.trim().toLowerCase() === 'shop' &&
                     !group.links?.some((item) => item?.link?.label?.toLowerCase() === 'books') ? (
-                      <li><Link className={footerLinkClass} href="/creating-ar-vr-book">Books</Link></li>
+                      <li>
+                        <Link className={footerLinkClass} href={creatingYourRealityConfig.booksURL}>
+                          Books
+                        </Link>
+                      </li>
                     ) : null}
                   </ul>
                 </div>

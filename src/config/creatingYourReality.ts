@@ -30,8 +30,15 @@ function resolveCYRPlannerURL(): string {
   }
 }
 
+/** Amazon Associates tag — every Amazon link needs it or it earns nothing. */
+const AMAZON_TAG = 'erinjerrimalo-20'
+const DEFAULT_AMAZON_URL = `https://www.amazon.com/dp/1492044199?tag=${AMAZON_TAG}`
+
 export const creatingYourRealityConfig = {
   route: '/shop/creating-your-reality',
+  /** The O'Reilly title page. Slug is `CreatingARVRBook`, not a kebab variant. */
+  booksURL: '/CreatingARVRBook',
+  amazonURL: process.env.AMAZON_STORE_URL?.trim() || DEFAULT_AMAZON_URL,
   cyraURL: process.env.CYR_SITE_URL?.trim() || DEFAULT_CYRA_URL,
   app: {
     exploreURL: process.env.CYR_TIMEBITE_URL?.trim() || '/timebite',
