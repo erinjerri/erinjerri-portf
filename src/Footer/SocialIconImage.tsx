@@ -36,7 +36,12 @@ export function SocialIconImage({
       height={20}
       sizes="20px"
       onError={() => setError(true)}
-      unoptimized
+      /**
+       * Optimized on purpose. These source files are 640x640 PNGs rendered at
+       * 20px; `unoptimized` shipped the originals (~7-12 KiB each, ~330ms each
+       * through the media proxy) for a 20px slot. The onError fallback below
+       * still covers any URL the optimizer can't handle.
+       */
     />
   )
 }
