@@ -242,8 +242,9 @@ export async function Footer({ data }: FooterProps = {}) {
                   key={group.id || groupIndex}
                   className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]"
                 >
+                  {/* Group headers read as headings, not as another link. */}
                   {group.header && (
-                    <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">
+                    <span className="block min-h-[1.5rem] font-title text-[0.82rem] font-bold uppercase leading-6 tracking-[0.1em] text-foreground">
                       {group.header}
                     </span>
                   )}
