@@ -33,7 +33,7 @@ export const HeroCredentialStrip: Block = {
     {
       name: 'separator',
       type: 'select',
-      defaultValue: 'bullet',
+      defaultValue: 'pipe',
       options: [
         { label: 'Bullet (•)', value: 'bullet' },
         { label: 'Middot (·)', value: 'middot' },

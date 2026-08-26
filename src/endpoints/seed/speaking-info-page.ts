@@ -58,7 +58,7 @@ export const speakingInfoPage = ({
                     children: [
                       {
                         type: 'text',
-                        text: 'SOFTWARE ENGINEER · PUBLISHED AUTHOR · SPATIAL COMPUTING PIONEER',
+                        text: 'SOFTWARE ENGINEER | PUBLISHED AUTHOR | SPATIAL COMPUTING PIONEER',
                         version: 1,
                       },
                     ],
@@ -161,7 +161,7 @@ export const speakingInfoPage = ({
           { value: '42+', label: 'COUNTRIES DISTRIBUTED' },
           { value: '#1', label: 'AMAZON GAME PROGRAMMING' },
           { value: '10K+', label: 'FOLLOWERS ACROSS PLATFORMS' },
-          { value: '3', label: 'LANGUAGES: EN · ZH · KO' },
+          { value: '3', label: 'LANGUAGES: EN | ZH | KO' },
         ],
       },
       {

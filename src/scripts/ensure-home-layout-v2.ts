@@ -45,6 +45,7 @@ const ORDER: string[] = [
 
 const HERO_IMAGE_FILENAME = 'erinjerri-meta-connect-2025-AI-glasses.webp'
 const SPEAKING_IMAGE_FILENAME = 'QCon-Erin-Speaking-rz.png'
+const TIMEBITE_IMAGE_FILENAME = 'timebite-macos-sample-screen.png'
 
 type LayoutBlock = NonNullable<Page['layout']>[number]
 
@@ -107,9 +108,22 @@ function buildTwoDoors(speakingImageId: number | string | null): LayoutBlock {
         ctaLabel: 'Book an advisory session →',
         ctaUrl: '/advisory',
         ctaStyle: 'outline',
-        terms: 'Paid sessions · Selective\nNot a discovery call\nScoped before we meet',
+        terms: 'Paid sessions | Selective\nNot a discovery call\nScoped before we meet',
       },
     ],
+  } as unknown as LayoutBlock
+}
+
+function buildProductShowcase(imageId: number | string | null): LayoutBlock {
+  return {
+    blockType: 'productShowcase',
+    blockName: 'What I am building',
+    ...(imageId ? { screenshot: imageId } : {}),
+    windowLabel: 'TimeBite',
+    eyebrow: 'What I am building',
+    headline: 'TimeBite',
+    blurb:
+      'Most tools are built around what you planned. TimeBite is built around what actually happened — how your days really unfold, so you can align them with what you said mattered.',
   } as unknown as LayoutBlock
 }
 
@@ -149,9 +163,10 @@ async function run(): Promise<void> {
     current.map((block) => (block as { blockType?: string }).blockType ?? ''),
   )
 
-  const [heroImageId, speakingImageId] = await Promise.all([
+  const [heroImageId, speakingImageId, timebiteImageId] = await Promise.all([
     findMediaIdByFilename(payload, HERO_IMAGE_FILENAME),
     findMediaIdByFilename(payload, SPEAKING_IMAGE_FILENAME),
+    findMediaIdByFilename(payload, TIMEBITE_IMAGE_FILENAME),
   ])
 
   if (!heroImageId) {
@@ -168,6 +183,17 @@ async function run(): Promise<void> {
   const additions: LayoutBlock[] = []
   if (!existingTypes.has('heroSplit')) additions.push(buildHeroSplit(heroImageId))
   if (!existingTypes.has('twoDoors')) additions.push(buildTwoDoors(speakingImageId))
+  /** The homepage currently has no productShowcase — the TimeBite section is a
+      plain content block with no image slot. This adds the real one. */
+  if (!existingTypes.has('productShowcase')) {
+    if (!timebiteImageId) {
+      payload.logger.warn(
+        `Media "${TIMEBITE_IMAGE_FILENAME}" not found — productShowcase requires a screenshot, so it is being skipped.`,
+      )
+    } else {
+      additions.push(buildProductShowcase(timebiteImageId))
+    }
+  }
 
   const nextLayout = reorder([...current, ...additions])
 
