@@ -1590,7 +1590,7 @@ export interface BookCoverRowBlock {
          */
         image: string | Media;
         /**
-         * e.g. English · 中文 · 한국어
+         * e.g. English | 中文 | 한국어
          */
         caption?: string | null;
         /**
@@ -1978,7 +1978,13 @@ export interface HeroSplitBlock {
  * via the `definition` "TwoDoorsBlock".
  */
 export interface TwoDoorsBlock {
+  /**
+   * Rendered as the section heading, in the title face.
+   */
   eyebrow?: string | null;
+  /**
+   * Optional sub-headline under WORK WITH ME. Leave blank for none.
+   */
   heading?: string | null;
   /**
    * Optional line under the heading.
