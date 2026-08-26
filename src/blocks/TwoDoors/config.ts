@@ -18,12 +18,16 @@ export const TwoDoors: Block = {
     {
       name: 'eyebrow',
       type: 'text',
-      defaultValue: 'Work with me',
+      defaultValue: 'WORK WITH ME',
+      admin: { description: 'Rendered as the section heading, in the title face.' },
     },
     {
       name: 'heading',
       type: 'text',
-      defaultValue: 'Two ways in.',
+      defaultValue: '',
+      admin: {
+        description: 'Optional sub-headline under WORK WITH ME. Leave blank for none.',
+      },
     },
     {
       name: 'intro',

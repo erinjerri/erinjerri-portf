@@ -73,7 +73,10 @@
 
 @layer base {
   :root {
-    --font-title: var(--font-league-spartan), system-ui, sans-serif;
+    /* League Spartan first; Century Gothic is the closest widely-installed
+       geometric fallback, then the body faces, before system-ui. */
+    --font-title: var(--font-league-spartan), 'Century Gothic', var(--font-glacial-indifference),
+      var(--font-satoshi), system-ui, sans-serif;
     /* Glacial Indifference for body copy; Satoshi stays as the metric-compatible
        fallback so text stays readable if the primary face fails to load. */
     --font-copy: var(--font-glacial-indifference), var(--font-satoshi), system-ui, sans-serif;

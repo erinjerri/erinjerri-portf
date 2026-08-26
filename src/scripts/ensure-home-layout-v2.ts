@@ -85,15 +85,15 @@ function buildTwoDoors(speakingImageId: number | string | null): LayoutBlock {
   return {
     blockType: 'twoDoors',
     blockName: 'Work with me',
-    eyebrow: 'Work with me',
-    heading: 'Two ways in.',
+    eyebrow: 'WORK WITH ME',
+    heading: '',
     intro:
       'I take a small number of engagements each year, in the places where the decision is expensive and the answer isn’t obvious yet.',
     doors: [
       {
         kicker: 'Keynotes & executive briefings',
         title: 'Speaking',
-        body: 'I speak to leadership teams about what happens after the model — when AI has to operate inside real products, real workflows, and eventually the room itself. Every talk is built against your roadmap on a prep call, never pulled off a shelf.',
+        body: 'I create talks tailored to your events on all things AI and more.',
         ...(speakingImageId ? { image: speakingImageId } : {}),
         ctaLabel: 'Request a speaking engagement →',
         ctaUrl: '/speaking-info',

@@ -15,15 +15,22 @@ export const TwoDoorsBlock: React.FC<TwoDoorsBlockProps> = (props) => {
 
   return (
     <div className="container my-16 md:my-20 lg:my-24">
+      {/* The eyebrow *is* the section heading here — "WORK WITH ME" in the
+          title face, gold, rather than a small label above a second headline. */}
       {eyebrow ? (
-        <p className={cn('mb-3 text-xs font-semibold uppercase tracking-[0.2em]', accent)}>
+        <h2
+          className={cn(
+            'font-title text-display-h2 font-semibold uppercase tracking-[0.12em] md:text-display-h2-md',
+            accent,
+          )}
+        >
           {eyebrow}
-        </p>
+        </h2>
       ) : null}
       {heading ? (
-        <h2 className="font-title text-display-h2 font-semibold tracking-tight md:text-display-h2-md">
+        <p className="mt-3 font-title text-xl font-medium tracking-tight text-foreground/95 md:text-2xl">
           {heading}
-        </h2>
+        </p>
       ) : null}
       {intro ? (
         <p className="mt-3 max-w-2xl text-muted-foreground lg:text-lg">{intro}</p>
@@ -46,7 +53,12 @@ export const TwoDoorsBlock: React.FC<TwoDoorsBlockProps> = (props) => {
             ) : null}
             <div className="flex flex-1 flex-col gap-4 p-5 lg:p-6">
               {door.kicker ? (
-                <span className={cn('text-xs font-semibold uppercase tracking-[0.14em]', accent)}>
+                <span
+                  className={cn(
+                    'font-title text-xs font-semibold uppercase tracking-[0.14em]',
+                    accent,
+                  )}
+                >
                   {door.kicker}
                 </span>
               ) : null}
@@ -67,7 +79,7 @@ export const TwoDoorsBlock: React.FC<TwoDoorsBlockProps> = (props) => {
                 {door.ctaLabel}
               </a>
               {door.terms ? (
-                <div className="mt-auto border-t border-border/60 pt-4 text-xs leading-relaxed text-muted-foreground">
+                <div className="mt-auto border-t border-border/60 pt-4 font-title text-xs uppercase leading-relaxed tracking-[0.08em] text-[hsl(43_42%_58%)]">
                   {door.terms
                     .split('\n')
                     .filter((line) => line.trim())
