@@ -13,20 +13,16 @@ export const TagPillsBlock: React.FC<TagPillsBlockProps> = (props) => {
         <p className="mb-4 max-w-3xl text-sm text-muted-foreground lg:text-base">{intro}</p>
       ) : null}
       <div className="flex flex-wrap justify-center gap-2 lg:justify-start lg:gap-3">
-        {tags.map((t, i) => {
-          /** Cycle teal → mint → pink, the same palette the biography uses. */
-          const color = accentForIndex(i)
-
-          return (
-            <span
-              className="inline-flex items-center rounded-[8px] border px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-wider"
-              key={i}
-              style={{ borderColor: `${color}80`, color }}
-            >
-              {t.label}
-            </span>
-          )
-        })}
+        {tags.map((t, i) => (
+          /** Matches the biography pills exactly: square, soft fill, palette text. */
+          <span
+            className="inline-flex items-center rounded-none bg-white/[0.06] px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
+            key={i}
+            style={{ color: accentForIndex(i) }}
+          >
+            {t.label}
+          </span>
+        ))}
       </div>
     </div>
   )
