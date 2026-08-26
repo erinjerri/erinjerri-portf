@@ -2,7 +2,8 @@ import { cn } from '@/utilities/ui'
 import type { StatStripBlock as StatStripBlockProps } from '@/payload-types'
 import React from 'react'
 
-const accent = 'text-[hsl(43_42%_58%)]'
+import { accentForIndex, BRAND_ACCENTS } from '@/utilities/brandAccents'
+
 
 export const StatStripBlock: React.FC<StatStripBlockProps> = (props) => {
   const { columns = 'four', emphasis = 'default', eyebrow, items } = props
@@ -18,7 +19,8 @@ export const StatStripBlock: React.FC<StatStripBlockProps> = (props) => {
     <div className="container my-16 md:my-20 lg:my-24">
       {eyebrow ? (
         <p
-          className={cn('mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em]', accent)}
+          className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em]"
+          style={{ color: BRAND_ACCENTS.teal }}
         >
           {eyebrow}
         </p>
@@ -27,7 +29,7 @@ export const StatStripBlock: React.FC<StatStripBlockProps> = (props) => {
         className={cn(
           'grid gap-6 border px-4 py-6 lg:gap-8 lg:px-8',
           isBold
-            ? 'border-[hsl(43_42%_58%)]/40 bg-card/50 shadow-sm'
+            ? 'border-[#78e7df]/40 bg-card/50 shadow-sm'
             : 'border-border/60 bg-card/30',
           grid,
         )}
@@ -35,8 +37,8 @@ export const StatStripBlock: React.FC<StatStripBlockProps> = (props) => {
         {items.map((item, i) => (
           <div className="text-center lg:text-left" key={i}>
             <div
+              style={{ color: accentForIndex(i) }}
               className={cn(
-                accent,
                 'font-title leading-none tracking-tight',
                 isBold
                   ? 'text-2xl font-bold tabular-nums sm:text-3xl'

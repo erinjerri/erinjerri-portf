@@ -27,6 +27,8 @@ import { BioBlock } from '../../blocks/BioBlock/config'
 import { SpeakerBio } from '../../blocks/SpeakerBio/config'
 import { SpeakerKitHeadshots } from '../../blocks/SpeakerKitHeadshots/config'
 import { SpeakerKit } from '../../blocks/SpeakerKit/config'
+import { HeroSplit } from '../../blocks/HeroSplit/config'
+import { TwoDoors } from '../../blocks/TwoDoors/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -123,6 +125,8 @@ export const Pages: CollectionConfig<'pages'> = {
                 SpeakerBio,
                 SpeakerKitHeadshots,
                 SpeakerKit,
+                HeroSplit,
+                TwoDoors,
               ].map(withBlockBackground),
               required: true,
               admin: {

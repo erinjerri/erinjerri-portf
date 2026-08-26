@@ -56,9 +56,10 @@ function getNavBackgroundSrc(data: Header | null): string {
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
-  // The homepage hero owns the full ribbon artwork. Avoid requesting the same
-  // image again in the sticky header while keeping the editable strip elsewhere.
-  const navBackgroundSrc = pathname === '/' ? null : getNavBackgroundSrc(data)
+  // The header strip is part of the brand, including on the homepage. The
+  // default asset is a 1400x155 webp, not the full hero ribbon, so rendering it
+  // here does not duplicate the hero's image request.
+  const navBackgroundSrc = getNavBackgroundSrc(data)
   /** Keep the dimensions strip on every “dark header” route (same set as `themeForPathname`), not only `/`. */
   const stripPinned = theme === 'dark'
   const stripVisible = stripPinned ? true : !scrolled
@@ -67,11 +68,11 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
     <header
       suppressHydrationWarning
       className={cn(
-        'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300',
+        'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,border-color] duration-300',
         scrolled
           ? stripPinned
-            ? 'bg-transparent backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
-            : 'bg-[#0a0b10] backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
+            ? 'bg-[#0a0b10eb] border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
+            : 'bg-[#0a0b10] border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
           : 'bg-transparent border-white/10 text-white',
       )}
       data-theme={theme}
@@ -136,15 +137,22 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathnam
   )
 
   useLayoutEffect(() => {
+    /** rAF-coalesce scroll: the raw event fires far more often than we can paint. */
+    let frame = 0
     const handleScroll = () => {
-      setScrolled(window.scrollY > 80)
+      if (frame) return
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+        setScrolled(window.scrollY > 80)
+      })
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+    setScrolled(window.scrollY > 80)
     setShellReady(true)
 
     return () => {
+      if (frame) window.cancelAnimationFrame(frame)
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])

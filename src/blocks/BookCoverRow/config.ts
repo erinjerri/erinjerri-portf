@@ -58,7 +58,7 @@ export const BookCoverRow: Block = {
           name: 'caption',
           type: 'text',
           admin: {
-            description: 'e.g. English · 中文 · 한국어',
+            description: 'e.g. English | 中文 | 한국어',
           },
         },
         {

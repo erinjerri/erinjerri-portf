@@ -36,6 +36,8 @@ import { isDuplicateHomeBiographyText } from '@/blocks/BioBlock/isDuplicateHomeB
 import { SpeakerBioBlock } from '@/blocks/SpeakerBio/Component'
 import { SpeakerKitHeadshotsBlock } from '@/blocks/SpeakerKitHeadshots/Component'
 import { SpeakerKitBlock } from '@/blocks/SpeakerKit/Component'
+import { HeroSplitBlock } from '@/blocks/HeroSplit/Component'
+import { TwoDoorsBlock } from '@/blocks/TwoDoors/Component'
 import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 
 const blockComponents = {
@@ -63,6 +65,8 @@ const blockComponents = {
   speakerBio: SpeakerBioBlock,
   speakerKitHeadshots: SpeakerKitHeadshotsBlock,
   speakerKit: SpeakerKitBlock,
+  heroSplit: HeroSplitBlock,
+  twoDoors: TwoDoorsBlock,
 }
 
 /** Layout block - element of page layout array */

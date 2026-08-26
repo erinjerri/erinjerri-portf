@@ -1,7 +1,7 @@
 import type { TagPillsBlock as TagPillsBlockProps } from '@/payload-types'
 import React from 'react'
 
-const accent = 'border-[hsl(43_42%_58%)]/50 text-[hsl(43_42%_58%)]'
+import { accentForIndex } from '@/utilities/brandAccents'
 
 export const TagPillsBlock: React.FC<TagPillsBlockProps> = (props) => {
   const { intro, tags } = props
@@ -14,9 +14,11 @@ export const TagPillsBlock: React.FC<TagPillsBlockProps> = (props) => {
       ) : null}
       <div className="flex flex-wrap justify-center gap-2 lg:justify-start lg:gap-3">
         {tags.map((t, i) => (
+          /** Matches the biography pills exactly: square, soft fill, palette text. */
           <span
-            className={`inline-flex items-center rounded-[8px] border px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-wider ${accent}`}
+            className="inline-flex items-center rounded-none bg-white/[0.06] px-4 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em]"
             key={i}
+            style={{ color: accentForIndex(i) }}
           >
             {t.label}
           </span>

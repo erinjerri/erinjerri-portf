@@ -33,7 +33,7 @@ export const creatingArVrBookPage = ({ bookAffiliateProductId }: Args): Required
           { value: '42+', label: 'COUNTRIES DISTRIBUTED' },
           { value: '#1', label: 'AMAZON GAME PROGRAMMING' },
           { value: '10K+', label: 'FOLLOWERS ACROSS PLATFORMS' },
-          { value: '3', label: 'LANGUAGES: EN · ZH · KO' },
+          { value: '3', label: 'LANGUAGES: EN | ZH | KO' },
         ],
       },
       {

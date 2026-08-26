@@ -1,7 +1,8 @@
 import type { SignatureTalksBlock as SignatureTalksBlockProps } from '@/payload-types'
 import React from 'react'
 
-const accent = 'text-[hsl(43_42%_58%)]'
+import { accentForIndex, BRAND_ACCENTS } from '@/utilities/brandAccents'
+
 
 export const SignatureTalksBlock: React.FC<SignatureTalksBlockProps> = (props) => {
   const { heading = 'Signature talks', intro, talks } = props
@@ -22,7 +23,10 @@ export const SignatureTalksBlock: React.FC<SignatureTalksBlockProps> = (props) =
             key={i}
           >
             <div className="flex gap-4">
-              <span className={`font-title text-xl font-semibold tabular-nums sm:text-2xl ${accent}`}>
+              <span
+                className="font-title text-xl font-semibold tabular-nums sm:text-2xl"
+                style={{ color: accentForIndex(i) }}
+              >
                 {talk.number}
               </span>
               <div className="min-w-0 flex-1">

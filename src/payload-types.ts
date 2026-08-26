@@ -379,6 +379,8 @@ export interface Page {
     | SpeakerBioBlock
     | SpeakerKitHeadshotsBlock
     | SpeakerKitBlock
+    | HeroSplitBlock
+    | TwoDoorsBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1588,7 +1590,7 @@ export interface BookCoverRowBlock {
          */
         image: string | Media;
         /**
-         * e.g. English · 中文 · 한국어
+         * e.g. English | 中文 | 한국어
          */
         caption?: string | null;
         /**
@@ -1931,6 +1933,92 @@ export interface SpeakerKitBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'speakerKit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroSplitBlock".
+ */
+export interface HeroSplitBlock {
+  /**
+   * Largest line. Keep it short — it sets at display size.
+   */
+  headline: string;
+  /**
+   * The claim directly under the headline. One or two sentences.
+   */
+  lead?: string | null;
+  /**
+   * Smaller supporting paragraph under the lead.
+   */
+  support?: string | null;
+  /**
+   * Shown at its native aspect ratio, not cropped to a letterbox. Portrait sources work well here.
+   */
+  image?: (string | null) | Media;
+  imageSide?: ('right' | 'left') | null;
+  imageAspect?: ('3/4' | '4/5' | '1/1' | '3/2') | null;
+  ctas?:
+    | {
+        label: string;
+        url: string;
+        style?: ('solid' | 'outline') | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroSplit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TwoDoorsBlock".
+ */
+export interface TwoDoorsBlock {
+  /**
+   * Rendered as the section heading, in the title face.
+   */
+  eyebrow?: string | null;
+  /**
+   * Optional sub-headline under WORK WITH ME. Leave blank for none.
+   */
+  heading?: string | null;
+  /**
+   * Optional line under the heading.
+   */
+  intro?: string | null;
+  doors?:
+    | {
+        /**
+         * Small uppercase line naming the audience.
+         */
+        kicker?: string | null;
+        title: string;
+        body: string;
+        /**
+         * Optional image above the card copy. Shown at 16:9 — low-resolution sources are fine at this size.
+         */
+        image?: (string | null) | Media;
+        ctaLabel: string;
+        ctaUrl: string;
+        ctaStyle?: ('solid' | 'outline') | null;
+        /**
+         * Qualifying terms pinned to the bottom of the card, one per line. Stating these up front is what protects the rate.
+         */
+        terms?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'twoDoors';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2378,6 +2466,8 @@ export interface PagesSelect<T extends boolean = true> {
         speakerBio?: T | SpeakerBioBlockSelect<T>;
         speakerKitHeadshots?: T | SpeakerKitHeadshotsBlockSelect<T>;
         speakerKit?: T | SpeakerKitBlockSelect<T>;
+        heroSplit?: T | HeroSplitBlockSelect<T>;
+        twoDoors?: T | TwoDoorsBlockSelect<T>;
       };
   meta?:
     | T
@@ -2886,6 +2976,54 @@ export interface SpeakerKitBlockSelect<T extends boolean = true> {
         id?: T;
       };
   downloadable?: T;
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroSplitBlock_select".
+ */
+export interface HeroSplitBlockSelect<T extends boolean = true> {
+  headline?: T;
+  lead?: T;
+  support?: T;
+  image?: T;
+  imageSide?: T;
+  imageAspect?: T;
+  ctas?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        style?: T;
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TwoDoorsBlock_select".
+ */
+export interface TwoDoorsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  doors?:
+    | T
+    | {
+        kicker?: T;
+        title?: T;
+        body?: T;
+        image?: T;
+        ctaLabel?: T;
+        ctaUrl?: T;
+        ctaStyle?: T;
+        terms?: T;
+        id?: T;
+      };
   background?: T;
   id?: T;
   blockName?: T;
