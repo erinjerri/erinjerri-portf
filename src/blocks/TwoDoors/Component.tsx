@@ -4,9 +4,11 @@ import React from 'react'
 import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 
-const accent = 'text-[hsl(43_42%_58%)]'
-const accentBorder = 'border-[hsl(43_42%_58%)]'
-const accentBg = 'bg-[hsl(43_42%_58%)]'
+import { BRAND_ACCENTS, accentForIndex } from '@/utilities/brandAccents'
+
+/** Buttons follow the logo: cobalt (primary) solid, light blue (accent) outline. */
+const SOLID_BTN = 'border-primary bg-primary text-primary-foreground hover:opacity-90'
+const OUTLINE_BTN = 'border-accent text-accent hover:bg-accent/10'
 
 export const TwoDoorsBlock: React.FC<TwoDoorsBlockProps> = (props) => {
   const { eyebrow, heading, intro, doors } = props
@@ -19,10 +21,8 @@ export const TwoDoorsBlock: React.FC<TwoDoorsBlockProps> = (props) => {
           title face, gold, rather than a small label above a second headline. */}
       {eyebrow ? (
         <h2
-          className={cn(
-            'font-title text-display-h2 font-semibold uppercase tracking-[0.12em] md:text-display-h2-md',
-            accent,
-          )}
+          className="font-title text-display-h2 font-semibold uppercase tracking-[0.12em] md:text-display-h2-md"
+          style={{ color: BRAND_ACCENTS.teal }}
         >
           {eyebrow}
         </h2>
@@ -54,10 +54,8 @@ export const TwoDoorsBlock: React.FC<TwoDoorsBlockProps> = (props) => {
             <div className="flex flex-1 flex-col gap-4 p-5 lg:p-6">
               {door.kicker ? (
                 <span
-                  className={cn(
-                    'font-title text-xs font-semibold uppercase tracking-[0.14em]',
-                    accent,
-                  )}
+                  className="font-title text-xs font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: accentForIndex(i) }}
                 >
                   {door.kicker}
                 </span>
@@ -69,17 +67,17 @@ export const TwoDoorsBlock: React.FC<TwoDoorsBlockProps> = (props) => {
               <a
                 className={cn(
                   'mt-1 inline-block self-start border px-5 py-3 font-title text-sm font-semibold no-underline transition-colors',
-                  accentBorder,
-                  door.ctaStyle === 'outline'
-                    ? cn(accent, 'hover:bg-[hsl(43_42%_58%)]/10')
-                    : cn(accentBg, 'text-background hover:opacity-90'),
+                  door.ctaStyle === 'outline' ? OUTLINE_BTN : SOLID_BTN,
                 )}
                 href={door.ctaUrl ?? '#'}
               >
                 {door.ctaLabel}
               </a>
               {door.terms ? (
-                <div className="mt-auto border-t border-border/60 pt-4 font-title text-xs uppercase leading-relaxed tracking-[0.08em] text-[hsl(43_42%_58%)]">
+                <div
+                  className="mt-auto border-t border-border/60 pt-4 font-title text-xs uppercase leading-relaxed tracking-[0.08em]"
+                  style={{ color: accentForIndex(i) }}
+                >
                   {door.terms
                     .split('\n')
                     .filter((line) => line.trim())

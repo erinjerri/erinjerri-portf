@@ -4,9 +4,9 @@ import React from 'react'
 import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 
-const accentBorder = 'border-[hsl(43_42%_58%)]'
-const accentText = 'text-[hsl(43_42%_58%)]'
-const accentBg = 'bg-[hsl(43_42%_58%)]'
+/** Buttons follow the logo: cobalt (primary) solid, light blue (accent) outline. */
+const SOLID_BTN = 'border-primary bg-primary text-primary-foreground hover:opacity-90'
+const OUTLINE_BTN = 'border-accent text-accent hover:bg-accent/10'
 
 const ASPECT_CLASS: Record<string, string> = {
   '3/4': 'aspect-[3/4]',
@@ -50,10 +50,7 @@ export const HeroSplitBlock: React.FC<HeroSplitBlockProps> = (props) => {
                 <a
                   className={cn(
                     'inline-block border px-6 py-3 font-title text-sm font-semibold no-underline transition-colors',
-                    accentBorder,
-                    cta.style === 'outline'
-                      ? cn(accentText, 'hover:bg-[hsl(43_42%_58%)]/10')
-                      : cn(accentBg, 'text-background hover:opacity-90'),
+                    cta.style === 'outline' ? OUTLINE_BTN : SOLID_BTN,
                   )}
                   href={cta.url ?? '#'}
                   key={i}
