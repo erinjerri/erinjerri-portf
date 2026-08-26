@@ -56,9 +56,10 @@ function getNavBackgroundSrc(data: Header | null): string {
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
-  // The homepage hero owns the full ribbon artwork. Avoid requesting the same
-  // image again in the sticky header while keeping the editable strip elsewhere.
-  const navBackgroundSrc = pathname === '/' ? null : getNavBackgroundSrc(data)
+  // The header strip is part of the brand, including on the homepage. The
+  // default asset is a 1400x155 webp, not the full hero ribbon, so rendering it
+  // here does not duplicate the hero's image request.
+  const navBackgroundSrc = getNavBackgroundSrc(data)
   /** Keep the dimensions strip on every “dark header” route (same set as `themeForPathname`), not only `/`. */
   const stripPinned = theme === 'dark'
   const stripVisible = stripPinned ? true : !scrolled
