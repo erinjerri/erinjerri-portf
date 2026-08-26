@@ -1,4 +1,5 @@
 const DEFAULT_SUBSTACK_URL = 'https://erinjerri.substack.com'
+const DEFAULT_CYRA_URL = 'https://cyra-site.netlify.app/'
 
 function resolveSubstackSubscribeURL(): string {
   const configured = process.env.SUBSTACK_SUBSCRIBE_URL?.trim() || DEFAULT_SUBSTACK_URL
@@ -16,7 +17,7 @@ function resolveSubstackSubscribeURL(): string {
 }
 
 function resolveCYRPlannerURL(): string {
-  const configured = process.env.CYR_PLANNER_URL?.trim() || 'https://cyra-site.netlify.app/'
+  const configured = process.env.CYR_PLANNER_URL?.trim() || process.env.CYR_SITE_URL?.trim() || DEFAULT_CYRA_URL
 
   try {
     const url = new URL(configured)
@@ -25,12 +26,13 @@ function resolveCYRPlannerURL(): string {
     url.searchParams.set('utm_campaign', 'planner_preorder')
     return url.toString()
   } catch {
-    return 'https://cyra-site.netlify.app/'
+    return DEFAULT_CYRA_URL
   }
 }
 
 export const creatingYourRealityConfig = {
   route: '/shop/creating-your-reality',
+  cyraURL: process.env.CYR_SITE_URL?.trim() || DEFAULT_CYRA_URL,
   app: {
     exploreURL: process.env.CYR_TIMEBITE_URL?.trim() || '/timebite',
     pricingURL: process.env.CYR_TIMEBITE_PRICING_URL?.trim() || '/timebite',
