@@ -7,7 +7,7 @@
 **Hero field:** `none` — renders *above* all layout blocks
 
 Rebuild by adding each block in this order and filling the fields below.
-Machine-restorable copy: `snapshots/page-layouts/home-v1.json`
+Machine-restorable copy: `snapshots/page-layouts/home-v1-hybrid.json`
 
 ## Block order
 
