@@ -189,11 +189,16 @@ export const speakingInfoPage = ({
       {
         blockType: 'tagPills',
         blockName: 'Creds',
+        /**
+         * Every entry here is a claim an organizer can verify. 'NVIDIA GTC' was
+         * listed and is not a stage Erin has spoken on — removed. Do not add a
+         * venue back until the talk has actually happened.
+         */
         tags: [
           { label: "O'REILLY AUTHOR" },
           { label: 'UC BERKELEY' },
           { label: 'QCON' },
-          { label: 'NVIDIA GTC' },
+          { label: 'STANFORD' },
           { label: 'HARVARD' },
           { label: 'APPLE VISION PRO' },
         ],
