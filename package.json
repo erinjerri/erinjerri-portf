@@ -48,7 +48,8 @@
     "ensure:home-layout-v2": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-home-layout-v2.ts",
     "ensure:subpages-v2": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-subpage-layouts-v2.ts",
     "ensure:footer-buy": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/ensure-footer-buy-group.ts",
-    "remove:footer-buy": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/remove-footer-buy-group.ts"
+    "remove:footer-buy": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/remove-footer-buy-group.ts",
+    "snapshot:layout": "cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" tsx src/scripts/snapshot-page-layout.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.717.0",
