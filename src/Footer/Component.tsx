@@ -14,6 +14,7 @@ import type { Footer, Media as MediaType } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
+import { creatingYourRealityConfig } from '@/config/creatingYourReality'
 import { SocialIconImage } from './SocialIconImage'
 import { SubscribeForm } from './SubscribeForm'
 import { SubstackIcon } from './SubstackIcon'
@@ -102,6 +103,38 @@ const normalizeSubstackPublicationURL = (rawValue?: string | null): string => {
 
 const getSubstackPublicationURL = (): string => {
   return normalizeSubstackPublicationURL(process.env.SUBSTACK_SUBSCRIBE_URL)
+}
+
+const footerLinkClass = 'text-muted-foreground transition-colors hover:text-foreground'
+
+function BuyFooterGroup() {
+  return (
+    <div className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]">
+      <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">Buy</span>
+      <ul className="flex flex-col gap-2">
+        <li>
+          <a
+            className={footerLinkClass}
+            href={creatingYourRealityConfig.amazonURL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Amazon Store
+          </a>
+        </li>
+        <li>
+          <Link className={footerLinkClass} href={creatingYourRealityConfig.booksURL}>
+            Books
+          </Link>
+        </li>
+        <li>
+          <a className={footerLinkClass} href={creatingYourRealityConfig.cyraURL} target="_blank" rel="noopener noreferrer">
+            Creating Your Reality
+          </a>
+        </li>
+      </ul>
+    </div>
+  )
 }
 
 function SocialIcon({
@@ -244,35 +277,47 @@ export async function Footer({ data }: FooterProps = {}) {
                 >
                   {group.header && (
                     <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">
-                      {group.header}
+                      {group.header.trim().toLowerCase() === 'shop' ? 'Buy' : group.header}
                     </span>
                   )}
                   <ul className="flex flex-col gap-2">
                     {group.links?.map((item, linkIndex) => {
                       const link = item?.link
                       if (!link?.label) return null
+                      const isCreatingYourReality = link.label.toLowerCase().includes('creating your reality')
                       return (
                         <li key={item.id || linkIndex}>
-                          <CMSLink
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                            type={link.type}
-                            url={link.url}
-                            newTab={link.newTab}
-                            label={link.label}
-                            reference={link.reference}
-                            archive={link.archive}
-                          />
+                          {isCreatingYourReality ? (
+                            <a className={footerLinkClass} href={creatingYourRealityConfig.cyraURL} target="_blank" rel="noopener noreferrer">
+                              Creating Your Reality
+                            </a>
+                          ) : (
+                            <CMSLink
+                              className="text-muted-foreground hover:text-foreground transition-colors"
+                              type={link.type}
+                              url={link.url}
+                              newTab={link.newTab}
+                              label={link.label}
+                              reference={link.reference}
+                              archive={link.archive}
+                            />
+                          )}
                         </li>
                       )
                     })}
                     {group.header?.trim().toLowerCase() === 'shop' &&
-                    !group.links?.some((item) => item?.link?.url === '/shop/creating-your-reality') ? (
+                    !group.links?.some((item) => item?.link?.label?.toLowerCase().includes('creating your reality')) ? (
                       <li>
-                        <Link
-                          className="text-muted-foreground transition-colors hover:text-foreground"
-                          href="/shop/creating-your-reality"
-                        >
+                        <a className={footerLinkClass} href={creatingYourRealityConfig.cyraURL} target="_blank" rel="noopener noreferrer">
                           Creating Your Reality
+                        </a>
+                      </li>
+                    ) : null}
+                    {group.header?.trim().toLowerCase() === 'shop' &&
+                    !group.links?.some((item) => item?.link?.label?.toLowerCase() === 'books') ? (
+                      <li>
+                        <Link className={footerLinkClass} href={creatingYourRealityConfig.booksURL}>
+                          Books
                         </Link>
                       </li>
                     ) : null}
@@ -280,26 +325,12 @@ export async function Footer({ data }: FooterProps = {}) {
                 </div>
               ))}
               {!hasShopGroup && (
-                <div className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]">
-                  <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">Shop</span>
-                  <ul className="flex flex-col gap-2">
-                    <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/store">Amazon Store</Link></li>
-                    <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/creating-ar-vr-book">Books</Link></li>
-                    <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/shop/creating-your-reality">Creating Your Reality</Link></li>
-                  </ul>
-                </div>
+                <BuyFooterGroup />
               )}
             </nav>
           ) : (
             <nav className="flex flex-wrap gap-x-12 gap-y-8">
-              <div className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]">
-                <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">Shop</span>
-                <ul className="flex flex-col gap-2">
-                  <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/store">Amazon Store</Link></li>
-                  <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/creating-ar-vr-book">Books</Link></li>
-                  <li><Link className="text-muted-foreground transition-colors hover:text-foreground" href="/shop/creating-your-reality">Creating Your Reality</Link></li>
-                </ul>
-              </div>
+              <BuyFooterGroup />
             </nav>
           )}
         </div>

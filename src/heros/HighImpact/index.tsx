@@ -254,7 +254,22 @@ export const HighImpactHero: React.FC<HeroProps> = ({
         />
       )}
       {backgroundImage && (
-        <div className="absolute inset-0 -z-10">
+        /**
+         * Mobile pins the band to the artwork's own aspect ratio; desktop keeps
+         * the full-bleed cover.
+         *
+         * The source is 1000x572 (landscape). Covering a phone-shaped box —
+         * 390x844, and taller still once hero content stacks — makes
+         * `object-cover` scale to match height, so it consumes only ~264px of
+         * the source's 1000px width and enlarges that slice ~4.4x at DPR 3.
+         * That is the pixelation.
+         *
+         * Constraining the band to `aspect-[1000/572]` renders the whole image
+         * at 390x223 — a 0.39x downscale, sharp at any DPR. The backdrop div
+         * above already paints everything below the band. Desktop is unchanged:
+         * a wide viewport is near the source aspect, so cover behaves.
+         */
+        <div className="absolute inset-x-0 top-0 -z-10 aspect-[1000/572] lg:inset-0 lg:aspect-auto lg:h-full">
           <Media
             alt={
               (typeof backgroundImage.alt === 'string' && backgroundImage.alt.trim()) ||
@@ -265,9 +280,9 @@ export const HighImpactHero: React.FC<HeroProps> = ({
             imgClassName={heroCoverImgClassName}
             pictureClassName="relative block h-full w-full"
             priority
-            quality={60}
+            quality={85}
             resource={backgroundImage}
-            size="(max-width: 768px) min(100vw, 768px), (max-width: 1536px) 90vw, 1200px"
+            size="(max-width: 768px) 100vw, (max-width: 1536px) 90vw, 1200px"
           />
         </div>
       )}
