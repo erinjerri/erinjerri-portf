@@ -100,6 +100,15 @@ R2_SECRET_ACCESS_KEY=
 R2_PUBLIC_HOSTNAME=
 ```
 
+For optional Microsoft Clarity tracking, include these public variables and leave tracking off by default:
+
+```env
+NEXT_PUBLIC_ENABLE_CLARITY=false
+NEXT_PUBLIC_CLARITY_PROJECT_ID=
+```
+
+Template users should set `NEXT_PUBLIC_ENABLE_CLARITY=true` and provide the Clarity project ID in their local `.env.local` or Netlify environment settings, then run `pnpm run build:netlify` before deploying. After deployment, they should verify both the browser request to `https://www.clarity.ms/tag/<project-id>` and a recent session in the Clarity dashboard. The project ID is not a secret, but real project-specific values should not be committed to the template.
+
 ### 2.3 Remove or anonymize sensitive data
 
 - Delete any `.env` or `.env.local` from the repo (they should be in `.gitignore`)

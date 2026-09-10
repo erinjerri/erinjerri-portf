@@ -189,11 +189,12 @@ export const speakingInfoPage = ({
       {
         blockType: 'tagPills',
         blockName: 'Creds',
+        /** Every entry is a claim an organizer can verify. Add a venue only after the talk has happened. */
         tags: [
           { label: "O'REILLY AUTHOR" },
           { label: 'UC BERKELEY' },
           { label: 'QCON' },
-          { label: 'NVIDIA GTC' },
+          { label: 'STANFORD' },
           { label: 'HARVARD' },
           { label: 'APPLE VISION PRO' },
         ],

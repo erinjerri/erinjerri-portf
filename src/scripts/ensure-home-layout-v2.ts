@@ -205,6 +205,7 @@ async function run(): Promise<void> {
   await payload.update({
     collection: 'pages',
     id: homePage.id,
+    context: { disableRevalidate: true },
     depth: 0,
     draft: true,
     overrideAccess: true,
