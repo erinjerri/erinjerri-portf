@@ -88,22 +88,17 @@ export default async function Page({ params: paramsPromise }: Args) {
     includeGridMedia: decodedSlug === 'home',
   })
 
-  const hasHomeGridMedia =
-    decodedSlug === 'home' &&
-    Boolean(
-      resolvedHero?.backgroundMedia ||
-      resolvedHero?.heroImage1 ||
-      resolvedHero?.heroImage2 ||
-      resolvedHero?.heroImage3 ||
-      resolvedHero?.productMockup,
-    )
-
-  const hero = hasHomeGridMedia
-    ? {
-        ...resolvedHero,
-        type: 'highImpact' as const,
-      }
-    : resolvedHero
+  /**
+   * The hero type is whatever the CMS says it is.
+   *
+   * This used to be forced to `highImpact` on /home whenever any legacy hero
+   * image field still held a value. That made the setting unfixable: those
+   * image fields are only shown in the admin when the type is already
+   * `highImpact`, so an editor who set the type to "none" still got a hero and
+   * had no control anywhere in the UI to remove it. The home hero is the
+   * `heroSplit` block now; the old collage fields are dormant data.
+   */
+  const hero = resolvedHero
 
   const { layout, videoAsset, videoSource, videoUrl } = enhancedPage
   const selectedVideo =

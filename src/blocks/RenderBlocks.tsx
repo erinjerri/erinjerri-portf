@@ -436,6 +436,22 @@ export const RenderBlocks: React.FC<{
                 (blockType === 'cta' && ctaHasLinks(block)) ||
                 (blockType === 'content' && contentHasLinks(block))
 
+              /**
+               * A stat strip immediately followed by tag pills is one
+               * credibility band, not two sections. Each normally contributes
+               * its own section padding *and* its own container margin, which
+               * stacked up to roughly 320px of dead space between the numbers
+               * and the credentials they belong to. Collapse the facing edges
+               * and zero both containers' margins so the pair reads as a unit.
+               */
+              const isCredBandLead = blockType === 'statStrip' && nextBlock?.blockType === 'tagPills'
+              const isCredBandTail = blockType === 'tagPills' && prevBlock?.blockType === 'statStrip'
+              const credBandClass = isCredBandLead
+                ? 'pt-16 pb-0 md:pt-24 md:pb-0 [&_.container]:my-0'
+                : isCredBandTail
+                  ? 'pt-6 pb-16 md:pt-7 md:pb-24 [&_.container]:my-0'
+                  : null
+
               const surfaceClass = BLOCK_SURFACE_CLASS[blockSurfaces[index] ?? 'default']
 
               // Interior pages space sections with vertical margin. A painted
@@ -445,15 +461,17 @@ export const RenderBlocks: React.FC<{
                 !isHomePage && surfaceClass ? 'py-20 md:py-24 lg:py-28' : marginClass
 
               const sectionClassName = cn(
-                isHomePage
-                  ? index === 0
-                    ? 'pt-8 pb-16 md:pt-10 md:pb-20'
-                    : isBookCoverRow && nextIsStandaloneLinksBlock
-                      ? 'pt-16 pb-4 md:pt-20 md:pb-6'
-                      : prevIsBookCoverRow && isStandaloneLinksBlock
-                        ? 'pt-4 pb-16 md:pt-6 md:pb-20'
-                        : 'py-16 md:py-24'
-                  : spacingClass,
+                credBandClass
+                  ? credBandClass
+                  : isHomePage
+                    ? index === 0
+                      ? 'pt-8 pb-16 md:pt-10 md:pb-20'
+                      : isBookCoverRow && nextIsStandaloneLinksBlock
+                        ? 'pt-16 pb-4 md:pt-20 md:pb-6'
+                        : prevIsBookCoverRow && isStandaloneLinksBlock
+                          ? 'pt-4 pb-16 md:pt-6 md:pb-20'
+                          : 'py-16 md:py-24'
+                    : spacingClass,
                 surfaceClass,
               )
               const blockProps = block as Record<string, unknown>
