@@ -1513,6 +1513,10 @@ export interface TagPillsBlock {
    * Optional line above the tags.
    */
   intro?: string | null;
+  /**
+   * The palette is pastel (mint, teal, pink), so white text on a plain accent fill is unreadable — roughly 1.3:1. "Solid" therefore pairs the accent fill with near-black text; "Deep" is the white-text option and darkens the fill to carry it.
+   */
+  variant?: ('subtle' | 'solid' | 'outline' | 'deep') | null;
   tags?:
     | {
         label: string;
@@ -2717,6 +2721,7 @@ export interface StatStripBlockSelect<T extends boolean = true> {
  */
 export interface TagPillsBlockSelect<T extends boolean = true> {
   intro?: T;
+  variant?: T;
   tags?:
     | T
     | {
