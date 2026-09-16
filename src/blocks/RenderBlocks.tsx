@@ -437,22 +437,44 @@ export const RenderBlocks: React.FC<{
                 (blockType === 'content' && contentHasLinks(block))
 
               /**
-               * A stat strip immediately followed by tag pills is one
-               * credibility band, not two sections. Each normally contributes
-               * its own section padding *and* its own container margin, which
-               * stacked up to roughly 320px of dead space between the numbers
-               * and the credentials they belong to. Collapse the facing edges
-               * and zero both containers' margins so the pair reads as a unit.
+               * heroSplit -> statStrip -> tagPills is one masthead, not three
+               * sections: the claim, the numbers behind it, and the titles.
+               *
+               * Left alone, each contributes its own section padding *and* its
+               * own container margin, stacking to roughly 320px of dead space
+               * between a number and the credential it belongs to. Worse, the
+               * surface resolver alternates from index 1, so the stat strip
+               * landed on a painted surface and the masthead visibly split in
+               * two. Adjacent members of the band share one flat surface and
+               * collapse the edge they face.
                */
-              const isCredBandLead = blockType === 'statStrip' && nextBlock?.blockType === 'tagPills'
-              const isCredBandTail = blockType === 'tagPills' && prevBlock?.blockType === 'statStrip'
-              const credBandClass = isCredBandLead
-                ? 'pt-16 pb-0 md:pt-24 md:pb-0 [&_.container]:my-0'
-                : isCredBandTail
-                  ? 'pt-6 pb-16 md:pt-7 md:pb-24 [&_.container]:my-0'
+              const inMasthead = (a?: string, b?: string) =>
+                (a === 'heroSplit' && (b === 'statStrip' || b === 'tagPills')) ||
+                (a === 'statStrip' && b === 'tagPills')
+
+              const attachAbove = inMasthead(prevBlock?.blockType, blockType)
+              const attachBelow = inMasthead(blockType, nextBlock?.blockType)
+
+              const mastheadClass =
+                attachAbove || attachBelow
+                  ? cn(
+                      attachAbove ? 'pt-6 md:pt-8' : 'pt-16 md:pt-24',
+                      attachBelow ? 'pb-0 md:pb-0' : 'pb-16 md:pb-24',
+                      '[&_.container]:my-0',
+                    )
                   : null
 
-              const surfaceClass = BLOCK_SURFACE_CLASS[blockSurfaces[index] ?? 'default']
+              /**
+               * An explicit background still wins; only `auto` blocks defer, so
+               * an editor who pins the strip to `light` still gets it.
+               */
+              const hasExplicitBackground = ['default', 'raised', 'light'].includes(
+                String((block as { background?: string | null })?.background ?? ''),
+              )
+              const surfaceClass =
+                attachAbove && !hasExplicitBackground
+                  ? ''
+                  : BLOCK_SURFACE_CLASS[blockSurfaces[index] ?? 'default']
 
               // Interior pages space sections with vertical margin. A painted
               // surface needs padding instead, or the colour band stops short of
@@ -461,8 +483,8 @@ export const RenderBlocks: React.FC<{
                 !isHomePage && surfaceClass ? 'py-20 md:py-24 lg:py-28' : marginClass
 
               const sectionClassName = cn(
-                credBandClass
-                  ? credBandClass
+                mastheadClass
+                  ? mastheadClass
                   : isHomePage
                     ? index === 0
                       ? 'pt-8 pb-16 md:pt-10 md:pb-20'
