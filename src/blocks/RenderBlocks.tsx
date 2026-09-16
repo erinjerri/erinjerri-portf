@@ -447,10 +447,15 @@ export const RenderBlocks: React.FC<{
                * landed on a painted surface and the masthead visibly split in
                * two. Adjacent members of the band share one flat surface and
                * collapse the edge they face.
+               *
+               * The proof blocks are treated as a set rather than a fixed
+               * sequence, so an editor can put the pills above the numbers or
+               * below them and the band holds either way.
                */
+              const MASTHEAD_PROOF = new Set(['statStrip', 'tagPills'])
               const inMasthead = (a?: string, b?: string) =>
-                (a === 'heroSplit' && (b === 'statStrip' || b === 'tagPills')) ||
-                (a === 'statStrip' && b === 'tagPills')
+                (a === 'heroSplit' && MASTHEAD_PROOF.has(String(b))) ||
+                (MASTHEAD_PROOF.has(String(a)) && MASTHEAD_PROOF.has(String(b)))
 
               const attachAbove = inMasthead(prevBlock?.blockType, blockType)
               const attachBelow = inMasthead(blockType, nextBlock?.blockType)
