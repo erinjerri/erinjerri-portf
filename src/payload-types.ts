@@ -1955,6 +1955,10 @@ export interface HeroSplitBlock {
    * Shown at its native aspect ratio, not cropped to a letterbox. Portrait sources work well here.
    */
   image?: (string | null) | Media;
+  /**
+   * Optional full-bleed image behind the whole block. Sits under a dark scrim so the copy stays legible.
+   */
+  backgroundImage?: (string | null) | Media;
   imageSide?: ('right' | 'left') | null;
   imageAspect?: ('3/4' | '4/5' | '1/1' | '3/2') | null;
   ctas?:
@@ -2989,6 +2993,7 @@ export interface HeroSplitBlockSelect<T extends boolean = true> {
   lead?: T;
   support?: T;
   image?: T;
+  backgroundImage?: T;
   imageSide?: T;
   imageAspect?: T;
   ctas?:

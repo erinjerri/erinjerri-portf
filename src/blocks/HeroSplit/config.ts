@@ -51,6 +51,18 @@ export const HeroSplit: Block = {
       },
     },
     {
+      name: 'backgroundImage',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: {
+        mediaType: { equals: 'image' },
+      },
+      admin: {
+        description:
+          'Optional full-bleed image behind the whole block. Sits under a dark scrim so the copy stays legible.',
+      },
+    },
+    {
       name: 'imageSide',
       type: 'select',
       defaultValue: 'right',

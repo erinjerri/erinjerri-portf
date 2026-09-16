@@ -1,6 +1,6 @@
 /**
- * Mobile perf: site "3D feel" is Canvas2D (not three.js). Throttled RAF, pauses when tab hidden /
- * off-screen, lower DPR + point counts on small viewports for TBT. Ambient mode also sleeps once
+ * The site's luminous ribbons use Canvas2D. Display-synced RAF, reusable curve buffers and
+ * cached star sprites keep motion smooth. Ambient mode also sleeps once
  * the hero blend has faded, so it does not keep a site-wide RAF alive during normal reading.
  */
 'use client'
@@ -85,10 +85,10 @@ const LAYERS: CurveLayer[] = [
   },
 ]
 
-const CURVE_POINT_COUNT = 180
-const CURVE_POINT_COUNT_AMBIENT_MOBILE = 110
-const STAR_COUNT = 42
-const STAR_COUNT_AMBIENT_MOBILE = 22
+const CURVE_POINT_COUNT = 96
+const CURVE_POINT_COUNT_AMBIENT_MOBILE = 64
+const STAR_COUNT = 28
+const STAR_COUNT_AMBIENT_MOBILE = 16
 
 function buildCurvePoints(
   config: CurveLayer,
@@ -98,9 +98,11 @@ function buildCurvePoints(
   pointerX: number,
   pointerY: number,
   pointCount: number = CURVE_POINT_COUNT,
+  points: CurvePoint[] = [],
+  drift = 0,
 ): CurvePoint[] {
-  const points: CurvePoint[] = []
   const count = Math.max(32, Math.min(pointCount, 256))
+  points.length = count
 
   for (let index = 0; index < count; index += 1) {
     const t = index / (count - 1)
@@ -118,10 +120,9 @@ function buildCurvePoints(
       pointerX * 0.014 +
       pointerY * 0.01
 
-    points.push({
-      x,
-      y: normalizedY * height,
-    })
+    const point = points[index] ?? (points[index] = { x: 0, y: 0 })
+    point.x = x
+    point.y = normalizedY * height + drift
   }
 
   return points
@@ -160,24 +161,15 @@ function drawGlowLine(
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
 
-  const m = intensityMul
-  ctx.globalAlpha = opacity * 0.12 * m
-  ctx.lineWidth = width * 18
-  ctx.shadowBlur = width * 34
-  ctx.shadowColor = color
+  // Reuse one path. Soft, nested strokes avoid 15 full-canvas shadow blur passes per frame.
   traceCurve(ctx, points)
-  ctx.stroke()
-
-  ctx.globalAlpha = opacity * 0.24 * m
-  ctx.lineWidth = width * 8
-  ctx.shadowBlur = width * 18
-  traceCurve(ctx, points)
-  ctx.stroke()
-
-  ctx.globalAlpha = opacity * m
-  ctx.lineWidth = width * 2.2
-  ctx.shadowBlur = width * 8
-  traceCurve(ctx, points)
+  for (let pass = 8; pass >= 1; pass -= 1) {
+    ctx.globalAlpha = opacity * intensityMul * 0.025 * (1 - pass / 10)
+    ctx.lineWidth = width * (2 + pass * 3)
+    ctx.stroke()
+  }
+  ctx.globalAlpha = opacity * intensityMul * 0.75
+  ctx.lineWidth = width * 1.3
   ctx.stroke()
 
   ctx.restore()
@@ -326,6 +318,18 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     let frame = 0
     let width = 0
     let height = 0
+    const curveBuffers = LAYERS.map((): CurvePoint[] => [])
+    // Render each glow once at retina resolution, then composite a small sprite per star.
+    const starSprites = ['#88e7ff', '#bfa7ff'].map((color) => {
+      const sprite = document.createElement('canvas')
+      sprite.width = sprite.height = 64
+      const spriteCtx = sprite.getContext('2d')
+      if (spriteCtx) {
+        spriteCtx.scale(2, 2)
+        drawStar(spriteCtx, 16, 16, 2.4, color, 1)
+      }
+      return sprite
+    })
     const pointerTarget = { x: 0, y: 0 }
     const pointerCurrent = { x: 0, y: 0 }
 
@@ -333,6 +337,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     const mReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
 
     const handlePointerMove = (event: PointerEvent) => {
+      if (motionPrefsRef.current.reduceMotion || event.pointerType === 'touch') return
       const bounds = canvas.getBoundingClientRect()
       const x = (event.clientX - bounds.left) / Math.max(bounds.width, 1)
       const y = (event.clientY - bounds.top) / Math.max(bounds.height, 1)
@@ -347,10 +352,9 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       requestRender()
     }
 
-    /** Site-wide ambient: 30fps cap always. Mobile `full` variant: 30fps; desktop `full`: ~60fps. */
+    // A local clock prevents phase jumps when the canvas wakes after being hidden.
     let lastFrameTimeMs = 0
-    const FRAME_MS_30 = 1000 / 30
-    const FRAME_MS_60 = 1000 / 60
+    let elapsed = 0
     let needsUpdate = true
 
     const getHeroBlend = () =>
@@ -370,8 +374,9 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     }
 
     const syncScroll = () => {
+      const previousBlend = getHeroBlend()
       scrollYRef.current = window.scrollY
-      if (variant === 'ambient') requestRender()
+      if (variant === 'ambient' && getHeroBlend() !== previousBlend) requestRender()
     }
     syncScroll()
     window.addEventListener('scroll', syncScroll, { passive: true })
@@ -393,56 +398,13 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
         return
       }
 
-      if (reduceMotion) {
-        lastFrameTimeMs = ts
-        const time = 0
-        pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
-        pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
-        const curveIntensity = variant === 'ambient' ? 0.18 + 0.82 * heroBlend : 1
-        drawBackground(
-          ctx,
-          width,
-          height,
-          time,
-          pointerCurrent.x,
-          pointerCurrent.y,
-          variant,
-          heroBlend,
-        )
-        const pointCap =
-          variant === 'ambient' && mobile ? CURVE_POINT_COUNT_AMBIENT_MOBILE : CURVE_POINT_COUNT
-        for (const [index, layer] of LAYERS.entries()) {
-          const points = buildCurvePoints(
-            layer,
-            time,
-            width,
-            height,
-            pointerCurrent.x,
-            pointerCurrent.y,
-            pointCap,
-          )
-          const drifted = points.map((point) => ({
-            x: point.x,
-            y: point.y + Math.sin(time * (0.38 + index * 0.06) + index) * (6 + index * 1.4),
-          }))
-          drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width, curveIntensity)
-        }
-        needsUpdate = false
-        return
-      }
-
-      const frameCapMs = variant === 'ambient' ? FRAME_MS_30 : mobile ? FRAME_MS_30 : FRAME_MS_60
-      if (ts - lastFrameTimeMs < frameCapMs * 0.92) {
-        frame = window.requestAnimationFrame(render)
-        return
-      }
+      const delta = lastFrameTimeMs ? Math.min((ts - lastFrameTimeMs) / 1000, 0.05) : 0
       lastFrameTimeMs = ts
-
-      const rawT = ts / 1000
-      const time = mobile ? rawT * MOBILE_TIME_SCALE : rawT
-
-      pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.06
-      pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.06
+      if (!reduceMotion) elapsed += delta * (mobile ? MOBILE_TIME_SCALE : 1)
+      const time = reduceMotion ? 0 : elapsed
+      const easing = reduceMotion ? 1 : 1 - Math.exp(-7.5 * delta)
+      pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * easing
+      pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * easing
 
       const curveIntensity = variant === 'ambient' ? 0.18 + 0.82 * heroBlend : 1
 
@@ -457,10 +419,8 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
         heroBlend,
       )
 
-      const leadCurves: CurvePoint[][] = []
-      const pointCap =
-        variant === 'ambient' && mobile ? CURVE_POINT_COUNT_AMBIENT_MOBILE : CURVE_POINT_COUNT
-      const starCap = variant === 'ambient' && mobile ? STAR_COUNT_AMBIENT_MOBILE : STAR_COUNT
+      const pointCap = mobile ? CURVE_POINT_COUNT_AMBIENT_MOBILE : CURVE_POINT_COUNT
+      const starCap = mobile ? STAR_COUNT_AMBIENT_MOBILE : STAR_COUNT
 
       for (const [index, layer] of LAYERS.entries()) {
         const points = buildCurvePoints(
@@ -471,20 +431,15 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
           pointerCurrent.x,
           pointerCurrent.y,
           pointCap,
+          curveBuffers[index],
+          Math.sin(time * (0.38 + index * 0.06) + index) * (6 + index * 1.4),
         )
-
-        const drifted = points.map((point) => ({
-          x: point.x,
-          y: point.y + Math.sin(time * (0.38 + index * 0.06) + index) * (6 + index * 1.4),
-        }))
-
-        if (index < 3) leadCurves.push(drifted)
-        drawGlowLine(ctx, drifted, layer.color, layer.opacity, layer.width, curveIntensity)
+        drawGlowLine(ctx, points, layer.color, layer.opacity, layer.width, curveIntensity)
       }
 
       const starMul = variant === 'ambient' ? Math.pow(heroBlend, 1.45) : 1
 
-      const guide = leadCurves[0] ?? []
+      const guide = curveBuffers[0] ?? []
       if (guide.length && starMul > 0.02) {
         for (let index = 0; index < starCap; index += 1) {
           const t = (index + 1) / (starCap + 1)
@@ -494,15 +449,19 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
           )
           const point = guide[sampleIndex]!
           const orbit = Math.sin(time * 0.8 + index * 0.6) * 10
-          const color = index % 4 === 0 ? '#bfa7ff' : '#88e7ff'
-          drawStar(
-            ctx,
-            point.x + Math.sin(time * 0.4 + index) * 11,
-            point.y + orbit + (index % 2 === 0 ? 9 : -5),
-            index % 5 === 0 ? 2.4 : 1.8,
-            color,
-            0.95 * starMul,
+          const sprite = starSprites[index % 4 === 0 ? 1 : 0]!
+          const size = index % 5 === 0 ? 32 : 24
+          ctx.save()
+          ctx.globalCompositeOperation = 'lighter'
+          ctx.globalAlpha = starMul * (0.55 + 0.2 * Math.sin(time * 0.6 + index))
+          ctx.drawImage(
+            sprite,
+            point.x + Math.sin(time * 0.4 + index) * 11 - size / 2,
+            point.y + orbit + (index % 2 === 0 ? 9 : -5) - size / 2,
+            size,
+            size,
           )
+          ctx.restore()
         }
       }
 
@@ -517,8 +476,16 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       const nextWidth = parent?.clientWidth ?? window.innerWidth
       const nextHeight = parent?.clientHeight ?? 520
       const isMobileViewport = window.matchMedia(MOBILE_MAX_WIDTH_MQ).matches
-      const dprMax = variant === 'ambient' && isMobileViewport ? 1 : isMobileViewport ? 1.5 : 2
+      const dprMax = isMobileViewport ? 1.5 : 2
       const dpr = Math.min(window.devicePixelRatio || 1, dprMax)
+
+      if (
+        width === nextWidth &&
+        height === nextHeight &&
+        canvas.width === Math.round(nextWidth * dpr) &&
+        canvas.height === Math.round(nextHeight * dpr)
+      )
+        return
 
       width = nextWidth
       height = nextHeight
@@ -537,6 +504,8 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     resize()
 
     const syncMotion = () => {
+      lastFrameTimeMs = 0
+      pointerTarget.x = pointerTarget.y = 0
       motionPrefsRef.current = {
         mobile: mMobile.matches,
         reduceMotion: mReduce.matches,
@@ -559,6 +528,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     mReduce.addEventListener('change', syncMotion)
 
     const onVisibility = () => {
+      lastFrameTimeMs = 0
       pageVisibleRef.current = document.visibilityState === 'visible'
       if (!pageVisibleRef.current && frame) {
         window.cancelAnimationFrame(frame)
@@ -583,6 +553,7 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       intersectionObserver = new IntersectionObserver(
         (entries) => {
           const hit = entries.some((e) => e.isIntersecting)
+          lastFrameTimeMs = 0
           inViewRef.current = hit
           if (!hit && frame) {
             window.cancelAnimationFrame(frame)
@@ -600,8 +571,8 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
     const parent = canvas.parentElement
     if (parent) resizeObserver.observe(parent)
     window.addEventListener('resize', resize)
-    canvas.addEventListener('pointermove', handlePointerMove)
-    canvas.addEventListener('pointerleave', handlePointerLeave)
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    document.documentElement.addEventListener('pointerleave', handlePointerLeave)
 
     return () => {
       window.cancelAnimationFrame(frame)
@@ -612,8 +583,8 @@ export function RibbonCurves({ variant = 'full' }: RibbonCurvesProps) {
       window.removeEventListener('scroll', syncScroll)
       mMobile.removeEventListener('change', syncMotion)
       mReduce.removeEventListener('change', syncMotion)
-      canvas.removeEventListener('pointermove', handlePointerMove)
-      canvas.removeEventListener('pointerleave', handlePointerLeave)
+      window.removeEventListener('pointermove', handlePointerMove)
+      document.documentElement.removeEventListener('pointerleave', handlePointerLeave)
     }
   }, [variant])
 

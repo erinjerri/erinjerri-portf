@@ -16,14 +16,43 @@ const ASPECT_CLASS: Record<string, string> = {
 }
 
 export const HeroSplitBlock: React.FC<HeroSplitBlockProps> = (props) => {
-  const { headline, lead, support, image, imageSide = 'right', imageAspect = '3/4', ctas } = props
+  const {
+    backgroundImage,
+    ctas,
+    headline,
+    image,
+    imageAspect = '3/4',
+    imageSide = 'right',
+    lead,
+    support,
+  } = props
 
   if (!headline) return null
 
   const aspectClass = ASPECT_CLASS[imageAspect ?? '3/4'] ?? ASPECT_CLASS['3/4']
 
+  const hasBackground = Boolean(backgroundImage && typeof backgroundImage === 'object')
+
   return (
-    <div className="container my-16 md:my-20 lg:my-24">
+    <div className={cn('relative', hasBackground ? 'isolate overflow-hidden' : undefined)}>
+      {hasBackground ? (
+        <>
+          <div className="absolute inset-0 -z-20">
+            <Media
+              fill
+              imgClassName="object-cover"
+              pictureClassName="block h-full w-full"
+              priority
+              quality={85}
+              resource={backgroundImage}
+              size="100vw"
+            />
+          </div>
+          {/* Scrim: the ribbon art is bright in places and the headline sits on top of it. */}
+          <div className="absolute inset-0 -z-10 bg-[#0a0b10]/72" aria-hidden="true" />
+        </>
+      ) : null}
+      <div className="container my-16 md:my-20 lg:my-24">
       <div
         className={cn(
           'grid items-center gap-8 md:gap-10 lg:gap-14',
@@ -82,6 +111,7 @@ export const HeroSplitBlock: React.FC<HeroSplitBlockProps> = (props) => {
           </div>
         ) : null}
       </div>
+    </div>
     </div>
   )
 }
