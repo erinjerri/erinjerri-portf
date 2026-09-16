@@ -1,4 +1,4 @@
-import type { Page, StatStripBlock } from '@/payload-types'
+import type { BookCoverRowBlock, Page, StatStripBlock, TagPillsBlock } from '@/payload-types'
 import { defaultBioBlock } from '@/blocks/BioBlock/defaults'
 
 type LayoutBlock = NonNullable<Page['layout']>[number]
@@ -12,6 +12,7 @@ const DEFAULT_BOOK_PAGE_SLUGS = [
   'creating-ar-vr',
   'creating-arvr-book',
   'creating-arvr',
+  'creatingarvrbook',
   'book-creating-ar-vr',
 ] as const
 
@@ -36,14 +37,60 @@ function bookStatStripBlock(): StatStripBlock {
   return {
     blockType: 'statStrip',
     blockName: 'Book metrics',
-    eyebrow: 'By Erin Jerri Pañgilinan & co-authors',
     columns: 'four',
     emphasis: 'bold',
     items: [
       { value: '42+', label: 'COUNTRIES DISTRIBUTED' },
-      { value: '#1', label: 'AMAZON GAME PROGRAMMING' },
-      { value: '10K+', label: 'FOLLOWERS ACROSS PLATFORMS' },
-      { value: '3', label: 'LANGUAGES: EN · ZH · KO' },
+      { value: '3', label: 'LANGUAGES PUBLISHED EN · ZH · KO' },
+      { value: '#1', label: 'AMAZON DEBUT GAME PROGRAMMING' },
+      { value: '2015', label: 'SHIPPING IN AI & XR SINCE' },
+    ],
+  }
+}
+
+function bookProofBlock(): BookCoverRowBlock {
+  return {
+    blockType: 'bookCoverRow',
+    blockName: 'Book proof',
+    heading: "I wrote the O'Reilly book on spatial computing — the first in over five years.",
+    intro: 'Author',
+    body: 'Creating Augmented and Virtual Realities (O’Reilly) debuted at #1 in Amazon’s Game Programming category, was translated into Chinese and Korean, reached 42+ countries, and became known across the XR community as the “VR Bible.” It’s taught as official VR developer curriculum.',
+    note: 'Three covers is the strongest visual proof on the site. Three languages side by side is the 42-countries claim — it does not need a stat to explain it. Worth more than any logo row.',
+    primaryButtonLabel: 'Buy the book →',
+    primaryButtonUrl: '/CreatingARVRBook',
+    secondaryButtonLabel: 'New books in development →',
+    secondaryButtonUrl: '/writing',
+    variant: 'authorProof',
+    covers: [
+      {
+        image: '/media/erinjerri-book-headshot-green-no-glare-768.webp',
+        caption: 'book-headshot-green-no-glare · 768×849',
+      },
+      {
+        image: '/media/CYR-CreatingARVR-X-cover-updated@1x.png',
+        caption: 'English',
+      },
+      {
+        image: '/media/creating-arvr-eng-chinese-korean-1001.webp',
+        caption: '中文',
+      },
+      {
+        image: '/media/CYR-CreatingARVR-X-cover-updated@1x.png',
+        caption: '한국어',
+      },
+    ],
+  } as unknown as BookCoverRowBlock
+}
+
+function bookCredsBlock(): TagPillsBlock {
+  return {
+    blockType: 'tagPills',
+    blockName: 'Book credentials',
+    tags: [
+      { label: "O'REILLY AUTHOR" },
+      { label: 'FOUNDER & FORMER CTO' },
+      { label: 'UC BERKELEY' },
+      { label: '10K+ FOLLOWERS' },
     ],
   }
 }
@@ -86,6 +133,16 @@ function layoutHasFourItemStatStrip(layout: Page['layout']): boolean {
   return blocks.some((b) => b?.blockType === 'statStrip' && statStripItemCount(b) >= 4)
 }
 
+function layoutHasBookProof(layout: Page['layout']): boolean {
+  const blocks = Array.isArray(layout) ? layout : []
+  return blocks.some((b) => b?.blockType === 'bookCoverRow' && Boolean(b.covers?.length))
+}
+
+function layoutHasBookCredentials(layout: Page['layout']): boolean {
+  const blocks = Array.isArray(layout) ? layout : []
+  return blocks.some((b) => b?.blockType === 'tagPills' && b.blockName === 'Book credentials')
+}
+
 /**
  * Ensures the bordered metrics row (42+, #1 Amazon Game Programming, 10K+, 3 languages) is present.
  * Prepends the canonical strip if no stat strip has four items; strips leading empty/partial stat strips first.
@@ -94,7 +151,10 @@ function ensureCreatingArVrBookMetrics(layout: Page['layout']): Page['layout'] {
   const blocks = Array.isArray(layout) ? [...layout] : []
 
   if (layoutHasFourItemStatStrip(blocks)) {
-    return blocks
+    const additions: LayoutBlock[] = []
+    if (!layoutHasBookProof(blocks)) additions.push(bookProofBlock())
+    if (!layoutHasBookCredentials(blocks)) additions.push(bookCredsBlock())
+    return additions.length ? [...additions, ...blocks] : blocks
   }
 
   const rest = [...blocks]
@@ -102,7 +162,12 @@ function ensureCreatingArVrBookMetrics(layout: Page['layout']): Page['layout'] {
     rest.shift()
   }
 
-  return [bookStatStripBlock(), ...rest]
+  const leadingBlocks: LayoutBlock[] = []
+  if (!layoutHasBookProof(rest)) leadingBlocks.push(bookProofBlock())
+  leadingBlocks.push(bookStatStripBlock())
+  if (!layoutHasBookCredentials(rest)) leadingBlocks.push(bookCredsBlock())
+
+  return [...leadingBlocks, ...rest]
 }
 
 function ensureSingleAboutBio(layout: Page['layout']): Page['layout'] {
@@ -154,6 +219,44 @@ function syncHomeBioHeadshot(layout: Page['layout']): Page['layout'] {
   )
 }
 
+function isHomeBookCoverRow(block: LayoutBlock | null | undefined): boolean {
+  if (block?.blockType !== 'bookCoverRow') return false
+
+  const serialized = JSON.stringify(block).toLowerCase()
+  return (
+    serialized.includes('creating augmented') ||
+    serialized.includes('creating ar vr') ||
+    serialized.includes('oreilly') ||
+    serialized.includes('o’reilly') ||
+    serialized.includes("o'reilly")
+  )
+}
+
+function isOrphanedHomeBookLinks(block: LayoutBlock | null | undefined): boolean {
+  if (block?.blockType !== 'content' && block?.blockType !== 'cta') return false
+
+  const serialized = JSON.stringify(block).toLowerCase()
+  return (
+    serialized.includes('bit.ly/creatingarvrb') &&
+    serialized.includes('book.douban.com/subject/35220393') &&
+    serialized.includes('product.kyobobook.co.kr/detail/s000003305062')
+  )
+}
+
+function syncHomeBookCovers(layout: Page['layout']): Page['layout'] {
+  const blocks = Array.isArray(layout) ? [...layout] : []
+  const coverIndex = blocks.findIndex(isHomeBookCoverRow)
+  const linksIndex = blocks.findIndex(isOrphanedHomeBookLinks)
+
+  if (coverIndex === -1 || linksIndex === -1) return blocks
+
+  const [coverBlock] = blocks.splice(coverIndex, 1)
+  const adjustedLinksIndex = coverIndex < linksIndex ? linksIndex - 1 : linksIndex
+
+  blocks.splice(adjustedLinksIndex, 1, coverBlock)
+  return blocks
+}
+
 export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
   page: T,
   slug: string,
@@ -164,6 +267,7 @@ export function enhancePageForRoute<T extends { layout: Page['layout'] }>(
 
   if (slug === 'home') {
     layout = syncHomeBioHeadshot(layout)
+    layout = syncHomeBookCovers(layout)
   }
 
   if (slug === 'about') {

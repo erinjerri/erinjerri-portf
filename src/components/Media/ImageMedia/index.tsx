@@ -87,6 +87,11 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     src = getMediaUrl(mediaUrl, cacheTag)
   }
 
+  if (srcFromProps && typeof srcFromProps === 'string' && !fill) {
+    width = width ?? 1200
+    height = height ?? 630
+  }
+
   const srcKey = typeof src === 'string' ? src : ''
   useEffect(() => setImageError(false), [srcKey])
 
@@ -99,13 +104,10 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   // Callers can still opt out for assets that genuinely need their original bytes.
   const disableOptimization = Boolean(unoptimizedFromProps)
 
-  const loading =
-    loadingFromProps ?? (priority ? 'eager' : 'lazy')
+  const loading = loadingFromProps ?? (priority ? 'eager' : 'lazy')
   // Quality: must match next.config images.qualities — bias lower on mobile for bytes.
   const ALLOWED_QUALITIES = [60, 65, 70, 75, 80, 85, 90, 100] as const
-  const rawQuality =
-    qualityFromProps ??
-    (fill && priority ? 50 : priority ? 65 : fill ? 65 : 75)
+  const rawQuality = qualityFromProps ?? (fill && priority ? 50 : priority ? 65 : fill ? 65 : 75)
   const quality = ALLOWED_QUALITIES.includes(rawQuality as (typeof ALLOWED_QUALITIES)[number])
     ? rawQuality
     : 70
@@ -146,7 +148,9 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         loading={loading}
         sizes={sizes}
         src={src}
-        style={fill && focalPoint && !containsObjectContain ? { objectPosition: focalPoint } : undefined}
+        style={
+          fill && focalPoint && !containsObjectContain ? { objectPosition: focalPoint } : undefined
+        }
         width={!fill ? width : undefined}
       />
     </picture>
