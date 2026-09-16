@@ -1,9 +1,16 @@
 import type { SignatureTalksBlock as SignatureTalksBlockProps } from '@/payload-types'
 import React from 'react'
 
-import { accentForIndex, BRAND_ACCENTS } from '@/utilities/brandAccents'
+import { BRAND_ACCENTS } from '@/utilities/brandAccents'
 
-
+/**
+ * The talk list an organizer scans before deciding whether to enquire.
+ *
+ * Was a two-column grid of bordered cards, which forced long titles to wrap
+ * hard and made the list read as eight objects rather than one menu. A single
+ * column with rules between rows lets each title run on one or two lines and
+ * keeps the scan vertical, which is how this gets read.
+ */
 export const SignatureTalksBlock: React.FC<SignatureTalksBlockProps> = (props) => {
   const { heading = 'Signature talks', intro, talks } = props
   if (!talks?.length) return null
@@ -14,29 +21,32 @@ export const SignatureTalksBlock: React.FC<SignatureTalksBlockProps> = (props) =
         {heading}
       </h2>
       {intro ? (
-        <p className="mt-3 max-w-3xl text-muted-foreground lg:text-lg">{intro}</p>
+        <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-muted-foreground lg:text-lg">
+          {intro}
+        </p>
       ) : null}
-      <div className="mt-8 grid gap-6 md:grid-cols-2">
+
+      <div className="mt-10 border-t border-border/60 md:mt-12">
         {talks.map((talk, i) => (
           <div
-            className="border border-border/60 bg-card/20 p-5 lg:p-6"
+            className="grid grid-cols-1 gap-x-6 gap-y-1 border-b border-border/60 py-6 sm:grid-cols-[3.25rem_1fr] md:py-7"
             key={i}
           >
-            <div className="flex gap-4">
-              <span
-                className="font-title text-xl font-semibold tabular-nums sm:text-2xl"
-                style={{ color: accentForIndex(i) }}
-              >
-                {talk.number}
-              </span>
-              <div className="min-w-0 flex-1">
-                <h3 className="font-title text-base font-semibold leading-snug text-foreground/95 lg:text-lg">
-                  {talk.title}
-                </h3>
-                <p className="mt-2 text-base leading-relaxed text-muted-foreground">
-                  {talk.subtitle}
+            <span
+              className="font-title text-xs font-medium tabular-nums tracking-[0.1em] sm:pt-1.5"
+              style={{ color: BRAND_ACCENTS.teal }}
+            >
+              {talk.number}
+            </span>
+            <div className="min-w-0">
+              <h3 className="font-title text-lg font-medium leading-snug tracking-tight text-foreground md:text-xl">
+                {talk.title?.trim()}
+              </h3>
+              {talk.subtitle?.trim() ? (
+                <p className="mt-1.5 max-w-[72ch] text-[0.95rem] leading-relaxed text-muted-foreground">
+                  {talk.subtitle.trim()}
                 </p>
-              </div>
+              ) : null}
             </div>
           </div>
         ))}
