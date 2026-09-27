@@ -23,6 +23,18 @@ export const BookCoverRow: Block = {
       },
     },
     {
+      name: 'leadImage',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: {
+        mediaType: { equals: 'image' },
+      },
+      admin: {
+        description:
+          'Optional portrait shown large beside the copy — e.g. you holding the book. When set, the covers drop to a supporting row on the right. Leave empty for the original centred layout.',
+      },
+    },
+    {
       name: 'aspectRatio',
       type: 'select',
       defaultValue: '2:3',
