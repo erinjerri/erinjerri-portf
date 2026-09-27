@@ -1584,6 +1584,10 @@ export interface BookCoverRowBlock {
    */
   intro?: string | null;
   /**
+   * Optional portrait shown large beside the copy — e.g. you holding the book. When set, the covers drop to a supporting row on the right. Leave empty for the original centred layout.
+   */
+  leadImage?: (string | null) | Media;
+  /**
    * Reserved for future use. Covers render at natural aspect ratio (no dark letterbox frame).
    */
   aspectRatio?: ('2:3' | '3:4') | null;
@@ -2759,6 +2763,7 @@ export interface BrandLogosBlockSelect<T extends boolean = true> {
 export interface BookCoverRowBlockSelect<T extends boolean = true> {
   heading?: T;
   intro?: T;
+  leadImage?: T;
   aspectRatio?: T;
   covers?:
     | T
