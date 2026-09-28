@@ -36,12 +36,13 @@ import { isDuplicateHomeBiographyText } from '@/blocks/BioBlock/isDuplicateHomeB
 import { SpeakerBioBlock } from '@/blocks/SpeakerBio/Component'
 import { SpeakerKitHeadshotsBlock } from '@/blocks/SpeakerKitHeadshots/Component'
 import { SpeakerKitBlock } from '@/blocks/SpeakerKit/Component'
+import { DividerBlockComponent } from '@/blocks/Divider/Component'
 import { HeroSplitBlock } from '@/blocks/HeroSplit/Component'
 import { TwoDoorsBlock } from '@/blocks/TwoDoors/Component'
-import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 
 const blockComponents = {
   archive: ArchiveBlock,
+  divider: DividerBlockComponent,
   affiliateProductsBlock: AffiliateProductsBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
@@ -137,15 +138,6 @@ function richTextHasContent(value: unknown): boolean {
 }
 
 /** Home layout: teal line between signature bands (same language as StatsBlock footer). */
-function showHomeTealDividerBetween(prevType: string | undefined, currentType: string | undefined) {
-  if (!prevType || !currentType) return false
-  return (
-    (prevType === 'bioBlock' && currentType === 'content') ||
-    (prevType === 'content' && currentType === 'brandLogos') ||
-    (prevType === 'brandLogos' && currentType === 'bookCoverRow')
-  )
-}
-
 function mediaBlockSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
   const mediaBlock = asMediaBlock(b)
   if (!mediaBlock) return false
@@ -503,18 +495,10 @@ export const RenderBlocks: React.FC<{
               )
               const blockProps = block as Record<string, unknown>
 
-              const showTealDivider =
-                isHomePage && showHomeTealDividerBetween(prevBlock?.blockType, blockType)
-
               return (
                 <div className={sectionClassName} key={index}>
                   {isHomePage ? (
                     <div className="mx-auto max-w-7xl px-6 md:px-10">
-                      {showTealDivider ? (
-                        <div className="mx-auto max-w-4xl pb-10 md:pb-12">
-                          <HomeTealSectionDivider />
-                        </div>
-                      ) : null}
                       <Block
                         {...blockProps}
                         pageSlug={pageSlug}

@@ -379,6 +379,7 @@ export interface Page {
     | SpeakerBioBlock
     | SpeakerKitHeadshotsBlock
     | SpeakerKitBlock
+    | DividerBlock
     | HeroSplitBlock
     | TwoDoorsBlock
   )[];
@@ -1944,6 +1945,28 @@ export interface SpeakerKitBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DividerBlock".
+ */
+export interface DividerBlock {
+  /**
+   * Line colour. Neutral is a plain hairline with no glow.
+   */
+  accent?: ('teal' | 'mint' | 'pink' | 'neutral') | null;
+  width?: ('content' | 'narrow' | 'full') | null;
+  /**
+   * Space above and below the rule.
+   */
+  spacing?: ('tight' | 'normal' | 'loose') | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'divider';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HeroSplitBlock".
  */
 export interface HeroSplitBlock {
@@ -2478,6 +2501,7 @@ export interface PagesSelect<T extends boolean = true> {
         speakerBio?: T | SpeakerBioBlockSelect<T>;
         speakerKitHeadshots?: T | SpeakerKitHeadshotsBlockSelect<T>;
         speakerKit?: T | SpeakerKitBlockSelect<T>;
+        divider?: T | DividerBlockSelect<T>;
         heroSplit?: T | HeroSplitBlockSelect<T>;
         twoDoors?: T | TwoDoorsBlockSelect<T>;
       };
@@ -2990,6 +3014,18 @@ export interface SpeakerKitBlockSelect<T extends boolean = true> {
         id?: T;
       };
   downloadable?: T;
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DividerBlock_select".
+ */
+export interface DividerBlockSelect<T extends boolean = true> {
+  accent?: T;
+  width?: T;
+  spacing?: T;
   background?: T;
   id?: T;
   blockName?: T;
