@@ -452,12 +452,21 @@ export const RenderBlocks: React.FC<{
               const attachAbove = inMasthead(prevBlock?.blockType, blockType)
               const attachBelow = inMasthead(blockType, nextBlock?.blockType)
 
+              /**
+               * The band is drawn as one rectangle: a hairline on the outside
+               * only, so the three sections share an outline instead of each
+               * carrying its own edge. Without this the masthead reads as a
+               * stack of panels even once the surfaces and spacing match.
+               */
               const mastheadClass =
                 attachAbove || attachBelow
                   ? cn(
                       attachAbove ? 'pt-6 md:pt-8' : 'pt-16 md:pt-24',
                       attachBelow ? 'pb-0 md:pb-0' : 'pb-16 md:pb-24',
                       '[&_.container]:my-0',
+                      'border-x border-[#78e7df]/15',
+                      !attachAbove && 'border-t',
+                      !attachBelow && 'border-b',
                     )
                   : null
 
