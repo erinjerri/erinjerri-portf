@@ -27,6 +27,7 @@ import { BioBlock } from '../../blocks/BioBlock/config'
 import { SpeakerBio } from '../../blocks/SpeakerBio/config'
 import { SpeakerKitHeadshots } from '../../blocks/SpeakerKitHeadshots/config'
 import { SpeakerKit } from '../../blocks/SpeakerKit/config'
+import { Divider } from '../../blocks/Divider/config'
 import { HeroSplit } from '../../blocks/HeroSplit/config'
 import { TwoDoors } from '../../blocks/TwoDoors/config'
 import { hero } from '@/heros/config'
@@ -125,6 +126,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 SpeakerBio,
                 SpeakerKitHeadshots,
                 SpeakerKit,
+                Divider,
                 HeroSplit,
                 TwoDoors,
               ].map(withBlockBackground),

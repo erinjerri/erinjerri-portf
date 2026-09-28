@@ -7,6 +7,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Button } from '@/components/ui/button'
+import { SOLID_BTN } from '@/utilities/buttonStyles'
 import { Media } from '@/components/Media'
 
 /** Tuned for sharp covers: ~320-384px CSS width x 2-3x DPR -> srcset pulls adequate pixels. */
@@ -95,7 +96,11 @@ export const BookCoverRowBlock: React.FC<BookCoverRowBlockProps> = (props) => {
             </div>
             {showButton ? (
               <div className="flex w-full shrink-0 justify-center sm:justify-start">
-                <Button asChild variant="outline" className="w-full rounded-none sm:w-auto">
+                <Button
+                  asChild
+                  variant="outline"
+                  className={cn('w-full rounded-none border sm:w-auto', SOLID_BTN)}
+                >
                   <Link href={btnUrl}>{btnLabel}</Link>
                 </Button>
               </div>

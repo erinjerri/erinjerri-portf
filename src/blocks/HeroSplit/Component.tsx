@@ -2,11 +2,9 @@ import type { HeroSplitBlock as HeroSplitBlockProps } from '@/payload-types'
 import React from 'react'
 
 import { Media } from '@/components/Media'
+import { OUTLINE_BTN, SOLID_BTN } from '@/utilities/buttonStyles'
 import { cn } from '@/utilities/ui'
 
-/** Buttons follow the logo: cobalt (primary) solid, light blue (accent) outline. */
-const SOLID_BTN = 'border-primary bg-primary text-primary-foreground hover:opacity-90'
-const OUTLINE_BTN = 'border-accent text-accent hover:bg-accent/10'
 
 const ASPECT_CLASS: Record<string, string> = {
   '3/4': 'aspect-[3/4]',
