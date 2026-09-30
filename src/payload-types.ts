@@ -359,6 +359,8 @@ export interface Page {
         blockName?: string | null;
         blockType: 'mediaBlock';
       }
+    | LargeVideoEmbed
+    | WatchTalks
     | ArchiveBlock
     | AffiliateProductsBlock
     | WatchBlock
@@ -881,6 +883,152 @@ export interface Document {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LargeVideoEmbed".
+ */
+export interface LargeVideoEmbed {
+  /**
+   * Choose whether to use a video URL or upload from the media library.
+   */
+  videoSource: 'url' | 'upload';
+  /**
+   * Paste a video URL (YouTube, Vimeo, or direct .mp4/.webm links supported).
+   */
+  videoUrl?: string | null;
+  /**
+   * Select a video from the media library.
+   */
+  video?: (string | null) | Media;
+  /**
+   * Optional poster image for the video (shows before playback).
+   */
+  thumbnail?: (string | null) | Media;
+  /**
+   * Optional text to overlay centered on the video.
+   */
+  overlayText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Background overlay opacity (0–100) to improve text readability. Darkens the video behind overlay text.
+   */
+  overlayOpacity?: number | null;
+  /**
+   * Choose the height of the video section.
+   */
+  heightVariant?: ('standard' | 'large' | 'extraLarge') | null;
+  /**
+   * Automatically play video when section comes into view.
+   */
+  autoplay?: boolean | null;
+  /**
+   * Loop video playback continuously.
+   */
+  loop?: boolean | null;
+  /**
+   * Mute video audio (required for autoplay in most browsers).
+   */
+  muted?: boolean | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'largeVideoEmbed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WatchTalks".
+ */
+export interface WatchTalks {
+  /**
+   * Section title (e.g., "Watch My Talks")
+   */
+  title?: string | null;
+  /**
+   * Optional description above the video player.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Add talks/videos that users can watch and toggle between.
+   */
+  talks?:
+    | {
+        /**
+         * Talk title or event name
+         */
+        title: string;
+        /**
+         * Event details, year, or conference name
+         */
+        subtitle?: string | null;
+        /**
+         * Choose the video source type.
+         */
+        videoSource: 'upload' | 'youtube' | 'url';
+        /**
+         * Select a video from the media library.
+         */
+        video?: (string | null) | Media;
+        /**
+         * Paste a YouTube or direct video URL.
+         */
+        videoUrl?: string | null;
+        /**
+         * Optional thumbnail for this talk.
+         */
+        thumbnail?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Choose the height of the video player.
+   */
+  videoHeight?: ('small' | 'medium' | 'large') | null;
+  /**
+   * Show thumbnail images in the talk selector.
+   */
+  showThumbnails?: boolean | null;
+  /**
+   * Allow embedding of YouTube videos inline.
+   */
+  allowYouTubeEmbed?: boolean | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'watchTalks';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2458,6 +2606,8 @@ export interface PagesSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         documentBlock?: T | DocumentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
+        largeVideoEmbed?: T | LargeVideoEmbedSelect<T>;
+        watchTalks?: T | WatchTalksSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         affiliateProductsBlock?: T | AffiliateProductsBlockSelect<T>;
         watchBlock?: T | WatchBlockSelect<T>;
@@ -2602,6 +2752,50 @@ export interface MediaBlockSelect<T extends boolean = true> {
   thumbnail?: T;
   audio?: T;
   media?: T;
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LargeVideoEmbed_select".
+ */
+export interface LargeVideoEmbedSelect<T extends boolean = true> {
+  videoSource?: T;
+  videoUrl?: T;
+  video?: T;
+  thumbnail?: T;
+  overlayText?: T;
+  overlayOpacity?: T;
+  heightVariant?: T;
+  autoplay?: T;
+  loop?: T;
+  muted?: T;
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WatchTalks_select".
+ */
+export interface WatchTalksSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  talks?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        videoSource?: T;
+        video?: T;
+        videoUrl?: T;
+        thumbnail?: T;
+        id?: T;
+      };
+  videoHeight?: T;
+  showThumbnails?: T;
+  allowYouTubeEmbed?: T;
   background?: T;
   id?: T;
   blockName?: T;
