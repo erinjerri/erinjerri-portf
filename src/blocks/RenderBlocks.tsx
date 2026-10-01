@@ -40,11 +40,13 @@ import { HeroSplitBlock } from '@/blocks/HeroSplit/Component'
 import { TwoDoorsBlock } from '@/blocks/TwoDoors/Component'
 import { LargeVideoEmbedBlock } from '@/blocks/LargeVideoEmbed/Component'
 import { WatchTalksBlock } from '@/blocks/WatchTalks/Component'
+import { AmazonStoreBlock } from '@/blocks/AmazonStore/Component'
 import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 
 const blockComponents = {
   archive: ArchiveBlock,
   affiliateProductsBlock: AffiliateProductsBlock,
+  amazonStore: AmazonStoreBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
   documentBlock: DocumentBlockComponent,

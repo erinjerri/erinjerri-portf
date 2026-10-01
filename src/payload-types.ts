@@ -361,6 +361,7 @@ export interface Page {
       }
     | LargeVideoEmbed
     | WatchTalks
+    | AmazonStore
     | ArchiveBlock
     | AffiliateProductsBlock
     | WatchBlock
@@ -1032,6 +1033,88 @@ export interface WatchTalks {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AmazonStore".
+ */
+export interface AmazonStore {
+  /**
+   * Section heading (e.g., "Shop My Favorites")
+   */
+  heading?: string | null;
+  /**
+   * Optional description under the heading
+   */
+  description?: string | null;
+  /**
+   * Show featured products in a prominent section at the top
+   */
+  showFeatured?: boolean | null;
+  /**
+   * Select 3-5 products to feature prominently. Mark products as "Featured" in the affiliate products collection.
+   */
+  featuredProducts?: (string | AffiliateProduct)[] | null;
+  /**
+   * How to display featured products
+   */
+  featuredLayout?: ('carousel' | 'grid') | null;
+  /**
+   * Show full product grid below featured section
+   */
+  showAllProducts?: boolean | null;
+  /**
+   * All products to display in the main grid
+   */
+  allProducts?: (string | AffiliateProduct)[] | null;
+  /**
+   * Product grid columns on desktop
+   */
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Show category/brand tags on product cards
+   */
+  showCategoryTags?: boolean | null;
+  /**
+   * Product card design style
+   */
+  cardStyle?: ('minimal' | 'full' | 'compact') | null;
+  /**
+   * Show Amazon affiliate disclosure
+   */
+  showDisclosure?: boolean | null;
+  disclosureText?: string | null;
+  /**
+   * Surface behind this section. Auto alternates with the sections around it. Light is for product screenshots and anything that needs to pop.
+   */
+  background?: ('auto' | 'default' | 'raised' | 'light') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'amazonStore';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliateProducts".
+ */
+export interface AffiliateProduct {
+  id: string;
+  title: string;
+  brand?: string | null;
+  description?: string | null;
+  /**
+   * Paste an Amazon product URL (or any URL). The site will append your Amazon Associates tag at render-time when applicable.
+   */
+  productURL: string;
+  /**
+   * Optional. Amazon ASIN, useful for your own bookkeeping.
+   */
+  asin?: string | null;
+  image?: (string | null) | Media;
+  ctaLabel?: string | null;
+  openInNewTab?: boolean | null;
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ArchiveBlock".
  */
 export interface ArchiveBlock {
@@ -1274,30 +1357,6 @@ export interface AffiliateProductsBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'affiliateProductsBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "affiliateProducts".
- */
-export interface AffiliateProduct {
-  id: string;
-  title: string;
-  brand?: string | null;
-  description?: string | null;
-  /**
-   * Paste an Amazon product URL (or any URL). The site will append your Amazon Associates tag at render-time when applicable.
-   */
-  productURL: string;
-  /**
-   * Optional. Amazon ASIN, useful for your own bookkeeping.
-   */
-  asin?: string | null;
-  image?: (string | null) | Media;
-  ctaLabel?: string | null;
-  openInNewTab?: boolean | null;
-  featured?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2608,6 +2667,7 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         largeVideoEmbed?: T | LargeVideoEmbedSelect<T>;
         watchTalks?: T | WatchTalksSelect<T>;
+        amazonStore?: T | AmazonStoreSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         affiliateProductsBlock?: T | AffiliateProductsBlockSelect<T>;
         watchBlock?: T | WatchBlockSelect<T>;
@@ -2796,6 +2856,27 @@ export interface WatchTalksSelect<T extends boolean = true> {
   videoHeight?: T;
   showThumbnails?: T;
   allowYouTubeEmbed?: T;
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AmazonStore_select".
+ */
+export interface AmazonStoreSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  showFeatured?: T;
+  featuredProducts?: T;
+  featuredLayout?: T;
+  showAllProducts?: T;
+  allProducts?: T;
+  columns?: T;
+  showCategoryTags?: T;
+  cardStyle?: T;
+  showDisclosure?: T;
+  disclosureText?: T;
   background?: T;
   id?: T;
   blockName?: T;
