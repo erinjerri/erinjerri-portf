@@ -33,5 +33,11 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+[functions]
+  # Use native file tracing to only include necessary files
+  node_bundler = "nft"
+  # Exclude large dev dependencies from functions
+  excluded_files = ["**/node_modules/@types/**", "**/node_modules/typescript/**"]
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"

@@ -33,6 +33,13 @@ Detailed guides for specific features:
 - **[R2_SETUP.md](docs/R2_SETUP.md)** — Cloudflare R2 media storage configuration
 - **[TECH_STACK.md](docs/TECH_STACK.md)** — Complete technology dependencies and versions
 
+## Setup Tutorials
+
+Helpful video guides for Payload CMS + Next.js setup:
+- [Cloudflare + Payload](https://www.youtube.com/watch?v=8jPNsLX7XGg) — Storage and deployment on Cloudflare
+- [Payload DB + File Storage](https://www.youtube.com/watch?v=-0CCUkoBDSY&t=692s) — Database and media configuration
+- [Payload + Supabase](https://www.youtube.com/watch?v=L5w2QYB9-UU&t=161s) — Alternative database setup
+
 ## Prerequisites
 
 - **Node.js:** ^18.20.2 or >=20.9.0
