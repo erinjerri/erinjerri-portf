@@ -29,6 +29,9 @@ import { SpeakerKitHeadshots } from '../../blocks/SpeakerKitHeadshots/config'
 import { SpeakerKit } from '../../blocks/SpeakerKit/config'
 import { HeroSplit } from '../../blocks/HeroSplit/config'
 import { TwoDoors } from '../../blocks/TwoDoors/config'
+import { LargeVideoEmbed } from '../../blocks/LargeVideoEmbed/config'
+import { WatchTalks } from '../../blocks/WatchTalks/config'
+import { AmazonStore } from '../../blocks/AmazonStore/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -105,6 +108,9 @@ export const Pages: CollectionConfig<'pages'> = {
                 Content,
                 DocumentBlock,
                 MediaBlock,
+                LargeVideoEmbed,
+                WatchTalks,
+                AmazonStore,
                 Archive,
                 AffiliateProductsBlock,
                 WatchBlock,

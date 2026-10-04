@@ -38,16 +38,22 @@ import { SpeakerKitHeadshotsBlock } from '@/blocks/SpeakerKitHeadshots/Component
 import { SpeakerKitBlock } from '@/blocks/SpeakerKit/Component'
 import { HeroSplitBlock } from '@/blocks/HeroSplit/Component'
 import { TwoDoorsBlock } from '@/blocks/TwoDoors/Component'
+import { LargeVideoEmbedBlock } from '@/blocks/LargeVideoEmbed/Component'
+import { WatchTalksBlock } from '@/blocks/WatchTalks/Component'
+import { AmazonStoreBlock } from '@/blocks/AmazonStore/Component'
 import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 
 const blockComponents = {
   archive: ArchiveBlock,
   affiliateProductsBlock: AffiliateProductsBlock,
+  amazonStore: AmazonStoreBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
   documentBlock: DocumentBlockComponent,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  largeVideoEmbed: LargeVideoEmbedBlock,
+  watchTalks: WatchTalksBlock,
   toplineHeader: ToplineHeaderBlock,
   videoBackgroundTransition: VideoBackgroundTransitionBlock,
   watchBlock: WatchBlockComponent,

@@ -13,15 +13,58 @@ Payload setup/tutorial links:
 - Payload DB + file storage video: https://www.youtube.com/watch?v=-0CCUkoBDSY&t=692s
 - Payload + Supabase video: https://www.youtube.com/watch?v=L5w2QYB9-UU&t=161s
 
+## Technology Stack
+
+This template uses:
+- **Next.js 15** + **React 19** for frontend
+- **Payload CMS 3.78** for headless content management
+- **MongoDB** for database
+- **Tailwind CSS** for styling
+- **TypeScript** for type safety
+- **Playwright** + **Vitest** for testing
+- **AWS S3** / **Cloudflare** for media storage
+
+See [docs/TECH_STACK.md](docs/TECH_STACK.md) for complete dependency list.
+
+## Prerequisites
+
+- **Node.js:** ^18.20.2 or >=20.9.0
+- **pnpm:** ^9 or ^10 (package manager)
+- **MongoDB:** Atlas cluster or local instance
+- **Git:** for version control
+
 ## Use as a template (GitHub + Netlify)
 
 1. In GitHub, click **Use this template** (or fork).
-2. In Netlify, create a new site from the repo and set environment variables:
-   - `PAYLOAD_SECRET`
-   - `DATABASE_URL` (MongoDB connection string)
-   - `NEXT_PUBLIC_SERVER_URL` (your site URL)
-   - Optional: `EMAIL_VERIFY_TRANSPORT=true` to enable SMTP verification on startup
-3. Deploy, then open `/admin`, login, and click **Seed your database** from the dashboard.
+2. **Clone locally:**
+   ```bash
+   git clone https://github.com/your-username/repo-name.git
+   cd repo-name
+   ```
+3. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+4. **Set up environment variables** (create `.env.local`):
+   ```bash
+   PAYLOAD_SECRET=your-secret-key-here
+   DATABASE_URL=mongodb+srv://user:password@cluster.mongodb.net/dbname
+   NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+   ```
+5. **Run locally:**
+   ```bash
+   pnpm dev
+   ```
+   - Admin: http://localhost:3000/admin
+   - Seed data: Click "Seed your database" from admin dashboard
+6. **Deploy to Netlify:**
+   - Connect your GitHub repo to Netlify
+   - Set environment variables in Netlify dashboard
+   - Deploy
+7. **Post-deployment setup:**
+   - Open `/admin` on your deployed site
+   - Login with seeded credentials
+   - Configure media storage (S3, Cloudflare, etc.)
 
 ### Seeding in production (recommended flow)
 
