@@ -1,6 +1,9 @@
 /** Production canonical origin for meta tags (explicit SEO; independent of dev env). */
 export const CANONICAL_SITE_ORIGIN = 'https://erinjerri.com'
 
+/** Site owner's name. */
+export const SITE_OWNER_NAME = 'Erin Jerri Pañgilinan'
+
 /** Site-wide default document title when a page has no CMS title. */
 export const SITE_DEFAULT_TITLE = 'Erin Jerri Pañgilinan — AI, Spatial Computing, TimeBite'
 

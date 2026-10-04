@@ -203,8 +203,6 @@ function contentHasRichText(b: LayoutBlock | null | undefined): boolean {
   return Array.isArray(c.columns) && c.columns.some((col) => richTextHasContent(col?.richText))
 }
 
-<<<<<<< HEAD
-=======
 function lexicalText(node: LexicalNode | null | undefined): string {
   if (!node || typeof node !== 'object') return ''
   const ownText = typeof node.text === 'string' ? node.text : ''
@@ -241,7 +239,6 @@ function isDuplicateHomeBiographyContent(
   return isDuplicateHomeBiographyText(text)
 }
 
->>>>>>> claude/large-video-embed-component-e18add
 function contentSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
   return contentHasLinks(b) && !contentHasRichText(b)
 }
@@ -374,13 +371,10 @@ export const RenderBlocks: React.FC<{
 
             if (typeof Block === 'function') {
               const prevBlock = blocksToRender[index - 1]
-<<<<<<< HEAD
-=======
               if (pageSlug === 'home' && isDuplicateHomeBiographyContent(prevBlock, block)) {
                 return null
               }
 
->>>>>>> claude/large-video-embed-component-e18add
               const isMedia =
                 blockType === 'mediaBlock' || blockType === 'videoBackgroundTransition'
               const prevIsCta = prevBlock?.blockType === 'cta'

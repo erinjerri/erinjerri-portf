@@ -31,13 +31,10 @@ import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloa
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
-<<<<<<< HEAD
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
-=======
 import { default as default_88c57d26ace6364590b44a2b22a682cc } from '../../../components/dashboard/AnalyticsNavLink'
 import { default as default_f88ccbe473db06b5dff1d35b29f7238f } from '../../../components/AdminLogoutNavLink'
 import { default as default_fdc531c161c680e8396d19136233b744 } from '../../../components/dashboard/AnalyticsView'
->>>>>>> claude/large-video-embed-component-e18add
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -74,12 +71,9 @@ export const importMap = {
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
-<<<<<<< HEAD
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
-=======
   "/components/dashboard/AnalyticsNavLink#default": default_88c57d26ace6364590b44a2b22a682cc,
   "/components/AdminLogoutNavLink#default": default_f88ccbe473db06b5dff1d35b29f7238f,
   "/components/dashboard/AnalyticsView#default": default_fdc531c161c680e8396d19136233b744,
->>>>>>> claude/large-video-embed-component-e18add
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
