@@ -26,6 +26,13 @@ This template uses:
 
 See [docs/TECH_STACK.md](docs/TECH_STACK.md) for complete dependency list.
 
+## Documentation
+
+Detailed guides for specific features:
+- **[BLOCKS.md](docs/BLOCKS.md)** — Available page layout blocks and components
+- **[R2_SETUP.md](docs/R2_SETUP.md)** — Cloudflare R2 media storage configuration
+- **[TECH_STACK.md](docs/TECH_STACK.md)** — Complete technology dependencies and versions
+
 ## Prerequisites
 
 - **Node.js:** ^18.20.2 or >=20.9.0
