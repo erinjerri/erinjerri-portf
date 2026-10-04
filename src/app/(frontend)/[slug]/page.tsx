@@ -14,7 +14,6 @@ import { withPayloadClientRetry } from '@/utilities/getPayloadClient'
 import { safeDecodeURIComponent } from '@/utilities/safeDecodeURIComponent'
 import { VideoEmbed } from '@/components/VideoEmbed'
 import { homeStatic } from '@/endpoints/seed/home-static'
-import { mergeHomeHireMeLayoutBlocks } from '@/endpoints/seed/home-hire-me-layout'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { cn } from '@/utilities/ui'
 
@@ -55,18 +54,19 @@ export default async function Page({ params: paramsPromise }: Args) {
   const decodedSlug = safeDecodeURIComponent(slug)
   const url = '/' + decodedSlug
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+  const allowStaticFallback = isBuild || process.env.NODE_ENV === 'development'
 
   let page: Awaited<ReturnType<typeof getPageBySlug>> | null = null
 
   try {
     page = await getPageBySlug(decodedSlug, draft)
   } catch (err) {
-    if (!isBuild) throw err
-    console.warn('[slug/page] Skipping prerender because DB is unavailable:', err)
+    if (!allowStaticFallback) throw err
+    console.warn('[slug/page] Using static fallback because DB is unavailable:', err)
     page = null
   }
 
-  const renderedPage = page ?? (isBuild && decodedSlug === 'home' ? homeStatic : null)
+  const renderedPage = page ?? (allowStaticFallback && decodedSlug === 'home' ? homeStatic : null)
 
   if (!renderedPage) {
     if (isBuild) {
@@ -88,28 +88,24 @@ export default async function Page({ params: paramsPromise }: Args) {
     includeGridMedia: decodedSlug === 'home',
   })
 
-  const hasHomeGridMedia =
-    decodedSlug === 'home' &&
-    Boolean(
-      resolvedHero?.backgroundMedia ||
-      resolvedHero?.heroImage1 ||
-      resolvedHero?.heroImage2 ||
-      resolvedHero?.heroImage3,
-    )
-
-  const hero = hasHomeGridMedia
-    ? {
-        ...resolvedHero,
-        type: 'highImpact' as const,
-      }
-    : resolvedHero
+  /**
+   * The hero type is whatever the CMS says it is.
+   *
+   * This used to be forced to `highImpact` on /home whenever any legacy hero
+   * image field still held a value. That made the setting unfixable: those
+   * image fields are only shown in the admin when the type is already
+   * `highImpact`, so an editor who set the type to "none" still got a hero and
+   * had no control anywhere in the UI to remove it. The home hero is the
+   * `heroSplit` block now; the old collage fields are dormant data.
+   */
+  const hero = resolvedHero
 
   const { layout, videoAsset, videoSource, videoUrl } = enhancedPage
   const selectedVideo =
     typeof videoAsset === 'object' && videoAsset?.mimeType?.includes('video') ? videoAsset : null
 
   const isHomePrismatic = decodedSlug === 'home'
-  const layoutToRender = isHomePrismatic ? mergeHomeHireMeLayoutBlocks(layout) : layout
+  const layoutToRender = layout
 
   return (
     <>
@@ -150,6 +146,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug = 'home' } = await paramsPromise
   const decodedSlug = safeDecodeURIComponent(slug)
   const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
+  const allowStaticFallback = isBuild || process.env.NODE_ENV === 'development'
 
   try {
     const page = await getPageBySlug(decodedSlug, draft)
@@ -159,8 +156,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
       canonicalPath: path,
     })
   } catch (err) {
-    if (!isBuild) throw err
-    console.warn('[slug/page] Skipping metadata because DB is unavailable:', err)
+    if (!allowStaticFallback) throw err
+    console.warn('[slug/page] Using fallback metadata because DB is unavailable:', err)
     const path = decodedSlug === 'home' ? '/' : `/${decodedSlug}`
     return generateMeta({
       doc: decodedSlug === 'home' ? homeStatic : null,

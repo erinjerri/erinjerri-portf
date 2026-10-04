@@ -201,7 +201,14 @@ export const Card: React.FC<{
         {titleToUse && (
           <div className="prose">
             <h3>
-              <Link className="not-prose" href={href} prefetch={false} ref={link.ref}>
+              {/* Title picks up the brand teal on card hover, so the whole card
+                  reads as one target instead of only the border reacting. */}
+              <Link
+                className="not-prose transition-colors duration-200 group-hover:text-[#78e7df]"
+                href={href}
+                prefetch={false}
+                ref={link.ref}
+              >
                 {titleToUse}
               </Link>
             </h3>

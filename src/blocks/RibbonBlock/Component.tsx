@@ -1,6 +1,8 @@
 import type { RibbonBlockBlock as RibbonBlockBlockProps } from '@/payload-types'
 import React from 'react'
 
+import { accentForIndex, BRAND_ACCENTS } from '@/utilities/brandAccents'
+
 const defaultColumns = [
   {
     number: '01',
@@ -29,12 +31,23 @@ function renderHeadline(headline: string, highlight: string | null | undefined) 
   return (
     <>
       {headline.slice(0, index)}
-      <span className="text-[#b7efc3] italic">{phrase}</span>
+      <span className="italic" style={{ color: BRAND_ACCENTS.mint }}>
+        {phrase}
+      </span>
       {headline.slice(index + phrase.length)}
     </>
   )
 }
 
+/**
+ * Positioning statement plus three practice areas.
+ *
+ * Previously a full-bleed band with a gradient wash, centred type, and the
+ * three columns boxed in with dividers 11rem below the headline. The boxes gave
+ * every card the same weight as the statement above it, and the gap read as two
+ * unrelated sections. Now: page ground, left-aligned, and each card carries a
+ * single accent rule on top — enough to separate them, not enough to compete.
+ */
 export const RibbonBlockBlock: React.FC<RibbonBlockBlockProps> = ({
   tagline,
   headline,
@@ -50,57 +63,49 @@ export const RibbonBlockBlock: React.FC<RibbonBlockBlockProps> = ({
   }
 
   const displayHeadline =
-    headline?.trim() || 'I focus on what happens after the model - when AI has to operate inside products, workflows, and environments.'
+    headline?.trim() ||
+    'I focus on what happens after the model - when AI has to operate inside products, workflows, and environments.'
 
   return (
-    <section className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden bg-transparent text-white">
-      {/* Local ambient wash (ribbon section only). */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(109,188,255,0.16),transparent_36%),radial-gradient(circle_at_82%_72%,rgba(150,126,255,0.12),transparent_30%),linear-gradient(180deg,rgba(8,10,16,0.72)_0%,rgba(7,9,14,0.94)_100%)]" />
+    <div className="container my-16 md:my-20 lg:my-24">
+      {tagline?.trim() ? (
+        <p
+          className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em]"
+          style={{ color: BRAND_ACCENTS.teal }}
+        >
+          {tagline.trim()}
+        </p>
+      ) : null}
 
-      <div className="relative z-10 mx-auto max-w-6xl px-7 pb-0 pt-14 md:px-12 md:pt-20">
-        {tagline?.trim() ? (
-          <p className="mx-auto max-w-4xl text-center text-[0.74rem] font-semibold uppercase tracking-[0.26em] text-white/55 md:text-[0.82rem]">
-            {tagline.trim()}
-          </p>
-        ) : null}
+      <h2 className="mt-5 max-w-[24ch] font-title text-[2rem] font-semibold leading-[1.14] tracking-tight text-balance md:text-[2.6rem]">
+        {renderHeadline(displayHeadline, highlight)}
+      </h2>
 
-        <div className="mx-auto mt-9 max-w-5xl text-center md:mt-12">
-          <h2 className="font-title text-[2.2rem] font-semibold leading-[1.18] text-white md:text-[4rem] md:leading-[1.08]">
-            {renderHeadline(displayHeadline, highlight)}
-          </h2>
+      {supportingText?.trim() ? (
+        <p className="mt-5 max-w-[62ch] text-base leading-relaxed text-muted-foreground md:text-lg">
+          {supportingText.trim()}
+        </p>
+      ) : null}
 
-          {supportingText?.trim() ? (
-            <p className="mx-auto mt-7 max-w-3xl text-[1.02rem] leading-8 text-white/44 md:text-[1.18rem] md:leading-9">
-              {supportingText.trim()}
+      <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 md:mt-12 md:grid-cols-3 lg:gap-x-8">
+        {columnItems.map((item, index) => (
+          <div
+            className="border-t-2 pt-5"
+            key={`${item.number}-${index}`}
+            style={{ borderTopColor: accentForIndex(index) }}
+          >
+            <p className="text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-muted-foreground/70">
+              {item.number?.trim() || defaultColumns[index]!.number}
             </p>
-          ) : null}
-        </div>
+            <h3 className="mt-2 font-title text-xl font-semibold leading-snug tracking-tight md:text-[1.35rem]">
+              {item.title?.trim() || defaultColumns[index]!.title}
+            </h3>
+            <p className="mt-2 text-[0.95rem] leading-relaxed text-muted-foreground">
+              {item.description?.trim() || defaultColumns[index]!.description}
+            </p>
+          </div>
+        ))}
       </div>
-
-      <div className="relative z-10 mx-auto mt-[11rem] max-w-6xl border-t border-white/10 px-7 pb-8 md:mt-[13rem] md:px-12 md:pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-3">
-          {columnItems.map((item, index) => (
-            <div
-              className={
-                index < 2
-                  ? 'border-b border-white/10 py-8 md:border-b-0 md:border-r md:border-white/10 md:px-10 md:py-10'
-                  : 'py-8 md:px-10 md:py-10'
-              }
-              key={`${item.number}-${index}`}
-            >
-              <p className="text-[0.86rem] font-semibold uppercase tracking-[0.16em] text-[#99e2ff]">
-                {item.number?.trim() || defaultColumns[index]!.number}
-              </p>
-              <h3 className="mt-5 font-title text-[2rem] font-semibold leading-tight text-white md:text-[2.22rem]">
-                {item.title?.trim() || defaultColumns[index]!.title}
-              </h3>
-              <p className="mt-4 max-w-[18rem] text-base leading-8 text-white/40 md:text-[1.05rem]">
-                {item.description?.trim() || defaultColumns[index]!.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+    </div>
   )
 }

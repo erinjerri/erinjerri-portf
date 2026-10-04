@@ -105,7 +105,7 @@ export const HeaderNav: React.FC<{
                 <span key={id} className="min-w-0 max-w-[min(100%,14rem)] sm:max-w-[min(100%,16rem)]">
                   <CMSLink
                     {...link}
-                    prefetch={false}
+                    prefetch={true}
                     appearance="inline"
                     className={cn(
                       'inline-flex min-h-[44px] w-full items-center justify-center rounded px-2 py-2 text-center leading-snug transition-colors sm:px-2.5 md:justify-center lg:px-3',
@@ -185,7 +185,7 @@ export const HeaderNav: React.FC<{
                     <div key={id} onClick={() => setMobileOpen(false)}>
                       <CMSLink
                         {...link}
-                        prefetch={false}
+                        prefetch={true}
                         appearance="inline"
                         className={cn(
                           'block rounded-xl px-5 py-3 text-lg uppercase tracking-[0.12em] font-semibold transition-colors',

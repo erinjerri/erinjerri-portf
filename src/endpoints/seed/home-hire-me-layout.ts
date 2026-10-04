@@ -104,6 +104,10 @@ export const homeHireMeLayoutBlocks: NonNullable<Page['layout']> = [
   }),
 ]
 
+/**
+ * Migration-only helper. Do not call this from the render path: homepage content must come from
+ * the CMS after ensure-home-signature-blocks has persisted the signature blocks.
+ */
 export function mergeHomeHireMeLayoutBlocks(
   layout: Page['layout'] | null | undefined,
 ): NonNullable<Page['layout']> {

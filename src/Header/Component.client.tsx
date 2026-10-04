@@ -38,9 +38,28 @@ type HeaderBodyProps = {
   scrolled: boolean
 }
 
+const DIMENSIONS_STRIP_SRC =
+  '/media/hero-top-banner-experience-dimensions-background-curves-cut-1400x155.webp'
+
+function getNavBackgroundSrc(data: Header | null): string {
+  const image = data?.navBackgroundImage
+  if (!image || typeof image !== 'object') return DIMENSIONS_STRIP_SRC
+
+  if (typeof image.url === 'string' && image.url.trim()) return image.url
+  if (typeof image.filename === 'string' && image.filename.trim()) {
+    return `/api/media/file/${encodeURIComponent(image.filename)}`
+  }
+
+  return DIMENSIONS_STRIP_SRC
+}
+
 /** Pure presentation from props — safe for SSR + first client paint (no scroll/path hooks). */
 function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
   const theme = useMemo(() => themeForPathname(pathname), [pathname])
+  // The header strip is part of the brand, including on the homepage. The
+  // default asset is a 1400x155 webp, not the full hero ribbon, so rendering it
+  // here does not duplicate the hero's image request.
+  const navBackgroundSrc = getNavBackgroundSrc(data)
   /** Keep the dimensions strip on every “dark header” route (same set as `themeForPathname`), not only `/`. */
   const stripPinned = theme === 'dark'
   const stripVisible = stripPinned ? true : !scrolled
@@ -49,11 +68,11 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
     <header
       suppressHydrationWarning
       className={cn(
-        'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300',
+        'sticky top-0 z-50 w-full overflow-hidden border-b transition-[background-color,border-color] duration-300',
         scrolled
           ? stripPinned
-            ? 'bg-transparent backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
-            : 'bg-[#0a0b10] backdrop-blur-xl border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
+            ? 'bg-[#0a0b10eb] border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
+            : 'bg-[#0a0b10] border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)] text-white'
           : 'bg-transparent border-white/10 text-white',
       )}
       data-theme={theme}
@@ -63,9 +82,12 @@ function HeaderBody({ data, pathname, scrolled }: HeaderBodyProps) {
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
-            backgroundImage: scrolled
-              ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
-              : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
+            backgroundImage: [
+              scrolled
+                ? 'linear-gradient(180deg, rgba(5, 10, 22, 0.92) 0%, rgba(7, 13, 26, 0.86) 100%)'
+                : 'linear-gradient(180deg, rgba(5, 10, 22, 0.86) 0%, rgba(9, 17, 32, 0.76) 100%)',
+              navBackgroundSrc ? `url(${navBackgroundSrc})` : 'none',
+            ].join(', '),
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
@@ -115,15 +137,22 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, initialPathnam
   )
 
   useLayoutEffect(() => {
+    /** rAF-coalesce scroll: the raw event fires far more often than we can paint. */
+    let frame = 0
     const handleScroll = () => {
-      setScrolled(window.scrollY > 80)
+      if (frame) return
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+        setScrolled(window.scrollY > 80)
+      })
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+    setScrolled(window.scrollY > 80)
     setShellReady(true)
 
     return () => {
+      if (frame) window.cancelAnimationFrame(frame)
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])

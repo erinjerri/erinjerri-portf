@@ -26,23 +26,34 @@ import { BrandLogosBlock } from '@/blocks/BrandLogos/Component'
 import { BookCoverRowBlock } from '@/blocks/BookCoverRow/Component'
 import { HeroCredentialStripBlock } from '@/blocks/HeroCredentialStrip/Component'
 import { SignatureTalksBlock } from '@/blocks/SignatureTalks/Component'
+import { ProductShowcaseBlock } from '@/blocks/ProductShowcase/Component'
+import { BLOCK_SURFACE_CLASS, resolveBlockSurfaces } from '@/utilities/blockSurfaces'
 import { BookAcclaimStripBlock } from '@/blocks/BookAcclaimStrip/Component'
 import { RibbonBlockBlock } from '@/blocks/RibbonBlock/Component'
 import { StatsBlockBlock } from '@/blocks/StatsBlock/Component'
 import { BioBlockBlock } from '@/blocks/BioBlock/Component'
+import { isDuplicateHomeBiographyText } from '@/blocks/BioBlock/isDuplicateHomeBiographyText'
 import { SpeakerBioBlock } from '@/blocks/SpeakerBio/Component'
 import { SpeakerKitHeadshotsBlock } from '@/blocks/SpeakerKitHeadshots/Component'
 import { SpeakerKitBlock } from '@/blocks/SpeakerKit/Component'
+import { HeroSplitBlock } from '@/blocks/HeroSplit/Component'
+import { TwoDoorsBlock } from '@/blocks/TwoDoors/Component'
+import { LargeVideoEmbedBlock } from '@/blocks/LargeVideoEmbed/Component'
+import { WatchTalksBlock } from '@/blocks/WatchTalks/Component'
+import { AmazonStoreBlock } from '@/blocks/AmazonStore/Component'
 import { HomeTealSectionDivider } from '@/components/HomeTealSectionDivider'
 
 const blockComponents = {
   archive: ArchiveBlock,
   affiliateProductsBlock: AffiliateProductsBlock,
+  amazonStore: AmazonStoreBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
   documentBlock: DocumentBlockComponent,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  largeVideoEmbed: LargeVideoEmbedBlock,
+  watchTalks: WatchTalksBlock,
   toplineHeader: ToplineHeaderBlock,
   videoBackgroundTransition: VideoBackgroundTransitionBlock,
   watchBlock: WatchBlockComponent,
@@ -52,6 +63,7 @@ const blockComponents = {
   bookCoverRow: BookCoverRowBlock,
   heroCredentialStrip: HeroCredentialStripBlock,
   signatureTalks: SignatureTalksBlock,
+  productShowcase: ProductShowcaseBlock,
   bookAcclaimStrip: BookAcclaimStripBlock,
   ribbonBlock: RibbonBlockBlock,
   statsBlock: StatsBlockBlock,
@@ -59,6 +71,8 @@ const blockComponents = {
   speakerBio: SpeakerBioBlock,
   speakerKitHeadshots: SpeakerKitHeadshotsBlock,
   speakerKit: SpeakerKitBlock,
+  heroSplit: HeroSplitBlock,
+  twoDoors: TwoDoorsBlock,
 }
 
 /** Layout block - element of page layout array */
@@ -189,6 +203,45 @@ function contentHasRichText(b: LayoutBlock | null | undefined): boolean {
   return Array.isArray(c.columns) && c.columns.some((col) => richTextHasContent(col?.richText))
 }
 
+<<<<<<< HEAD
+=======
+function lexicalText(node: LexicalNode | null | undefined): string {
+  if (!node || typeof node !== 'object') return ''
+  const ownText = typeof node.text === 'string' ? node.text : ''
+  const childText = Array.isArray(node.children) ? node.children.map(lexicalText).join(' ') : ''
+  return `${ownText} ${childText}`.trim()
+}
+
+function richTextPlainText(value: unknown): string {
+  if (!value || typeof value !== 'object') return ''
+  const root = (value as { root?: { children?: LexicalNode[] } }).root
+  if (!root || !Array.isArray(root.children)) return ''
+  return root.children.map(lexicalText).join(' ').replace(/\s+/g, ' ').trim()
+}
+
+function contentPlainText(b: LayoutBlock | null | undefined): string {
+  if (!b) return ''
+  const c = b as ContentBlockType
+  if (!Array.isArray(c.columns)) return ''
+  return c.columns
+    .map((col) => richTextPlainText(col?.richText))
+    .join(' ')
+    .trim()
+}
+
+function isDuplicateHomeBiographyContent(
+  previousBlock: LayoutBlock | null | undefined,
+  currentBlock: LayoutBlock | null | undefined,
+): boolean {
+  if (previousBlock?.blockType !== 'bioBlock' || currentBlock?.blockType !== 'content') {
+    return false
+  }
+
+  const text = contentPlainText(currentBlock).toLowerCase()
+  return isDuplicateHomeBiographyText(text)
+}
+
+>>>>>>> claude/large-video-embed-component-e18add
 function contentSupportsOverlayMerge(b: LayoutBlock | null | undefined): boolean {
   return contentHasLinks(b) && !contentHasRichText(b)
 }
@@ -230,6 +283,12 @@ export const RenderBlocks: React.FC<{
   }
 
   const blocksToRender = leadingTrimCount > 0 ? blocks.slice(leadingTrimCount) : blocks
+
+  // Resolved once for the whole layout so `auto` can alternate against the
+  // surface its neighbour actually landed on.
+  const blockSurfaces = resolveBlockSurfaces(
+    blocksToRender.map((block) => (block as { background?: string | null })?.background),
+  )
 
   if (hasBlocks) {
     return (
@@ -315,6 +374,13 @@ export const RenderBlocks: React.FC<{
 
             if (typeof Block === 'function') {
               const prevBlock = blocksToRender[index - 1]
+<<<<<<< HEAD
+=======
+              if (pageSlug === 'home' && isDuplicateHomeBiographyContent(prevBlock, block)) {
+                return null
+              }
+
+>>>>>>> claude/large-video-embed-component-e18add
               const isMedia =
                 blockType === 'mediaBlock' || blockType === 'videoBackgroundTransition'
               const prevIsCta = prevBlock?.blockType === 'cta'
@@ -382,16 +448,70 @@ export const RenderBlocks: React.FC<{
                 (blockType === 'cta' && ctaHasLinks(block)) ||
                 (blockType === 'content' && contentHasLinks(block))
 
+              /**
+               * heroSplit -> statStrip -> tagPills is one masthead, not three
+               * sections: the claim, the numbers behind it, and the titles.
+               *
+               * Left alone, each contributes its own section padding *and* its
+               * own container margin, stacking to roughly 320px of dead space
+               * between a number and the credential it belongs to. Worse, the
+               * surface resolver alternates from index 1, so the stat strip
+               * landed on a painted surface and the masthead visibly split in
+               * two. Adjacent members of the band share one flat surface and
+               * collapse the edge they face.
+               *
+               * The proof blocks are treated as a set rather than a fixed
+               * sequence, so an editor can put the pills above the numbers or
+               * below them and the band holds either way.
+               */
+              const MASTHEAD_PROOF = new Set(['statStrip', 'tagPills'])
+              const inMasthead = (a?: string, b?: string) =>
+                (a === 'heroSplit' && MASTHEAD_PROOF.has(String(b))) ||
+                (MASTHEAD_PROOF.has(String(a)) && MASTHEAD_PROOF.has(String(b)))
+
+              const attachAbove = inMasthead(prevBlock?.blockType, blockType)
+              const attachBelow = inMasthead(blockType, nextBlock?.blockType)
+
+              const mastheadClass =
+                attachAbove || attachBelow
+                  ? cn(
+                      attachAbove ? 'pt-6 md:pt-8' : 'pt-16 md:pt-24',
+                      attachBelow ? 'pb-0 md:pb-0' : 'pb-16 md:pb-24',
+                      '[&_.container]:my-0',
+                    )
+                  : null
+
+              /**
+               * An explicit background still wins; only `auto` blocks defer, so
+               * an editor who pins the strip to `light` still gets it.
+               */
+              const hasExplicitBackground = ['default', 'raised', 'light'].includes(
+                String((block as { background?: string | null })?.background ?? ''),
+              )
+              const surfaceClass =
+                attachAbove && !hasExplicitBackground
+                  ? ''
+                  : BLOCK_SURFACE_CLASS[blockSurfaces[index] ?? 'default']
+
+              // Interior pages space sections with vertical margin. A painted
+              // surface needs padding instead, or the colour band stops short of
+              // the content and leaves a gap between sections.
+              const spacingClass =
+                !isHomePage && surfaceClass ? 'py-20 md:py-24 lg:py-28' : marginClass
+
               const sectionClassName = cn(
-                isHomePage
-                  ? index === 0
-                    ? 'pt-8 pb-16 md:pt-10 md:pb-20'
-                    : isBookCoverRow && nextIsStandaloneLinksBlock
-                      ? 'pt-16 pb-4 md:pt-20 md:pb-6'
-                      : prevIsBookCoverRow && isStandaloneLinksBlock
-                        ? 'pt-4 pb-16 md:pt-6 md:pb-20'
-                        : 'py-16 md:py-24'
-                  : marginClass,
+                mastheadClass
+                  ? mastheadClass
+                  : isHomePage
+                    ? index === 0
+                      ? 'pt-8 pb-16 md:pt-10 md:pb-20'
+                      : isBookCoverRow && nextIsStandaloneLinksBlock
+                        ? 'pt-16 pb-4 md:pt-20 md:pb-6'
+                        : prevIsBookCoverRow && isStandaloneLinksBlock
+                          ? 'pt-4 pb-16 md:pt-6 md:pb-20'
+                          : 'py-16 md:py-24'
+                    : spacingClass,
+                surfaceClass,
               )
               const blockProps = block as Record<string, unknown>
 

@@ -118,8 +118,12 @@ const renderUploadNode = ({ node }: { node: { value?: unknown; fields?: { alt?: 
   return <picture>{pictureJSX}</picture>
 }
 
-function createJsxConverters(demoteExtraHeroH1: boolean): JSXConvertersFunction<NodeTypes> {
+function createJsxConverters(
+  demoteExtraHeroH1: boolean,
+  demoteExtraH1: boolean = false,
+): JSXConvertersFunction<NodeTypes> {
   let heroH1Count = 0
+  let articleH1Count = 0
 
   return ({ defaultConverters }) => ({
     ...defaultConverters,
@@ -136,21 +140,47 @@ function createJsxConverters(demoteExtraHeroH1: boolean): JSXConvertersFunction<
           Tag = 'div'
           demotedClass = 'hero-rich-demoted-h1'
         }
+      } else if (demoteExtraH1 && requested === 'h1') {
+        // Authors routinely pick H1 for every section heading in Lexical, which
+        // leaves a post with no heading hierarchy. It also breaks vertical
+        // rhythm: prose gives h1 `margin-top: 0` (it expects a page title), so
+        // every section heading collides with the paragraph above it. Later h1s
+        // become real h2s, which carry prose's `margin-top: 2em`.
+        articleH1Count += 1
+        if (articleH1Count > 1) Tag = 'h2'
       }
 
       const children = node.children ?? []
       const inline = children.filter((c) => !BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
       const blocks = children.filter((c) => BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''))
+
+      // Only wrap when a block node is nested inside the heading. Wrapping every
+      // heading in a <div> made each one a :first-child, which suppressed the
+      // prose sibling margins that separate a heading from the text above it.
+      if (blocks.length === 0) {
+        return <Tag className={demotedClass}>{nodesToJSX({ nodes: inline })}</Tag>
+      }
+
       return (
         <div>
           <Tag className={demotedClass}>{nodesToJSX({ nodes: inline })}</Tag>
-          {blocks.length > 0 ? nodesToJSX({ nodes: blocks }) : null}
+          {nodesToJSX({ nodes: blocks })}
         </div>
       )
     },
     paragraph: ({ node, nodesToJSX }) => {
-      // Use <div> instead of <p> to avoid hydration errors when block elements
-      // (headings, other divs) are nested inside paragraph nodes from Lexical
+      // Lexical sometimes nests block-level nodes (headings, embedded blocks)
+      // inside a paragraph node. <p> cannot legally contain those - the browser
+      // auto-closes the tag and hydration desyncs - so fall back to <div> only
+      // in that case. Emitting <p> for ordinary copy is what lets Tailwind's
+      // `prose` apply line-height and paragraph spacing; when every paragraph
+      // was a <div>, none of the prose body rules matched.
+      const childNodes = node.children ?? []
+      const hasBlockChild = childNodes.some((c) =>
+        BLOCK_NODE_TYPES.has((c as { type?: string }).type ?? ''),
+      )
+      const Tag: keyof React.JSX.IntrinsicElements = hasBlockChild ? 'div' : 'p'
+
       const children = nodesToJSX({ nodes: node.children })
       const style: React.CSSProperties = {}
       if (node.format === 'center') style.textAlign = 'center'
@@ -158,9 +188,7 @@ function createJsxConverters(demoteExtraHeroH1: boolean): JSXConvertersFunction<
       if (node.format === 'left') style.textAlign = 'left'
       if (node.indent) style.paddingInlineStart = `${node.indent * 2}rem`
 
-      return (
-        <div style={Object.keys(style).length > 0 ? style : undefined}>{children}</div>
-      )
+      return <Tag style={Object.keys(style).length > 0 ? style : undefined}>{children}</Tag>
     },
     blocks: {
       banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,
@@ -218,6 +246,8 @@ type Props = {
   enableProse?: boolean
   /** High-impact hero: keep first Lexical h1 as &lt;h1&gt;; demote later h1 to styled divs. */
   demoteExtraHeroH1?: boolean
+  /** Article body: keep first Lexical h1 as &lt;h1&gt;; demote later h1 to semantic &lt;h2&gt;. */
+  demoteExtraH1?: boolean
 } & React.HTMLAttributes<HTMLDivElement>
 
 export default function RichText(props: Props) {
@@ -226,10 +256,14 @@ export default function RichText(props: Props) {
     enableProse = true,
     enableGutter = true,
     demoteExtraHeroH1 = false,
+    demoteExtraH1 = false,
     ...rest
   } = props
 
-  const converters = demoteExtraHeroH1 ? createJsxConverters(true) : defaultJsxConverters
+  const converters =
+    demoteExtraHeroH1 || demoteExtraH1
+      ? createJsxConverters(demoteExtraHeroH1, demoteExtraH1)
+      : defaultJsxConverters
 
   return (
     <ConvertRichText
@@ -239,7 +273,10 @@ export default function RichText(props: Props) {
         {
           container: enableGutter,
           'max-w-none': !enableGutter,
-          'mx-auto prose prose-base text-base prose-a:text-primary md:text-[1.125rem]':
+          // Set size and leading together. `text-base` alone also sets
+          // line-height: 1.5rem, which overrode prose's 1.75 and left 18px body
+          // copy on a 24px line (1.33) - far too tight to read comfortably.
+          'mx-auto prose prose-base prose-a:text-primary text-[1rem] leading-[1.7] md:text-[1.125rem] md:leading-[1.75]':
             enableProse,
         },
         className,

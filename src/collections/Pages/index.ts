@@ -18,6 +18,8 @@ import { BrandLogos } from '../../blocks/BrandLogos/config'
 import { BookCoverRow } from '../../blocks/BookCoverRow/config'
 import { HeroCredentialStrip } from '../../blocks/HeroCredentialStrip/config'
 import { SignatureTalks } from '../../blocks/SignatureTalks/config'
+import { ProductShowcase } from '../../blocks/ProductShowcase/config'
+import { withBlockBackground } from '../../fields/blockBackground'
 import { BookAcclaimStrip } from '../../blocks/BookAcclaimStrip/config'
 import { RibbonBlock } from '../../blocks/RibbonBlock/config'
 import { StatsBlock } from '../../blocks/StatsBlock/config'
@@ -25,6 +27,11 @@ import { BioBlock } from '../../blocks/BioBlock/config'
 import { SpeakerBio } from '../../blocks/SpeakerBio/config'
 import { SpeakerKitHeadshots } from '../../blocks/SpeakerKitHeadshots/config'
 import { SpeakerKit } from '../../blocks/SpeakerKit/config'
+import { HeroSplit } from '../../blocks/HeroSplit/config'
+import { TwoDoors } from '../../blocks/TwoDoors/config'
+import { LargeVideoEmbed } from '../../blocks/LargeVideoEmbed/config'
+import { WatchTalks } from '../../blocks/WatchTalks/config'
+import { AmazonStore } from '../../blocks/AmazonStore/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -93,11 +100,17 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
+              // withBlockBackground appends the per-section surface control to
+              // every block, so the field is registered in one place instead of
+              // being copied into each block config.
               blocks: [
                 CallToAction,
                 Content,
                 DocumentBlock,
                 MediaBlock,
+                LargeVideoEmbed,
+                WatchTalks,
+                AmazonStore,
                 Archive,
                 AffiliateProductsBlock,
                 WatchBlock,
@@ -110,6 +123,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 BookCoverRow,
                 HeroCredentialStrip,
                 SignatureTalks,
+                ProductShowcase,
                 BookAcclaimStrip,
                 RibbonBlock,
                 StatsBlock,
@@ -117,7 +131,9 @@ export const Pages: CollectionConfig<'pages'> = {
                 SpeakerBio,
                 SpeakerKitHeadshots,
                 SpeakerKit,
-              ],
+                HeroSplit,
+                TwoDoors,
+              ].map(withBlockBackground),
               required: true,
               admin: {
                 initCollapsed: true,

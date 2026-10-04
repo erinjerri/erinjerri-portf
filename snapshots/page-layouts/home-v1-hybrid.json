@@ -1,0 +1,2139 @@
+{
+  "capturedAt": "2026-08-31T06:33:22.918Z",
+  "label": "v1",
+  "slug": "home",
+  "title": "Home",
+  "status": "published",
+  "hero": {
+    "type": "none",
+    "richText": {
+      "root": {
+        "children": [
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "I'm Erin Jerri. ",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "heading",
+            "version": 1,
+            "tag": "h1"
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Creating the systems that shape reality.",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "heading",
+            "version": 1,
+            "tag": "h1"
+          },
+          {
+            "children": [],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Author of the first O’Reilly book that became known as the \"VR Bible\" — written years before AI glasses turned spatial computing mainstream.",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Founder & former CTO. Engineer. Systems builder.",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          }
+        ],
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
+      }
+    },
+    "links": [
+      {
+        "link": {
+          "type": "reference",
+          "reference": {
+            "relationTo": "pages",
+            "value": "69a780027b4ee6011cb2e5c7"
+          },
+          "url": "",
+          "label": "Join TimeBite Beta",
+          "appearance": "default"
+        },
+        "id": "6990ffbafa8d7f03a20697c0"
+      },
+      {
+        "link": {
+          "type": "reference",
+          "reference": {
+            "relationTo": "pages",
+            "value": "69cb06b9ac222b97be3bc5bb"
+          },
+          "url": "Experience",
+          "label": "Work With Me",
+          "appearance": "light"
+        },
+        "id": "6990ffbafa8d7f03a20697c1"
+      }
+    ],
+    "backgroundMedia": "6a890c0b1143409092e27046",
+    "heroImageCount": "1",
+    "heroImage1": "6996467c282c3b03e172e6da",
+    "heroImage2": "69da9b46d5d73db9b5191218",
+    "heroImage3": "69964b80c04e4b18d0327feb",
+    "productMockup": "6a87df5ab7ad3a844aba4406",
+    "media": "69bc6da4ae50a29da6548166"
+  },
+  "blockOrder": [
+    "heroSplit",
+    "statsBlock",
+    "ribbonBlock",
+    "twoDoors",
+    "signatureTalks",
+    "bioBlock",
+    "content",
+    "content",
+    "content",
+    "content",
+    "content",
+    "bookCoverRow",
+    "brandLogos",
+    "productShowcase",
+    "archive",
+    "cta"
+  ],
+  "layout": [
+    {
+      "blockType": "heroSplit",
+      "headline": "I'm Erin Jerri.",
+      "lead": "AI is leaving the chat window. I've been building for the room it walks into since 2015.",
+      "support": "Lead author of Creating Augmented and Virtual Realities (O’Reilly) — the spatial computing reference written years before AI glasses made the category mainstream. Engineer, founder, former CTO.",
+      "image": "69da9b46d5d73db9b5191218",
+      "imageSide": "right",
+      "imageAspect": "3/4",
+      "ctas": [
+        {
+          "label": "Request a speaking engagement",
+          "url": "/speaking-info",
+          "style": "solid",
+          "id": "6a8f019320a0c32a1747f0a6"
+        },
+        {
+          "label": "Book an advisory session",
+          "url": "/advisory",
+          "style": "outline",
+          "id": "6a8f019320a0c32a1747f0a7"
+        }
+      ],
+      "background": "auto",
+      "id": "6a8f019320a0c32a1747f0a8",
+      "blockName": "Hero (split)"
+    },
+    {
+      "blockType": "statsBlock",
+      "eyebrow": "Selected highlights",
+      "items": [
+        {
+          "value": "#1",
+          "label": "Game Programming on Amazon",
+          "color": "mint",
+          "id": "69dc3ba31ad97d703aecc351"
+        },
+        {
+          "value": "42+",
+          "label": "Countries distributed",
+          "color": "teal",
+          "id": "69dc3ba31ad97d703aecc352"
+        },
+        {
+          "value": "10+",
+          "label": "Years in AI, XR, spatial computing",
+          "color": "pink",
+          "id": "69dc3ba31ad97d703aecc353"
+        }
+      ],
+      "background": "auto",
+      "id": "69dc3ba31ad97d703aecc354",
+      "blockName": "Selected highlights"
+    },
+    {
+      "blockType": "ribbonBlock",
+      "tagline": "O'Reilly Media Author | Founder & Former Startup CTO | Software Engineer",
+      "headline": "I focus on what happens after the model - when AI has to operate inside products, workflows, and environments.",
+      "highlight": "after the model",
+      "supportingText": "When AI has to operate inside products, workflows, and environments.",
+      "columns": [
+        {
+          "number": "01",
+          "title": "AI Agents",
+          "description": "Systems that operate beyond chat - executing inside real products and workflows.",
+          "id": "69dc3ba21ad97d703aecc34b"
+        },
+        {
+          "number": "02",
+          "title": "Spatial Computing",
+          "description": "AR, VR, and mixed reality interfaces built for visionOS, iOS, and what comes next.",
+          "id": "69dc3ba21ad97d703aecc34c"
+        },
+        {
+          "number": "03",
+          "title": "Product Systems",
+          "description": "Architecture and strategy for AI-native products designed to scale in the real world.",
+          "id": "69dc3ba21ad97d703aecc34d"
+        }
+      ],
+      "background": "auto",
+      "id": "69dada7a8b082e180fb9810d",
+      "blockName": "Intro"
+    },
+    {
+      "blockType": "twoDoors",
+      "eyebrow": "WORK WITH ME",
+      "heading": "",
+      "intro": "I take a small number of engagements each year, in the places where the decision is expensive and the answer isn’t obvious yet.",
+      "doors": [
+        {
+          "kicker": "Keynotes & executive briefings",
+          "title": "Speaking",
+          "body": "I create talks tailored to your events on all things AI and more.",
+          "image": "69965b9d3ca4ac5192db8982",
+          "ctaLabel": "Request a speaking engagement →",
+          "ctaUrl": "/speaking-info",
+          "ctaStyle": "solid",
+          "terms": "Paid engagements only\nIn-person & virtual\nPrep call before every booking",
+          "id": "6a8f019320a0c32a1747f0a9"
+        },
+        {
+          "kicker": "Founders, product & investor teams",
+          "title": "Advisory",
+          "body": "Focused paid sessions for teams already in motion, where the next product decision carries real consequences. I’ve been building in AI and spatial computing since 2015 as an engineer, founder, and CTO — the advice comes from having shipped it.",
+          "ctaLabel": "Book an advisory session →",
+          "ctaUrl": "/advisory",
+          "ctaStyle": "outline",
+          "terms": "Paid sessions | Selective\nNot a discovery call\nScoped before we meet",
+          "id": "6a8f019320a0c32a1747f0aa"
+        }
+      ],
+      "background": "auto",
+      "id": "6a8f019320a0c32a1747f0ab",
+      "blockName": "Work with me"
+    },
+    {
+      "blockType": "signatureTalks",
+      "heading": "Selected talks",
+      "intro": "Keynotes, executive briefings, and technical talks on AI, spatial computing, and interface shifts.",
+      "talks": [
+        {
+          "number": "01",
+          "title": "Federated Intelligence: Architectures for Collective AI",
+          "subtitle": "How AI can truly be for everyone.",
+          "id": "6a88be77c964d8d8566d71bd"
+        },
+        {
+          "number": "02",
+          "title": "How We See: A New Vision for XR and Artificial Intelligence (AI) ",
+          "subtitle": "Humanity ",
+          "id": "6a88be77c964d8d8566d71be"
+        },
+        {
+          "number": "03",
+          "title": "Embodied Time: Balancing the Real and the Digital in the Age of AI",
+          "subtitle": "Toward a Non-Toxic Quantified Self: Intentional Technology, Embodied Life",
+          "id": "6a88be77c964d8d8566d71bf"
+        },
+        {
+          "number": "04",
+          "title": "Rethinking Microinteractions: A Sustainable, Intentional Approach to Creation with AI",
+          "subtitle": "How to build efficiently and sustainably with AI — without having to token max to the extreme.",
+          "id": "6a88be77c964d8d8566d71c0"
+        }
+      ],
+      "background": "auto",
+      "id": "6a88be77c964d8d8566d71c1",
+      "blockName": "Selected talks"
+    },
+    {
+      "blockType": "bioBlock",
+      "eyebrow": "Hi, I'm Erin",
+      "headline": "Software engineer, startup founder, and writer - born and raised in Silicon Valley.",
+      "headshot": "69995de03575120f07f53b03",
+      "speakerHeadshots": [
+        {
+          "image": "6996467c282c3b03e172e6da",
+          "label": "Erin Black and White Headshot",
+          "id": "6a6c44852a108340c2a75000"
+        }
+      ],
+      "headshotsDownloadable": true,
+      "paragraphs": [
+        {
+          "text": "Erin Jerri Malonzo Pañgilinan is a proud Silicon Valley native born and raised software engineer, startup founder, former CTO, author, and speaker working at the intersection of artificial intelligence, spatial computing, and emerging interfaces.",
+          "highlights": [
+            {
+              "phrase": "Silicon Valley native",
+              "color": "white",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9778"
+            },
+            {
+              "phrase": "software engineer",
+              "color": "mint",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9779"
+            },
+            {
+              "phrase": "startup founder",
+              "color": "teal",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a977a"
+            },
+            {
+              "phrase": "former CTO",
+              "color": "pink",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a977b"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a977c"
+        },
+        {
+          "text": "She is the lead author of Creating Augmented and Virtual Realities: Theory and Practice for Next-Generation Spatial Computing (O’Reilly Media), which debuted as the #1 new release in Amazon’s Game Programming category, has been translated into Chinese and Korean, is distributed in more than 42 countries, and became widely known within the XR community as the “VR Bible.”",
+          "highlights": [
+            {
+              "phrase": "Creating Augmented and Virtual Realities",
+              "color": "teal",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a977d"
+            },
+            {
+              "phrase": "O’Reilly Media",
+              "color": "mint",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a977e"
+            },
+            {
+              "phrase": "#1 new release in Amazon’s Game Programming category",
+              "color": "pink",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a977f"
+            },
+            {
+              "phrase": "“VR Bible”",
+              "color": "white",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9780"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a9781"
+        },
+        {
+          "text": "Erin is the founder of TimeBite, an AI-native platform currently in beta on Apple platforms, that helps people better understand how they spend their time and align daily actions with long-term goals.",
+          "highlights": [
+            {
+              "phrase": "TimeBite",
+              "color": "teal",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9782"
+            },
+            {
+              "phrase": "AI-native platform",
+              "color": "mint",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9783"
+            },
+            {
+              "phrase": "beta on Apple platforms",
+              "color": "pink",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9784"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a9785"
+        },
+        {
+          "text": "Her technical background includes selection into leading engineering and entrepreneurial programs, including the Amazon Web Services CTO Fellowship (2022), Gitcoin Kernel (2021), Verizon Ventures’ Alley program (2019), Meta’s Oculus Launch Pad (2018), the University of San Francisco Data Institute’s Deep Learning Fellowship (2017–2018), the inaugural Data Ethics program through fast.ai (2020), and Venture Forward through the National Venture Capital Association (NVCA) and UC Berkeley Executive Law Program (2025).",
+          "highlights": [
+            {
+              "phrase": "Amazon Web Services CTO Fellowship",
+              "color": "mint",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9786"
+            },
+            {
+              "phrase": "Gitcoin Kernel",
+              "color": "teal",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9787"
+            },
+            {
+              "phrase": "Meta’s Oculus Launch Pad",
+              "color": "pink",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9788"
+            },
+            {
+              "phrase": "Venture Forward",
+              "color": "white",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9789"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a978a"
+        },
+        {
+          "text": "Erin earned her B.A. from the University of California, Berkeley.",
+          "highlights": [
+            {
+              "phrase": "University of California, Berkeley",
+              "color": "mint",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a978b"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a978c"
+        },
+        {
+          "text": "Early in her career, she spent more than seven years as a journalist and more than five years in civic engagement, including paid campaign staff for Obama for America (2012) and Ro Khanna for Congress (2014).",
+          "highlights": [
+            {
+              "phrase": "seven years as a journalist",
+              "color": "teal",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a978d"
+            },
+            {
+              "phrase": "civic engagement",
+              "color": "pink",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a978e"
+            },
+            {
+              "phrase": "Obama for America",
+              "color": "white",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a978f"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a9790"
+        },
+        {
+          "text": "She co-founded two nonprofit organizations — FASTER (Filipinx Americans in STEAM), which supports Filipinx American professionals in tech, and ARVR Academy, which focused on increasing representation of women in immersive technology — and has served on the board of the Silicon Valley Ice Skating Association (SVISA)",
+          "highlights": [
+            {
+              "phrase": "FASTER",
+              "color": "mint",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9791"
+            },
+            {
+              "phrase": "ARVR Academy",
+              "color": "teal",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9792"
+            },
+            {
+              "phrase": "Silicon Valley Ice Skating Association",
+              "color": "pink",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9793"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a9794"
+        },
+        {
+          "text": "Today, Erin builds AI-native products, advises founders on AI and spatial computing, and is developing new books, film, and television projects.",
+          "highlights": [
+            {
+              "phrase": "AI-native products",
+              "color": "mint",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9795"
+            },
+            {
+              "phrase": "advises founders",
+              "color": "teal",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9796"
+            },
+            {
+              "phrase": "books, film, and television projects",
+              "color": "pink",
+              "underline": false,
+              "id": "6a6c410c8f4255c7b08a9797"
+            }
+          ],
+          "id": "6a6c410c8f4255c7b08a9798"
+        }
+      ],
+      "pills": [
+        {
+          "label": "O'Reilly Media Author",
+          "color": "pink",
+          "id": "69dc3ba31ad97d703aecc35d"
+        },
+        {
+          "label": " UC Berkeley Alumnus",
+          "color": "teal",
+          "id": "69dc3ba31ad97d703aecc35e"
+        },
+        {
+          "label": "Software Engineer",
+          "color": "mint",
+          "id": "69dc4a5e4ee3d8cd3e726d2a"
+        },
+        {
+          "label": "Founder & Former Startup CTO",
+          "color": "white",
+          "id": "69dc4a754ee3d8cd3e726d2c"
+        }
+      ],
+      "background": "auto",
+      "id": "69dc3ba31ad97d703aecc361",
+      "blockName": "Bio"
+    },
+    {
+      "blockType": "content",
+      "contrastStyle": "default",
+      "columns": [
+        {
+          "size": "half",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Hi, I’m Erin! 👋🏼",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I’m a software engineer, startup founder, and writer, born and raised in Silicon Valley. ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I’ve been building in AI, spatial computing, and web3 since 2015.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I'm widely known as the lead author and co-editor of ",
+                      "type": "text",
+                      "version": 1
+                    },
+                    {
+                      "children": [
+                        {
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "O’Reilly Media's ",
+                          "type": "text",
+                          "version": 1
+                        },
+                        {
+                          "detail": 0,
+                          "format": 2,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Creating Augmented and Virtual Realities: Theory and Practice for Next-Generation Spatial Computing",
+                          "type": "text",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "link",
+                      "version": 3,
+                      "fields": {
+                        "url": "https://bit.ly/CreatingARVRBkPRT",
+                        "newTab": true,
+                        "linkType": "custom"
+                      },
+                      "id": "69d5e952f19f19a3b69d707f"
+                    },
+                    {
+                      "detail": 0,
+                      "format": 2,
+                      "mode": "normal",
+                      "style": "",
+                      "text": ", ",
+                      "type": "text",
+                      "version": 1
+                    },
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "which debuted #1 in Amazon’s Game Programming category and has been translated into Chinese and Korean, reaching readers around the world.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I'm a proud UC Berkeley alumnus and was previously a fast.ai deep learning fellow through the University of San Francisco’s Deep Learning program (2017-2018) and Data Ethics inaugural class (2020). ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Right now, I’m building TimeBite — along with new books, apps, and film projects. ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Sign up for my ",
+                      "type": "text",
+                      "version": 1
+                    },
+                    {
+                      "children": [
+                        {
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Substack",
+                          "type": "text",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "link",
+                      "version": 3,
+                      "fields": {
+                        "url": "https://erinjerri.substack.com",
+                        "linkType": "custom"
+                      },
+                      "id": "69d5ea400d935bcb4bf33de9"
+                    },
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": ", Creating Your Reality to join the beta. ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "link": {
+            "type": "reference",
+            "appearance": "default"
+          },
+          "id": "69995d116ed487f5b774383d"
+        },
+        {
+          "size": "half",
+          "contentType": "media",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "media": "69eef4106ae13f16174b4596",
+          "link": {
+            "type": "reference",
+            "appearance": "default"
+          },
+          "id": "69995d136ed487f5b774383f"
+        }
+      ],
+      "background": "auto",
+      "id": "69995d0d6ed487f5b774383b",
+      "blockName": "About"
+    },
+    {
+      "blockType": "content",
+      "contrastStyle": "default",
+      "columns": [
+        {
+          "size": "full",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "What I Build",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "My work spans AI, spatial computing, and product systems built for real-world use — across iOS, visionOS, and emerging interfaces.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I focus on what happens after the model — when AI has to operate inside products, workflows, and environments.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I build systems where AI moves beyond chat — and into execution.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– AI agents operating inside applications  ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– Spatial computing interfaces (AR/VR/MR)  ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– Product systems designed for real-world workflows  ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "My work focuses on turning intelligence into something that acts — not just responds.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "link": {
+            "type": "reference",
+            "appearance": "default"
+          },
+          "id": "69d9e92925625bcbc43592d0"
+        }
+      ],
+      "background": "auto",
+      "id": "69d9e8ed25625bcbc43592ce",
+      "blockName": "Experience"
+    },
+    {
+      "blockType": "content",
+      "contrastStyle": null,
+      "columns": [
+        {
+          "size": "oneThird",
+          "contentType": "media",
+          "columnStyle": "default",
+          "whiteStyleMode": "fullBleed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "media": null,
+          "enableLink": true,
+          "link": {
+            "type": "custom",
+            "url": " https://bit.ly/CreatingARVRB ",
+            "label": "Amazon",
+            "appearance": "default"
+          },
+          "id": "6990ffbafa8d7f03a20697c3"
+        },
+        {
+          "size": "oneThird",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "icon": null,
+          "enableLink": true,
+          "link": {
+            "type": "custom",
+            "url": "https://book.douban.com/subject/35220393/",
+            "label": "Buy in Chinese",
+            "appearance": "default"
+          },
+          "id": "699e96d4349275143d417c8c"
+        },
+        {
+          "size": "oneThird",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "icon": null,
+          "enableLink": true,
+          "link": {
+            "type": "custom",
+            "url": "https://product.kyobobook.co.kr/detail/S000003305062",
+            "label": "Buy in Korean ",
+            "appearance": "default"
+          },
+          "id": "69d5e2b6caf7e86309989bf5"
+        }
+      ],
+      "background": "auto",
+      "id": "6990ffbafa8d7f03a20697c8",
+      "blockName": "Buy Book Block"
+    },
+    {
+      "blockType": "content",
+      "contrastStyle": "default",
+      "columns": [
+        {
+          "size": "half",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 1,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "TimeBite is an AI + spatial computing system for how you actually spend your time.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "It’s what I’m building right now — a LifeOS for how people make decisions, spend time, and operate day to day.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Most tools are built around planning. But that’s not how things actually play out. TimeBite makes that visible — how your days actually unfold, not just what you intended",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Sign Up to my Substack to be the first to access the limited TimeBite beta on iOS and visionOS. ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "enableLink": true,
+          "link": {
+            "type": "reference",
+            "reference": {
+              "relationTo": "pages",
+              "value": "69a780027b4ee6011cb2e5c7"
+            },
+            "label": "Sign Up",
+            "appearance": "default"
+          },
+          "id": "69ab82ca7299947f86e10ac6"
+        },
+        {
+          "size": "half",
+          "contentType": "media",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "media": "6a87df5ab7ad3a844aba4406",
+          "link": {
+            "type": "reference",
+            "appearance": "default"
+          },
+          "id": "69ab82f77299947f86e10ac8"
+        }
+      ],
+      "background": "auto",
+      "id": "69ab82c57299947f86e10ac4",
+      "blockName": "TimeBite"
+    },
+    {
+      "blockType": "content",
+      "contrastStyle": null,
+      "columns": [
+        {
+          "size": "full",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Work With Me",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I work with a small number of teams each year on high-leverage problems in AI and spatial computing — where the product direction isn’t obvious and the decisions matter.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "The work focuses on defining the system — how AI operates inside real products, workflows, and environments, not just models or prototypes.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "This  includes:",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– Technical and business strategy for AI-native applications and spatial computing/XR hardware",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– Building interfaces and workflows for spatial computing/XR and next-generation platforms  ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Advisory is selective and reserved for teams where I can have outsized impact.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "icon": null,
+          "enableLink": true,
+          "link": {
+            "type": "reference",
+            "reference": {
+              "relationTo": "pages",
+              "value": "69cb06b9ac222b97be3bc5bb"
+            },
+            "label": "Schedule an Advisory Session",
+            "appearance": "default"
+          },
+          "id": "699e947a349275143d417c85"
+        },
+        {
+          "size": "half",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Speaking",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I speak on what happens before and especially ",
+                      "type": "text",
+                      "version": 1
+                    },
+                    {
+                      "detail": 0,
+                      "format": 1,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "after",
+                      "type": "text",
+                      "version": 1
+                    },
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": " the model — when AI has to operate inside real products, workflows, and environments.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Most talks on AI and spatial computing stay at a surface level — without the technical depth, historical context, or understanding of real system constraints.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Mine focus on what actually works — how these systems get built, shipped, and used in practice.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Talks are grounded in real systems, drawing from work across AI, spatial computing/XR, web3, and product infrastructure.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Formats include:",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– Keynotes  ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– Executive briefings  ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "– Product and engineering deep dives  ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Watch selected talks here",
+                          "type": "text",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "link",
+                      "version": 3,
+                      "fields": {
+                        "doc": {
+                          "label": "Watch",
+                          "relationTo": "pages",
+                          "value": "699515188a363acdc1c243bd"
+                        },
+                        "newTab": false,
+                        "linkType": "internal"
+                      },
+                      "id": "699e82983468c8d5261e647f"
+                    },
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": ". ",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "icon": null,
+          "enableLink": true,
+          "link": {
+            "type": "reference",
+            "reference": {
+              "relationTo": "pages",
+              "value": "69cb0324ac222b97be3bc223"
+            },
+            "url": "",
+            "label": "Request a Speaking Engagement",
+            "appearance": "default"
+          },
+          "id": "699e947a349275143d417c86"
+        },
+        {
+          "size": "half",
+          "contentType": "text",
+          "columnStyle": "default",
+          "whiteStyleMode": "boxed",
+          "richText": {
+            "root": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Advisory",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "heading",
+                  "version": 1,
+                  "tag": "h2"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Erin works with founders and product teams navigating critical decisions in AI and spatial computing.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Sessions are paid, focused, and designed for teams moving quickly where clarity matters.",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "children": [],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "paragraph",
+                  "version": 1,
+                  "textFormat": 0,
+                  "textStyle": ""
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "root",
+              "version": 1
+            }
+          },
+          "icon": null,
+          "enableLink": true,
+          "link": {
+            "type": "custom",
+            "url": "https://cal.com/erinjerri/erin-jerri-advisory-meeting-paid",
+            "label": "Book a Paid Advisory Session.",
+            "appearance": "default"
+          },
+          "id": "699e947a349275143d417c87"
+        }
+      ],
+      "background": "auto",
+      "id": "699e947a349275143d417c84",
+      "blockName": "Work With Me Block"
+    },
+    {
+      "blockType": "bookCoverRow",
+      "heading": "Buy Books in English, Chinese, and Korean",
+      "intro": "The book is distributed in 42+ countries and translated in multiple languages. ",
+      "aspectRatio": "2:3",
+      "covers": [
+        {
+          "image": "69d5e26bcff89157bb853176",
+          "caption": "English",
+          "id": "69d5e753d828df7f9e28eae6"
+        },
+        {
+          "image": "69d5dfd05292d15e1d719282",
+          "caption": "Chinese",
+          "id": "69d5e76dd828df7f9e28eae7"
+        },
+        {
+          "image": "69d5dfe95292d15e1d71929f",
+          "caption": "Korean",
+          "id": "69d5e76fd828df7f9e28eae8"
+        }
+      ],
+      "background": "auto",
+      "id": "69d5e153caf7e86309989bf4",
+      "blockName": "Book Covers"
+    },
+    {
+      "blockType": "brandLogos",
+      "heading": "Experience",
+      "intro": "Selected for programs and fellowships across AI, XR, and web3, including AWS CTO Fellowship, Alley (Verizon Ventures), and Gitcoin Kernel.",
+      "style": null,
+      "logos": [
+        {
+          "logo": "69d5f5580d4949d706d17f60",
+          "id": "69d5f42280cbc6010b61110b"
+        },
+        {
+          "logo": "69d9acf37347a5597319a49a",
+          "label": "Alley - Verizon Ventures",
+          "id": "69d5f42480cbc6010b61110d"
+        },
+        {
+          "logo": "69d5fee5013518ce6816a88c",
+          "label": "O'Reilly Media",
+          "id": "69d5f59f80cbc6010b61110f"
+        }
+      ],
+      "background": "auto",
+      "id": "69d5dd805e3c8e198d9067c0",
+      "blockName": "Brand Logos"
+    },
+    {
+      "blockType": "productShowcase",
+      "screenshot": "6a87df5ab7ad3a844aba4406",
+      "windowLabel": "TimeBite",
+      "eyebrow": "What I am building",
+      "headline": "TimeBite",
+      "blurb": "Most tools are built around what you planned. TimeBite is built around what actually happened — how your days really unfold, so you can align them with what you said mattered.",
+      "links": [],
+      "background": "auto",
+      "id": "6a8f019320a0c32a1747f0ac",
+      "blockName": "What I am building"
+    },
+    {
+      "blockType": "archive",
+      "introContent": {
+        "root": {
+          "children": [
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Recent posts",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "heading",
+              "version": 1,
+              "tag": "h3"
+            },
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Read more on my official ",
+                  "type": "text",
+                  "version": 1
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Substack",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "link",
+                  "version": 3,
+                  "fields": {
+                    "url": "https://erinjerri.substack.com",
+                    "linkType": "custom"
+                  },
+                  "id": "69995ca5fc30934c4bc7d984"
+                },
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " and ",
+                  "type": "text",
+                  "version": 1
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "LinkedIn Newsletter",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "link",
+                  "version": 3,
+                  "fields": {
+                    "url": "https://bit.ly/LNK-News-EJ",
+                    "linkType": "custom"
+                  },
+                  "id": "69995cc3fc30934c4bc7d985"
+                },
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ". ",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "paragraph",
+              "version": 1,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "type": "root",
+          "version": 1
+        }
+      },
+      "populateBy": "collection",
+      "relationTo": "posts",
+      "categories": [],
+      "limit": 10,
+      "background": "auto",
+      "id": "6990ffbafa8d7f03a20697ca",
+      "blockName": "Archive Block"
+    },
+    {
+      "blockType": "cta",
+      "contrastStyle": "whiteBgBlackText",
+      "richText": {
+        "root": {
+          "children": [
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Sign up for my beta here.",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "heading",
+              "version": 1,
+              "tag": "h3"
+            },
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Subscribe to my Substack to be on the pre-release beta list. The beta will be on iOS, VisionOS initially with future integrations with MacOS, and AI glasses. ",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "paragraph",
+              "version": 1,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "type": "root",
+          "version": 1
+        }
+      },
+      "links": [
+        {
+          "link": {
+            "type": "custom",
+            "newTab": true,
+            "url": "https://erinjerri.substack.com",
+            "label": "Get Early Access to TimeBite",
+            "appearance": "default"
+          },
+          "id": "6990ffbafa8d7f03a20697cb"
+        }
+      ],
+      "background": "auto",
+      "id": "6990ffbafa8d7f03a20697cc",
+      "blockName": "CTA"
+    }
+  ]
+}

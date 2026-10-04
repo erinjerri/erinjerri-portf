@@ -1,40 +1,43 @@
-/**
- * Performance: `display: "swap"` + `adjustFontFallback` limit FOIT/CLS; subset + weight list
- * trims bytes vs loading full variable axes.
- */
-import { Jost, League_Spartan } from 'next/font/google'
+import localFont from 'next/font/local'
 
 /**
- * Public site typography only: these classes are applied on `<html>` in
- * `src/app/(frontend)/layout.tsx` (`frontendFontVariables`). Payload admin
- * (`src/app/(payload)/layout.tsx`) does not use this file — changing fonts in
- * the CMS admin UI will not affect the marketing site.
+ * Fonts are bundled with the application rather than fetched from a third
+ * party at build or render time. This keeps the public site visually
+ * consistent in local development and in production.
+ */
+const leagueSpartan = localFont({
+  src: './fonts/LeagueSpartan-Variable.woff2',
+  variable: '--font-league-spartan',
+  weight: '200 900',
+  display: 'swap',
+})
+
+const satoshi = localFont({
+  src: [
+    { path: './fonts/Satoshi-Regular.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/Satoshi-Medium.woff2', weight: '500', style: 'normal' },
+    { path: './fonts/Satoshi-Bold.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-satoshi',
+  display: 'swap',
+})
+
+/**
+ * Body copy. Geometric sans with a single-storey 'a', which is the shape
+ * Satoshi and League Spartan both lack (they use a double-storey 'a').
  *
- * After changing families here, update the human-readable fallbacks in
- * `globals.css` (`--font-title` / `--font-copy`) so the stack matches.
+ * Ships Regular and Bold only - there is no medium weight, so a 500 request
+ * resolves to Regular by normal CSS font matching rather than being synthesised.
+ *
+ * Alfredo Marco Pradil, SIL Open Font License 1.1 (see GlacialIndifference-OFL.txt).
  */
-/** Body / UI copy — self-host via next/font for zero layout shift vs @fontsource. */
-export const fontJost = Jost({
-  subsets: ['latin'],
+const glacialIndifference = localFont({
+  src: [
+    { path: './fonts/GlacialIndifference-Regular.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/GlacialIndifference-Bold.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-glacial-indifference',
   display: 'swap',
-  preload: true,
-  adjustFontFallback: true,
-  variable: '--font-family-copy',
-  weight: ['400', '500', '600', '800'],
 })
 
-/** Headings / display — paired with Jost in CSS variables. */
-export const fontLeagueSpartan = League_Spartan({
-  subsets: ['latin'],
-  display: 'swap',
-  preload: true,
-  adjustFontFallback: true,
-  variable: '--font-family-title',
-  weight: ['400', '500', '600', '800'],
-})
-
-/**
- * Space-separated variable classes for `<html>`.
- * Do not pass this through `tailwind-merge` / `cn()` — hashed names can be mishandled.
- */
-export const frontendFontVariables = `${fontJost.variable} ${fontLeagueSpartan.variable}`
+export const frontendFontVariables = `${leagueSpartan.variable} ${satoshi.variable} ${glacialIndifference.variable}`

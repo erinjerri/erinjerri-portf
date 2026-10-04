@@ -14,8 +14,10 @@ import type { Footer, Media as MediaType } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
+import { creatingYourRealityConfig } from '@/config/creatingYourReality'
 import { SocialIconImage } from './SocialIconImage'
 import { SubscribeForm } from './SubscribeForm'
+import { SubstackIcon } from './SubstackIcon'
 
 const resolveFallbackSocialIcon = (
   label: string,
@@ -24,6 +26,7 @@ const resolveFallbackSocialIcon = (
   const value = `${label} ${url}`.toLowerCase()
 
   if (value.includes('mail') || value.includes('email') || url.includes('@')) return Mail
+  if (value.includes('substack') || value.includes('erinjerri.substack.com')) return SubstackIcon
   if (value.includes('github')) return Github
   if (value.includes('linkedin')) return Linkedin
   if (value.includes('youtube')) return Youtube
@@ -53,23 +56,85 @@ const hasLocalMediaFile = (mediaUrl: string): boolean => {
 const isBrokenR2Url = (u: string | null | undefined): boolean =>
   Boolean(u && typeof u === 'string' && u.includes('r2.cloudflarestorage.com'))
 
+const normalizeSocialHref = (url: string): string => {
+  const trimmed = url.trim()
+  if (!trimmed) return trimmed
+  if (trimmed.startsWith('mailto:')) return trimmed
+  if (trimmed.includes('@') && !trimmed.includes('://')) return `mailto:${trimmed}`
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) return trimmed
+  if (trimmed.startsWith('//')) return `https:${trimmed}`
+  return `https://${trimmed}`
+}
+
+const normalizeSubstackPublicationURL = (rawValue?: string | null): string => {
+  const fallback = 'https://erinjerri.substack.com'
+  const raw = rawValue?.trim()
+  if (!raw) return fallback
+
+  try {
+    const url = new URL(raw)
+    const host = url.hostname.toLowerCase()
+
+    if (!host.endsWith('.substack.com')) return fallback
+
+    const pathname = url.pathname.replace(/\/+$/, '').toLowerCase()
+    if (pathname === '' || pathname === '/subscribe' || pathname === '/embed') {
+      url.pathname = ''
+      url.search = ''
+      url.hash = ''
+      return url.toString().replace(/\/$/, '')
+    }
+
+    if (pathname.startsWith('/api/v1/free')) {
+      url.pathname = ''
+      url.search = ''
+      url.hash = ''
+      return url.toString().replace(/\/$/, '')
+    }
+
+    url.pathname = ''
+    url.search = ''
+    url.hash = ''
+    return url.toString().replace(/\/$/, '')
+  } catch {
+    return fallback
+  }
+}
+
 const getSubstackPublicationURL = (): string => {
-  const raw =
-    process.env.SUBSTACK_SUBSCRIBE_URL?.trim() || process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim()
-  if (!raw) return ''
+  return normalizeSubstackPublicationURL(process.env.SUBSTACK_SUBSCRIBE_URL)
+}
 
-  const trimmed = raw.replace(/\/$/, '')
-  const lower = trimmed.toLowerCase()
+const footerLinkClass = 'text-muted-foreground transition-colors hover:text-foreground'
 
-  if (lower.includes('/api/v1/free')) {
-    return trimmed.replace(/\/api\/v1\/free(\?.*)?$/i, '')
-  }
-
-  if (lower.endsWith('.substack.com') || lower.includes('.substack.com/')) {
-    return lower.endsWith('/subscribe') ? trimmed.replace(/\/subscribe$/i, '') : trimmed
-  }
-
-  return ''
+function BuyFooterGroup() {
+  return (
+    <div className="flex min-h-0 flex-col gap-3 [contain:layout] min-h-[2.5rem]">
+      <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">Buy</span>
+      <ul className="flex flex-col gap-2">
+        <li>
+          <a
+            className={footerLinkClass}
+            href={creatingYourRealityConfig.amazonURL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Amazon Store
+          </a>
+        </li>
+        <li>
+          <Link className={footerLinkClass} href={creatingYourRealityConfig.booksURL}>
+            Books
+          </Link>
+        </li>
+        <li>
+          <a className={footerLinkClass} href={creatingYourRealityConfig.cyraURL} target="_blank" rel="noopener noreferrer">
+            Creating Your Reality
+          </a>
+        </li>
+      </ul>
+    </div>
+  )
 }
 
 function SocialIcon({
@@ -98,44 +163,54 @@ function SocialIcon({
   // Use icon URL when: local /media/ file exists, or it's an external URL (R2, etc.)
   const resolvedIconUrl =
     iconUrl && (hasLocalMediaFile(iconUrl) || iconUrl.startsWith('http')) ? iconUrl : null
-  const href =
-    url.includes('@') && !url.includes('://') && !url.startsWith('mailto:') ? `mailto:${url}` : url
+  const href = normalizeSocialHref(url)
   const isExternal = href.startsWith('http://') || href.startsWith('https://')
   const FallbackIcon = fallbackIcon
+
+  const content = resolvedIconUrl ? (
+    <SocialIconImage
+      src={resolvedIconUrl}
+      alt=""
+      className="h-5 w-5 object-contain"
+      fallback={<FallbackIcon className="h-5 w-5" />}
+    />
+  ) : (
+    <FallbackIcon className="h-5 w-5" />
+  )
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-foreground hover:text-foreground/80 transition-colors"
+        aria-label={label}
+      >
+        {content}
+      </a>
+    )
+  }
 
   return (
     <Link
       href={href}
       prefetch={false}
-      target={isExternal ? '_blank' : undefined}
-      rel={isExternal ? 'noopener noreferrer' : undefined}
       className="text-foreground hover:text-foreground/80 transition-colors"
       aria-label={label}
     >
-      {resolvedIconUrl ? (
-        <SocialIconImage
-          src={resolvedIconUrl}
-          alt=""
-          className="h-5 w-5 object-contain"
-          fallback={<FallbackIcon className="h-5 w-5" />}
-        />
-      ) : (
-        <FallbackIcon className="h-5 w-5" />
-      )}
+      {content}
     </Link>
   )
 }
 
 interface FooterProps {
   data?: Footer | null
-  variant?: 'main' | 'poetry'
 }
 
-export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
+export async function Footer({ data }: FooterProps = {}) {
   const substackPublicationURL = getSubstackPublicationURL()
-  const substackEmbedSrc = substackPublicationURL
-    ? `${substackPublicationURL.replace(/\/$/, '')}/embed`
-    : ''
+  const substackEmbedSrc = `${substackPublicationURL.replace(/\/$/, '')}/embed`
   let footerData: Footer | null = data ?? null
 
   if (data === undefined) {
@@ -151,9 +226,9 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
 
   const subscribeSection = footerData?.subscribeSection
   const linkGroups = footerData?.linkGroups || []
+  const hasShopGroup = linkGroups.some((group) => group?.header?.trim().toLowerCase() === 'shop')
   const socialLinks = footerData?.socialLinks || []
   const copyright = footerData?.copyright
-  const isPoetryFooter = variant === 'poetry'
 
   return (
     <footer className="mt-auto border-t border-border bg-transparent text-foreground [contain:paint]">
@@ -166,13 +241,13 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
               <Logo className="w-[8.75rem]" />
             </Link>
 
-            {!isPoetryFooter && substackEmbedSrc && subscribeSection?.showSubscribe !== false && (
+            {subscribeSection?.showSubscribe !== false && (
               <div className="min-h-[7rem] w-full max-w-full">
                 <SubscribeForm action={substackEmbedSrc} />
               </div>
             )}
 
-            {!isPoetryFooter && subscribeSection?.slogan && (
+            {subscribeSection?.slogan && (
               <p className="text-sm text-muted-foreground">{subscribeSection.slogan}</p>
             )}
 
@@ -193,24 +268,7 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
           </div>
 
           {/* Right column: Link groups */}
-          {isPoetryFooter ? (
-            <nav className="flex flex-col gap-3 text-sm">
-              <Link
-                className="text-muted-foreground transition-colors hover:text-foreground"
-                href="/"
-                prefetch={false}
-              >
-                Back to portfolio
-              </Link>
-              <Link
-                className="text-muted-foreground transition-colors hover:text-foreground"
-                href="/poetry"
-                prefetch={false}
-              >
-                All poetry
-              </Link>
-            </nav>
-          ) : linkGroups.length > 0 ? (
+          {linkGroups.length > 0 ? (
             <nav className="flex flex-wrap gap-x-12 gap-y-8">
               {linkGroups.map((group, groupIndex) => (
                 <div
@@ -219,50 +277,67 @@ export async function Footer({ data, variant = 'main' }: FooterProps = {}) {
                 >
                   {group.header && (
                     <span className="block min-h-[1.5rem] font-semibold leading-6 text-foreground">
-                      {group.header}
+                      {group.header.trim().toLowerCase() === 'shop' ? 'Buy' : group.header}
                     </span>
                   )}
                   <ul className="flex flex-col gap-2">
                     {group.links?.map((item, linkIndex) => {
                       const link = item?.link
                       if (!link?.label) return null
+                      const isCreatingYourReality = link.label.toLowerCase().includes('creating your reality')
                       return (
                         <li key={item.id || linkIndex}>
-                          <CMSLink
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                            type={link.type}
-                            url={link.url}
-                            newTab={link.newTab}
-                            label={link.label}
-                            reference={link.reference}
-                            archive={link.archive}
-                          />
+                          {isCreatingYourReality ? (
+                            <a className={footerLinkClass} href={creatingYourRealityConfig.cyraURL} target="_blank" rel="noopener noreferrer">
+                              Creating Your Reality
+                            </a>
+                          ) : (
+                            <CMSLink
+                              className="text-muted-foreground hover:text-foreground transition-colors"
+                              type={link.type}
+                              url={link.url}
+                              newTab={link.newTab}
+                              label={link.label}
+                              reference={link.reference}
+                              archive={link.archive}
+                            />
+                          )}
                         </li>
                       )
                     })}
+                    {group.header?.trim().toLowerCase() === 'shop' &&
+                    !group.links?.some((item) => item?.link?.label?.toLowerCase().includes('creating your reality')) ? (
+                      <li>
+                        <a className={footerLinkClass} href={creatingYourRealityConfig.cyraURL} target="_blank" rel="noopener noreferrer">
+                          Creating Your Reality
+                        </a>
+                      </li>
+                    ) : null}
+                    {group.header?.trim().toLowerCase() === 'shop' &&
+                    !group.links?.some((item) => item?.link?.label?.toLowerCase() === 'books') ? (
+                      <li>
+                        <Link className={footerLinkClass} href={creatingYourRealityConfig.booksURL}>
+                          Books
+                        </Link>
+                      </li>
+                    ) : null}
                   </ul>
                 </div>
               ))}
+              {!hasShopGroup && (
+                <BuyFooterGroup />
+              )}
             </nav>
-          ) : null}
+          ) : (
+            <nav className="flex flex-wrap gap-x-12 gap-y-8">
+              <BuyFooterGroup />
+            </nav>
+          )}
         </div>
 
         {/* Bottom: Copyright */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row sm:justify-between gap-4 text-sm text-muted-foreground">
           {copyright && <span>{copyright}</span>}
-          {isPoetryFooter ? (
-            <Link className="transition-colors hover:text-foreground" href="/" prefetch={false}>
-              Back to portfolio
-            </Link>
-          ) : (
-            <Link
-              className="transition-colors hover:text-foreground"
-              href="/poetry"
-              prefetch={false}
-            >
-              Poetry
-            </Link>
-          )}
         </div>
       </div>
     </footer>

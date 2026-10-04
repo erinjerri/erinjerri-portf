@@ -74,8 +74,19 @@ const allowedOrigins = Array.from(
 
 export default buildConfig({
   admin: {
+    suppressHydrationWarning: true,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      afterNavLinks: ['/components/dashboard/AnalyticsNavLink', '/components/AdminLogoutNavLink'],
+      views: {
+        analyticsDashboard: {
+          Component: '/components/dashboard/AnalyticsView',
+          path: '/analytics-dashboard',
+          exact: true,
+        },
+      },
     },
     user: Users.slug,
     livePreview: {

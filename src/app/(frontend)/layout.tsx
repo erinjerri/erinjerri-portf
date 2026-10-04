@@ -22,7 +22,7 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Footer as FooterType, Header as HeaderType } from '@/payload-types'
 
 import './globals.css'
-import { fontJost, frontendFontVariables } from './fonts'
+import { frontendFontVariables } from './fonts'
 import { getServerSideURL } from '@/utilities/getURL'
 import { getRequestHostname, isPoetryHostname } from '@/utilities/poetry'
 
@@ -68,24 +68,27 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const enableThirdPartyScripts = process.env.NODE_ENV === 'production'
 
   return (
-    <html className={frontendFontVariables} lang="en" suppressHydrationWarning data-theme="dark">
+    <html
+      className={frontendFontVariables}
+      lang="en"
+      suppressHydrationWarning
+      data-theme="dark"
+    >
       <head>
+        <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {/* Preconnect to analytics origins to reduce connection latency when scripts load */}
         {enableThirdPartyScripts && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
           <link rel="preconnect" href="https://www.googletagmanager.com" />
         ) : null}
       </head>
-      <body className={fontJost.className}>
+      <body>
         <Providers>
           <AdminBar />
 
-          {!isPoetrySite ? <Header data={headerFailed ? undefined : headerData} /> : null}
+          {!isPoetrySite ? <Header data={headerFailed ? null : headerData} /> : null}
           {children}
-          <Footer
-            data={footerFailed ? undefined : footerData}
-            variant={isPoetrySite ? 'poetry' : 'main'}
-          />
+          <Footer data={footerFailed ? null : footerData} />
         </Providers>
         {enableThirdPartyScripts ? (
           <Analytics
@@ -112,8 +115,9 @@ export const metadata: Metadata = {
   title: SITE_DEFAULT_TITLE,
   twitter: {
     card: 'summary_large_image',
-    ...(process.env.NEXT_PUBLIC_TWITTER_HANDLE
-      ? { creator: process.env.NEXT_PUBLIC_TWITTER_HANDLE }
-      : {}),
+    creator: '@erinjerri',
+  },
+  other: {
+    'facebook-domain-verification': 'e7i7sx90g844e0evm09nqf9repc7pr',
   },
 }

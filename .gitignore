@@ -220,14 +220,10 @@ node_modules 2/
 out/
 dist/
 *.tsbuildinfo
-playwright-report/
-test-results/
-*.report.html
 
 # OS noise
 .DS_Store
 .gstack/
 
-# Local Payload uploads (keep the directory, not its contents)
-public/media/*
-!public/media/.gitkeep
+# Payload speaker headshot stored in R2; keep local derivatives out of deploy bundles
+public/media/erinjerri-headshot-2*.png

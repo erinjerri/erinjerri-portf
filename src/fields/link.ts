@@ -126,7 +126,8 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       type: 'text',
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'custom',
-        description: 'URL (e.g. https://example.com) or email (e.g. you@domain.com — mailto: is added automatically)',
+        description:
+          'Enter the full external URL, e.g. https://example.com, or email (e.g. you@domain.com — mailto: is added automatically)',
       },
       label: 'Custom URL',
       required: true,

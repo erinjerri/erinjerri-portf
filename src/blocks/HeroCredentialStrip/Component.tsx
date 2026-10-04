@@ -9,11 +9,11 @@ const separatorMap = {
 
 export const HeroCredentialStripBlock: React.FC<HeroCredentialStripBlockProps> = ({
   phrases,
-  separator = 'bullet',
+  separator = 'pipe',
 }) => {
   if (!phrases?.length) return null
 
-  const marker = separatorMap[separator ?? 'bullet'] ?? '•'
+  const marker = separatorMap[separator ?? 'pipe'] ?? '|'
 
   return (
     <div className="container mt-4 mb-12 md:mt-5 md:mb-16">
