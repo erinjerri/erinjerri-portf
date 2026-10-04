@@ -40,21 +40,7 @@ export const LargeVideoEmbed: Block = {
       type: 'text',
       admin: {
         condition: (_, siblingData) => siblingData?.videoSource === 'url',
-        description: 'Paste a video URL (YouTube, Vimeo, or direct .mp4/.webm links supported).',
-      },
-      validate: (value: unknown, { siblingData }: { siblingData?: LargeVideoEmbedSiblingData }) => {
-        if (siblingData?.videoSource !== 'url') return true
-        if (!value || typeof value !== 'string') return 'Please enter a video URL.'
-
-        try {
-          const parsedURL = new URL(value)
-          if (!parsedURL.protocol.startsWith('http')) {
-            return 'Please enter a valid http(s) URL.'
-          }
-          return true
-        } catch {
-          return 'Please enter a valid URL.'
-        }
+        description: 'Paste a video URL (YouTube, Vimeo, or direct .mp4/.webm links supported). Optional - leave blank if not using URL source.',
       },
     },
     {
